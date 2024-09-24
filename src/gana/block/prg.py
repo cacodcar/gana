@@ -1,7 +1,12 @@
 """Mathematical Program"""
 
+from IPython.display import Math, display
 from dataclasses import dataclass, field
+from typing import Self
 from warnings import warn
+
+from sympy import latex
+
 from ..element.v import V
 from ..element.s import S
 from ..element.x import X
@@ -33,7 +38,19 @@ class Prg:
 
     def __setattr__(self, name: str, value: V) -> None:
 
-        if name != 'name' and value:
+        if not name in [
+            'name',
+            'overwrite',
+            'sets',
+            'variables',
+            'continuous',
+            'binary',
+            'parameters',
+            'functions',
+            'constraints',
+            'objectives',
+            'names',
+        ]:
             if name in self.names:
                 if self.overwrite:
                     warn(f'Overwriting {name}')
@@ -44,7 +61,7 @@ class Prg:
 
             self.names.append(name)
 
-        if isinstance(value, V | X | S | P):
+        if isinstance(value, V | X | S | P | F | C | O):
             value.name = name
 
         if isinstance(value, S):
@@ -78,3 +95,31 @@ class Prg:
 
     def __hash__(self):
         return hash(self.name)
+
+    def club(self, prg: Self):
+        """Club two Programs"""
+        if isinstance(prg, Prg):
+
+            self.sets = list(set(self.sets) | set(prg.sets))
+            self.variables = list(set(self.variables) | set(prg.variables))
+            self.continuous = list(set(self.continuous) | set(prg.continuous))
+            self.binary = list(set(self.binary) | set(prg.binary))
+            self.parameters = list(set(self.parameters) | set(prg.parameters))
+            self.functions = list(set(self.functions) | set(prg.functions))
+            self.constraints = list(set(self.constraints) | set(prg.constraints))
+            self.objectives = list(set(self.objectives) | set(prg.objectives))
+
+    def eqns(self):
+        """Return all equations"""
+        for c in self.constraints:
+            yield c.sym
+
+    def pprint(self):
+        """Pretty prints the component"""
+        for e in self.eqns():
+            display(Math(latex(e, mul_symbol='dot')))
+
+    def latex(self):
+        """Returns the latex"""
+        for e in self.eqns():
+            display(latex(e, mul_symbol='dot'))

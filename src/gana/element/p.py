@@ -46,13 +46,17 @@ class P:
         """symbolic representation"""
         if self.name:
             if self.index:
-                return IndexedBase(self.name)[
-                    symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
-                ]
+                return (
+                    IndexedBase(self.name)[
+                        symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
+                    ]
+                    if isinstance(self.value, list)
+                    else self.value
+                )
             else:
-                return Symbol(self.name)
+                return Symbol(self.name) if isinstance(self.value, list) else self.value
         else:
-            return Symbol('')
+            return Symbol('') if isinstance(self.value, list) else self.value
 
     def __repr__(self):
         return self.name
@@ -125,7 +129,6 @@ class P:
 
         if isinstance(other, P):
             check = list({i == j for i, j in zip(self.value, other.value)})
-            print(check)
             if len(check) == 1 and check[0] is True:
                 return True
             else:
@@ -144,13 +147,13 @@ class P:
                 return False
 
         else:
-            return C(lhs=self, rhs=other, rel='leq')
+            return C(lhs=self, rhs=other, rel='le')
 
     def __ge__(self, other: Self):
         if isinstance(other, P):
             return not self <= other
         else:
-            return C(lhs=self, rhs=other, rel='geq')
+            return C(lhs=self, rhs=other, rel='ge')
 
     def __lt__(self, other: Self):
 

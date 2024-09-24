@@ -65,10 +65,10 @@ class X:
         return C(lhs=self, rhs=other, rel='eq')
 
     def __le__(self, other):
-        return C(lhs=self, rhs=other, rel='leq')
+        return C(lhs=self, rhs=other, rel='le')
 
     def __ge__(self, other):
-        return C(lhs=self, rhs=other, rel='geq')
+        return C(lhs=self, rhs=other, rel='ge')
 
     def __lt__(self, other):
         return self <= other
