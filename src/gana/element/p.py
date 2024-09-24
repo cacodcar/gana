@@ -4,10 +4,12 @@
 from __future__ import annotations
 
 from math import prod
-from typing import Self, TYPE_CHECKING
-from sympy import IndexedBase, Symbol, symbols, Idx
-from ..relational.f import F
+from typing import TYPE_CHECKING, Self
+
+from sympy import Idx, IndexedBase, Symbol, symbols
+
 from ..relational.c import C
+from ..relational.f import F
 from .m import M
 
 if TYPE_CHECKING:

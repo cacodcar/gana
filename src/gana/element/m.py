@@ -2,6 +2,7 @@
 """
 
 from typing import Self
+
 from sympy import IndexedBase
 
 

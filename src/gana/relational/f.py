@@ -8,9 +8,10 @@ from typing import TYPE_CHECKING, Self
 from .c import C
 
 if TYPE_CHECKING:
+    from sympy import Add
+
     from ..element.p import P
     from ..element.v import V
-    from sympy import Add
 
 
 class F:

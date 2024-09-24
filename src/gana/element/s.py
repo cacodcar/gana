@@ -1,8 +1,9 @@
 """A set of objects"""
 
-from typing import Self, Any
 from operator import is_
-from sympy import Symbol, FiniteSet
+from typing import Any, Self
+
+from sympy import FiniteSet, Symbol
 
 
 class S:
