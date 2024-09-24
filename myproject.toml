@@ -1,0 +1,18 @@
+[project]
+name = "ganit"
+version = "0.0.1"
+authors = [
+  { name="Rahul Kakodkar", email="cacodcar@gmail.com" },
+]
+description = "A barebones mathematical programming package"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/cacodcar/ganit"
+Issues = "https://github.com/cacodcar/ganit/issues"
