@@ -1,6 +1,7 @@
 """Mathematical Program"""
 
 from dataclasses import dataclass, field
+from warnings import warn
 from ..element.v import V
 from ..element.s import S
 from ..element.x import X
@@ -16,6 +17,7 @@ class Prg:
     """A mathematical program"""
 
     name: str = field(default='Program')
+    overwrite: bool = field(default=False)
 
     def __post_init__(self):
         self.sets: list[S] = []
@@ -27,7 +29,20 @@ class Prg:
         self.constraints: list[C] = []
         self.objectives: list[O] = []
 
+        self.names: list[str] = []
+
     def __setattr__(self, name: str, value: V) -> None:
+
+        if name != 'name' and value:
+            if name in self.names:
+                if self.overwrite:
+                    warn(f'Overwriting {name}')
+                else:
+                    raise ValueError(
+                        f'{name} is already defined, set overwrite=True to allow overwriting'
+                    )
+
+            self.names.append(name)
 
         if isinstance(value, V | X | S | P):
             value.name = name

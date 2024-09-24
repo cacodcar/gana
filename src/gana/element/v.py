@@ -45,6 +45,12 @@ class V:
     def __len__(self):
         return prod([len(s) for s in self.index])
 
+    def __neg__(self):
+        return F(rel='-', two=self)
+
+    def __pos__(self):
+        return F(rel='+', two=self)
+
     def __add__(self, other: Self | F):
         return F(one=self, two=other, rel='+')
 

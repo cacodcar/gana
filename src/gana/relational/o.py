@@ -11,6 +11,18 @@ if TYPE_CHECKING:
 class O:
     """Minimization Objective"""
 
-    def __init__(self, name: str = 'min', function: F = None):
+    def __init__(self, *args: F, name: str = 'min'):
+        self.func: F = args[0] if args else None
         self.name = name
-        self.function = function
+
+    @property
+    def sym(self):
+        """symbolic representation"""
+        if self.func:
+            return self.func.sym
+
+    def __repr__(self):
+        return self.name
+
+    def __hash__(self):
+        return hash(self.name)

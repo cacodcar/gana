@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from .f import F
     from ..element.p import P
     from ..element.v import V
+    from sympy import LessThan, GreaterThan, Eq
 
 
 class C:
@@ -25,8 +26,11 @@ class C:
         if self.lhs.index != self.rhs.index:
             raise ValueError('Indexes of all variables in a constraint must be same')
 
+        # since indices should match, take any
+        self.index = self.lhs.index
+
     @property
-    def sym(self):
+    def sym(self) -> LessThan | GreaterThan | Eq:
         """symbolic representation"""
         return Rel(self.lhs.sym, self.rhs.sym, self.rel)
 

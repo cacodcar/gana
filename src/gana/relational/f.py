@@ -10,6 +10,7 @@ from .c import C
 if TYPE_CHECKING:
     from ..element.p import P
     from ..element.v import V
+    from sympy import Add
 
 
 class F:
@@ -21,26 +22,41 @@ class F:
         symbol (IndexedBase): Symbolic representation of the Variable
     """
 
-    def __init__(self, one: P | V | Self, two: P | V | Self, rel: str, name: str = 'func'):
+    def __init__(
+        self,
+        one: P | V | Self = None,
+        rel: str = '+',
+        two: P | V | Self = None,
+        name: str = 'func',
+    ):
         self.one = one
         self.two = two
         self.rel = rel
         self.name = name
-        
-        if self.one.index != self.two.index:
+
+        if self.one and self.two and self.one.index != self.two.index:
             raise ValueError('Indexes of both variables must be same')
 
-        # since indices should match, take any
-        self.index = self.one.index
+        if self.one:
+            self.index = self.one.index
+        elif self.two:
+            self.index = self.two.index
 
     @property
-    def sym(self):
+    def sym(self) -> Add:
         """symbolic representation"""
+
         if self.rel == '+':
-            return self.one.sym + self.two.sym
+            if self.one:
+                return self.one.sym + self.two.sym
+            else:
+                return +self.two.sym
 
         if self.rel == '-':
-            return self.one.sym - self.two.sym
+            if self.one:
+                return self.one.sym - self.two.sym
+            else:
+                return -self.two.sym
 
         if self.rel == '*':
             return self.one.sym * self.two.sym
@@ -54,26 +70,32 @@ class F:
     def __hash__(self):
         return hash(self.name)
 
+    def __neg__(self):
+        return F(rel='-', two=self)
+
+    def __pos__(self):
+        return F(rel='+', two=self)
+
     def __add__(self, other: Self | P | V):
-        return F(one=self, two=other, rel='+')
+        return F(one=self, rel='+', two=other)
 
     def __sub__(self, other: Self | P | V):
-        return F(one=self, two=other, rel='-')
+        return F(one=self, rel='-', two=other)
 
     def __mul__(self, other: Self | P | V):
-        return F(one=self, two=other, rel='*')
+        return F(one=self, rel='*', two=other)
 
     def __truediv__(self, other: Self | P | V):
-        return F(one=self, two=other, rel='/')
+        return F(one=self, rel='/', two=other)
 
     def __eq__(self, other: Self | P | V):
-        return C(lhs=self, rhs=other, rel='eq')
+        return C(lhs=self, rel='eq', rhs=other)
 
     def __le__(self, other: Self | P | V):
-        return C(lhs=self, rhs=other, rel='le')
+        return C(lhs=self, rel='le', rhs=other)
 
     def __ge__(self, other: Self | P | V):
-        return C(lhs=self, rhs=other, rel='ge')
+        return C(lhs=self, rel='ge', rhs=other)
 
     def __lt__(self, other: Self | P | V):
         return self <= other

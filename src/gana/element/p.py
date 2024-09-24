@@ -44,12 +44,15 @@ class P:
     @property
     def sym(self) -> IndexedBase | Symbol:
         """symbolic representation"""
-        if self.index:
-            return IndexedBase(self.name)[
-                symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
-            ]
+        if self.name:
+            if self.index:
+                return IndexedBase(self.name)[
+                    symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
+                ]
+            else:
+                return Symbol(self.name)
         else:
-            return Symbol(self.name)
+            return Symbol('')
 
     def __repr__(self):
         return self.name
