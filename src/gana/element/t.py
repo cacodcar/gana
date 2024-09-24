@@ -9,11 +9,10 @@ from typing import TYPE_CHECKING
 from sympy import IndexedBase
 
 
-@dataclass
 class T:
     """Parametric variable"""
-
-    name: str = 't'
+    def __init__(self, name: str = 't'):
+        self.name = name 
 
     def __repr__(self):
         return self.name

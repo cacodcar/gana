@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Self
 
 from .c import C
@@ -13,7 +12,6 @@ if TYPE_CHECKING:
     from ..element.v import V
 
 
-@dataclass
 class F:
     """Provides some relational operation between Parameters and Variables
 
@@ -23,14 +21,17 @@ class F:
         symbol (IndexedBase): Symbolic representation of the Variable
     """
 
-    one: P | V | Self = field()
-    two: P | V | Self = field()
-    rel: str = field()
-    name: str = field(default='func')
-
-    def __post_init__(self):
+    def __init__(self, one: P | V | Self, two: P | V | Self, rel: str, name: str = 'func'):
+        self.one = one
+        self.two = two
+        self.rel = rel
+        self.name = name
+        
         if self.one.index != self.two.index:
             raise ValueError('Indexes of both variables must be same')
+
+        # since indices should match, take any
+        self.index = self.one.index
 
     @property
     def sym(self):
@@ -69,10 +70,10 @@ class F:
         return C(lhs=self, rhs=other, rel='eq')
 
     def __le__(self, other: Self | P | V):
-        return C(lhs=self, rhs=other, rel='leq')
+        return C(lhs=self, rhs=other, rel='le')
 
     def __ge__(self, other: Self | P | V):
-        return C(lhs=self, rhs=other, rel='geq')
+        return C(lhs=self, rhs=other, rel='ge')
 
     def __lt__(self, other: Self | P | V):
         return self <= other

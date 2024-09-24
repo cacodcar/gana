@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class P:
     """A Parameter"""
-    
+
     def __init__(self, *args: S, value: int | float | list | bool, name: str = 'Par'):
         self.index = args
         self.value = value

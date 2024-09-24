@@ -46,7 +46,6 @@ class V:
         return prod([len(s) for s in self.index])
 
     def __add__(self, other: Self | F):
-
         return F(one=self, two=other, rel='+')
 
     def __sub__(self, other: Self | F):
