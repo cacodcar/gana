@@ -11,6 +11,7 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 from ..relational.c import C
 from ..relational.f import F
 from .m import M
+from .z import Z
 from .v import V
 
 if TYPE_CHECKING:
@@ -98,7 +99,11 @@ class P:
             # big M is always bigger than any number
             return M()
 
-        if isinstance(other, P | V):
+        if isinstance(other, Z):
+            # zero, like me, has no real impact
+            return self
+
+        if isinstance(other, P):
             # to handle big M values in list
             # I could manage M + int | float = M
             # not int | float + M = M
@@ -109,6 +114,22 @@ class P:
                     for i, j in zip(self._, other._)
                 ],
             )
+
+        if isinstance(other, V):
+            if self._ and other._:
+                # evaluated variables return Parameters
+                return P(
+                    *self.index,
+                    _=[
+                        i + j if not isinstance(i, M) else M()
+                        for i, j in zip(self._, other._)
+                    ],
+                )
+
+            else:
+                # unevaluated variables return function
+                return F(one=self, rel='+', two=other)
+
         if isinstance(other, F):
             # added to a function returns a function
             return F(one=self, two=other, rel='+')
@@ -129,6 +150,18 @@ class P:
         if isinstance(other, F):
             return F(one=self, two=other, rel='-')
 
+        if isinstance(other, V):
+            if self._ and other._:
+                return P(
+                    *self.index,
+                    _=[
+                        i - j if not isinstance(i, M) else M()
+                        for i, j in zip(self._, other._)
+                    ],
+                )
+            else:
+                return F(one=self, rel='-', two=other)
+
     def __mul__(self, other: Self):
         if isinstance(other, P):
             return P(
@@ -138,14 +171,32 @@ class P:
                     for i, j in zip(self._, other._)
                 ],
             )
+
         if isinstance(other, F):
-            return F(one=self, two=other, rel='*')
+            return F(one=self, rel='*', two=other)
+
+        if isinstance(other, V):
+            if self._ and other._:
+                return P(
+                    *self.index,
+                    _=[
+                        i * j if not isinstance(i, M) else M()
+                        for i, j in zip(self._, other._)
+                    ],
+                )
+            else:
+                return F(one=self, rel='*', two=other)
 
     def __truediv__(self, other: Self):
         if isinstance(other, P):
             return P(*self.index, _=[i / j for i, j in zip(self._, other._)])
-        else:
+        if isinstance(other, F):
             return F(one=self, two=other, rel='/')
+        if isinstance(other, V):
+            if self._ and other._:
+                return P(*self.index, _=[i / j for i, j in zip(self._, other._)])
+            else:
+                return F(one=self, rel='/', two=other)
 
     def __floordiv__(self, other: Self):
 

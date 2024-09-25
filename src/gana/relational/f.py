@@ -51,11 +51,12 @@ class F:
         """symbolic representation"""
 
         if self.rel == '+':
-            if
+            return self.one.sym + self.two.sym
 
         if self.rel == '-':
             if self.one:
                 return self.one.sym - self.two.sym
+            # this is used to generate negatives
             else:
                 return -self.two.sym
 
