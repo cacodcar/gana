@@ -6,27 +6,6 @@ from typing import Any, Self
 from sympy import FiniteSet, Symbol
 
 
-class _S:
-    """Member of the set"""
-
-    def __init__(self, name: str):
-        self.name = str(name)
-
-    @property
-    def sym(self) -> Symbol:
-        """symbolic representation"""
-        return Symbol(self.name)
-
-    def __repr__(self):
-        return self.name
-
-    def __hash__(self):
-        return hash(self.name)
-
-    def __len__(self):
-        return 1
-
-
 class S:
     """A Set
 
@@ -65,13 +44,6 @@ class S:
         """symbolic representation"""
         return FiniteSet(*self.members)
 
-    def x(self) -> list[_S]:
-        """Members in the Set"""
-        if self.members:
-            return [_S(m) for m in self.members]
-        else:
-            return []
-
     def __repr__(self):
         return self.name
 
@@ -82,7 +54,7 @@ class S:
         return len(self.members)
 
     def __getitem__(self, key: int | str):
-        return self.x()[key]
+        return self.members[key]
 
     def __contains__(self, other: Any):
         return True if other in self.members else False

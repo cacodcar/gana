@@ -11,7 +11,6 @@ from ..element.p import P
 from ..element.s import S
 from ..element.t import T
 from ..element.v import V
-from ..element.x import X
 from ..relational.c import C
 from ..relational.f import F
 from ..relational.o import O
@@ -29,10 +28,9 @@ class Prg:
         # modeling elements
         self.sets: list[S] = []
 
-        self.variables: list[V | X] = []
+        self.variables: list[V] = []
         self.contvars: list[V] = []
-        self.intvars: list[X] = []
-
+        self.intvars: list[V] = []
         self.parameters: list[P] = []
 
         self.mpvars: list[T] = []
@@ -72,7 +70,7 @@ class Prg:
             self.names.append(name)
 
         # modeling elements
-        if isinstance(value, S | V | X | P | T | F | C | O):
+        if isinstance(value, S | V | P | T | F | C | O):
             value.name = name
 
         if isinstance(value, S):
@@ -80,21 +78,40 @@ class Prg:
             self.sets.append(value)
             value.count = len(self.sets)
 
-        if isinstance(value, V | X):
+        if isinstance(value, V):
             self.variables.append(value)
             value.count = len(self.variables)
 
-            if isinstance(value, V):
-                self.contvars.append(value)
-                value.count = len(self.contvars)
+            # if variable has index
+            # generate variables for each index
+            if value.index:
+                for i in value.idx:
+                    value.kids.append(
+                        V(*i, name=value.name, itg=value.itg, nn=value.nn)
+                    )
+                for k in value.kids:
+                    k.mum = value
 
-            if isinstance(value, X):
+            if value.itg:
+                # integer variable
                 self.intvars.append(value)
-                value.count = len(self.intvars)
+
+            else:
+                # continuous variable
+                self.contvars.append(value)
 
         if isinstance(value, P):
             self.parameters.append(value)
             value.count = len(self.parameters)
+
+            # if parameter has index
+            # generate parameters for each index
+            if value.index:
+                for n, i in enumerate(value.idx):
+                    value._[n] = P(*i, name=value.name, _=value._[n])
+
+                for p in value._:
+                    p.mum = value
 
         if isinstance(value, T):
             self.mpvars.append(value)

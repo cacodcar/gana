@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self
-
+from operator import is_not
 from .c import C
 
 if TYPE_CHECKING:
@@ -35,7 +35,12 @@ class F:
         self.rel = rel
         self.name = name
 
-        if self.one and self.two and self.one.index != self.two.index:
+        if (
+            self.one
+            and self.two
+            and is_not(self.one.mum, self.two.mum)
+            and self.one.index != self.two.index
+        ):
             raise ValueError('Indexes of both variables must be same')
 
         if self.one:
@@ -65,6 +70,12 @@ class F:
 
         if self.rel == '/':
             return self.one.sym / self.two.sym
+
+    def x(self):
+        """Elements in the function"""
+        return sum(
+            [i.x() if isinstance(i, F) else [i] for i in [self.one, self.two] if i], []
+        )
 
     def __repr__(self):
         return self.name

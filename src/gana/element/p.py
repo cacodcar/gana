@@ -15,40 +15,19 @@ from .z import Z
 from .s import S
 
 
-class _P:
-    """Parameter at a particular index"""
-
-    def __init__(self, _: float, idx: tuple, name: str):
-        self._ = _
-        self.idx = idx
-        self.name = f'{name}{idx}'
-
-    @property
-    def sym(self) -> IndexedBase | Symbol:
-        """symbolic representation"""
-        return IndexedBase(self.name)[
-            symbols(",".join([f'{d}' for d in self.idx]), cls=Idx)
-        ]
-
-    def __repr__(self):
-        return self.name
-
-    def __hash__(self):
-        return hash(self.name)
-
-    def __len__(self):
-        return 1
-
-
 class P:
     """A Parameter"""
 
     def __init__(self, *args: S, _: int | float | list | bool = 0, name: str = 'Param'):
         self.index = args
-        self._ = _
+        self._: Self = _
         self.name = name
         # keeps a count of, updated in program
         self.count: int = None
+
+        # if a parameter is declared as a child (at an constituent index)
+        # the mum is the parent parameter
+        self.mum = None
 
         if isinstance(self._, bool) and self._ is True:
             # True instances big Ms
@@ -71,21 +50,18 @@ class P:
                 if isinstance(v, bool) and v is True:
                     self._[i] = M()
 
-        if self.index:
-            # values are attached to indices in a dictionary
-            # this helps access for getitem etc
-            self._ = {
-                idx: self._[n]
-                for n, idx in enumerate(list(product(*[s.members for s in self.index])))
-            }
+        # if self.index:
+        #     # values are attached to indices in a dictionary
+        #     # this helps access for getitem etc
+        #     self._ = {i: self._[n] for n, i in enumerate(self.idx)}
 
-        else:
-            # if list, just give positions as indices
-            if isinstance(self._, list):
-                self._ = {n: v for n, v in enumerate(self._)}
-            # if single value (float), give it a zero index
-            else:
-                self._ = {0: self._}
+        # else:
+        #     # if list, just give positions as indices
+        #     if isinstance(self._, list):
+        #         self._ = {n: v for n, v in enumerate(self._)}
+        #     # if single value (float), give it a zero index
+        #     else:
+        #         self._ = {0: self._}
 
     @property
     def sym(self) -> IndexedBase | Symbol:
@@ -96,27 +72,23 @@ class P:
                     IndexedBase(self.name)[
                         symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
                     ]
-                    if isinstance(self._, dict)
+                    if isinstance(self._, list)
                     else self._
                 )
             else:
-                return Symbol(self.name) if isinstance(self._, dict) else self._
+                return Symbol(self.name) if isinstance(self._, list) else self._
         else:
-            return Symbol('') if isinstance(self._, dict) else self._
+            return Symbol('') if isinstance(self._, list) else self._
 
     @property
     def idx(self) -> list[tuple]:
         """index"""
-        return list(
-            product(*[s.members if isinstance(s, S) else [s] for s in self.index])
-        )
-
-    def x(self) -> list[_P] | Self:
-        """Variables at all indices"""
-        if self.index:
-            return [_P(self._[i], i, self.name) for i in self.idx]
+        if not self.mum:
+            return list(
+                product(*[s.members if isinstance(s, S) else [s] for s in self.index])
+            )
         else:
-            return self
+            return self.index
 
     @staticmethod
     def _bigm():
@@ -129,7 +101,7 @@ class P:
         return hash(self.name)
 
     def __len__(self):
-        return prod([len(s) for s in self.index])
+        return prod([len(s) if isinstance(s, S) else 1 for s in self.index])
 
     def __getitem__(self, key: int | tuple):
         return self._[key]

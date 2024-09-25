@@ -7,12 +7,12 @@ from typing import TYPE_CHECKING
 
 from sympy import Rel
 
+
 if TYPE_CHECKING:
     from sympy import Eq, GreaterThan, LessThan
-
+    from .f import F
     from ..element.p import P
     from ..element.v import V
-    from .f import F
 
 
 class C:
@@ -37,6 +37,10 @@ class C:
     def sym(self) -> LessThan | GreaterThan | Eq:
         """symbolic representation"""
         return Rel(self.lhs.sym, self.rhs.sym, self.rel)
+
+    def x(self):
+        """Elements in the constraint"""
+        return sum([f if isinstance(f, list) else [f] for f in self.lhs.x()], [])
 
     def __repr__(self):
         return self.name

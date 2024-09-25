@@ -13,36 +13,18 @@ from ..relational.f import F
 from .s import S
 
 
-class _V:
-    """Variable at a particular index"""
-
-    def __init__(self, idx: tuple, name: str):
-        self.idx = idx
-        self.name = f'{name}{idx}'
-
-    @property
-    def sym(self) -> IndexedBase | Symbol:
-        """symbolic representation"""
-        return IndexedBase(self.name)[
-            symbols(",".join([f'{d}' for d in self.idx]), cls=Idx)
-        ]
-
-    def __repr__(self):
-        return self.name
-
-    def __hash__(self):
-        return hash(self.name)
-
-    def __len__(self):
-        return 1
-
-
 class V:
     """A Continuous Variable"""
 
-    def __init__(self, *args: S, name: str = 'contvar'):
+    def __init__(
+        self, *args: S, name: str = 'contvar', itg: bool = False, nn: bool = True
+    ):
         self.index = args
         self.name = name
+        # if the variable is an integer variable
+        self.itg = itg
+        # if the variable is non negative
+        self.nn = nn
 
         # value is determined when mathematical model is solved
         # the flag _fixed is changed when .fix(val) is called
@@ -50,6 +32,12 @@ class V:
         self._ = None
         # keeps a count of, updated in program
         self.count: int = None
+
+        # if a variable is declared as a child (at an constituent index)
+        # the mum is the parent variable
+        self.mum = None
+        # these collect the variables that are generated at each index
+        self.kids: list[Self] = []
 
     @property
     def sym(self) -> IndexedBase | Symbol:
@@ -85,25 +73,20 @@ class V:
 
         self._fixed = True
 
-    def x(self) -> list[_V] | Self:
-        """Variables at all indices"""
-        if self.index:
-            return [_V(i, self.name) for i in self.idx]
+    def __len__(self):
+        return prod([len(s) if isinstance(s, S) else 1 for s in self.index])
+
+    def __getitem__(self, key: int | tuple):
+        if self._fixed:
+            return self._[key]
         else:
-            return self
+            return self.kids[self.idx.index(key)]
 
     def __repr__(self):
         return self.name
 
     def __hash__(self):
         return hash(self.name)
-
-    def __len__(self):
-        return prod([len(s) for s in self.index])
-
-    def __getitem__(self, key: int | tuple):
-        if self._fixed:
-            return self._[key]
 
     def __neg__(self):
         return F(rel='-', two=self)
@@ -127,13 +110,13 @@ class V:
         return F(one=self, two=other, rel='/')
 
     def __eq__(self, other):
-        return C(lhs=self, rhs=other, rel='eq')
+        return C(lhs=+self, rhs=other, rel='eq')
 
     def __le__(self, other):
-        return C(lhs=self, rhs=other, rel='le')
+        return C(lhs=+self, rhs=other, rel='le')
 
     def __ge__(self, other):
-        return C(lhs=self, rhs=other, rel='ge')
+        return C(lhs=+self, rhs=other, rel='ge')
 
     def __lt__(self, other):
         return self <= other
