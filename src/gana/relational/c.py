@@ -26,6 +26,9 @@ class C:
         self.rel = rel
         self.name = name
 
+        # keeps a count of, updated in program
+        self.count: int = None
+
         if self.lhs.index != self.rhs.index:
             raise ValueError('Indexes of all variables in a constraint must be same')
 

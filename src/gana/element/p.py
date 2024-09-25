@@ -11,6 +11,7 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 from ..relational.c import C
 from ..relational.f import F
 from .m import M
+from .v import V
 
 if TYPE_CHECKING:
     from .s import S
@@ -19,29 +20,32 @@ if TYPE_CHECKING:
 class P:
     """A Parameter"""
 
-    def __init__(self, *args: S, value: int | float | list | bool, name: str = 'Par'):
+    def __init__(self, *args: S, _: int | float | list | bool = 0, name: str = 'Param'):
         self.index = args
-        self.value = value
+        self._ = _
         self.name = name
 
-        if isinstance(self.value, bool) and self.value is True:
-            # Make big Ms
-            self.value = M(big=True)
+        # keeps a count of, updated in program
+        self.count: int = None
 
-        if isinstance(self.value, list):
-            if len(self) != len(self.value):
+        if isinstance(self._, bool) and self._ is True:
+            # True instances big Ms
+            self._ = M()
+
+        if isinstance(self._, list):
+            if len(self) != len(self._):
                 raise ValueError(
-                    f'Length of values ({len(self.value)}) must be equal to the size of the index set ({len(self)})'
+                    f'Length of values ({len(self._)}) must be equal to the size of the index set ({len(self)})'
                 )
 
-            # Make big Ms
-            for i, v in enumerate(self.value):
+            # Make big Ms in list
+            for i, v in enumerate(self._):
                 if isinstance(v, bool) and v is True:
-                    self.value[i] = M(big=True)
+                    self._[i] = M()
 
     def x(self):
-        """returns the value of the parameter"""
-        return self.value
+        """returns the _ of the parameter"""
+        return self._
 
     @property
     def sym(self) -> IndexedBase | Symbol:
@@ -52,13 +56,17 @@ class P:
                     IndexedBase(self.name)[
                         symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
                     ]
-                    if isinstance(self.value, list)
-                    else self.value
+                    if isinstance(self._, list)
+                    else self._
                 )
             else:
-                return Symbol(self.name) if isinstance(self.value, list) else self.value
+                return Symbol(self.name) if isinstance(self._, list) else self._
         else:
-            return Symbol('') if isinstance(self.value, list) else self.value
+            return Symbol('') if isinstance(self._, list) else self._
+
+    @staticmethod
+    def _bigm():
+        return M()
 
     def __repr__(self):
         return self.name
@@ -71,66 +79,90 @@ class P:
 
     def __neg__(self):
 
-        return P(*self.index, value=[-i for i in self.value])
+        return P(*self.index, _=[-i for i in self._])
 
     def __pos__(self):
-        return P(*self.index, value=[+i for i in self.value])
+        return P(*self.index, _=[+i for i in self._])
 
     def __abs__(self):
-        return P(*self.index, value=[abs(i) for i in self.value])
+        return P(*self.index, _=[abs(i) for i in self._])
 
     def __invert__(self):
-        return P(*self.index, value=[~i for i in self.value])
+        return P(*self.index, _=[~i for i in self._])
 
+    # the ones below do this:
+    # compare themselves to big Ms, Parameters, Variables, and Functions
     def __add__(self, other: Self):
 
-        if isinstance(other, P):
+        if isinstance(other, M):
+            # big M is always bigger than any number
+            return M()
+
+        if isinstance(other, P | V):
+            # to handle big M values in list
+            # I could manage M + int | float = M
+            # not int | float + M = M
             return P(
-                *self.index, value=[i + j for i, j in zip(self.value, other.value)]
+                *self.index,
+                _=[
+                    i + j if not isinstance(i, M) else M()
+                    for i, j in zip(self._, other._)
+                ],
             )
-        else:
+        if isinstance(other, F):
+            # added to a function returns a function
             return F(one=self, two=other, rel='+')
 
     def __sub__(self, other: Self):
+
+        if isinstance(other, M):
+            return M()
+
         if isinstance(other, P):
             return P(
-                *self.index, value=[i - j for i, j in zip(self.value, other.value)]
+                *self.index,
+                _=[
+                    i - j if not isinstance(i, M) else M()
+                    for i, j in zip(self._, other._)
+                ],
             )
-        else:
+        if isinstance(other, F):
             return F(one=self, two=other, rel='-')
 
     def __mul__(self, other: Self):
         if isinstance(other, P):
             return P(
-                *self.index, value=[i * j for i, j in zip(self.value, other.value)]
+                *self.index,
+                _=[
+                    i * j if not isinstance(i, M) else M()
+                    for i, j in zip(self._, other._)
+                ],
             )
-        else:
+        if isinstance(other, F):
             return F(one=self, two=other, rel='*')
 
     def __truediv__(self, other: Self):
         if isinstance(other, P):
-            return P(
-                *self.index, value=[i / j for i, j in zip(self.value, other.value)]
-            )
+            return P(*self.index, _=[i / j for i, j in zip(self._, other._)])
         else:
             return F(one=self, two=other, rel='/')
 
     def __floordiv__(self, other: Self):
 
-        return P(*self.index, value=[i // j for i, j in zip(self.value, other.value)])
+        return P(*self.index, _=[i // j for i, j in zip(self._, other._)])
 
     def __mod__(self, other: Self):
 
-        return P(*self.index, value=[i % j for i, j in zip(self.value, other.value)])
+        return P(*self.index, _=[i % j for i, j in zip(self._, other._)])
 
     def __pow__(self, other: Self):
 
-        return P(*self.index, value=[i**j for i, j in zip(self.value, other.value)])
+        return P(*self.index, _=[i**j for i, j in zip(self._, other._)])
 
     def __eq__(self, other: Self):
 
         if isinstance(other, P):
-            check = list({i == j for i, j in zip(self.value, other.value)})
+            check = list({i == j for i, j in zip(self._, other._)})
             if len(check) == 1 and check[0] is True:
                 return True
             else:
@@ -142,7 +174,7 @@ class P:
     def __le__(self, other: Self):
 
         if isinstance(other, P):
-            check = [i <= j for i, j in zip(self.value, other.value)]
+            check = [i <= j for i, j in zip(self._, other._)]
             if all(check):
                 return True
             else:
@@ -160,7 +192,7 @@ class P:
     def __lt__(self, other: Self):
 
         if isinstance(other, P):
-            check = [i < j for i, j in zip(self.value, other.value)]
+            check = [i < j for i, j in zip(self._, other._)]
             if all(check):
                 return True
             else:

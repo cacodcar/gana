@@ -18,15 +18,19 @@ if TYPE_CHECKING:
 class X:
     """A Binary Variable"""
 
-    def __init__(self, *args: S, name: str = 'bvar'):
+    def __init__(self, *args: S, name: str = 'intvar'):
         self.index = args
         self.name = name
+
         # value is determined when mathematical model is solved
-        self.value = None
+        self._: int = None
+
+        # keeps a count of, updated in program
+        self.count: int = None
 
     def x(self):
         """returns the value of the variable"""
-        return self.value
+        return self._
 
     @property
     def sym(self) -> IndexedBase | Symbol:

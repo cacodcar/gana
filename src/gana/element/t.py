@@ -14,10 +14,16 @@ if TYPE_CHECKING:
 class T:
     """Parametric variable"""
 
-    def __init__(self, *args: S, domain: tuple[float, float], name: str = 't'):
+    def __init__(self, *args: S, _: tuple[float, float], name: str = 'mpvar'):
         self.index = args
-        self.domain = domain
+
+        # Parametric variables can take a value within a domain
+        # Can be especially useful when value are uncertain
+        self._ = _
         self.name = name
+
+        # keeps a count of, updated in program
+        self.count: int = None
 
     @property
     def sym(self) -> IndexedBase | Symbol:

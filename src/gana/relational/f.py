@@ -43,15 +43,27 @@ class F:
         elif self.two:
             self.index = self.two.index
 
+        # keeps a count of, updated in program
+        self.count: int = None
+
     @property
     def sym(self) -> Add:
         """symbolic representation"""
 
         if self.rel == '+':
+
             if self.one:
-                return self.one.sym + self.two.sym
-            else:
-                return +self.two.sym
+                o = self.one.sym
+
+            if self.two:
+                t = self.two.sym
+            else: 
+
+
+            if self.two:
+                sym = sym + self.two.sym if self.one else self.two.sym
+
+            return sym
 
         if self.rel == '-':
             if self.one:

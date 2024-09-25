@@ -1,5 +1,7 @@
-"""For unbounded parameters
+"""BigM 
 """
+
+from __future__ import annotations
 
 from typing import Self
 
@@ -7,35 +9,22 @@ from sympy import IndexedBase
 
 
 class M:
-    """
-    If big is True:
-        A really big number like the weight on my shoulders
-    If big is False:
-        really small number like the money in my bank account
+    """BigM, infinity basically"""
 
-    Attributes:
-        big (bool): True if big, False if small
-        m (float): small m value
-
-    """
-
-    def __init__(self, big: bool = True, m: float = None, pos: bool = True):
-        self.big = big
-        self.m = m
+    def __init__(self, _: float = None, pos: bool = True):
+        # big value if needed
+        self._ = _
         self.pos = pos
 
-        if self.big:
-            self.name = 'M'
-        else:
-            self.name = 'm'
-
-        if not self.pos:
-            self.name = '-' + self.name
+    @property
+    def name(self):
+        """name"""
+        return '-M' if not self.pos or self._ < 0 else 'M'
 
     @property
     def sym(self):
         """Symbol"""
-        return IndexedBase(f'{self.name}')
+        return -IndexedBase('M') if not self.pos or self._ < 0 else IndexedBase('M')
 
     def __repr__(self):
         return self.name
@@ -47,34 +36,45 @@ class M:
         return 1
 
     def __neg__(self):
-
-        return M(big=True, pos=False)
+        return M()
 
     def __pos__(self):
-        return M(big=True, pos=True)
+        return M()
 
-    def __add__(self, other: Self | int | float):
+    def __add__(self, other: Self | float):
 
-        if isinstance(other, (M, int, float)):
-            if self.pos:
-                return M(big=True)
+        if isinstance(other, M):
+            if self._ and other._:
+                return M(_=self._ + other._)
             else:
-                return M(big=True, pos=False)
+                return M()
+
+        if isinstance(other, (int, float)):
+            if self.pos:
+                return M()
+            else:
+                return M(pos=False)
 
     def __sub__(self, other: Self):
-        if isinstance(other, (M, int, float)):
-            if self.pos:
-                return M(big=True)
+
+        if isinstance(other, M):
+            if self._ and other._:
+                return M(_=self._ - other._)
             else:
-                return M(big=True, pos=False)
+                return -M()
+
+        if isinstance(other, (int, float)):
+            if self.pos:
+                return M()
+            else:
+                return M(pos=False)
 
     def __gt__(self, other: Self):
         if isinstance(other, (int, float)):
-            # BigM is always greater than any number
-            return self.big
-        if isinstance(other, M):
-            if other.big is False:
-                return self.big
+            if self.pos:
+                return True
+            else:
+                return False
 
     def __ge__(self, other: Self):
         return self > other
@@ -91,10 +91,11 @@ class M:
             return False
 
         if isinstance(other, M):
-            if self.big == other.big:
-                return True
-            else:
-                return False
+            if self._ and other._:
+                if self._ == other._:
+                    return True
+                else:
+                    return False
 
     def __ne__(self, other: Self):
         return not self == other

@@ -15,6 +15,9 @@ class O:
         self.func: F = args[0] if args else None
         self.name = name
 
+        # keeps a count of, updated in program
+        self.count: int = None
+
     @property
     def sym(self):
         """symbolic representation"""

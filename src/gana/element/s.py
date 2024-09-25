@@ -3,7 +3,7 @@
 from operator import is_
 from typing import Any, Self
 
-from sympy import FiniteSet, Symbol
+from sympy import FiniteSet
 
 
 class S:
@@ -33,9 +33,11 @@ class S:
 
     """
 
-    def __init__(self, *args, name: str = 'set'):
+    def __init__(self, *args: str | float, name: str = 'set'):
         self.members = list(args)
         self.name = name
+        # keeps a count of, updated in program
+        self.count: int = None
 
     @property
     def sym(self) -> FiniteSet:

@@ -18,15 +18,19 @@ if TYPE_CHECKING:
 class V:
     """A Continuous Variable"""
 
-    def __init__(self, *args: S, name: str = 'cvar'):
+    def __init__(self, *args: S, name: str = 'contvar'):
         self.index = args
         self.name = name
+
         # value is determined when mathematical model is solved
-        self.value = None
+        self._: int | float = None
+
+        # keeps a count of, updated in program
+        self.count: int = None
 
     def x(self):
         """returns the value of the variable"""
-        return self.value
+        return self._
 
     @property
     def sym(self) -> IndexedBase | Symbol:

@@ -28,11 +28,14 @@ class Prg:
 
         # modeling elements
         self.sets: list[S] = []
+
         self.variables: list[V | X] = []
-        self.continuous: list[V] = []
-        self.binary: list[X] = []
+        self.contvars: list[V] = []
+        self.intvars: list[X] = []
+
         self.parameters: list[P] = []
-        self.thetas: list[T] = []
+
+        self.mpvars: list[T] = []
 
         # relational elements
         self.functions: list[F] = []
@@ -49,10 +52,10 @@ class Prg:
             'overwrite',
             'sets',
             'variables',
-            'continuous',
-            'binary',
+            'contvars',
+            'intvars',
             'parameters',
-            'thetas',
+            'mpvars',
             'functions',
             'constraints',
             'objectives',
@@ -73,22 +76,29 @@ class Prg:
             value.name = name
 
         if isinstance(value, S):
+            # set the counter on the element
             self.sets.append(value)
+            value.count = len(self.sets)
 
         if isinstance(value, V | X):
             self.variables.append(value)
+            value.count = len(self.variables)
 
             if isinstance(value, V):
-                self.continuous.append(value)
+                self.contvars.append(value)
+                value.count = len(self.contvars)
 
             if isinstance(value, X):
-                self.binary.append(value)
+                self.intvars.append(value)
+                value.count = len(self.intvars)
 
         if isinstance(value, P):
             self.parameters.append(value)
+            value.count = len(self.parameters)
 
         if isinstance(value, T):
-            self.thetas.append(value)
+            self.mpvars.append(value)
+            value.count = len(self.mpvars)
 
         # relational elements
         if isinstance(value, F):
@@ -96,9 +106,11 @@ class Prg:
 
         if isinstance(value, C):
             self.constraints.append(value)
+            value.count = len(self.constraints)
 
         if isinstance(value, O):
             self.objectives.append(value)
+            value.count = len(self.objectives)
 
         super().__setattr__(name, value)
 
@@ -109,11 +121,11 @@ class Prg:
             # modeling elements
             self.sets = list(set(self.sets) | set(prg.sets))
             self.variables = list(set(self.variables) | set(prg.variables))
-            self.continuous = list(set(self.continuous) | set(prg.continuous))
-            self.binary = list(set(self.binary) | set(prg.binary))
+            self.contvars = list(set(self.contvars) | set(prg.contvars))
+            self.intvars = list(set(self.intvars) | set(prg.intvars))
             self.parameters = list(set(self.parameters) | set(prg.parameters))
             self.parameters = list(set(self.parameters) | set(prg.parameters))
-            self.thetas = list(set(self.thetas) | set(prg.thetas))
+            self.mpvars = list(set(self.mpvars) | set(prg.mpvars))
 
             # relational elements
             self.functions = list(set(self.functions) | set(prg.functions))
