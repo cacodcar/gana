@@ -33,6 +33,12 @@ class P:
             # True instances big Ms
             self._ = M()
 
+        if isinstance(self._, (int, float)):
+            if len(self) > 1:
+                # if a scalar value is passed to a parameter with multiple indices
+                # it is converted to a list of the same repeated value
+                self._ = [self._] * len(self)
+
         if isinstance(self._, list):
             if len(self) != len(self._):
                 raise ValueError(
@@ -77,6 +83,9 @@ class P:
 
     def __len__(self):
         return prod([len(s) for s in self.index])
+
+    def __getitem__(self, key: int):
+        return self._[key]
 
     def __neg__(self):
 
