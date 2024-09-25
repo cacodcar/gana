@@ -51,19 +51,7 @@ class F:
         """symbolic representation"""
 
         if self.rel == '+':
-
-            if self.one:
-                o = self.one.sym
-
-            if self.two:
-                t = self.two.sym
-            else: 
-
-
-            if self.two:
-                sym = sym + self.two.sym if self.one else self.two.sym
-
-            return sym
+            if
 
         if self.rel == '-':
             if self.one:
