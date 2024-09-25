@@ -12,8 +12,8 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 from ..relational.c import C
 from ..relational.f import F
 from .m import M
-from .z import Z
 from .v import V
+from .z import Z
 
 if TYPE_CHECKING:
     from .s import S
