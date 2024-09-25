@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from itertools import product
 from math import prod
 from typing import TYPE_CHECKING, Self
 
@@ -34,7 +35,7 @@ class P:
             self._ = M()
 
         if isinstance(self._, (int, float)):
-            if len(self) > 1:
+            if self.index:
                 # if a scalar value is passed to a parameter with multiple indices
                 # it is converted to a list of the same repeated value
                 self._ = [self._] * len(self)
@@ -50,9 +51,21 @@ class P:
                 if isinstance(v, bool) and v is True:
                     self._[i] = M()
 
-    def x(self):
-        """returns the _ of the parameter"""
-        return self._
+        if self.index:
+            # values are attached to indices in a dictionary
+            # this helps access for getitem etc
+            self.val = {
+                idx: self._[n]
+                for n, idx in enumerate(list(product(*[s.members for s in self.index])))
+            }
+
+        else:
+            # if list, just give positions as indices
+            if isinstance(self._, list):
+                self.val = {n: v for n, v in enumerate(self._)}
+            # if single value (float), give it a zero index
+            else:
+                self.val = {0: self._}
 
     @property
     def sym(self) -> IndexedBase | Symbol:
@@ -84,8 +97,8 @@ class P:
     def __len__(self):
         return prod([len(s) for s in self.index])
 
-    def __getitem__(self, key: int):
-        return self._[key]
+    def __getitem__(self, key: int | tuple):
+        return self.val[key]
 
     def __neg__(self):
 

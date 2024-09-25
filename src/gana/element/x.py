@@ -28,10 +28,6 @@ class X:
         # keeps a count of, updated in program
         self.count: int = None
 
-    def x(self):
-        """returns the value of the variable"""
-        return self._
-
     @property
     def sym(self) -> IndexedBase | Symbol:
         """symbolic representation"""
