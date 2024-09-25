@@ -27,6 +27,7 @@ class P:
         self._ = _
         self.name = name
 
+        self.val: dict = None
         # keeps a count of, updated in program
         self.count: int = None
 
@@ -41,7 +42,7 @@ class P:
                 self._ = [self._] * len(self)
 
         if isinstance(self._, list):
-            if len(self) != len(self._):
+            if self.index and len(self) != len(self._):
                 raise ValueError(
                     f'Length of values ({len(self._)}) must be equal to the size of the index set ({len(self)})'
                 )
@@ -83,6 +84,13 @@ class P:
                 return Symbol(self.name) if isinstance(self._, list) else self._
         else:
             return Symbol('') if isinstance(self._, list) else self._
+
+    @property
+    def idx(self) -> list[tuple]:
+        """index"""
+        return list(
+            product(*[s.members if isinstance(s, S) else [s] for s in self.index])
+        )
 
     @staticmethod
     def _bigm():

@@ -11,6 +11,7 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 
 from ..relational.c import C
 from ..relational.f import F
+
 # if TYPE_CHECKING:
 from .s import S
 
@@ -30,8 +31,6 @@ class V:
         # keeps a count of, updated in program
         self.count: int = None
 
-        self.vset = {i: V(i, name=self.name) for i in self.idx}
-
     @property
     def sym(self) -> IndexedBase | Symbol:
         """symbolic representation"""
@@ -45,7 +44,9 @@ class V:
     @property
     def idx(self) -> list[tuple]:
         """index"""
-        return list(product(*[s.members for s in self.index if isinstance(s, S)]))
+        return list(
+            product(*[s.members if isinstance(s, S) else [s] for s in self.index])
+        )
 
     def fix(self, val: float | list[float]):
         """Fix the value of the variable"""
@@ -53,10 +54,7 @@ class V:
         if self.index:
             # values are attached to indices in a dictionary
             # this helps access for getitem etc
-            self.val = {
-                idx: self._[n]
-                for n, idx in enumerate(list(product(*[s.members for s in self.index])))
-            }
+            self.val = {idx: self._[n] for n, idx in enumerate(self.idx)}
         else:
             # if list, just give positions as indices
             if isinstance(self._, list):
@@ -80,12 +78,8 @@ class V:
         if self._fixed:
             return self.val[key]
         else:
-            if self.index:
-                # if set of variables, return the variable at that key
-                return self.vset[key]
-            else:
-                # do not return anything if not fixed
-                print('TBD')
+            # do not return anything if not fixed
+            print('TBD')
 
     def __neg__(self):
         return F(rel='-', two=self)
