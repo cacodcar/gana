@@ -1,18 +1,15 @@
 """Continuous Variable
 """
 
-from __future__ import annotations
-
 from itertools import product
 from math import prod
-from typing import TYPE_CHECKING, Self
+from typing import Self
 
 from sympy import Idx, IndexedBase, Symbol, symbols
 
 from ..relational.c import C
 from ..relational.f import F
 
-# if TYPE_CHECKING:
 from .s import S
 
 
@@ -27,7 +24,6 @@ class V:
         # the flag _fixed is changed when .fix(val) is called
         self._fixed = False
         self._: int | float = None
-        self.val: dict = None
         # keeps a count of, updated in program
         self.count: int = None
 
@@ -54,14 +50,14 @@ class V:
         if self.index:
             # values are attached to indices in a dictionary
             # this helps access for getitem etc
-            self.val = {idx: self._[n] for n, idx in enumerate(self.idx)}
+            self._ = {idx: self._[n] for n, idx in enumerate(self.idx)}
         else:
             # if list, just give positions as indices
             if isinstance(self._, list):
-                self.val = {n: v for n, v in enumerate(self._)}
+                self._ = {n: v for n, v in enumerate(self._)}
             # if single value (float), give it a zero index
             else:
-                self.val = {0: self._}
+                self._ = {0: self._}
 
         self._fixed = True
 
@@ -78,8 +74,9 @@ class V:
         if self._fixed:
             return self.val[key]
         else:
-            # do not return anything if not fixed
-            print('TBD')
+            if self.val and key in self.val:
+                # if value is not fixed, it will be determined
+                print('TBD')
 
     def __neg__(self):
         return F(rel='-', two=self)

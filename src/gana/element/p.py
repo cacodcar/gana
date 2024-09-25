@@ -26,8 +26,6 @@ class P:
         self.index = args
         self._ = _
         self.name = name
-
-        self.val: dict = None
         # keeps a count of, updated in program
         self.count: int = None
 
@@ -55,7 +53,7 @@ class P:
         if self.index:
             # values are attached to indices in a dictionary
             # this helps access for getitem etc
-            self.val = {
+            self._ = {
                 idx: self._[n]
                 for n, idx in enumerate(list(product(*[s.members for s in self.index])))
             }
@@ -63,10 +61,10 @@ class P:
         else:
             # if list, just give positions as indices
             if isinstance(self._, list):
-                self.val = {n: v for n, v in enumerate(self._)}
+                self._ = {n: v for n, v in enumerate(self._)}
             # if single value (float), give it a zero index
             else:
-                self.val = {0: self._}
+                self._ = {0: self._}
 
     @property
     def sym(self) -> IndexedBase | Symbol:
@@ -77,13 +75,13 @@ class P:
                     IndexedBase(self.name)[
                         symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
                     ]
-                    if isinstance(self._, list)
+                    if isinstance(self._, dict)
                     else self._
                 )
             else:
-                return Symbol(self.name) if isinstance(self._, list) else self._
+                return Symbol(self.name) if isinstance(self._, dict) else self._
         else:
-            return Symbol('') if isinstance(self._, list) else self._
+            return Symbol('') if isinstance(self._, dict) else self._
 
     @property
     def idx(self) -> list[tuple]:
@@ -106,7 +104,7 @@ class P:
         return prod([len(s) for s in self.index])
 
     def __getitem__(self, key: int | tuple):
-        return self.val[key]
+        return self._[key]
 
     def __neg__(self):
 

@@ -53,6 +53,9 @@ class S:
     def __len__(self):
         return len(self.members)
 
+    def __getitem__(self, key: int | str):
+        return self.members[key]
+
     def __contains__(self, other: Any):
         return True if other in self.members else False
 
