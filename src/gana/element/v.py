@@ -13,6 +13,30 @@ from ..relational.f import F
 from .s import S
 
 
+class _V:
+    """Variable at a particular index"""
+
+    def __init__(self, idx: tuple, name: str):
+        self.idx = idx
+        self.name = f'{name}{idx}'
+
+    @property
+    def sym(self) -> IndexedBase | Symbol:
+        """symbolic representation"""
+        return IndexedBase(self.name)[
+            symbols(",".join([f'{d}' for d in self.idx]), cls=Idx)
+        ]
+
+    def __repr__(self):
+        return self.name
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __len__(self):
+        return 1
+
+
 class V:
     """A Continuous Variable"""
 
@@ -23,7 +47,7 @@ class V:
         # value is determined when mathematical model is solved
         # the flag _fixed is changed when .fix(val) is called
         self._fixed = False
-        self._: int | float = None
+        self._ = None
         # keeps a count of, updated in program
         self.count: int = None
 
@@ -61,6 +85,13 @@ class V:
 
         self._fixed = True
 
+    def x(self) -> list[_V] | Self:
+        """Variables at all indices"""
+        if self.index:
+            return [_V(i, self.name) for i in self.idx]
+        else:
+            return self
+
     def __repr__(self):
         return self.name
 
@@ -72,11 +103,7 @@ class V:
 
     def __getitem__(self, key: int | tuple):
         if self._fixed:
-            return self.val[key]
-        else:
-            if self.val and key in self.val:
-                # if value is not fixed, it will be determined
-                print('TBD')
+            return self._[key]
 
     def __neg__(self):
         return F(rel='-', two=self)

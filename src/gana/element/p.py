@@ -1,11 +1,9 @@
 """A Paramter
 """
 
-from __future__ import annotations
-
 from itertools import product
 from math import prod
-from typing import TYPE_CHECKING, Self
+from typing import Self
 
 from sympy import Idx, IndexedBase, Symbol, symbols
 
@@ -14,9 +12,32 @@ from ..relational.f import F
 from .m import M
 from .v import V
 from .z import Z
+from .s import S
 
-if TYPE_CHECKING:
-    from .s import S
+
+class _P:
+    """Parameter at a particular index"""
+
+    def __init__(self, _: float, idx: tuple, name: str):
+        self._ = _
+        self.idx = idx
+        self.name = f'{name}{idx}'
+
+    @property
+    def sym(self) -> IndexedBase | Symbol:
+        """symbolic representation"""
+        return IndexedBase(self.name)[
+            symbols(",".join([f'{d}' for d in self.idx]), cls=Idx)
+        ]
+
+    def __repr__(self):
+        return self.name
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __len__(self):
+        return 1
 
 
 class P:
@@ -89,6 +110,13 @@ class P:
         return list(
             product(*[s.members if isinstance(s, S) else [s] for s in self.index])
         )
+
+    def x(self) -> list[_P] | Self:
+        """Variables at all indices"""
+        if self.index:
+            return [_P(self._[i], i, self.name) for i in self.idx]
+        else:
+            return self
 
     @staticmethod
     def _bigm():

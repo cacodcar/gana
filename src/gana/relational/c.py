@@ -18,9 +18,7 @@ if TYPE_CHECKING:
 class C:
     """Constraint gives the relationship between Parameters, Variables, or Expressions"""
 
-    def __init__(
-        self, lhs: F | P | V, rhs: F | P | V, rel: str = 'eq', name: str = 'cons'
-    ):
+    def __init__(self, lhs: F | V, rhs: P, rel: str = 'eq', name: str = 'cons'):
         self.lhs = lhs
         self.rhs = rhs
         self.rel = rel
