@@ -39,11 +39,6 @@ class S:
         # keeps a count of, updated in program
         self.count: int = None
 
-    @property
-    def sym(self) -> FiniteSet:
-        """symbolic representation"""
-        return FiniteSet(*self.members)
-
     def __repr__(self):
         return self.name
 
@@ -118,3 +113,7 @@ class S:
 
     def __iter__(self):
         return iter(self.members)
+
+    def __call__(self) -> FiniteSet:
+        """symbolic representation"""
+        return FiniteSet(*self.members)

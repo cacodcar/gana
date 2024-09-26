@@ -25,11 +25,6 @@ class M:
         else:
             return 'M'
 
-    @property
-    def sym(self):
-        """Symbol"""
-        return -IndexedBase('M') if self.neg else IndexedBase('M')
-
     def __repr__(self):
         return self.name
 
@@ -117,3 +112,6 @@ class M:
 
     def __ne__(self, other: Self):
         return not self == other
+
+    def __call__(self) -> IndexedBase:
+        return -IndexedBase('M') if self.neg else IndexedBase('M')

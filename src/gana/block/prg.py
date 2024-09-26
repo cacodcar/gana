@@ -152,12 +152,7 @@ class Prg:
     def eqns(self):
         """Return all equations"""
         for c in self.constraints:
-            yield c.sym
-
-    def pprint(self):
-        """Pretty prints the component"""
-        for e in self.eqns():
-            display(Math(latex(e, mul_symbol='dot')))
+            yield c()
 
     def latex(self):
         """Returns the latex"""
@@ -169,3 +164,8 @@ class Prg:
 
     def __hash__(self):
         return hash(self.name)
+
+    def __call__(self):
+        """Pretty prints the component"""
+        for e in self.eqns():
+            display(Math(latex(e, mul_symbol='dot')))

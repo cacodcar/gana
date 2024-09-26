@@ -29,11 +29,6 @@ class C:
         # since indices should match, take any
         self.index = self.lhs.index
 
-    @property
-    def sym(self) -> LessThan | GreaterThan | Eq:
-        """symbolic representation"""
-        return Rel(self.lhs.sym, self.rhs.sym, self.rel)
-
     def x(self):
         """Elements in the constraint"""
         return sum([f if isinstance(f, list) else [f] for f in self.lhs.x()], [])
@@ -43,3 +38,7 @@ class C:
 
     def __hash__(self):
         return hash(self.name)
+
+    def __call__(self) -> LessThan | GreaterThan | Eq:
+        """symbolic representation"""
+        return Rel(self.lhs(), self.rhs(), self.rel)

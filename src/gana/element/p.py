@@ -51,23 +51,6 @@ class P:
                     self._[i] = M()
 
     @property
-    def sym(self) -> IndexedBase | Symbol:
-        """symbolic representation"""
-        if self.name:
-            if self.index:
-                return (
-                    IndexedBase(self.name)[
-                        symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
-                    ]
-                    if isinstance(self._, list)
-                    else self._
-                )
-            else:
-                return Symbol(self.name) if isinstance(self._, list) else self._
-        else:
-            return Symbol('') if isinstance(self._, list) else self._
-
-    @property
     def idx(self) -> list[tuple]:
         """index"""
         if not self.mum:
@@ -320,3 +303,19 @@ class P:
             return not self < other
         else:
             return self >= other
+
+    def __call__(self) -> IndexedBase | Symbol:
+        """symbolic representation"""
+        if self.name:
+            if self.index:
+                return (
+                    IndexedBase(self.name)[
+                        symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
+                    ]
+                    if isinstance(self._, list)
+                    else self._
+                )
+            else:
+                return Symbol(self.name) if isinstance(self._, list) else self._
+        else:
+            return Symbol('') if isinstance(self._, list) else self._

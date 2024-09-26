@@ -18,14 +18,16 @@ class O:
         # keeps a count of, updated in program
         self.count: int = None
 
-    @property
-    def sym(self):
-        """symbolic representation"""
-        if self.func:
-            return self.func.sym
-
     def __repr__(self):
         return self.name
 
     def __hash__(self):
         return hash(self.name)
+
+    def __len__(self):
+        return 1
+
+    def __call__(self):
+        """symbolic representation"""
+        if self.func:
+            return self.func()

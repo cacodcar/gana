@@ -53,29 +53,6 @@ class F:
         # keeps a count of, updated in program
         self.count: int = None
 
-    @property
-    def sym(self) -> Add:
-        """symbolic representation"""
-
-        if self.rel == '+':
-            if self.one:
-                return self.one.sym + self.two.sym
-            else:
-                return self.two.sym
-
-        if self.rel == '-':
-            if self.one:
-                return self.one.sym - self.two.sym
-            # this is used to generate negatives
-            else:
-                return -self.two.sym
-
-        if self.rel == '*':
-            return self.one.sym * self.two.sym
-
-        if self.rel == '/':
-            return self.one.sym / self.two.sym
-
     def x(self):
         """Elements in the function"""
         return sum(
@@ -120,3 +97,25 @@ class F:
 
     def __gt__(self, other: Self | P | V):
         return self >= other
+
+    def __call__(self) -> Add:
+        """symbolic representation"""
+
+        if self.rel == '+':
+            if self.one:
+                return self.one() + self.two()
+            else:
+                return self.two()
+
+        if self.rel == '-':
+            if self.one:
+                return self.one() - self.two()
+            # this is used to generate negatives
+            else:
+                return -self.two()
+
+        if self.rel == '*':
+            return self.one() * self.two()
+
+        if self.rel == '/':
+            return self.one() / self.two()

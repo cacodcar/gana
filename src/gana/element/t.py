@@ -25,8 +25,13 @@ class T:
         # keeps a count of, updated in program
         self.count: int = None
 
-    @property
-    def sym(self) -> IndexedBase | Symbol:
+    def __repr__(self):
+        return self.name
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __call__(self) -> IndexedBase | Symbol:
         """symbolic representation"""
         if self.index:
             return IndexedBase(f'θ^{self.name}')[
@@ -35,8 +40,4 @@ class T:
         else:
             return Symbol(f'θ^{self.name}')
 
-    def __repr__(self):
-        return self.name
-
-    def __hash__(self):
-        return hash(self.name)
+    # TODO - __mul__ and __add__ methods

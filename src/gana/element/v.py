@@ -40,16 +40,6 @@ class V:
         self.kids: list[Self] = []
 
     @property
-    def sym(self) -> IndexedBase | Symbol:
-        """symbolic representation"""
-        if self.index:
-            return IndexedBase(self.name)[
-                symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
-            ]
-        else:
-            return Symbol(self.name)
-
-    @property
     def idx(self) -> list[tuple]:
         """index"""
         return list(
@@ -133,3 +123,12 @@ class V:
 
     def __gt__(self, other):
         return self >= other
+
+    def __call__(self) -> IndexedBase | Symbol:
+        """symbolic representation"""
+        if self.index:
+            return IndexedBase(self.name)[
+                symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
+            ]
+        else:
+            return Symbol(self.name)
