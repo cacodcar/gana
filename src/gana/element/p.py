@@ -78,8 +78,10 @@ class P:
             return self._[key]
 
     def __neg__(self):
-
-        return P(*self.index, _=[-i for i in self._])
+        if isinstance(self._, list):
+            return P(*self.index, _=[-i for i in self._])
+        else:
+            return P(*self.index, _=-self._)
 
     def __pos__(self):
         return P(*self.index, _=[+i for i in self._])
@@ -244,42 +246,67 @@ class P:
     def __eq__(self, other: Self):
 
         if isinstance(other, P):
-            check = list({i == j for i, j in zip(self._, other._)})
-            if len(check) == 1 and check[0] is True:
+            if isinstance(self._, list) and all(
+                [i == j for i, j in zip(self._, other._)]
+            ):
                 return True
+            elif isinstance(self._, (int, float)) and self._ == other._:
+                return True
+
             else:
                 return False
+        elif isinstance(other, (V, F)):
+            return C(lhs=self, rhs=other, rel='eq')
 
         else:
-            return C(lhs=self, rhs=other, rel='eq')
+            return False
 
     def __le__(self, other: Self):
 
         if isinstance(other, P):
-            check = [i <= j for i, j in zip(self._, other._)]
-            if all(check):
+            if isinstance(self._, list) and all(
+                [i <= j for i, j in zip(self._, other._)]
+            ):
                 return True
+            elif isinstance(self._, (int, float)) and self._ <= other._:
+                return True
+
             else:
                 return False
 
-        else:
+        elif isinstance(other, (V, F)):
             return C(lhs=self, rhs=other, rel='le')
+
+        else:
+            return False
 
     def __ge__(self, other: Self):
         if isinstance(other, P):
-            return not self <= other
+            if isinstance(self._, list) and all(
+                [i >= j for i, j in zip(self._, other._)]
+            ):
+                return True
+            elif isinstance(self._, (int, float)) and self._ >= other._:
+                return True
+
+            else:
+                return False
+
         else:
             return C(lhs=self, rhs=other, rel='ge')
 
     def __lt__(self, other: Self):
 
         if isinstance(other, P):
-            check = [i < j for i, j in zip(self._, other._)]
-            if all(check):
+            if isinstance(self._, list) and all(
+                [i < j for i, j in zip(self._, other._)]
+            ):
                 return True
+            elif isinstance(self._, (int, float)) and self._ < other._:
+                return True
+
             else:
                 return False
-
         else:
             return self <= other
 
@@ -293,7 +320,15 @@ class P:
 
     def __gt__(self, other: Self):
         if isinstance(other, P):
-            return not self < other
+            if isinstance(self._, list) and all(
+                [i > j for i, j in zip(self._, other._)]
+            ):
+                return True
+            elif isinstance(self._, (int, float)) and self._ > other._:
+                return True
+
+            else:
+                return False
         else:
             return self >= other
 

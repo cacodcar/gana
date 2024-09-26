@@ -53,10 +53,22 @@ def prgp1(prg):
 
 
 @pytest.fixture
+def _prgp1(prgp1):
+    """- prgp1"""
+    return -prgp1
+
+
+@pytest.fixture
 def prgp2(prg, s1):
     """index + scalar parameter"""
     prg.p2 = P(s1, _=5)
     return prg.p2
+
+
+@pytest.fixture
+def _prgp2(prgp2):
+    """- prgp2"""
+    return -prgp2
 
 
 @pytest.fixture
@@ -66,13 +78,29 @@ def prgp3(prg, s0, s1):
     return prg.p3
 
 
-def test_prgparams(s0, s1, prgp0, prgp1, prgp2, prgp3):
+def test_prgparams(s0, s1, prgp0, prgp1, _prgp1, prgp2, _prgp2, prgp3):
     assert prgp0._ == 5
+    assert -prgp0 == P(_=-5)
     assert prgp0.index == ()
-    assert prgp1._ == [P(_=4), P(_=5), P(_=6)]
-    assert prgp2._ == [P('a', _=5), P('b', _=5), P('c', _=5)]
+    assert prgp1._ == [4, 5, 6]
+    assert _prgp1._ == [-4, -5, -6]
+    assert prgp2._ == [
+        P('a', name='prgp2', _=5),
+        P('b', name='prgp2', _=5),
+        P('c', name='prgp2', _=5),
+    ]
+    assert _prgp2._ == [
+        P('a', name='prgp2', _=-5),
+        P('b', name='prgp2', _=-5),
+        P('c', name='prgp2', _=-5),
+    ]
+
     assert prgp2.index[0] == s1
-    assert prgp3._ == [P(_=[4]), P(_=[5]), P(_=[6])]
+    assert prgp3._ == [
+        P(name='prgp3', _=[4]),
+        P(name='prgp3', _=[5]),
+        P(name='prgp3', _=[6]),
+    ]
     assert prgp3._ == [P(s0, _=4), P(s0, _=[5]), P(s0, _=[6])]
     assert prgp3.idx == [(0, 'a'), (0, 'b'), (0, 'c')]
     assert prgp3._[0].index == (0, 'a')
