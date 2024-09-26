@@ -11,20 +11,25 @@ from sympy import IndexedBase
 class Z:
     """Zero, Shunya"""
 
-    def __init__(self, _: float = None, pos: bool = True):
-        # big value if needed
+    def __init__(self, _: float = None, neg: bool = False):
+        if _ and _ < 0:
+            raise ValueError('Zero value cant be negative, give neg = True')
+        # a tolerance value if needed
         self._ = _
-        self.pos = pos
+        self.neg = neg
 
     @property
     def name(self):
         """name"""
-        return '-zero' if not self.pos or self._ < 0 else 'zero'
+        if self.neg:
+            return '-Z'
+        else:
+            return 'Z'
 
     @property
     def sym(self):
         """Symbol"""
-        return -IndexedBase('δ') if not self.pos or self._ < 0 else IndexedBase('δ')
+        return -IndexedBase('δ') if self.neg else IndexedBase('δ')
 
     def __repr__(self):
         return self.name
@@ -36,65 +41,85 @@ class Z:
         return 1
 
     def __neg__(self):
-        return Z()
+        if self.neg:
+            return Z()
+        else:
+            return Z(neg=True)
 
     def __pos__(self):
-        return Z()
+        return self
 
     def __add__(self, other: Self | float):
-        if isinstance(other, Z):
-            return Z(_=self._ + other._)
+        return other
 
-        if isinstance(other, (int, float)):
-            return other
+    def __radd__(self, other: Self | float):
+        return other
 
     def __sub__(self, other: Self | float):
         if isinstance(other, Z):
-            return Z(_=self._ - other._)
-
-        if isinstance(other, (int, float)):
+            return self
+        else:
             return -other
+
+    def __rsub__(self, other: Self | float):
+        return other
+
+    def __mul__(self, other: Self | float):
+        return self
+
+    def __rmul__(self, other: Self | float):
+        return self
+
+    def __truediv__(self, other: Self | float):
+        return self
+
+    def __rtruediv__(self, other: Self | float):
+        raise ValueError('Cant divide by zero')
 
     def __gt__(self, other: Self | float):
 
         if isinstance(other, Z):
-            # zero is smaller
-            return self._ > other._
+            if self.neg and not other.neg:
+                return True
+
+            if not self.neg and other.neg:
+                return False
+
+            if self.neg and other.neg:
+                return False
+
+            if not self.neg and not other.neg:
+                return False
 
         if isinstance(other, (int, float)):
 
+            if other < 0:
+                return True
+
             if other >= 0:
                 return False
-            else:
-                return True
 
     def __ge__(self, other: Self | float):
-
-        if isinstance(other, Z):
-            # zero is smaller
-            return self._ >= other._
-
-        if isinstance(other, (int, float)):
-            if other >= 0:
-                return False
-            else:
-                return True
+        return self > other
 
     def __lt__(self, other: Self | float):
         return not self > other
 
     def __le__(self, other: Self | float):
-        return not self >= other
+        return not self > other
 
     def __eq__(self, other: Self | float):
-
         if isinstance(other, Z):
-            if self._ == other._:
+            if self.neg and other.neg:
                 return True
 
-        if isinstance(other, (int, float)):
-            if other == 0:
+            if not self.neg and not other.neg:
                 return True
+
+            if (not self.neg and other.neg) or (self.neg and not other.neg):
+                return False
+        else:
+            return False
 
     def __ne__(self, other: Self | float):
         return not self == other

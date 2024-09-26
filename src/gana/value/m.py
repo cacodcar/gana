@@ -1,13 +1,9 @@
 """BigM 
 """
 
-from __future__ import annotations
-
 from typing import Self
 
 from sympy import IndexedBase
-
-from ..element.p import P
 
 
 class M:
@@ -15,7 +11,7 @@ class M:
 
     def __init__(self, _: float = None, neg: bool = False):
         if _ and _ < 0:
-            raise ValueError('Big M cannot be negative')
+            raise ValueError('Big M cannot be negative, give neg = True')
         # big value if needed
         self._ = _
         # if this is a negative big M
@@ -24,7 +20,10 @@ class M:
     @property
     def name(self):
         """name"""
-        return 'M' if not self.neg or self._ < 0 else 'M'
+        if self.neg:
+            return '-M'
+        else:
+            return 'M'
 
     @property
     def sym(self):
@@ -41,25 +40,37 @@ class M:
         return 1
 
     def __neg__(self):
-        return M()
+        if self.neg:
+            return M()
+        else:
+            return M(neg=True)
 
     def __pos__(self):
-        return M()
+        return self
 
     def __add__(self, other: Self | float):
-        if self.neg:
-            return M(neg=True)
-        else:
-            return M()
+        return self
 
     def __radd__(self, other: Self | float):
-        return self + other
+        return self
 
     def __sub__(self, other: Self):
-        return self + other
+        return self
 
     def __rsub__(self, other: Self):
-        return self + other
+        return -self
+
+    def __mul__(self, other: Self):
+        return self
+
+    def __rmul__(self, other: Self):
+        return self
+
+    def __truediv__(self, other: Self):
+        return self
+
+    def __rtruediv__(self, other: Self):
+        return 0
 
     def __gt__(self, other: Self):
         if isinstance(other, M):
@@ -75,23 +86,12 @@ class M:
 
             if not self.neg and not other.neg:
                 return False
+
         if isinstance(other, (int, float)):
-
-            if self.neg and other < 0:
+            if self.neg:
+                return False
+            else:
                 return True
-
-            if not self.neg and other < 0:
-                return False
-
-            if self.neg and other >= 0:
-                return False
-
-            if not self.neg and other >= 0:
-                return False
-            
-        if isinstance(other, P):
-            if P.
-            return True
 
     def __ge__(self, other: Self):
         return self > other
@@ -103,7 +103,17 @@ class M:
         return not self > other
 
     def __eq__(self, other: Self):
-        return False
+        if isinstance(other, M):
+            if self.neg and other.neg:
+                return True
+
+            if not self.neg and not other.neg:
+                return True
+
+            if (not self.neg and other.neg) or (self.neg and not other.neg):
+                return False
+        else:
+            return False
 
     def __ne__(self, other: Self):
         return not self == other
