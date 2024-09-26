@@ -9,9 +9,9 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 
 from ..relational.c import C
 from ..relational.f import F
-from .m import M
+from ..value.m import M
 from .v import V
-from .z import Z
+from ..value.z import Z
 from .s import S
 
 
@@ -49,19 +49,6 @@ class P:
             for i, v in enumerate(self._):
                 if isinstance(v, bool) and v is True:
                     self._[i] = M()
-
-        # if self.index:
-        #     # values are attached to indices in a dictionary
-        #     # this helps access for getitem etc
-        #     self._ = {i: self._[n] for n, i in enumerate(self.idx)}
-
-        # else:
-        #     # if list, just give positions as indices
-        #     if isinstance(self._, list):
-        #         self._ = {n: v for n, v in enumerate(self._)}
-        #     # if single value (float), give it a zero index
-        #     else:
-        #         self._ = {0: self._}
 
     @property
     def sym(self) -> IndexedBase | Symbol:
