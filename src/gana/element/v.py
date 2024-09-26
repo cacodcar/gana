@@ -77,10 +77,14 @@ class V:
         return prod([len(s) if isinstance(s, S) else 1 for s in self.index])
 
     def __getitem__(self, key: int | tuple):
+        if isinstance(key, tuple):
+            k = self.idx.index(key)
+        if isinstance(key, int):
+            k = key
         if self._fixed:
-            return self._[key]
+            return self.kids[k]._
         else:
-            return self.kids[self.idx.index(key)]
+            return self.kids[k]
 
     def __repr__(self):
         return self.name

@@ -104,7 +104,12 @@ class P:
         return prod([len(s) if isinstance(s, S) else 1 for s in self.index])
 
     def __getitem__(self, key: int | tuple):
-        return self._[key]
+
+        if isinstance(key, tuple):
+            return self._[self.idx.index(key)]
+
+        if isinstance(key, int):
+            return self._[key]
 
     def __neg__(self):
 
@@ -162,6 +167,23 @@ class P:
             # added to a function returns a function
             return F(one=self, two=other, rel='+')
 
+    def __radd__(self, other: Self):
+        if isinstance(other, M):
+            return M()
+
+        if isinstance(other, Z):
+            return self
+
+        if isinstance(other, (int, float)):
+            for i in self:
+                i._ = [ii + other for ii in i._]
+            return self
+
+        if isinstance(other, list):
+            for n, i in enumerate(self):
+                i._ = i._ + other[n]
+            return self
+
     def __sub__(self, other: Self):
 
         if isinstance(other, M):
@@ -189,6 +211,24 @@ class P:
                 )
             else:
                 return F(one=self, rel='-', two=other)
+
+    def __rsub__(self, other: Self):
+
+        if isinstance(other, M):
+            return M()
+
+        if isinstance(other, Z):
+            return -self
+
+        if isinstance(other, (int, float)):
+            for i in self:
+                i._ = other - i._
+            return self
+
+        if isinstance(other, list):
+            for n, i in enumerate(other):
+                self._[n]._ = i - self._[n]._
+                return self
 
     def __mul__(self, other: Self):
         if isinstance(other, P):

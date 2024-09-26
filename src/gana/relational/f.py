@@ -41,7 +41,7 @@ class F:
             and is_not(self.one.mum, self.two.mum)
             and self.one.index != self.two.index
         ):
-            raise ValueError('Indexes of both variables must be same')
+            raise ValueError('Cant operate with variables of different indices')
 
         if self.one:
             self.index = self.one.index
@@ -56,7 +56,10 @@ class F:
         """symbolic representation"""
 
         if self.rel == '+':
-            return self.one.sym + self.two.sym
+            if self.one:
+                return self.one.sym + self.two.sym
+            else:
+                return self.two.sym
 
         if self.rel == '-':
             if self.one:

@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-
+from operator import is_not
 from sympy import Rel
 
 
@@ -26,10 +26,6 @@ class C:
 
         # keeps a count of, updated in program
         self.count: int = None
-
-        if self.lhs.index != self.rhs.index:
-            raise ValueError('Indexes of all variables in a constraint must be same')
-
         # since indices should match, take any
         self.index = self.lhs.index
 
