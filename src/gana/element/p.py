@@ -18,7 +18,7 @@ from .s import S
 class P:
     """A Parameter"""
 
-    def __init__(self, *args: S, _: int | float | list | bool = 0, name: str = 'Param'):
+    def __init__(self, *args: S, _: int | float | list | bool, name: str = 'Param'):
         self.index = args
         self._: Self = _
         self.name = name

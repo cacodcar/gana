@@ -4,12 +4,12 @@ from src.gana.value.m import M
 from src.gana.value.z import Z
 
 
-@pytest.fixture()
+@pytest.fixture
 def m():
     return M()
 
 
-@pytest.fixture()
+@pytest.fixture
 def z():
     return Z()
 

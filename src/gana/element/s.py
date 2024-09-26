@@ -3,7 +3,7 @@
 from operator import is_
 from typing import Any, Self
 
-from sympy import FiniteSet, Symbol
+from sympy import FiniteSet
 
 
 class S:
@@ -61,7 +61,12 @@ class S:
 
     def __eq__(self, other: Self):
         if isinstance(other, S):
-            return is_(self, other)
+            if set(self.members) == set(other.members):
+                return True
+            else:
+                return False
+        else:
+            return False
 
     def __and__(self, other: Self):
         if isinstance(other, S):
