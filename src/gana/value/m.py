@@ -1,13 +1,9 @@
 """BigM 
 """
 
-from __future__ import annotations
-
 from typing import Self
 
 from sympy import IndexedBase
-
-from ..element.p import P
 
 
 class M:
@@ -41,10 +37,13 @@ class M:
         return 1
 
     def __neg__(self):
-        return M()
+        if self.neg:
+            return M()
+        else:
+            return M(neg=True)
 
     def __pos__(self):
-        return M()
+        return self
 
     def __add__(self, other: Self | float):
         if self.neg:
@@ -75,23 +74,19 @@ class M:
 
             if not self.neg and not other.neg:
                 return False
-        if isinstance(other, (int, float)):
 
+        if isinstance(other, (int, float)):
             if self.neg and other < 0:
-                return True
+                return False
 
             if not self.neg and other < 0:
-                return False
+                return True
 
             if self.neg and other >= 0:
                 return False
 
             if not self.neg and other >= 0:
-                return False
-            
-        if isinstance(other, P):
-            if P.
-            return True
+                return True
 
     def __ge__(self, other: Self):
         return self > other
