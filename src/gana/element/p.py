@@ -133,21 +133,10 @@ class P:
             return F(one=self, two=other, rel='+')
 
     def __radd__(self, other: Self):
-        if isinstance(other, M):
-            return M()
-
-        if isinstance(other, Z):
+        if other == 0:
             return self
-
-        if isinstance(other, (int, float)):
-            for i in self:
-                i._ = [ii + other for ii in i._]
-            return self
-
-        if isinstance(other, list):
-            for n, i in enumerate(self):
-                i._ = i._ + other[n]
-            return self
+        else:
+            return self + other
 
     def __sub__(self, other: Self):
 
@@ -157,10 +146,7 @@ class P:
         if isinstance(other, P):
             return P(
                 *self.index,
-                _=[
-                    i - j if not isinstance(i, M) else M()
-                    for i, j in zip(self._, other._)
-                ],
+                _=[i - j for i, j in zip(self._, other._)],
             )
         if isinstance(other, F):
             return F(one=self, two=other, rel='-')
@@ -169,31 +155,13 @@ class P:
             if self._ and other._:
                 return P(
                     *self.index,
-                    _=[
-                        i - j if not isinstance(i, M) else M()
-                        for i, j in zip(self._, other._)
-                    ],
+                    _=[i - j for i, j in zip(self._, other._)],
                 )
             else:
                 return F(one=self, rel='-', two=other)
 
     def __rsub__(self, other: Self):
-
-        if isinstance(other, M):
-            return M()
-
-        if isinstance(other, Z):
-            return -self
-
-        if isinstance(other, (int, float)):
-            for i in self:
-                i._ = other - i._
-            return self
-
-        if isinstance(other, list):
-            for n, i in enumerate(other):
-                self._[n]._ = i - self._[n]._
-                return self
+        return self - other
 
     def __mul__(self, other: Self):
         if isinstance(other, P):
@@ -220,6 +188,9 @@ class P:
             else:
                 return F(one=self, rel='*', two=other)
 
+    def __rmul__(self, other: Self):
+        return self * other
+
     def __truediv__(self, other: Self):
         if isinstance(other, P):
             return P(*self.index, _=[i / j for i, j in zip(self._, other._)])
@@ -230,6 +201,9 @@ class P:
                 return P(*self.index, _=[i / j for i, j in zip(self._, other._)])
             else:
                 return F(one=self, rel='/', two=other)
+
+    def __rtruediv__(self, other: Self):
+        return self / other
 
     def __floordiv__(self, other: Self):
 

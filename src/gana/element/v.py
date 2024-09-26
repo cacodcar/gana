@@ -101,7 +101,7 @@ class V:
         if other == 0:
             return self
         else:
-            return self.__add__(other)
+            return self + other
 
     def __sub__(self, other: Self | F):
 
