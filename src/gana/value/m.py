@@ -1,0 +1,109 @@
+"""BigM 
+"""
+
+from __future__ import annotations
+
+from typing import Self
+
+from sympy import IndexedBase
+
+from ..element.p import P
+
+
+class M:
+    """BigM, infinity basically"""
+
+    def __init__(self, _: float = None, neg: bool = False):
+        if _ and _ < 0:
+            raise ValueError('Big M cannot be negative')
+        # big value if needed
+        self._ = _
+        # if this is a negative big M
+        self.neg = neg
+
+    @property
+    def name(self):
+        """name"""
+        return 'M' if not self.neg or self._ < 0 else 'M'
+
+    @property
+    def sym(self):
+        """Symbol"""
+        return -IndexedBase('M') if self.neg else IndexedBase('M')
+
+    def __repr__(self):
+        return self.name
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __len__(self):
+        return 1
+
+    def __neg__(self):
+        return M()
+
+    def __pos__(self):
+        return M()
+
+    def __add__(self, other: Self | float):
+        if self.neg:
+            return M(neg=True)
+        else:
+            return M()
+
+    def __radd__(self, other: Self | float):
+        return self + other
+
+    def __sub__(self, other: Self):
+        return self + other
+
+    def __rsub__(self, other: Self):
+        return self + other
+
+    def __gt__(self, other: Self):
+        if isinstance(other, M):
+
+            if self.neg and not other.neg:
+                return True
+
+            if not self.neg and other.neg:
+                return False
+
+            if self.neg and other.neg:
+                return False
+
+            if not self.neg and not other.neg:
+                return False
+        if isinstance(other, (int, float)):
+
+            if self.neg and other < 0:
+                return True
+
+            if not self.neg and other < 0:
+                return False
+
+            if self.neg and other >= 0:
+                return False
+
+            if not self.neg and other >= 0:
+                return False
+            
+        if isinstance(other, P):
+            if P.
+            return True
+
+    def __ge__(self, other: Self):
+        return self > other
+
+    def __lt__(self, other: Self):
+        return not self > other
+
+    def __le__(self, other: Self):
+        return not self > other
+
+    def __eq__(self, other: Self):
+        return False
+
+    def __ne__(self, other: Self):
+        return not self == other
