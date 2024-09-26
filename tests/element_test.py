@@ -94,7 +94,7 @@ def prgv2(prg, s0, s1):
     return prg.v2
 
 
-# def test_vars(prgv1, prgv2):
+def test_vars(prgv1, prgv2):
 
-#     assert prgv1._ == [V('a'), V('b'), V('c')]
-#     assert prgv2._ == [V(0, 'a'), V(0, 'b'), V(0, 'c')]
+    assert prgv1._ == [V('a'), V('b'), V('c')]
+    assert prgv2._ == [V(0, 'a'), V(0, 'b'), V(0, 'c')]

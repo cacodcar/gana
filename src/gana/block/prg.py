@@ -85,12 +85,9 @@ class Prg:
             # if variable has index
             # generate variables for each index
             if value.index:
-                for i in value.idx:
-                    value.kids.append(
-                        V(*i, name=value.name, itg=value.itg, nn=value.nn)
-                    )
-                for k in value.kids:
-                    k.mum = value
+                for n, i in enumerate(value.idx):
+                    value._.append(V(*i, name=value.name, itg=value.itg, nn=value.nn))
+                    value._[n].mum = value
 
             if value.itg:
                 # integer variable

@@ -20,7 +20,7 @@ class P:
 
     def __init__(self, *args: S, _: int | float | list | bool, name: str = 'Param'):
         self.index = args
-        self._: Self = _
+        self._: list[Self] = _
         self.name = name
         # keeps a count of, updated in program
         self.count: int = None
@@ -59,10 +59,6 @@ class P:
             )
         else:
             return self.index
-
-    @staticmethod
-    def _bigm():
-        return M()
 
     def __repr__(self):
         return self.name
@@ -123,10 +119,7 @@ class P:
                 # evaluated variables return Parameters
                 return P(
                     *self.index,
-                    _=[
-                        i + j if not isinstance(i, M) else M()
-                        for i, j in zip(self._, other._)
-                    ],
+                    _=[i + j for i, j in zip(self._, other._)],
                 )
 
             else:
