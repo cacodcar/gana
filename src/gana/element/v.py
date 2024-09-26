@@ -101,6 +101,12 @@ class V:
     def __add__(self, other: Self | F):
         return F(one=self, two=other, rel='+')
 
+    def __radd__(self, other: Self | F | int):
+        if other == 0:
+            return self
+        else:
+            return self.__add__(other)
+
     def __sub__(self, other: Self | F):
 
         return F(one=self, two=other, rel='-')

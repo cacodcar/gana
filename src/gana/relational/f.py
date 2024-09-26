@@ -38,6 +38,8 @@ class F:
         if (
             self.one
             and self.two
+            and not isinstance(self.two, F)
+            and not isinstance(self.one, F)
             and is_not(self.one.mum, self.two.mum)
             and self.one.index != self.two.index
         ):
