@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class O:
     """Minimization Objective"""
 
-    def __init__(self, *args: F, name: str = 'min'):
+    def __init__(self, *args: tuple[F], name: str = 'min'):
         self.func: F = args[0] if args else None
         self.name = name
 
@@ -31,3 +31,5 @@ class O:
         """symbolic representation"""
         if self.func:
             return self.func()
+        else:
+            return 0

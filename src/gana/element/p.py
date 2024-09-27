@@ -167,29 +167,17 @@ class P:
         if isinstance(other, P):
             return P(
                 *self.index,
-                _=[
-                    i * j if not isinstance(i, M) else M()
-                    for i, j in zip(self._, other._)
-                ],
+                _=[i * j for i, j in zip(self._, other._)],
             )
 
         if isinstance(other, F):
             return F(one=self, rel='*', two=other)
 
         if isinstance(other, V):
-            if self._ and other._:
-                return P(
-                    *self.index,
-                    _=[
-                        i * j if not isinstance(i, M) else M()
-                        for i, j in zip(self._, other._)
-                    ],
-                )
-            else:
-                return F(one=self, rel='*', two=other)
+            return F(one=self, rel='*', two=other)
 
     def __rmul__(self, other: Self):
-        return self * other
+        return other * self
 
     def __truediv__(self, other: Self):
         if isinstance(other, P):
@@ -197,13 +185,10 @@ class P:
         if isinstance(other, F):
             return F(one=self, two=other, rel='/')
         if isinstance(other, V):
-            if self._ and other._:
-                return P(*self.index, _=[i / j for i, j in zip(self._, other._)])
-            else:
-                return F(one=self, rel='/', two=other)
+            return F(one=self, rel='/', two=other)
 
     def __rtruediv__(self, other: Self):
-        return self / other
+        return other * self
 
     def __floordiv__(self, other: Self):
 
@@ -308,16 +293,25 @@ class P:
 
     def __call__(self) -> IndexedBase | Symbol:
         """symbolic representation"""
-        if self.name:
-            if self.index:
-                return (
-                    IndexedBase(self.name)[
+
+        if isinstance(self._, list):
+            if len(self._) == 1:
+                if isinstance(self._[0], P):
+                    return self._[0]._[0]
+
+                else:
+                    return self._[0]
+
+            else:
+                if self.index:
+                    return IndexedBase(self.name)[
                         symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
                     ]
-                    if isinstance(self._, list)
-                    else self._
-                )
-            else:
-                return Symbol(self.name) if isinstance(self._, list) else self._
+                else:
+                    return Symbol(self.name)
         else:
-            return Symbol('') if isinstance(self._, list) else self._
+            if isinstance(self._, P):
+                return self._._
+
+            else:
+                return self._

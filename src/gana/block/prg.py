@@ -146,11 +146,6 @@ class Prg:
             self.constraints = list(set(self.constraints) | set(prg.constraints))
             self.objectives = list(set(self.objectives) | set(prg.objectives))
 
-    def eqns(self):
-        """Return all equations"""
-        for c in self.constraints:
-            yield c()
-
     def latex(self):
         """Returns the latex"""
         for e in self.eqns():
@@ -163,6 +158,8 @@ class Prg:
         return hash(self.name)
 
     def __call__(self):
-        """Pretty prints the component"""
-        for e in self.eqns():
-            display(Math(latex(e, mul_symbol='dot')))
+        for c in self.constraints:
+            display(Math(latex(c(), mul_symbol='dot')))
+
+        for o in self.objectives:
+            display(Math(latex(o(), mul_symbol='dot')))
