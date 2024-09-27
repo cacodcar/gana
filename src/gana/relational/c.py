@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from operator import is_not
 from sympy import Rel
 
 
@@ -28,6 +27,7 @@ class C:
         self.count: int = None
         # since indices should match, take any
         self.index = self.lhs.index
+
 
     def x(self):
         """Elements in the constraint"""

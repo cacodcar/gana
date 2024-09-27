@@ -95,7 +95,7 @@ class V:
         return F(rel='+', two=self)
 
     def __add__(self, other: Self | F):
-        return F(one=self, two=other, rel='+')
+        return F(one=self, rel='+', two=other)
 
     def __radd__(self, other: Self | F | int):
         if other == 0:

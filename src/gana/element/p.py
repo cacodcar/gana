@@ -110,10 +110,7 @@ class P:
             # not int | float + M = M
             return P(
                 *self.index,
-                _=[
-                    i + j if not isinstance(i, M) else M()
-                    for i, j in zip(self._, other._)
-                ],
+                _=[i + j for i, j in zip(self._, other._)],
             )
 
         if isinstance(other, V):

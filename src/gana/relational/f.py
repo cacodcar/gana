@@ -28,12 +28,10 @@ class F:
         one: P | V | Self = None,
         rel: str = '+',
         two: P | V | Self = None,
-        name: str = 'func',
     ):
         self.one = one
         self.two = two
         self.rel = rel
-        self.name = name
 
         if (
             self.one
@@ -52,6 +50,7 @@ class F:
 
         # keeps a count of, updated in program
         self.count: int = None
+        self.name = f'{self.one}{self.rel}{self.two}'
 
     def x(self):
         """Elements in the function"""
@@ -73,6 +72,12 @@ class F:
 
     def __add__(self, other: Self | P | V):
         return F(one=self, rel='+', two=other)
+
+    def __radd__(self, other: Self | P | V | int):
+        if other == 0:
+            return self
+        else:
+            return self + other
 
     def __sub__(self, other: Self | P | V):
         return F(one=self, rel='-', two=other)

@@ -146,10 +146,24 @@ class Prg:
             self.constraints = list(set(self.constraints) | set(prg.constraints))
             self.objectives = list(set(self.objectives) | set(prg.objectives))
 
+    def matrix(self):
+        """Return Matrix Representation"""
+        
+
+    def pyomo(self):
+        """Return Pyomo Model"""
+
+    def mps(self):
+        """Return MPS File"""
+
+    def lp(self):
+        """Return LP File"""
+
     def latex(self):
-        """Returns the latex"""
-        for e in self.eqns():
+        """Display LaTeX"""
+        for e in self.constraints + self.objectives:
             display(latex(e, mul_symbol='dot'))
+
 
     def __repr__(self):
         return self.name
@@ -158,8 +172,5 @@ class Prg:
         return hash(self.name)
 
     def __call__(self):
-        for c in self.constraints:
-            display(Math(latex(c(), mul_symbol='dot')))
-
-        for o in self.objectives:
-            display(Math(latex(o(), mul_symbol='dot')))
+        for e in self.constraints + self.objectives:
+            display(Math(latex(e(), mul_symbol='dot')))

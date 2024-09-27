@@ -12,7 +12,7 @@ class O:
     """Minimization Objective"""
 
     def __init__(self, *args: tuple[F], name: str = 'min'):
-        self.func: F = args[0] if args else None
+        self.func: F = args[0]
         self.name = name
 
         # keeps a count of, updated in program
@@ -29,7 +29,4 @@ class O:
 
     def __call__(self):
         """symbolic representation"""
-        if self.func:
-            return self.func()
-        else:
-            return 0
+        return self.func()
