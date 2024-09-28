@@ -42,13 +42,15 @@ class S:
         # keeps a count of, updated in program
         self.count: int = None
 
-    def latex(self) -> str:
+    def latex(self, descriptive: bool = False) -> str:
         """LaTeX representation"""
-        return Math(str(self))
 
-    def latexd(self) -> str:
-        """Descriptive LaTeX representation with members"""
-        return Math(str(self) + r'\in' + r'\{' + r', '.join(rf'{m}' for m in self._) + r'\}')
+        if descriptive:
+            return Math(
+                str(self) + r'\in' + r'\{' + r', '.join(rf'{m}' for m in self._) + r'\}'
+            )
+        else:
+            return Math(str(self))
 
     def sympy(self) -> FiniteSet:
         """Sympy representation"""
@@ -150,6 +152,6 @@ class S:
     def __iter__(self):
         return iter(self._)
 
-    def __call__(self) -> FiniteSet:
+    def __call__(self, descriptive: bool = False) -> FiniteSet:
         """symbolic representation"""
-        return self.latex()
+        return self.latex(descriptive)

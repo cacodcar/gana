@@ -44,7 +44,7 @@ class V:
     def idx(self) -> list[tuple]:
         """index"""
         return list(
-            product(*[s.members if isinstance(s, S) else [s] for s in self.index])
+            product(*[s._ if isinstance(s, S) else [s] for s in self.index])
         )
 
     def fix(self, val: float | list[float]):

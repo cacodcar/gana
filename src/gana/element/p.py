@@ -55,7 +55,7 @@ class P:
         """index"""
         if not self.mum:
             return list(
-                product(*[s.members if isinstance(s, S) else [s] for s in self.index])
+                product(*[s._ if isinstance(s, S) else [s] for s in self.index])
             )
         else:
             return self.index
