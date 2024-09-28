@@ -46,11 +46,18 @@ class S:
         """LaTeX representation"""
 
         if descriptive:
-            return Math(
-                str(self) + r'\in' + r'\{' + r', '.join(rf'{m}' for m in self._) + r'\}'
+            return (
+                r'\mathcal{'
+                + str(self)
+                + r'}'
+                + r'\in'
+                + r'\{'
+                + r', '.join(rf'{m}' for m in self._)
+                + r'\}'
             )
+
         else:
-            return Math(str(self))
+            return r'\mathcal{' + str(self) + r'}'
 
     def sympy(self) -> FiniteSet:
         """Sympy representation"""
@@ -58,14 +65,14 @@ class S:
 
     def pyomo(self) -> Set:
         """Pyomo representation"""
-        return Set(initialize=self._)
+        return Set(initialize=self._, doc=self.name)
 
     def mps(self, pos: int) -> str:
         """MPS representation
         Args:
             pos (int): Position of the member in the set
         """
-        return rf'_{self[pos]}'
+        return rf'_{self[pos]}'.upper()
 
     def lp(self, pos: int) -> str:
         """LP representation
@@ -154,4 +161,4 @@ class S:
 
     def __call__(self, descriptive: bool = False) -> FiniteSet:
         """symbolic representation"""
-        return self.latex(descriptive)
+        return Math(self.latex(descriptive))

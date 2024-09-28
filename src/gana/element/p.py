@@ -50,7 +50,6 @@ class P:
                 if isinstance(v, bool) and v is True:
                     self._[i] = M()
 
-    @property
     def idx(self) -> list[tuple]:
         """index"""
         if not self.mum:
@@ -59,6 +58,7 @@ class P:
             )
         else:
             return self.index
+
 
     def __repr__(self):
         return self.name
@@ -72,7 +72,7 @@ class P:
     def __getitem__(self, key: int | tuple):
 
         if isinstance(key, tuple):
-            return self._[self.idx.index(key)]
+            return self._[self.idx().index(key)]
 
         if isinstance(key, int):
             return self._[key]

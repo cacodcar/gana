@@ -90,7 +90,7 @@ class Prg:
             # if variable has index
             # generate variables for each index
             if value.index:
-                for n, i in enumerate(value.idx):
+                for n, i in enumerate(value.idx()):
                     value._.append(V(*i, name=value.name, itg=value.itg, nn=value.nn))
                     value._[n].mum = value
 
@@ -109,7 +109,7 @@ class Prg:
             # if parameter has index
             # generate parameters for each index
             if value.index:
-                for n, i in enumerate(value.idx):
+                for n, i in enumerate(value.idx()):
                     value._[n] = P(*i, name=value.name, _=value._[n])
 
                 for p in value._:
