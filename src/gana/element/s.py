@@ -1,9 +1,12 @@
 """A set of objects"""
 
-from operator import is_
 from typing import Any, Self
 
+from IPython.display import Math
+
 from sympy import FiniteSet
+
+from pyomo.environ import Set
 
 
 class S:
@@ -39,8 +42,41 @@ class S:
         # keeps a count of, updated in program
         self.count: int = None
 
+    def latex(self) -> str:
+        """LaTeX representation"""
+        return Math(r'\{' + r', '.join(rf'{m}' for m in self.members) + r'\}')
+
+    def latexf(self) -> str:
+        """LaTeX representation"""
+        return Math(str(self) + r'\in' + self.latex())
+
+    def sympy(self) -> FiniteSet:
+        """Sympy representation"""
+        return FiniteSet(*self.members)
+
+    def pyomo(self) -> Set:
+        """Pyomo representation"""
+        return Set(initialize=self.members)
+
+    def mps(self, pos: int) -> str:
+        """MPS representation
+        Args:
+            pos (int): Position of the member in the set
+        """
+        return rf'_{self[pos]}'
+
+    def lp(self, pos: int) -> str:
+        """LP representation
+        Args:
+            pos (int): Position of the member in the set
+        """
+        return rf'_{self[pos]}'
+
+    def __str__(self):
+        return rf'{self.name}'
+
     def __repr__(self):
-        return self.name
+        return str(self)
 
     def __hash__(self):
         return hash(self.name)
@@ -116,4 +152,4 @@ class S:
 
     def __call__(self) -> FiniteSet:
         """symbolic representation"""
-        return FiniteSet(*self.members)
+        return self.latex()
