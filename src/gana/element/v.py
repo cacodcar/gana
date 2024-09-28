@@ -91,30 +91,30 @@ class V:
     def sympy(self) -> IndexedBase | Symbol:
         """symbolic representation"""
         if self.index:
-            return IndexedBase(self.name)[
+            return IndexedBase(str(self))[
                 symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
             ]
         else:
-            return Symbol(self.name)
+            return Symbol(str(self))
 
     def pyomo(self) -> Var:
         """Pyomo representation"""
         idx = [i.pyomo() for i in self.index]
         if self.itg:
             if self.nn:
-                return Var(*idx, domain=NonNegativeIntegers, doc=self.name)
+                return Var(*idx, domain=NonNegativeIntegers, doc=str(self))
             else:
-                return Var(*idx, domain=Integers, doc=self.name)
+                return Var(*idx, domain=Integers, doc=str(self))
 
         else:
             if self.bnr:
-                return Var(*idx, domain=Binary, doc=self.name)
+                return Var(*idx, domain=Binary, doc=str(self))
 
             if self.nn:
-                return Var(*idx, domain=NonNegativeReals, doc=self.name)
+                return Var(*idx, domain=NonNegativeReals, doc=str(self))
 
             else:
-                return Var(*idx, domain=Reals, doc=self.name)
+                return Var(*idx, domain=Reals, doc=str(self))
 
     def mps(self) -> str:
         """MPS representation"""
@@ -139,10 +139,10 @@ class V:
         return rf'{self.name}'
 
     def __repr__(self):
-        return str(self.name)
+        return str(self)
 
     def __hash__(self):
-        return hash(self.name)
+        return hash(str(self))
 
     def __neg__(self):
         return F(rel='-', two=self)
@@ -187,5 +187,4 @@ class V:
         return self >= other
 
     def __call__(self) -> str:
-        """symbolic representation"""
         return Math(self.latex())

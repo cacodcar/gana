@@ -102,7 +102,7 @@ def test_prgparams(s0, s1, prgp0, prgp1, _prgp1, prgp2, _prgp2, prgp3):
         P(name='prgp3', _=[6]),
     ]
     assert prgp3._ == [P(s0, _=4), P(s0, _=[5]), P(s0, _=[6])]
-    assert prgp3.idx == [(0, 'a'), (0, 'b'), (0, 'c')]
+    assert prgp3.idx() == [(0, 'a'), (0, 'b'), (0, 'c')]
     assert prgp3._[0].index == (0, 'a')
     assert prgp3._[1].index == (0, 'b')
     assert prgp3._[2].index == (0, 'c')

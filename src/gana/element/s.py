@@ -65,7 +65,7 @@ class S:
 
     def pyomo(self) -> Set:
         """Pyomo representation"""
-        return Set(initialize=self._, doc=self.name)
+        return Set(initialize=self._, doc=str(self))
 
     def mps(self, pos: int) -> str:
         """MPS representation
@@ -88,7 +88,7 @@ class S:
         return str(self)
 
     def __hash__(self):
-        return hash(self.name)
+        return hash(str(self))
 
     def __len__(self):
         return len(self._)
@@ -160,5 +160,4 @@ class S:
         return iter(self._)
 
     def __call__(self, descriptive: bool = False) -> FiniteSet:
-        """symbolic representation"""
         return Math(self.latex(descriptive))

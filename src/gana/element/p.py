@@ -6,6 +6,7 @@ from math import prod
 from typing import Self
 
 from sympy import Idx, IndexedBase, Symbol, symbols
+from IPython.display import Math
 
 from ..relational.c import C
 from ..relational.f import F
@@ -59,12 +60,43 @@ class P:
         else:
             return self.index
 
+    def latex(self) -> str:
+        """LaTeX representation"""
+        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.index) + r'}'
+
+    def sympy(self) -> IndexedBase | Symbol:
+        """symbolic representation"""
+
+        if isinstance(self._, list):
+            if len(self._) == 1:
+                if isinstance(self._[0], P):
+                    return self._[0]._[0]
+
+                else:
+                    return self._[0]
+
+            else:
+                if self.index:
+                    return IndexedBase(str(self))[
+                        symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
+                    ]
+                else:
+                    return Symbol(str(self))
+        else:
+            if isinstance(self._, P):
+                return self._._
+
+            else:
+                return self._
+
+    def __str__(self):
+        return rf'{self.name}'.capitalize()
 
     def __repr__(self):
-        return self.name
+        return str(self)
 
     def __hash__(self):
-        return hash(self.name)
+        return hash(str(self))
 
     def __len__(self):
         return prod([len(s) if isinstance(s, S) else 1 for s in self.index])
@@ -289,26 +321,4 @@ class P:
             return self >= other
 
     def __call__(self) -> IndexedBase | Symbol:
-        """symbolic representation"""
-
-        if isinstance(self._, list):
-            if len(self._) == 1:
-                if isinstance(self._[0], P):
-                    return self._[0]._[0]
-
-                else:
-                    return self._[0]
-
-            else:
-                if self.index:
-                    return IndexedBase(self.name)[
-                        symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
-                    ]
-                else:
-                    return Symbol(self.name)
-        else:
-            if isinstance(self._, P):
-                return self._._
-
-            else:
-                return self._
+        return Math(self.latex())
