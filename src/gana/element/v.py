@@ -109,11 +109,11 @@ class V:
 
     def __mul__(self, other: Self | F):
 
-        return F(one=self, two=other, rel='*')
+        return F(one=self, two=other, rel='×')
 
     def __truediv__(self, other: Self | F):
 
-        return F(one=self, two=other, rel='/')
+        return F(one=self, two=other, rel='÷')
 
     def __eq__(self, other):
         return C(lhs=+self, rhs=other, rel='eq')

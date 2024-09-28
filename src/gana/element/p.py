@@ -168,10 +168,10 @@ class P:
             )
 
         if isinstance(other, F):
-            return F(one=self, rel='*', two=other)
+            return F(one=self, rel='×', two=other)
 
         if isinstance(other, V):
-            return F(one=self, rel='*', two=other)
+            return F(one=self, rel='×', two=other)
 
     def __rmul__(self, other: Self):
         return other * self
@@ -180,9 +180,9 @@ class P:
         if isinstance(other, P):
             return P(*self.index, _=[i / j for i, j in zip(self._, other._)])
         if isinstance(other, F):
-            return F(one=self, two=other, rel='/')
+            return F(one=self, two=other, rel='÷')
         if isinstance(other, V):
-            return F(one=self, rel='/', two=other)
+            return F(one=self, rel='÷', two=other)
 
     def __rtruediv__(self, other: Self):
         return other * self

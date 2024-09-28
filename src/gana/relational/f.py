@@ -83,10 +83,10 @@ class F:
         return F(one=self, rel='-', two=other)
 
     def __mul__(self, other: Self | P | V):
-        return F(one=self, rel='*', two=other)
+        return F(one=self, rel='×', two=other)
 
     def __truediv__(self, other: Self | P | V):
-        return F(one=self, rel='/', two=other)
+        return F(one=self, rel='÷', two=other)
 
     def __eq__(self, other: Self | P | V):
         return C(lhs=self, rel='eq', rhs=other)
@@ -119,8 +119,8 @@ class F:
             else:
                 return -self.two()
 
-        if self.rel == '*':
+        if self.rel == '×':
             return self.one() * self.two()
 
-        if self.rel == '/':
+        if self.rel == '÷':
             return self.one() / self.two()
