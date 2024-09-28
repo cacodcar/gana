@@ -15,7 +15,7 @@ class S:
     Attributes:
         args (Any): Memebers of the Set
         name (str): Name of the Set
-        members (set): Members of the Set. Generated from args
+        _ (set): members of the Set. Made into sets themselves
 
     Examples:
         >>> p = Program()
@@ -36,27 +36,27 @@ class S:
 
     """
 
-    def __init__(self, *args: str | float, name: str = 'set'):
-        self.members = list(args)
+    def __init__(self, *_: str | float, name: str = 'set'):
+        self._ = list(_)
         self.name = name
         # keeps a count of, updated in program
         self.count: int = None
 
     def latex(self) -> str:
         """LaTeX representation"""
-        return Math(r'\{' + r', '.join(rf'{m}' for m in self.members) + r'\}')
+        return Math(str(self))
 
-    def latexf(self) -> str:
-        """LaTeX representation"""
-        return Math(str(self) + r'\in' + self.latex())
+    def latexd(self) -> str:
+        """Descriptive LaTeX representation with members"""
+        return Math(str(self) + r'\in' + r'\{' + r', '.join(rf'{m}' for m in self._) + r'\}')
 
     def sympy(self) -> FiniteSet:
         """Sympy representation"""
-        return FiniteSet(*self.members)
+        return FiniteSet(*[str(s) for s in self._])
 
     def pyomo(self) -> Set:
         """Pyomo representation"""
-        return Set(initialize=self.members)
+        return Set(initialize=self._)
 
     def mps(self, pos: int) -> str:
         """MPS representation
@@ -82,17 +82,17 @@ class S:
         return hash(self.name)
 
     def __len__(self):
-        return len(self.members)
+        return len(self._)
 
     def __getitem__(self, key: int | str):
-        return self.members[key]
+        return self._[key]
 
     def __contains__(self, other: Any):
-        return True if other in self.members else False
+        return True if other in self._ else False
 
     def __eq__(self, other: Self):
         if isinstance(other, S):
-            if set(self.members) == set(other.members):
+            if set(self._) == set(other._):
                 return True
             else:
                 return False
@@ -101,54 +101,54 @@ class S:
 
     def __and__(self, other: Self):
         if isinstance(other, S):
-            return S(*list(set(self.members) & set(other.members)))
+            return S(*list(set(self._) & set(other._)))
 
     def __iand__(self, other: Self):
         if isinstance(other, S):
-            return S(*list(set(self.members) & set(other.members)))
+            return S(*list(set(self._) & set(other._)))
 
     def __rand__(self, other: Self):
         if isinstance(other, S):
-            return S(*list(set(self.members) & set(other.members)))
+            return S(*list(set(self._) & set(other._)))
 
     def __or__(self, other: Self):
         if isinstance(other, S):
-            return S(*list(set(self.members) | set(other.members)))
+            return S(*list(set(self._) | set(other._)))
 
     def __ior__(self, other: Self):
         if isinstance(other, S):
-            return S(*list(set(self.members) | set(other.members)))
+            return S(*list(set(self._) | set(other._)))
 
     def __ror__(self, other: Self):
         if isinstance(other, S):
-            return S(*list(set(self.members) | set(other.members)))
+            return S(*list(set(self._) | set(other._)))
 
     def __xor__(self, other: Self):
         if isinstance(other, S):
-            return S(*list(set(self.members) ^ set(other.members)))
+            return S(*list(set(self._) ^ set(other._)))
 
     def __ixor__(self, other: Self):
         if isinstance(other, S):
-            return S(*list(set(self.members) ^ set(other.members)))
+            return S(*list(set(self._) ^ set(other._)))
 
     def __rxor__(self, other: Self):
         if isinstance(other, S):
-            return S(*list(set(self.members) ^ set(other.members)))
+            return S(*list(set(self._) ^ set(other._)))
 
     def __sub__(self, other: Self):
         if isinstance(other, S):
-            return S(*list(set(self.members) - set(other.members)))
+            return S(*list(set(self._) - set(other._)))
 
     def __isub__(self, other: Self):
         if isinstance(other, S):
-            return S(*list(set(self.members) - set(other.members)))
+            return S(*list(set(self._) - set(other._)))
 
     def __rsub__(self, other: Self):
         if isinstance(other, S):
-            return S(*list(set(self.members) - set(other.members)))
+            return S(*list(set(self._) - set(other._)))
 
     def __iter__(self):
-        return iter(self.members)
+        return iter(self._)
 
     def __call__(self) -> FiniteSet:
         """symbolic representation"""

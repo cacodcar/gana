@@ -77,6 +77,11 @@ class Prg:
             # set the counter on the element
             self.sets.append(value)
             value.count = len(self.sets)
+            for n, s in enumerate(value._):
+                if isinstance(s, (int, float)):
+                    value._[n] = S(s, name=f'{value.name}_{n}')
+                else:
+                    value._[n] = S(s, name=str(s))
 
         if isinstance(value, V):
             self.variables.append(value)
@@ -148,7 +153,6 @@ class Prg:
 
     def matrix(self):
         """Return Matrix Representation"""
-        
 
     def pyomo(self):
         """Return Pyomo Model"""
@@ -163,7 +167,6 @@ class Prg:
         """Display LaTeX"""
         for e in self.constraints + self.objectives:
             display(latex(e, mul_symbol='dot'))
-
 
     def __repr__(self):
         return self.name
