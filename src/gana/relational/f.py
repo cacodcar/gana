@@ -12,6 +12,7 @@ from .c import C
 
 if TYPE_CHECKING:
     from sympy import Add
+
     from ..element.p import P
     from ..element.v import V
 

@@ -4,8 +4,8 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from IPython.display import Math
 
+from IPython.display import Math
 from pyomo.environ import Constraint
 from sympy import Rel
 

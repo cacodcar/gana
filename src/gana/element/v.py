@@ -8,14 +8,8 @@ from math import prod
 from typing import Self
 
 from IPython.display import Math
-from pyomo.environ import (
-    Binary,
-    Integers,
-    NonNegativeIntegers,
-    NonNegativeReals,
-    Reals,
-    Var,
-)
+from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
+                           NonNegativeReals, Reals, Var)
 from sympy import Idx, IndexedBase, Symbol, symbols
 
 from ..relational.c import C
