@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from IPython.display import Math
 
+from pyomo.environ import Constraint
 from sympy import Rel
 
 if TYPE_CHECKING:
@@ -29,10 +31,26 @@ class C:
         # since indices should match, take any
         self.index = self.lhs.index
 
-
     def x(self):
         """Elements in the constraint"""
         return sum([f if isinstance(f, list) else [f] for f in self.lhs.x()], [])
+
+    def latex(self):
+        """Latex representation"""
+        if self.rel == 'eq':
+            rel = '='
+
+        if self.rel == 'le':
+            rel = r'\leq'
+
+        if self.rel == 'ge':
+            rel = r'\geq'
+
+        return rf'{self.lhs.latex()} {rel} {self.rhs.latex()}'
+
+    def sympy(self) -> LessThan | GreaterThan | Eq:
+        """sympy representation"""
+        return Rel(self.lhs(), self.rhs(), self.rel)
 
     def __repr__(self):
         return self.name
@@ -42,4 +60,4 @@ class C:
 
     def __call__(self) -> LessThan | GreaterThan | Eq:
         """symbolic representation"""
-        return Rel(self.lhs(), self.rhs(), self.rel)
+        return Math(self.latex())
