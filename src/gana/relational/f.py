@@ -12,7 +12,6 @@ from .c import C
 
 if TYPE_CHECKING:
     from sympy import Add
-
     from ..element.p import P
     from ..element.v import V
 
@@ -53,7 +52,14 @@ class F:
 
         # keeps a count of, updated in program
         self.count: int = None
-        self.name = f'{self.one}{self.rel}{self.two}'
+        if self.one:
+            self.name = f'{self.one}{self.rel}{self.two}'
+        else:
+            self.name = f'{self.rel}{self.two}'
+
+    # def _(self, args: tuple) -> float:
+    #     """Function Eval"""
+    #     return 
 
     def x(self):
         """Elements in the function"""

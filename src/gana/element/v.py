@@ -8,8 +8,14 @@ from math import prod
 from typing import Self
 
 from IPython.display import Math
-from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
-                           NonNegativeReals, Reals, Var)
+from pyomo.environ import (
+    Binary,
+    Integers,
+    NonNegativeIntegers,
+    NonNegativeReals,
+    Reals,
+    Var,
+)
 from sympy import Idx, IndexedBase, Symbol, symbols
 
 from ..relational.c import C
@@ -22,14 +28,20 @@ class V:
 
     def __init__(
         self,
-        *args: S,
+        *index: S,
         name: str = 'contvar',
         itg: bool = False,
         nn: bool = True,
         bnr: bool = False,
     ):
-        self.index = args
-        self.name = name
+        if index:
+            self.index = index
+            # This works well for variables generated at the indices
+            # of a variable set 
+            self.name = f'{name}{self.index}'
+        else:
+            self.index = S(0, name=f'{name}')
+            self.name = name
         # if the variable is an integer variable
         self.itg = itg
         # if the variable is non negative

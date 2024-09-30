@@ -31,6 +31,9 @@ class C:
         # since indices should match, take any
         self.index = self.lhs.index
 
+        # whether the constraint is binding
+        self.binding = False
+
     def x(self):
         """Elements in the constraint"""
         return sum([f if isinstance(f, list) else [f] for f in self.lhs.x()], [])
@@ -38,7 +41,7 @@ class C:
     def latex(self):
         """Latex representation"""
         if self.rel == 'eq':
-            rel = '='
+            rel = r'='
 
         if self.rel == 'le':
             rel = r'\leq'
@@ -50,7 +53,7 @@ class C:
 
     def sympy(self) -> LessThan | GreaterThan | Eq:
         """sympy representation"""
-        return Rel(self.lhs(), self.rhs(), self.rel)
+        return Rel(self.lhs.sympy(), self.rhs.sympy(), self.rel)
 
     def __repr__(self):
         return self.name

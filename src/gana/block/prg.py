@@ -102,6 +102,11 @@ class Prg:
                 # continuous variable
                 self.contvars.append(value)
 
+            # if variable is non negative
+            if value.nn:
+                setattr(self, f'{value}^0', P(*value.index, _=0))
+                setattr(self, f'{value}_nn', value >= getattr(self, f'{value}^0'))
+
         if isinstance(value, P):
             self.parameters.append(value)
             value.count = len(self.parameters)
