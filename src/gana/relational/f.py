@@ -18,13 +18,7 @@ if TYPE_CHECKING:
 
 
 class F:
-    """Provides some relational operation between Parameters and Variables
-
-    Attributes:
-        P1 (Parameter): First Parameter
-        component (IsDfn): Component for which variable is being defined
-        symbol (IndexedBase): Symbolic representation of the Variable
-    """
+    """Provides some relational operation between Parameters and Variables"""
 
     def __init__(
         self,
@@ -44,7 +38,7 @@ class F:
             and is_not(self.one.mum, self.two.mum)
             and self.one.index != self.two.index
         ):
-            raise ValueError('Cant operate with variables of different indices')
+            raise ValueError('Cannot operate with variables of different indices')
 
         if self.one:
             self.index = self.one.index
@@ -67,7 +61,7 @@ class F:
         return sum(
             [i.x() if isinstance(i, F) else [i] for i in [self.one, self.two] if i], []
         )
-
+        
     def latex(self) -> str:
         """Equation"""
         if self.rel == '+':

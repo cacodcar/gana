@@ -4,8 +4,7 @@ from dataclasses import dataclass, field
 from typing import Self
 from warnings import warn
 
-from IPython.display import Math, display
-from sympy import latex
+from IPython.display import display
 
 from ..element.p import P
 from ..element.s import S
@@ -43,6 +42,12 @@ class Prg:
         # names of declared modeling and relational elements
         self.names: list[str] = []
 
+        # counts
+        # A separate counter is needed because elements, i.e.:
+        # (variables, parameters, constraints, objectives)
+        # are indexed and are a set of elements as opposed to a single element
+        self._n_t, self._n_v, self._n_p, self._n_c, self._n_o = (0 for _ in range(5))
+
     def __setattr__(self, name: str, value: V) -> None:
 
         if not name in [
@@ -58,6 +63,11 @@ class Prg:
             'constraints',
             'objectives',
             'names',
+            '_n_t',
+            '_n_v',
+            '_n_p',
+            '_n_c',
+            '_n_o',
         ]:
             if name in self.names:
                 if self.overwrite:
@@ -93,6 +103,8 @@ class Prg:
                 for n, i in enumerate(value.idx()):
                     value._.append(V(*i, name=value.name, itg=value.itg, nn=value.nn))
                     value._[n].mum = value
+                    value._[n].count = self._n_v
+                    self._n_v += 1
 
             if value.itg:
                 # integer variable
@@ -103,9 +115,9 @@ class Prg:
                 self.contvars.append(value)
 
             # if variable is non negative
-            if value.nn:
-                setattr(self, f'{value}^0', P(*value.index, _=0))
-                setattr(self, f'{value}_nn', value >= getattr(self, f'{value}^0'))
+            # if value.nn:
+            # setattr(self, f'{value}^0', P(*value.index, _=0))
+            # setattr(self, f'{value}_nn', value >= getattr(self, f'{value}^0'))
 
         if isinstance(value, P):
             self.parameters.append(value)
@@ -116,13 +128,21 @@ class Prg:
             if value.index:
                 for n, i in enumerate(value.idx()):
                     value._[n] = P(*i, name=value.name, _=value._[n])
-
-                for p in value._:
-                    p.mum = value
+                    value._[n].mum = value
+                    value._[n].count = self._n_p
+                    self._n_p += 1
+                # for p in value._:
+                #     p.mum = value
 
         if isinstance(value, T):
             self.mpvars.append(value)
-            value.count = len(self.mpvars)
+
+            if value.index:
+                for n, i in enumerate(value.idx()):
+                    value._[n] = T(*i, name=value.name, _=value._[n])
+                    value._[n].mum = value
+                    value._[n].count = self._n_t
+                    self._n_t += 1
 
         # relational elements
         if isinstance(value, F):

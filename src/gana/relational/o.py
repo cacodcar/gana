@@ -13,8 +13,8 @@ if TYPE_CHECKING:
 class O:
     """Minimization Objective"""
 
-    def __init__(self, *args: tuple[F], name: str = 'min'):
-        self.func: F = args[0]
+    def __init__(self, *f: tuple[F], name: str = 'min'):
+        self.f: F = f[0]
         self.name = name
 
         # keeps a count of, updated in program
@@ -22,11 +22,11 @@ class O:
 
     def latex(self) -> str:
         """Latex representation"""
-        return rf'min {self.func.latex()}'
+        return rf'min {self.f.latex()}'
 
     def sympy(self):
         """Sympy representation"""
-        return self.func.sympy()
+        return self.f.sympy()
 
     def __str__(self):
         return rf'{self.name}'
@@ -41,4 +41,4 @@ class O:
         return 1
 
     def __call__(self):
-        return Math(self.func.latex())
+        return Math(self.f.latex())
