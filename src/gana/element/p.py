@@ -19,10 +19,16 @@ from .v import V
 class P:
     """A Parameter"""
 
-    def __init__(self, *args: S, _: int | float | list | bool, name: str = 'Param'):
-        self.index = args
-        self._: list[Self] = _
+    def __init__(self, *index: S, _: int | float | list | bool, name: str = 'Param'):
+        if index:
+            self.index = index
+            # This works well for variables generated at the indices
+            # of a variable set
+        else:
+            self.index = S(0, name=f'{name}')
+
         self.name = name
+        self._: list[Self] = _
         # keeps a count of, updated in program
         self.count: int = None
 

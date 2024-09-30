@@ -37,11 +37,11 @@ class V:
         if index:
             self.index = index
             # This works well for variables generated at the indices
-            # of a variable set 
-            self.name = f'{name}{self.index}'
+            # of a variable set
         else:
             self.index = S(0, name=f'{name}')
-            self.name = name
+
+        self.name = name
         # if the variable is an integer variable
         self.itg = itg
         # if the variable is non negative

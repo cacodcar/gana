@@ -171,7 +171,7 @@ class Prg:
     def latex(self):
         """Display LaTeX"""
         for e in self.constraints + self.objectives:
-            display(latex(e, mul_symbol='dot'))
+            display(e.latex())
 
     def __repr__(self):
         return self.name
@@ -181,4 +181,4 @@ class Prg:
 
     def __call__(self):
         for e in self.constraints + self.objectives:
-            display(Math(latex(e(), mul_symbol='dot')))
+            display(e())

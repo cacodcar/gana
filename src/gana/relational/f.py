@@ -59,7 +59,7 @@ class F:
 
     # def _(self, args: tuple) -> float:
     #     """Function Eval"""
-    #     return 
+    #     return
 
     def x(self):
         """Elements in the function"""
