@@ -320,5 +320,5 @@ class P:
         else:
             return self >= other
 
-    def __call__(self) -> IndexedBase | Symbol:
+    def __call__(self) -> str:
         return Math(self.latex())

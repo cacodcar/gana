@@ -58,11 +58,35 @@ class F:
             [i.x() if isinstance(i, F) else [i] for i in [self.one, self.two] if i], []
         )
 
+    def eqn(self) -> str:
+        """Equation"""
+        if self.rel == '+':
+            if self.one:
+                return str(self.one) + r'+' + str(self.two)
+            else:
+                return str(self.two)
+
+        if self.rel == '-':
+            if self.one:
+                return str(self.one) + r'-' + str(self.two)
+            # this is used to generate negatives
+            else:
+                return -str(self.two)
+
+        if self.rel == '×':
+            return str(self.one) + r'×' + str(self.two)
+
+        if self.rel == '÷':
+            return str(self.one) + r'÷' + str(self.two)
+
+    def __str__(self):
+        return rf'{self.name}'
+
     def __repr__(self):
-        return self.name
+        return str(self)
 
     def __hash__(self):
-        return hash(self.name)
+        return hash(str(self))
 
     def __neg__(self):
         return F(rel='-', two=self)
@@ -103,24 +127,24 @@ class F:
     def __gt__(self, other: Self | P | V):
         return self >= other
 
-    def __call__(self) -> Add:
-        """symbolic representation"""
+    # def __call__(self) -> Add:
+    #     """symbolic representation"""
 
-        if self.rel == '+':
-            if self.one:
-                return self.one() + self.two()
-            else:
-                return self.two()
+    #     if self.rel == '+':
+    #         if self.one:
+    #             return self.one() + self.two()
+    #         else:
+    #             return self.two()
 
-        if self.rel == '-':
-            if self.one:
-                return self.one() - self.two()
-            # this is used to generate negatives
-            else:
-                return -self.two()
+    #     if self.rel == '-':
+    #         if self.one:
+    #             return self.one() - self.two()
+    #         # this is used to generate negatives
+    #         else:
+    #             return -self.two()
 
-        if self.rel == '×':
-            return self.one() * self.two()
+    #     if self.rel == '×':
+    #         return self.one() * self.two()
 
-        if self.rel == '÷':
-            return self.one() / self.two()
+    #     if self.rel == '÷':
+    #         return self.one() / self.two()
