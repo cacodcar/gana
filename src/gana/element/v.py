@@ -6,18 +6,11 @@ from __future__ import annotations
 from itertools import product
 from math import prod
 from typing import Self
+
 from IPython.display import Math
-
+from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
+                           NonNegativeReals, Reals, Var)
 from sympy import Idx, IndexedBase, Symbol, symbols
-
-from pyomo.environ import (
-    Var,
-    NonNegativeIntegers,
-    NonNegativeReals,
-    Binary,
-    Reals,
-    Integers,
-)
 
 from ..relational.c import C
 from ..relational.f import F

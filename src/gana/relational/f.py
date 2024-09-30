@@ -3,8 +3,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
 from operator import is_not
+from typing import TYPE_CHECKING, Self
+
+from IPython.display import Math
+
 from .c import C
 
 if TYPE_CHECKING:
@@ -58,26 +61,47 @@ class F:
             [i.x() if isinstance(i, F) else [i] for i in [self.one, self.two] if i], []
         )
 
-    def eqn(self) -> str:
+    def latex(self) -> str:
         """Equation"""
         if self.rel == '+':
             if self.one:
-                return str(self.one) + r'+' + str(self.two)
+                return rf'{self.one.latex()} + {self.two.latex()}'
             else:
-                return str(self.two)
+                return rf'{self.two.latex()}'
 
         if self.rel == '-':
             if self.one:
-                return str(self.one) + r'-' + str(self.two)
+                return rf'{self.one.latex()} - {self.two.latex()}'
             # this is used to generate negatives
             else:
-                return -str(self.two)
+                return rf'-{self.two.latex()}'
 
         if self.rel == '×':
-            return str(self.one) + r'×' + str(self.two)
+            return rf'{self.one.latex()} \cdot {self.two.latex()}'
 
         if self.rel == '÷':
-            return str(self.one) + r'÷' + str(self.two)
+            return rf'\frac{{{self.one.latex()}}}{{{self.two.latex()}}}'
+
+    def sympy(self) -> Add:
+        """Equation"""
+        if self.rel == '+':
+            if self.one:
+                return self.one.sympy() + self.two.sympy()
+            else:
+                return self.two.sympy()
+
+        if self.rel == '-':
+            if self.one:
+                return self.one.sympy() - self.two.sympy()
+            # this is used to generate negatives
+            else:
+                return -self.two.sympy()
+
+        if self.rel == '×':
+            return self.one.sympy() * self.two.sympy()
+
+        if self.rel == '÷':
+            return self.one.sympy() / self.two.sympy()
 
     def __str__(self):
         return rf'{self.name}'
@@ -127,24 +151,6 @@ class F:
     def __gt__(self, other: Self | P | V):
         return self >= other
 
-    # def __call__(self) -> Add:
-    #     """symbolic representation"""
-
-    #     if self.rel == '+':
-    #         if self.one:
-    #             return self.one() + self.two()
-    #         else:
-    #             return self.two()
-
-    #     if self.rel == '-':
-    #         if self.one:
-    #             return self.one() - self.two()
-    #         # this is used to generate negatives
-    #         else:
-    #             return -self.two()
-
-    #     if self.rel == '×':
-    #         return self.one() * self.two()
-
-    #     if self.rel == '÷':
-    #         return self.one() / self.two()
+    def __call__(self) -> str:
+        """symbolic representation"""
+        return Math(self.latex())

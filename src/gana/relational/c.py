@@ -4,14 +4,15 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from sympy import Rel
 
+from sympy import Rel
 
 if TYPE_CHECKING:
     from sympy import Eq, GreaterThan, LessThan
-    from .f import F
+
     from ..element.p import P
     from ..element.v import V
+    from .f import F
 
 
 class C:

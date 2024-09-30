@@ -3,10 +3,8 @@
 from typing import Any, Self
 
 from IPython.display import Math
-
-from sympy import FiniteSet
-
 from pyomo.environ import Set
+from sympy import FiniteSet
 
 
 class S:

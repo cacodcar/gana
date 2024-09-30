@@ -5,15 +5,15 @@ from itertools import product
 from math import prod
 from typing import Self
 
-from sympy import Idx, IndexedBase, Symbol, symbols
 from IPython.display import Math
+from sympy import Idx, IndexedBase, Symbol, symbols
 
 from ..relational.c import C
 from ..relational.f import F
 from ..value.m import M
-from .v import V
 from ..value.z import Z
 from .s import S
+from .v import V
 
 
 class P:
