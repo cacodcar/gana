@@ -12,8 +12,8 @@ from sympy import Rel
 if TYPE_CHECKING:
     from sympy import Eq, GreaterThan, LessThan
 
-    from ..sets.parameter import P
-    from ..sets.variable import V
+    from .parameter import P
+    from .variable import V
     from .function import F
 
 
