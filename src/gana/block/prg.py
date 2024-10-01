@@ -1,6 +1,7 @@
 """Mathematical Program"""
 
 from dataclasses import dataclass, field
+from itertools import product
 from typing import Self
 from warnings import warn
 
@@ -25,22 +26,22 @@ class Prg:
     def __post_init__(self):
 
         # modeling elements
-        self.sets: list[S] = []
-
-        self.variables: list[V] = []
-        self.contvars: list[V] = []
-        self.intvars: list[V] = []
-        self.parameters: list[P] = []
-
-        self.mpvars: list[T] = []
-
-        # relational elements
-        self.functions: list[F] = []
-        self.constraints: list[C] = []
-        self.objectives: list[O] = []
+        (
+            self.sets,
+            self.variables,
+            self.vars_cnt,
+            self.vars_itg,
+            self.vars_nn,
+            self.vars_bnr,
+            self.parameters,
+            self.thetas,
+            self.functions,
+            self.constraints,
+            self.objectives,
+        ) = ([] for _ in range(11))
 
         # names of declared modeling and relational elements
-        self.names: list[str] = []
+        self.names = []
 
         # counts
         # A separate counter is needed because elements, i.e.:
@@ -55,10 +56,11 @@ class Prg:
             'overwrite',
             'sets',
             'variables',
-            'contvars',
-            'intvars',
+            'vars_cnt',
+            'vars_itg',
+            'vars_nn',
             'parameters',
-            'mpvars',
+            'thetas',
             'functions',
             'constraints',
             'objectives',
@@ -94,33 +96,34 @@ class Prg:
                     value._[n] = S(s, name=str(s))
 
         if isinstance(value, V):
-            self.variables.append(value)
+            self.variables += value
             value.count = len(self.variables)
-
             # if variable has index
             # generate variables for each index
             if value.index:
                 for n, i in enumerate(value.idx()):
                     value._.append(V(*i, name=value.name, itg=value.itg, nn=value.nn))
                     value._[n].mum = value
-                    value._[n].count = self._n_v
-                    self._n_v += 1
 
             if value.itg:
                 # integer variable
-                self.intvars.append(value)
+                self.vars_itg += value
 
+            if value.nn:
+                # non negative variable
+                self.vars_nn += value
+
+            
             else:
                 # continuous variable
-                self.contvars.append(value)
-
+                self.vars_cnt += value
             # if variable is non negative
             # if value.nn:
             # setattr(self, f'{value}^0', P(*value.index, _=0))
             # setattr(self, f'{value}_nn', value >= getattr(self, f'{value}^0'))
 
         if isinstance(value, P):
-            self.parameters.append(value)
+            self.parameters += value
             value.count = len(self.parameters)
 
             # if parameter has index
@@ -129,24 +132,19 @@ class Prg:
                 for n, i in enumerate(value.idx()):
                     value._[n] = P(*i, name=value.name, _=value._[n])
                     value._[n].mum = value
-                    value._[n].count = self._n_p
-                    self._n_p += 1
-                # for p in value._:
-                #     p.mum = value
 
         if isinstance(value, T):
-            self.mpvars.append(value)
-
+            self.thetas.append(value)
             if value.index:
                 for n, i in enumerate(value.idx()):
                     value._[n] = T(*i, name=value.name, _=value._[n])
                     value._[n].mum = value
-                    value._[n].count = self._n_t
-                    self._n_t += 1
+
 
         # relational elements
         if isinstance(value, F):
-            self.functions.append(value)
+            self.functions += value
+            value.count = len(self.functions)
 
         if isinstance(value, C):
             self.constraints.append(value)
@@ -163,18 +161,22 @@ class Prg:
         if isinstance(prg, Prg):
 
             # modeling elements
-            self.sets = list(set(self.sets) | set(prg.sets))
-            self.variables = list(set(self.variables) | set(prg.variables))
-            self.contvars = list(set(self.contvars) | set(prg.contvars))
-            self.intvars = list(set(self.intvars) | set(prg.intvars))
-            self.parameters = list(set(self.parameters) | set(prg.parameters))
-            self.parameters = list(set(self.parameters) | set(prg.parameters))
-            self.mpvars = list(set(self.mpvars) | set(prg.mpvars))
+            self.sets += prg.sets
+            self.variables += prg.variables
+            self.vars_cnt += prg.vars_cnt
+            self.vars_itg += prg.vars_itg
+            self.vars_nn += prg.vars_nn
+            self.vars_bnr += prg.vars_bnr
+            self.thetas += prg.thetas
+            self.parameters += prg.parameters
+            self.functions += prg.functions
+            self.constraints += prg.constraints
+            self.objectives += prg.objectives
 
-            # relational elements
-            self.functions = list(set(self.functions) | set(prg.functions))
-            self.constraints = list(set(self.constraints) | set(prg.constraints))
-            self.objectives = list(set(self.objectives) | set(prg.objectives))
+    @property
+    def index(self):
+        """Set of all indices"""
+        return S(product(*[s._ if isinstance(s, S) else [s] for s in self.sets]))
 
     def matrix(self):
         """Return Matrix Representation"""
@@ -190,6 +192,10 @@ class Prg:
 
     def latex(self):
         """Display LaTeX"""
+
+        for s in self.sets:
+            display(s.latex())
+
         for e in self.constraints + self.objectives:
             display(e.latex())
 
@@ -199,6 +205,18 @@ class Prg:
     def __hash__(self):
         return hash(self.name)
 
+    def __getitem__(self, key: int | tuple):
+
+        if isinstance(key, tuple):
+            return self.index[self.idx().index(key)]
+
+        if isinstance(key, int):
+            return self.index[key]
+
     def __call__(self):
+
+        for s in self.sets:
+            display(s())
+
         for e in self.constraints + self.objectives:
             display(e())

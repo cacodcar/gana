@@ -52,16 +52,18 @@ class F:
         else:
             self.name = f'{self.rel}{self.two}'
 
+        self._: list[Self] = []
+
     # def _(self, args: tuple) -> float:
     #     """Function Eval"""
     #     return
-
-    def x(self):
+    @property
+    def _(self):
         """Elements in the function"""
         return sum(
-            [i.x() if isinstance(i, F) else [i] for i in [self.one, self.two] if i], []
+            [i._ if isinstance(i, F) else F(i) for i in [self.one, self.two] if i], []
         )
-        
+
     def latex(self) -> str:
         """Equation"""
         if self.rel == '+':

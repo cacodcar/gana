@@ -8,8 +8,14 @@ from math import prod
 from typing import Self
 
 from IPython.display import Math
-from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
-                           NonNegativeReals, Reals, Var)
+from pyomo.environ import (
+    Binary,
+    Integers,
+    NonNegativeIntegers,
+    NonNegativeReals,
+    Reals,
+    Var,
+)
 from sympy import Idx, IndexedBase, Symbol, symbols
 
 from ..relational.c import C
@@ -38,10 +44,16 @@ class V:
         self.name = name
         # if the variable is an integer variable
         self.itg = itg
+        # if the variable is binary
+        if bnr:
+            self.bnr = bnr
+            self.itg = bnr
+            self.nn = bnr
         # if the variable is non negative
         self.nn = nn
-        # if the variable is binary
-        self.bnr = bnr
+
+        if not nn:
+            self.bnr = nn
 
         # value is determined when mathematical model is solved
         # the flag _fixed is changed when .fix(val) is called
