@@ -2,7 +2,7 @@
 
 import pytest
 
-from sympy import FiniteSet
+from IPython.display import Math
 
 from src.gana.sets.index import I
 from src.gana.sets.parameter import P
@@ -54,6 +54,7 @@ def test_index(p):
     assert p.i1._[2] in p.i1
     assert p.i1 == p.i4
     assert list(p.i1) == p.i1._
+    p.i1()
 
 
 # @pytest.fixture
