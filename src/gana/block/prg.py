@@ -24,7 +24,10 @@ class Prg:
     overwrite: bool = field(default=False)
 
     def __post_init__(self):
+        # names of declared modeling and relational elements
+        self.names = []
 
+        self.sets: list[S] = []
         # modeling elements
         (
             self.sets,
@@ -39,9 +42,6 @@ class Prg:
             self.constraints,
             self.objectives,
         ) = ([] for _ in range(11))
-
-        # names of declared modeling and relational elements
-        self.names = []
 
         # counts
         # A separate counter is needed because elements, i.e.:
@@ -59,6 +59,7 @@ class Prg:
             'vars_cnt',
             'vars_itg',
             'vars_nn',
+            'vars_bnr',
             'parameters',
             'thetas',
             'functions',
@@ -87,16 +88,17 @@ class Prg:
 
         if isinstance(value, S):
             # set the counter on the element
-            self.sets.append(value)
-            value.count = len(self.sets)
-            for n, s in enumerate(value._):
-                if isinstance(s, (int, float)):
-                    value._[n] = S(s, name=f'{value.name}_{n}')
-                else:
-                    value._[n] = S(s, name=str(s))
+            if name in self.names:
+                self.sets.append(value)
+                value.count = len(self.sets)
+                for n, s in enumerate(value._):
+                    if isinstance(s, (int, float)):
+                        value._[n] = S(s, name=f'{value.name}_{n}')
+                    else:
+                        value._[n] = S(s, name=str(s))
 
         if isinstance(value, V):
-            self.variables += value
+            self.variables.append(value)
             value.count = len(self.variables)
             # if variable has index
             # generate variables for each index
@@ -107,23 +109,22 @@ class Prg:
 
             if value.itg:
                 # integer variable
-                self.vars_itg += value
+                self.vars_itg.append(value)
 
             if value.nn:
                 # non negative variable
-                self.vars_nn += value
+                self.vars_nn.append(value)
 
-            
             else:
                 # continuous variable
-                self.vars_cnt += value
+                self.vars_cnt.append(value)
             # if variable is non negative
             # if value.nn:
             # setattr(self, f'{value}^0', P(*value.index, _=0))
             # setattr(self, f'{value}_nn', value >= getattr(self, f'{value}^0'))
 
         if isinstance(value, P):
-            self.parameters += value
+            self.parameters.append(value)
             value.count = len(self.parameters)
 
             # if parameter has index
@@ -140,10 +141,9 @@ class Prg:
                     value._[n] = T(*i, name=value.name, _=value._[n])
                     value._[n].mum = value
 
-
         # relational elements
         if isinstance(value, F):
-            self.functions += value
+            self.functions.append(value)
             value.count = len(self.functions)
 
         if isinstance(value, C):
