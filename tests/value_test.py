@@ -1,7 +1,7 @@
 import pytest
 
-from src.gana.value.m import M
-from src.gana.value.z import Z
+from gana.value.bigm import M
+from gana.value.zero import Z
 
 
 @pytest.fixture

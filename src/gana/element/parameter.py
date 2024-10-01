@@ -8,12 +8,12 @@ from typing import Self
 from IPython.display import Math
 from sympy import Idx, IndexedBase, Symbol, symbols
 
-from ..relational.c import C
-from ..relational.f import F
-from ..value.m import M
-from ..value.z import Z
-from .s import S
-from .v import V
+from ..relational.constraint import C
+from ..relational.function import F
+from ..value.bigm import M
+from ..value.zero import Z
+from .collection import S
+from .variable import V
 
 
 class P:

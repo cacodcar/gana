@@ -7,13 +7,13 @@ from warnings import warn
 
 from IPython.display import display
 
-from ..element.p import P
-from ..element.s import S
-from ..element.t import T
-from ..element.v import V
-from ..relational.c import C
-from ..relational.f import F
-from ..relational.o import O
+from ..element.parameter import P
+from ..element.collection import S
+from ..element.theta import T
+from ..element.variable import V
+from ..relational.constraint import C
+from ..relational.function import F
+from ..relational.objective import O
 
 
 @dataclass

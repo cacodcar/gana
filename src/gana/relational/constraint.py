@@ -12,9 +12,9 @@ from sympy import Rel
 if TYPE_CHECKING:
     from sympy import Eq, GreaterThan, LessThan
 
-    from ..element.p import P
-    from ..element.v import V
-    from .f import F
+    from ..element.parameter import P
+    from ..element.variable import V
+    from .function import F
 
 
 class C:

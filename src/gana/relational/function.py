@@ -8,13 +8,13 @@ from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math
 
-from .c import C
+from .constraint import C
 
 if TYPE_CHECKING:
     from sympy import Add
 
-    from ..element.p import P
-    from ..element.v import V
+    from ..element.parameter import P
+    from ..element.variable import V
 
 
 class F:

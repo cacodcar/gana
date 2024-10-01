@@ -1,4 +1,4 @@
-"""A set of objects"""
+"""A collection of objects, a set basically"""
 
 from typing import Any, Self
 

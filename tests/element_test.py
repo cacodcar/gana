@@ -1,9 +1,9 @@
 import pytest
 
-from src.gana.element.s import S
-from src.gana.element.p import P
-from src.gana.element.v import V
-from src.gana.block.prg import Prg
+from gana.element.collection import S
+from gana.element.parameter import P
+from gana.element.variable import V
+from gana.block.program import Prg
 
 
 @pytest.fixture

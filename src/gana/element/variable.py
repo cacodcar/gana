@@ -18,9 +18,9 @@ from pyomo.environ import (
 )
 from sympy import Idx, IndexedBase, Symbol, symbols
 
-from ..relational.c import C
-from ..relational.f import F
-from .s import S
+from ..relational.constraint import C
+from ..relational.function import F
+from .collection import S
 
 
 class V:
