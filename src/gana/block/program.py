@@ -7,10 +7,10 @@ from warnings import warn
 
 from IPython.display import display
 
-from ..element.parameter import P
-from ..element.collection import S
-from ..element.theta import T
-from ..element.variable import V
+from ..sets.parameter import P
+from ..sets.collection import S
+from ..sets.theta import T
+from ..sets.variable import V
 from ..relational.constraint import C
 from ..relational.function import F
 from ..relational.objective import O

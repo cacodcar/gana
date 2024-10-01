@@ -1,7 +1,9 @@
+"""Value tests"""
+
 import pytest
 
-from gana.value.bigm import M
-from gana.value.zero import Z
+from src.gana.value.bigm import M
+from src.gana.value.zero import Z
 
 
 @pytest.fixture

@@ -13,8 +13,8 @@ from .constraint import C
 if TYPE_CHECKING:
     from sympy import Add
 
-    from ..element.parameter import P
-    from ..element.variable import V
+    from ..sets.parameter import P
+    from ..sets.variable import V
 
 
 class F:
