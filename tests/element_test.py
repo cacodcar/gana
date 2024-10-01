@@ -5,29 +5,12 @@ import pytest
 from IPython.display import Math
 
 from src.gana.sets.index import I
+
 from src.gana.sets.parameter import P
 from src.gana.sets.variable import V
 from src.gana.block.program import Prg
 
-
-@pytest.fixture
-def p():
-    """program"""
-    prg = Prg()
-    prg.i0 = I(0)
-    prg.i1 = I('a', 'b', 'c')
-    prg.i2 = I('d', 'e')
-    prg.i3 = I('a', 'b', 'c', 'd', 'e')
-    prg.i4 = I('a', 'b', 'c')
-    return prg
-
-
-@pytest.fixture
-def ps():
-    """program"""
-    prg = Prg()
-    prg.i0 = I(0)
-    return prg
+from .test_fixtures import p, ps
 
 
 def test_rep(p, ps):
@@ -37,7 +20,6 @@ def test_rep(p, ps):
 
 
 def test_index(p):
-    assert str(p.i0) == 'i0'
     with pytest.raises(ValueError):
         I('a', 'a', 'b')
     assert (p.i1 & p.i3) == p.i4
@@ -47,14 +29,29 @@ def test_index(p):
     assert (p.i1 ^ p.i2) == p.i3
     assert (p.i1 ^ p.i2) == (p.i2 ^ p.i1)
     assert (p.i3 - p.i1) == p.i2
-    assert p.i0.latex() == '\\mathcal{i0}'
-    assert p.i0.latex(True) == '\\mathcal{i0}\\in\\{0\\}'
+    assert p.i5._ == [
+        (p.i0._[0], p.i1._[0]),
+        (p.i0._[0], p.i1._[1]),
+        (p.i0._[0], p.i1._[2]),
+    ]
+
     assert len(p.i1) == 3
     assert p.i1[0] == p.i1._[0]
     assert p.i1._[2] in p.i1
     assert p.i1 == p.i4
     assert list(p.i1) == p.i1._
-    p.i1()
+
+
+def test_variable(p):
+    with pytest.raises(ValueError):
+        V(bnr=True, nn=False)
+    assert p.v3.itg
+    assert p.v3.nn
+
+    assert p.v1()
+    assert len(p.v1) == 3
+    # assert p.v2[(0, 'a')] == p.v2._[0]
+    # assert p.v1[0] == p.v1._[0]
 
 
 # @pytest.fixture

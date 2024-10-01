@@ -10,10 +10,10 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 
 from .constraint import C
 from .function import F
-from ..value.bigm import M
-from ..value.zero import Z
 from .index import I
 from .variable import V
+from ..value.zero import Z
+from ..value.bigm import M
 
 
 class P:

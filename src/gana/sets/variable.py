@@ -45,15 +45,14 @@ class V:
         # if the variable is an integer variable
         self.itg = itg
         # if the variable is binary
-        if bnr:
-            self.bnr = bnr
+        self.bnr = bnr
+        if self.bnr:
             self.itg = bnr
-            self.nn = bnr
+            if not nn:
+                raise ValueError('Binary variables must be non-negative')
+
         # if the variable is non negative
         self.nn = nn
-
-        if not nn:
-            self.bnr = nn
 
         # value is determined when mathematical model is solved
         # the flag _fixed is changed when .fix(val) is called
@@ -67,29 +66,29 @@ class V:
         # the mum is the parent variable
         self.mum = None
 
-    def fix(self, val: float | list[float]):
-        """Fix the value of the variable"""
+    # def fix(self, val: float | list[float]):
+    #     """Fix the value of the variable"""
 
-        if self.index:
-            # values are attached to indices in a dictionary
-            # this helps access for getitem etc
-            for n, i in enumerate(val):
-                self._[n] = i
+    #     if self.index:
+    #         # values are attached to indices in a dictionary
+    #         # this helps access for getitem etc
+    #         for n, i in enumerate(val):
+    #             self._[n] = i
 
-        else:
-            # if list, just give positions as indices
-            if isinstance(val, list):
-                if len(self._) != len(self):
-                    raise ValueError(
-                        f'{self}:Length of values ({len(self._)}) must be equal to the size of the index set ({len(self)})'
-                    )
-                for n, i in enumerate(val):
-                    self._[n] = val
-            # if single value (float), give it a zero index
-            if isinstance(val, (int, float)):
-                self._ = val
+    #     else:
+    #         # if list, just give positions as indices
+    #         if isinstance(val, list):
+    #             if len(self._) != len(self):
+    #                 raise ValueError(
+    #                     f'{self}:Length of values ({len(self._)}) must be equal to the size of the index set ({len(self)})'
+    #                 )
+    #             for n, i in enumerate(val):
+    #                 self._[n] = val
+    #         # if single value (float), give it a zero index
+    #         if isinstance(val, (int, float)):
+    #             self._ = val
 
-        self._fixed = True
+    #     self._fixed = True
 
     def idx(self) -> list[tuple]:
         """index"""
@@ -101,29 +100,26 @@ class V:
 
     def sympy(self) -> IndexedBase | Symbol:
         """symbolic representation"""
-        if self.index:
-            return IndexedBase(str(self))[
-                symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
-            ]
-        else:
-            return Symbol(str(self))
+        return IndexedBase(str(self))[
+            symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
+        ]
 
     def pyomo(self) -> Var:
         """Pyomo representation"""
         idx = [i.pyomo() for i in self.index]
-        if self.itg:
+
+        if self.bnr:
+            return Var(*idx, domain=Binary, doc=str(self))
+
+        elif self.itg:
             if self.nn:
                 return Var(*idx, domain=NonNegativeIntegers, doc=str(self))
             else:
                 return Var(*idx, domain=Integers, doc=str(self))
 
         else:
-            if self.bnr:
-                return Var(*idx, domain=Binary, doc=str(self))
-
             if self.nn:
                 return Var(*idx, domain=NonNegativeReals, doc=str(self))
-
             else:
                 return Var(*idx, domain=Reals, doc=str(self))
 
@@ -139,7 +135,6 @@ class V:
         return prod([len(s) if isinstance(s, I) else 1 for s in self.index])
 
     def __getitem__(self, key: int | tuple):
-
         if isinstance(key, tuple):
             return self._[self.idx().index(key)]
 
@@ -174,13 +169,30 @@ class V:
 
         return F(one=self, two=other, rel='-')
 
+    def __rsub__(self, other: Self | F | int):
+        if other == 0:
+            return -self
+        else:
+            return -self + other
+
     def __mul__(self, other: Self | F):
 
         return F(one=self, two=other, rel='×')
 
-    def __truediv__(self, other: Self | F):
+    def __rmul__(self, other: Self | F | int):
+        if other == 1:
+            return self
+        else:
+            return self * other
 
+    def __truediv__(self, other: Self | F):
         return F(one=self, two=other, rel='÷')
+
+    def __rtruediv__(self, other: Self | F | int):
+        if other == 1:
+            return self
+        else:
+            return self / other
 
     def __eq__(self, other):
         return C(lhs=+self, rhs=other, rel='eq')

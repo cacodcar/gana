@@ -5,6 +5,7 @@ from typing import Any, Self
 from IPython.display import Math
 from pyomo.environ import Set
 from sympy import FiniteSet
+from itertools import product
 
 
 class I:
@@ -122,6 +123,9 @@ class I:
 
     def __sub__(self, other: Self):
         return I(*list(set(self._) - set(other._)), name=f'{self.name}-{other.name}')
+
+    def __mul__(self, other: Self):
+        return I(*list(product(self._, other._)), name=f'{self.name}*{other.name}')
 
     def __iter__(self):
         return iter(self._)
