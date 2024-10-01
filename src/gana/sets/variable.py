@@ -18,9 +18,9 @@ from pyomo.environ import (
 )
 from sympy import Idx, IndexedBase, Symbol, symbols
 
-from ..relational.constraint import C
-from ..relational.function import F
-from .collection import S
+from .constraint import C
+from .function import F
+from .index import I
 
 
 class V:
@@ -28,7 +28,7 @@ class V:
 
     def __init__(
         self,
-        *index: S,
+        *index: I,
         name: str = 'contvar',
         itg: bool = False,
         nn: bool = True,
@@ -39,7 +39,7 @@ class V:
             # This works well for variables generated at the indices
             # of a variable set
         else:
-            self.index = S(0, name=f'{name}')
+            self.index = I(0, name=f'{name}')
 
         self.name = name
         # if the variable is an integer variable
@@ -93,7 +93,7 @@ class V:
 
     def idx(self) -> list[tuple]:
         """index"""
-        return list(product(*[s._ if isinstance(s, S) else [s] for s in self.index]))
+        return list(product(*[s._ if isinstance(s, I) else [s] for s in self.index]))
 
     def latex(self) -> str:
         """LaTeX representation"""
@@ -136,7 +136,7 @@ class V:
         return str(self)
 
     def __len__(self):
-        return prod([len(s) if isinstance(s, S) else 1 for s in self.index])
+        return prod([len(s) if isinstance(s, I) else 1 for s in self.index])
 
     def __getitem__(self, key: int | tuple):
 

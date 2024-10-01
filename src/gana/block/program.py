@@ -8,12 +8,12 @@ from warnings import warn
 from IPython.display import display
 
 from ..sets.parameter import P
-from ..sets.collection import S
+from ..sets.index import I
 from ..sets.theta import T
 from ..sets.variable import V
-from ..relational.constraint import C
-from ..relational.function import F
-from ..relational.objective import O
+from ..sets.constraint import C
+from ..sets.function import F
+from ..sets.objective import O
 
 
 @dataclass
@@ -27,10 +27,9 @@ class Prg:
         # names of declared modeling and relational elements
         self.names = []
 
-        self.sets: list[S] = []
         # modeling elements
         (
-            self.sets,
+            self.indices,
             self.variables,
             self.vars_cnt,
             self.vars_itg,
@@ -49,12 +48,12 @@ class Prg:
         # are indexed and are a set of elements as opposed to a single element
         self._n_t, self._n_v, self._n_p, self._n_c, self._n_o = (0 for _ in range(5))
 
-    def __setattr__(self, name: str, value: V) -> None:
+    def __setattr__(self, name, value) -> None:
 
         if not name in [
             'name',
             'overwrite',
-            'sets',
+            'indices',
             'variables',
             'vars_cnt',
             'vars_itg',
@@ -79,23 +78,20 @@ class Prg:
                     raise ValueError(
                         f'{name} is already defined, set overwrite=True to allow overwriting'
                     )
-
             self.names.append(name)
 
         # modeling elements
-        if isinstance(value, S | V | P | T | F | C | O):
+        if isinstance(value, (I, V, P, T, F, C, O)):
             value.name = name
 
-        if isinstance(value, S):
+        if isinstance(value, I):
             # set the counter on the element
-            if name in self.names:
-                self.sets.append(value)
-                value.count = len(self.sets)
-                for n, s in enumerate(value._):
-                    if isinstance(s, (int, float)):
-                        value._[n] = S(s, name=f'{value.name}_{n}')
-                    else:
-                        value._[n] = S(s, name=str(s))
+            self.indices.append(value)
+            value.count = len(self.indices)
+            if isinstance(value._, list):
+                for n, i in enumerate(value._):
+                    if isinstance(i, (int, float, str)):
+                        value._[n] = I(i, name=f'{i}')
 
         if isinstance(value, V):
             self.variables.append(value)
@@ -161,7 +157,7 @@ class Prg:
         if isinstance(prg, Prg):
 
             # modeling elements
-            self.sets += prg.sets
+            self.indices += prg.indices
             self.variables += prg.variables
             self.vars_cnt += prg.vars_cnt
             self.vars_itg += prg.vars_itg
@@ -176,7 +172,7 @@ class Prg:
     @property
     def index(self):
         """Set of all indices"""
-        return S(product(*[s._ if isinstance(s, S) else [s] for s in self.sets]))
+        return I(product(*[s._ if isinstance(s, I) else [s] for s in self.indices]))
 
     def matrix(self):
         """Return Matrix Representation"""
@@ -193,7 +189,7 @@ class Prg:
     def latex(self):
         """Display LaTeX"""
 
-        for s in self.sets:
+        for s in self.indices:
             display(s.latex())
 
         for e in self.constraints + self.objectives:
@@ -215,7 +211,7 @@ class Prg:
 
     def __call__(self):
 
-        for s in self.sets:
+        for s in self.indices:
             display(s())
 
         for e in self.constraints + self.objectives:

@@ -8,24 +8,24 @@ from typing import Self
 from IPython.display import Math
 from sympy import Idx, IndexedBase, Symbol, symbols
 
-from ..relational.constraint import C
-from ..relational.function import F
+from .constraint import C
+from .function import F
 from ..value.bigm import M
 from ..value.zero import Z
-from .collection import S
+from .index import I
 from .variable import V
 
 
 class P:
     """A Parameter"""
 
-    def __init__(self, *index: S, _: int | float | list | bool, name: str = 'Param'):
+    def __init__(self, *index: I, _: int | float | list | bool, name: str = 'Param'):
         if index:
             self.index = index
             # This works well for variables generated at the indices
             # of a variable set
         else:
-            self.index = S(0, name=f'{name}')
+            self.index = I(0, name=f'{name}')
 
         self.name = name
         self._: list[Self] = _
@@ -61,7 +61,7 @@ class P:
         """index"""
         if not self.mum:
             return list(
-                product(*[s._ if isinstance(s, S) else [s] for s in self.index])
+                product(*[s._ if isinstance(s, I) else [s] for s in self.index])
             )
         else:
             return self.index
@@ -105,7 +105,7 @@ class P:
         return hash(str(self))
 
     def __len__(self):
-        return prod([len(s) if isinstance(s, S) else 1 for s in self.index])
+        return prod([len(s) if isinstance(s, I) else 1 for s in self.index])
 
     def __getitem__(self, key: int | tuple):
 

@@ -8,13 +8,13 @@ from typing import TYPE_CHECKING
 from sympy import Idx, IndexedBase, Symbol, symbols
 
 if TYPE_CHECKING:
-    from .collection import S
+    from .index import I
 
 
 class T:
     """Parametric variable"""
 
-    def __init__(self, *args: S, _: tuple[float, float], name: str = 'mpvar'):
+    def __init__(self, *args: I, _: tuple[float, float], name: str = 'mpvar'):
         self.index = args
 
         # Parametric variables can take a value within a domain
