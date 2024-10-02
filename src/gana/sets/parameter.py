@@ -240,69 +240,25 @@ class P:
     def __eq__(self, other: Self):
 
         if isinstance(other, P):
-            if isinstance(self._, list) and all(
-                [i == j for i, j in zip(self._, other._)]
-            ):
-                return True
-            elif isinstance(self._, (int, float)) and self._ == other._:
-                return True
-
-            else:
-                return False
-        elif isinstance(other, (V, F)):
-            return C(lhs=self, rhs=other, rel='eq')
-
-        else:
-            return False
+            return all([i == j for i, j in zip(self._, other._)])
+        return C(lhs=self, rhs=other, rel='eq')
 
     def __le__(self, other: Self):
 
         if isinstance(other, P):
-            if isinstance(self._, list) and all(
-                [i <= j for i, j in zip(self._, other._)]
-            ):
-                return True
-            elif isinstance(self._, (int, float)) and self._ <= other._:
-                return True
-
-            else:
-                return False
-
-        elif isinstance(other, (V, F)):
-            return C(lhs=self, rhs=other, rel='le')
-
-        else:
-            return False
+            return all([i <= j for i, j in zip(self._, other._)])
+        return C(lhs=self, rhs=other, rel='le')
 
     def __ge__(self, other: Self):
         if isinstance(other, P):
-            if isinstance(self._, list) and all(
-                [i >= j for i, j in zip(self._, other._)]
-            ):
-                return True
-            elif isinstance(self._, (int, float)) and self._ >= other._:
-                return True
-
-            else:
-                return False
-
-        else:
-            return C(lhs=self, rhs=other, rel='ge')
+            return all([i >= j for i, j in zip(self._, other._)])
+        return C(lhs=self, rhs=other, rel='ge')
 
     def __lt__(self, other: Self):
 
         if isinstance(other, P):
-            if isinstance(self._, list) and all(
-                [i < j for i, j in zip(self._, other._)]
-            ):
-                return True
-            elif isinstance(self._, (int, float)) and self._ < other._:
-                return True
-
-            else:
-                return False
-        else:
-            return self <= other
+            return all([i < j for i, j in zip(self._, other._)])
+        return self <= other
 
     def __ne__(self, other: Self):
         if isinstance(other, P):
@@ -314,17 +270,8 @@ class P:
 
     def __gt__(self, other: Self):
         if isinstance(other, P):
-            if isinstance(self._, list) and all(
-                [i > j for i, j in zip(self._, other._)]
-            ):
-                return True
-            elif isinstance(self._, (int, float)) and self._ > other._:
-                return True
-
-            else:
-                return False
-        else:
-            return self >= other
+            return all([i > j for i, j in zip(self._, other._)])
+        return self >= other
 
     def __call__(self) -> str:
         return Math(self.latex())
