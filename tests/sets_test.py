@@ -9,6 +9,7 @@ from src.gana.sets.index import I
 from src.gana.sets.parameter import P
 from src.gana.sets.variable import V
 from src.gana.sets.function import F
+from src.gana.sets.constraint import C
 from src.gana.block.program import Prg
 
 from .test_fixtures import p, ps
@@ -59,6 +60,36 @@ def test_variable(p):
     assert p.v2 + p.v2_ == F(one=p.v2, rel='+', two=p.v2_)
     assert p.v2 - p.v2_ == F(one=p.v2, rel='-', two=p.v2_)
     assert sum(p.v1) == p.v1['a'] + p.v1['b'] + p.v1['c']
+    assert p.v1['a'] == p.v1[0]
+    assert 0 + p.v1 == p.v1 + 0
+    assert p.f1.one == p.v2_
+    assert p.f1.rel == '+'
+    assert p.f1.two == p.v2
+    assert p.f2.one == p.v2_
+    assert p.f2.rel == '-'
+    assert p.f2.two == p.v2
+    assert p.f3.one == p.v2_
+    assert p.f3.rel == '×'
+    assert p.f3.two == p.v2
+    assert p.f4.one == p.v2_
+    assert p.f4.rel == '÷'
+    assert p.f4.two == p.v2
+    assert p.c1.lhs == p.v2_
+    assert p.c1.rel == 'eq'
+    assert p.c1.rhs == p.v2
+    assert p.c2.lhs == p.v2_
+    assert p.c2.rel == 'ge'
+    assert p.c2.rhs == p.v2
+    assert p.c3.lhs == p.v2_
+    assert p.c3.rel == 'le'
+    assert p.c3.rhs == p.v2
+    assert p.c4.lhs == p.v2_
+    assert p.c4.rel == 'ge'
+    assert p.c4.rhs == p.v2
+    assert p.c5.lhs == p.v2_
+    assert p.c5.rel == 'le'
+    assert p.c5.rhs == p.v2
+
     # assert p.v2[(0, 'a')] == p.v2._[0]
     # assert p.v1[0] == p.v1._[0]
 

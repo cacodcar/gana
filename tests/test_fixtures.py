@@ -23,6 +23,15 @@ def p():
     prg.v2 = V(prg.i0, prg.i1, itg=True)
     prg.v2_ = V(prg.i0, prg.i1, nn=False)
     prg.v3 = V(prg.i0, bnr=True)
+    prg.f1 = prg.v2_ + prg.v2
+    prg.f2 = prg.v2_ - prg.v2
+    prg.f3 = prg.v2_ * prg.v2
+    prg.f4 = prg.v2_ / prg.v2
+    prg.c1 = prg.v2_ == prg.v2
+    prg.c2 = prg.v2_ >= prg.v2
+    prg.c3 = prg.v2_ <= prg.v2
+    prg.c4 = prg.v2_ >  prg.v2
+    prg.c5 = prg.v2_ <  prg.v2
     return prg
 
 

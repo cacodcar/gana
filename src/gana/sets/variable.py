@@ -137,7 +137,7 @@ class V:
     def __getitem__(self, key: int | tuple):
         if isinstance(key, (int, slice)):
             return self._[key]
-        
+
         return self._[
             [tuple([i.name for i in idx]) for idx in self.idx()].index(tuple(key))
         ]
@@ -163,9 +163,6 @@ class V:
     def __radd__(self, other: Self | F):
         if other == 0:
             return self
-        return self + other
-
-    def __iadd__(self, other: Self | F):
         return self + other
 
     def __sub__(self, other: Self | F):
