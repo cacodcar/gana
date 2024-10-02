@@ -16,11 +16,13 @@ def test_latex(p):
     assert p.i0.latex() == '\\mathcal{i0}'
     assert p.i0.latex(True) == '\\mathcal{i0}\\in\\{0\\}'
     assert p.v1.latex() == r'v1_{i1}'
+    assert p.p1.latex() == r'P1_{i0}'
 
 
 def test_sympy(p):
     assert p.i0.sympy() == FiniteSet(0)
     assert p.v1.sympy() == IndexedBase('v1')[symbols('i1', cls=Idx)]
+    assert p.p1.sympy() == IndexedBase('P1')[symbols('i0', cls=Idx)]
 
 
 def test_pyomo(p, m):

@@ -34,12 +34,10 @@ class V:
         nn: bool = True,
         bnr: bool = False,
     ):
-        if index:
-            self.index = index
-            # This works well for variables generated at the indices
-            # of a variable set
-        else:
-            self.index = I(0, name=f'{name}')
+
+        self.index = index
+        # This works well for variables generated at the indices
+        # of a variable set
 
         self.name = name
         # if the variable is an integer variable
@@ -92,7 +90,7 @@ class V:
 
     def idx(self) -> list[tuple]:
         """index"""
-        return list(product(*[s._ if isinstance(s, I) else [s] for s in self.index]))
+        return list(product(*[i._ if isinstance(i, I) else [i] for i in self.index]))
 
     def latex(self) -> str:
         """LaTeX representation"""
@@ -132,7 +130,7 @@ class V:
         return str(self)
 
     def __len__(self):
-        return prod([len(s) if isinstance(s, I) else 1 for s in self.index])
+        return prod([len(i) if isinstance(i, I) else 1 for i in self.index])
 
     def __getitem__(self, key: int | tuple):
         if isinstance(key, (int, slice)):

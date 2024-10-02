@@ -125,7 +125,12 @@ class I:
         return I(*list(set(self._) - set(other._)), name=f'{self.name}-{other.name}')
 
     def __mul__(self, other: Self):
+        if isinstance(other, int) and other == 1:
+            return self
         return I(*list(product(self._, other._)), name=f'{self.name}*{other.name}')
+
+    def __rmul__(self, other: Self):
+        return self * other
 
     def __iter__(self):
         return iter(self._)

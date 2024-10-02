@@ -19,16 +19,16 @@ from ..value.bigm import M
 class P:
     """A Parameter"""
 
-    def __init__(self, *index: I, _: int | float | list | bool, name: str = 'Param'):
-        if index:
-            self.index = index
-            # This works well for variables generated at the indices
-            # of a variable set
-        else:
-            self.index = I(0, name=f'{name}')
+    def __init__(self, *index: I, _: list[int | float | bool], name: str = 'Param'):
+
+        self._: list[Self] = _
+
+        self.index = index
+        # This works well for variables generated at the indices
+        # of a variable set
 
         self.name = name
-        self._: list[Self] = _
+
         # keeps a count of, updated in program
         self.count: int = None
 
@@ -36,35 +36,19 @@ class P:
         # the mum is the parent parameter
         self.mum = None
 
-        if isinstance(self._, bool) and self._ is True:
-            # True instances big Ms
-            self._ = M()
+        if len(self) != len(self._):
+            raise ValueError(
+                f'Length of values ({len(self._)}) must be equal to the size of the index set ({len(self)})'
+            )
 
-        if isinstance(self._, (int, float)):
-            if self.index:
-                # if a scalar value is passed to a parameter with multiple indices
-                # it is converted to a list of the same repeated value
-                self._ = [self._] * len(self)
-
-        if isinstance(self._, list):
-            if self.index and len(self) != len(self._):
-                raise ValueError(
-                    f'Length of values ({len(self._)}) must be equal to the size of the index set ({len(self)})'
-                )
-
-            # Make big Ms in list
-            for i, v in enumerate(self._):
-                if isinstance(v, bool) and v is True:
-                    self._[i] = M()
+        # Make big Ms in list
+        for i, v in enumerate(self._):
+            if isinstance(v, bool) and v is True:
+                self._[i] = M()
 
     def idx(self) -> list[tuple]:
         """index"""
-        if not self.mum:
-            return list(
-                product(*[s._ if isinstance(s, I) else [s] for s in self.index])
-            )
-        else:
-            return self.index
+        return list(product(*[i._ if isinstance(i, I) else [i] for i in self.index]))
 
     def latex(self) -> str:
         """LaTeX representation"""
@@ -73,27 +57,9 @@ class P:
     def sympy(self) -> IndexedBase | Symbol:
         """symbolic representation"""
 
-        if isinstance(self._, list):
-            if len(self._) == 1:
-                if isinstance(self._[0], P):
-                    return self._[0]._[0]
-
-                else:
-                    return self._[0]
-
-            else:
-                if self.index:
-                    return IndexedBase(str(self))[
-                        symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
-                    ]
-                else:
-                    return Symbol(str(self))
-        else:
-            if isinstance(self._, P):
-                return self._._
-
-            else:
-                return self._
+        return IndexedBase(str(self))[
+            symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
+        ]
 
     def __str__(self):
         return rf'{self.name}'.capitalize()
@@ -105,42 +71,32 @@ class P:
         return hash(str(self))
 
     def __len__(self):
-        return prod([len(s) if isinstance(s, I) else 1 for s in self.index])
+        return prod([len(i) if isinstance(i, I) else 1 for i in self.index])
 
     def __getitem__(self, key: int | tuple):
-
-        if isinstance(key, tuple):
-            return self._[self.idx().index(key)]
-
-        if isinstance(key, int):
+        if isinstance(key, (int, slice)):
             return self._[key]
 
+        return self._[
+            [tuple([i.name for i in idx]) for idx in self.idx()].index(tuple(key))
+        ]
+
     def __neg__(self):
-        if isinstance(self._, list):
-            return P(*self.index, _=[-i for i in self._])
-        else:
-            return P(*self.index, _=-self._)
+        return P(*self.index, _=[-i for i in self._])
+        # if isinstance(self._, list):
+        #     return P(*self.index, _=[-i for i in self._])
+        # else:
+        #     return P(*self.index, _=-self._)
 
     def __pos__(self):
-        return P(*self.index, _=[+i for i in self._])
+        return self
 
     def __abs__(self):
         return P(*self.index, _=[abs(i) for i in self._])
 
-    def __invert__(self):
-        return P(*self.index, _=[~i for i in self._])
-
     # the ones below do this:
     # compare themselves to big Ms, Parameters, Variables, and Functions
     def __add__(self, other: Self):
-
-        if isinstance(other, M):
-            # big M is always bigger than any number
-            return M()
-
-        if isinstance(other, Z):
-            # zero, like me, has no real impact
-            return self
 
         if isinstance(other, P):
             # to handle big M values in list
@@ -175,14 +131,12 @@ class P:
 
     def __sub__(self, other: Self):
 
-        if isinstance(other, M):
-            return M()
-
         if isinstance(other, P):
             return P(
                 *self.index,
                 _=[i - j for i, j in zip(self._, other._)],
             )
+        
         if isinstance(other, F):
             return F(one=self, two=other, rel='-')
 

@@ -127,7 +127,7 @@ class Prg:
             # generate parameters for each index
             if value.index:
                 for n, i in enumerate(value.idx()):
-                    value._[n] = P(*i, name=value.name, _=value._[n])
+                    value._[n] = P(*i, name=value.name, _=[value._[n]])
                     value._[n].mum = value
 
         if isinstance(value, T):
@@ -155,19 +155,18 @@ class Prg:
     def club(self, prg: Self):
         """Club two Programs"""
         if isinstance(prg, Prg):
-
             # modeling elements
-            self.indices += prg.indices
-            self.variables += prg.variables
-            self.vars_cnt += prg.vars_cnt
-            self.vars_itg += prg.vars_itg
-            self.vars_nn += prg.vars_nn
-            self.vars_bnr += prg.vars_bnr
-            self.thetas += prg.thetas
-            self.parameters += prg.parameters
-            self.functions += prg.functions
-            self.constraints += prg.constraints
-            self.objectives += prg.objectives
+            self.indices = self.indices + prg.indices
+            self.variables = self.variables + prg.variables
+            self.vars_cnt = self.vars_cnt + prg.vars_cnt
+            self.vars_itg = self.vars_itg + prg.vars_itg
+            self.vars_nn = self.vars_nn + prg.vars_nn
+            self.vars_bnr = self.vars_bnr + prg.vars_bnr
+            self.thetas = self.thetas + prg.thetas
+            self.parameters = self.parameters + prg.parameters
+            self.functions = self.functions + prg.functions
+            self.constraints = self.constraints + prg.constraints
+            self.objectives = self.objectives + prg.objectives
 
     @property
     def index(self):
@@ -212,7 +211,7 @@ class Prg:
     def __call__(self):
 
         for s in self.indices:
-            display(s())
+            display(s(True))
 
         for e in self.constraints + self.objectives:
             display(e())
