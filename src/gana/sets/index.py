@@ -1,11 +1,11 @@
 """A collection of objects, a set basically"""
 
 from typing import Any, Self
+from itertools import product
 
 from IPython.display import Math
 from pyomo.environ import Set
 from sympy import FiniteSet
-from itertools import product
 
 
 class I:
@@ -35,7 +35,7 @@ class I:
 
     """
 
-    def __init__(self, *_: str | float, name: str = 'set'):
+    def __init__(self, *_: str, name: str = 'set'):
 
         if len(_) == 1:
             self.is_set = False

@@ -135,11 +135,12 @@ class V:
         return prod([len(s) if isinstance(s, I) else 1 for s in self.index])
 
     def __getitem__(self, key: int | tuple):
-        if isinstance(key, tuple):
-            return self._[self.idx().index(key)]
-
-        if isinstance(key, int):
+        if isinstance(key, (int, slice)):
             return self._[key]
+        
+        return self._[
+            [tuple([i.name for i in idx]) for idx in self.idx()].index(tuple(key))
+        ]
 
     def __str__(self):
         return rf'{self.name}'
@@ -159,11 +160,13 @@ class V:
     def __add__(self, other: Self | F):
         return F(one=self, rel='+', two=other)
 
-    def __radd__(self, other: Self | F | int):
+    def __radd__(self, other: Self | F):
         if other == 0:
             return self
-        else:
-            return self + other
+        return self + other
+
+    def __iadd__(self, other: Self | F):
+        return self + other
 
     def __sub__(self, other: Self | F):
 
@@ -193,6 +196,10 @@ class V:
             return self
         else:
             return self / other
+
+    def __iter__(self):
+        for i in self._:
+            yield i
 
     def __eq__(self, other):
         return C(lhs=+self, rhs=other, rel='eq')

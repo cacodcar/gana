@@ -52,7 +52,7 @@ class F:
         else:
             self.name = f'{self.rel}{self.two}'
 
-        self._: list[Self] = []
+        # self._: list[Self] = []
 
     # def _(self, args: tuple) -> float:
     #     """Function Eval"""
@@ -154,6 +154,9 @@ class F:
     def __gt__(self, other: Self | P | V):
         return self >= other
 
-    def __call__(self) -> str:
+    def __call__(self, *_) -> str:
         """symbolic representation"""
-        return Math(self.latex())
+        if len(_) == 1:
+            return Math(self.latex())
+        #TODO - put eval function 
+        # else: 

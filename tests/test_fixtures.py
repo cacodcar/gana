@@ -11,7 +11,7 @@ from pyomo.environ import ConcreteModel, Set
 def p():
     """program"""
     prg = Prg()
-    prg.i0 = I(0)
+    prg.i0 = I('0')
     prg.i1 = I('a', 'b', 'c')
     prg.i2 = I('d', 'e')
     prg.i3 = I('a', 'b', 'c', 'd', 'e')
@@ -30,7 +30,8 @@ def p():
 def ps():
     """program"""
     prg = Prg()
-    prg.i0 = I(0)
+    prg.i0 = I('0')
+    prg.v0 = V()
     return prg
 
 
