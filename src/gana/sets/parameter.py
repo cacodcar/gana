@@ -12,7 +12,6 @@ from .constraint import C
 from .function import F
 from .index import I
 from .variable import V
-from ..value.zero import Z
 from ..value.bigm import M
 
 
@@ -94,76 +93,48 @@ class P:
     def __abs__(self):
         return P(*self.index, _=[abs(i) for i in self._])
 
-    # the ones below do this:
-    # compare themselves to big Ms, Parameters, Variables, and Functions
+    # --- Handling basic operations----
+    # if there is a zero on the left, just return P
+    # if the other is a parameter, add the values
+    # if the other is a function/variable, return a function
+
+    # r<operation>
+    # for the right hand side operations
+    # they only kick in when the left hand side operator 
+    # does not have the operation/the operation did not work 
+    # in this case, we just do the equivalent self
     def __add__(self, other: Self):
-
-        if isinstance(other, P):
-            # to handle big M values in list
-            # I could manage M + int | float = M
-            # not int | float + M = M
-            return P(
-                *self.index,
-                _=[i + j for i, j in zip(self._, other._)],
-            )
-
-        if isinstance(other, V):
-            if self._ and other._:
-                # evaluated variables return Parameters
-                return P(
-                    *self.index,
-                    _=[i + j for i, j in zip(self._, other._)],
-                )
-
-            else:
-                # unevaluated variables return function
-                return F(one=self, rel='+', two=other)
-
-        if isinstance(other, F):
-            # added to a function returns a function
-            return F(one=self, two=other, rel='+')
-
-    def __radd__(self, other: Self):
+    
         if other == 0:
             return self
-        else:
-            return self + other
-
-    def __sub__(self, other: Self):
 
         if isinstance(other, P):
-            return P(
-                *self.index,
-                _=[i - j for i, j in zip(self._, other._)],
-            )
-        
-        if isinstance(other, F):
-            return F(one=self, two=other, rel='-')
+            self._ = [i + j for i, j in zip(self._, other._)]
+            return self
 
-        if isinstance(other, V):
-            if self._ and other._:
-                return P(
-                    *self.index,
-                    _=[i - j for i, j in zip(self._, other._)],
-                )
-            else:
-                return F(one=self, rel='-', two=other)
+        return F(one=self, rel='+', two=other)
+
+    def __radd__(self, other: Self):
+        return self + other
+
+    def __sub__(self, other: Self):
+        if other == 0:
+            return self
+        if isinstance(other, P):
+            self._ = [i - j for i, j in zip(self._, other._)]
+            return self
+        return F(one=self, rel='-', two=other)
 
     def __rsub__(self, other: Self):
         return self - other
 
     def __mul__(self, other: Self):
+        if other == 0:
+            return self
         if isinstance(other, P):
-            return P(
-                *self.index,
-                _=[i * j for i, j in zip(self._, other._)],
-            )
-
-        if isinstance(other, F):
-            return F(one=self, rel='×', two=other)
-
-        if isinstance(other, V):
-            return F(one=self, rel='×', two=other)
+            self._ = [i * j for i, j in zip(self._, other._)]
+            return self
+        return F(one=self, rel='+', two=other)
 
     def __rmul__(self, other: Self):
         return other * self

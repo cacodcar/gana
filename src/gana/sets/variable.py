@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from itertools import product
 from math import prod
-from typing import Self
+from typing import Self, TYPE_CHECKING
 
 from IPython.display import Math
 from pyomo.environ import (
@@ -21,6 +21,10 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 from .constraint import C
 from .function import F
 from .index import I
+
+
+if TYPE_CHECKING:
+    from .parameter import P
 
 
 class V:
@@ -64,29 +68,16 @@ class V:
         # the mum is the parent variable
         self.mum = None
 
-    # def fix(self, val: float | list[float]):
-    #     """Fix the value of the variable"""
-
-    #     if self.index:
-    #         # values are attached to indices in a dictionary
-    #         # this helps access for getitem etc
-    #         for n, i in enumerate(val):
-    #             self._[n] = i
-
-    #     else:
-    #         # if list, just give positions as indices
-    #         if isinstance(val, list):
-    #             if len(self._) != len(self):
-    #                 raise ValueError(
-    #                     f'{self}:Length of values ({len(self._)}) must be equal to the size of the index set ({len(self)})'
-    #                 )
-    #             for n, i in enumerate(val):
-    #                 self._[n] = val
-    #         # if single value (float), give it a zero index
-    #         if isinstance(val, (int, float)):
-    #             self._ = val
-
-    #     self._fixed = True
+    def fix(self, values: P | list[float]):
+        """Fix the value of the variable"""
+        # i am not running a type check for Parameter here
+        # P imports V 
+        if isinstance(values, list):
+            self._ = values
+            self._fixed = True
+        else: 
+            self._ = values._
+            self._fixed = True
 
     def idx(self) -> list[tuple]:
         """index"""

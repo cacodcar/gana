@@ -20,7 +20,7 @@ from ..sets.objective import O
 class Prg:
     """A mathematical program"""
 
-    name: str = field(default='Program')
+    name: str = field(default=':p:')
     overwrite: bool = field(default=False)
 
     def __post_init__(self):
@@ -152,21 +152,22 @@ class Prg:
 
         super().__setattr__(name, value)
 
-    def club(self, prg: Self):
-        """Club two Programs"""
-        if isinstance(prg, Prg):
-            # modeling elements
-            self.indices = self.indices + prg.indices
-            self.variables = self.variables + prg.variables
-            self.vars_cnt = self.vars_cnt + prg.vars_cnt
-            self.vars_itg = self.vars_itg + prg.vars_itg
-            self.vars_nn = self.vars_nn + prg.vars_nn
-            self.vars_bnr = self.vars_bnr + prg.vars_bnr
-            self.thetas = self.thetas + prg.thetas
-            self.parameters = self.parameters + prg.parameters
-            self.functions = self.functions + prg.functions
-            self.constraints = self.constraints + prg.constraints
-            self.objectives = self.objectives + prg.objectives
+    def combine(self, *prgs: tuple[Self]):
+        """Club Programs"""
+        for prg in prgs:
+            if isinstance(prg, Prg):
+                # modeling elements
+                self.indices = self.indices + prg.indices
+                self.variables = self.variables + prg.variables
+                self.vars_cnt = self.vars_cnt + prg.vars_cnt
+                self.vars_itg = self.vars_itg + prg.vars_itg
+                self.vars_nn = self.vars_nn + prg.vars_nn
+                self.vars_bnr = self.vars_bnr + prg.vars_bnr
+                self.thetas = self.thetas + prg.thetas
+                self.parameters = self.parameters + prg.parameters
+                self.functions = self.functions + prg.functions
+                self.constraints = self.constraints + prg.constraints
+                self.objectives = self.objectives + prg.objectives
 
     @property
     def index(self):
@@ -194,19 +195,22 @@ class Prg:
         for e in self.constraints + self.objectives:
             display(e.latex())
 
+    def __str__(self):
+        return rf'{self.name}'
+
     def __repr__(self):
-        return self.name
+        return str(self)
 
     def __hash__(self):
-        return hash(self.name)
+        return hash(str(self))
 
-    def __getitem__(self, key: int | tuple):
+    # def __getitem__(self, key: int | tuple):
 
-        if isinstance(key, tuple):
-            return self.index[self.idx().index(key)]
+    #     if isinstance(key, tuple):
+    #         return self.index[self.idx().index(key)]
 
-        if isinstance(key, int):
-            return self.index[key]
+    #     if isinstance(key, int):
+    #         return self.index[key]
 
     def __call__(self):
 
