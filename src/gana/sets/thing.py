@@ -9,6 +9,7 @@ class X:
     def __init__(self, *parents):
         self.parents = list(parents)
         self.name: str = None
+        self.number: int = None
 
     def __str__(self):
         return rf'{self.name}'

@@ -45,7 +45,9 @@ class Prg:
 
     def __setattr__(self, name, value) -> None:
 
-        # modeling elements
+        # Collect names here
+        # Things (X) can belong to multiple indices
+        # Hence they can be overwritten
         if isinstance(value, (I, X, V, P, T, F, C, O)):
             if not isinstance(value, X) and name in self.names:
                 warn(f'Overwriting {name}')
@@ -53,25 +55,34 @@ class Prg:
             self.names.append(name)
 
         if isinstance(value, I):
+            print(name)
             self.indices.append(value)
             value.number = len(self.indices)
+
+            # if only a single integer is passed
+            # create an orderd set of that length
             if isinstance(value._[0], int):
                 value._ = [f'{name}{x}' for x in range(value._[0])]
+                value.ordered = True
 
+            # if not assume string and make a set of things
+            # with the same name, and set them on the program
             for n, x in enumerate(value._):
-                thng = X(value)
-                value._[n] = thng
-                setattr(self, x, thng)
+                if x in self.things:
+                    # if thing already declared as part of another index
+                    # update her parents
+                    thng: X = self.things[self.things.index(x)]
+                    thng.parents.append(value)
+                    value._[n] = thng
+                else:
+                    # else make a new thing
+                    thng = X(value)
+                    value._[n] = thng
+                    setattr(self, x, thng)
 
         if isinstance(value, X):
-            if name in self.things:
-                thng = getattr(self, name)
-                value.parents.extend(thng.parents)
-                value.number = thng.number
-                self.things[thng.number] = value
-            else:
-                value.number = len(self.things)
-                self.things.append(value)
+            value.number = len(self.things)
+            self.things.append(value)
 
         if isinstance(value, V):
             self.variables.append(value)

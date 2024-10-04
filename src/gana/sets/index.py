@@ -49,6 +49,7 @@ class I:
         # number, name will be updated in Program
         self.name: str = None
         self.number: int = None
+        self.ordered: bool = False
 
     def latex(self, descriptive: bool = False) -> str:
         """LaTeX representation"""
