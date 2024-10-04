@@ -51,6 +51,11 @@ class I:
         self.number: int = None
         self.ordered: bool = False
 
+    @property
+    def tag(self) -> str:
+        """Unique tag for the index"""
+        return f'i{self.number}'
+
     def latex(self, descriptive: bool = False) -> str:
         """LaTeX representation"""
 
@@ -67,6 +72,10 @@ class I:
 
         else:
             return r'\mathcal{' + str(self) + r'}'
+
+    def pprint(self, descriptive: bool = False) -> Math:
+        """Display the set"""
+        return Math(self.latex(descriptive))
 
     def sympy(self) -> FiniteSet:
         """Sympy representation"""
@@ -124,8 +133,6 @@ class I:
         return I(*list(set(self._) - set(other._)))
 
     def __mul__(self, other: Self):
-        print('adasd')
-        print(self, other)
         # this to allow using product
         if isinstance(other, int) and other == 1:
             return self
@@ -135,7 +142,7 @@ class I:
                     f'{other} can only belong at one index of element.',
                     f'{other} also in {self}',
                 )
-            return I(*list(product(self._, [other._])))
+            return I(*list(product(self._, [other])))
 
         if isinstance(other, I):
             if set(self._) & set(other._):
@@ -152,11 +159,8 @@ class I:
                     f'{other} can only belong at one index of element.',
                     f'{other} also in {self}',
                 )
-            return I(*list(product([other._], self._)))
+            return I(*list(product([other], self._)))
         return self * other
 
     def __iter__(self):
         return iter(self._)
-
-    def __call__(self, descriptive: bool = False) -> FiniteSet:
-        return Math(self.latex(descriptive))

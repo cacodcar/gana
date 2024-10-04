@@ -42,6 +42,7 @@ class Prg:
             self.constraints,
             self.objectives,
         ) = ([] for _ in range(12))
+        self.n_vrb, self.n_prm, self.n_cns = (0 for _ in range(3))
 
     def __setattr__(self, name, value) -> None:
 
@@ -55,7 +56,6 @@ class Prg:
             self.names.append(name)
 
         if isinstance(value, I):
-            print(name)
             self.indices.append(value)
             value.number = len(self.indices)
 
@@ -76,17 +76,38 @@ class Prg:
                     value._[n] = thng
                 else:
                     # else make a new thing
+                    # and set it on the program
                     thng = X(value)
                     value._[n] = thng
                     setattr(self, x, thng)
 
         if isinstance(value, X):
+            # only new things are set, see setattr for I
             value.number = len(self.things)
             self.things.append(value)
 
         if isinstance(value, V):
+            value.number = len(self.variables)
             self.variables.append(value)
-            value.counts = len(self.variables)
+            value.tags = [
+                f'v{i}' for i in range(self.n_vrb, self.n_vrb + len(value.idx()))
+            ]
+            if value.index:
+                for n, i in enumerate(value.idx()):
+                    print(value.vars, n)
+                    print(i)
+                    value.vars.append(
+                        V(
+                            i,
+                            name=value.name,
+                            itg=value.itg,
+                            nn=value.nn,
+                            bnr=value.bnr,
+                        )
+                    )
+                    value.vars[n].parent = value
+
+            self.n_vrb += len(value.idx())
 
             if value.itg:
                 # integer variable
@@ -106,10 +127,6 @@ class Prg:
 
             # if parameter has index
             # generate parameters for each index
-            if value.index:
-                for n, i in enumerate(value.idx()):
-                    value._[n] = P(*i, name=value.name, _=[value._[n]])
-                    value._[n].mum = value
 
         if isinstance(value, T):
             self.thetas.append(value)

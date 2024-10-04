@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
 
 class V:
-    """A Continuous Variable"""
+    """Variable Set"""
 
     def __init__(
         self,
@@ -39,12 +39,17 @@ class V:
         nn: bool = True,
         bnr: bool = False,
     ):
+        print(index)
         self.index = list(index)
-        self.indices = prod(self.index)._
-        self._: list[int | float] = None
-        # This works well for variables generated at the indices
-        # of a variable set
+
         self.name = name
+        # variables generated at the indices
+        # of a variable set are stored here
+        # once realized, the values take a int or float value
+
+        self.parent: Self = None
+        self.vars: list[Self] = []
+
         # if the variable is an integer variable
         self.itg = itg
         # if the variable is binary
@@ -58,16 +63,13 @@ class V:
         self.nn = nn
 
         # value is determined when mathematical model is solved
+        self._: list[int | float] = []
         # the flag _fixed is changed when .fix(val) is called
         self._fixed = False
-        self._: list[Self] = []
 
-        # keeps a count of, updated in program
-        self.count: int = None
-
-        # if a variable is declared as a child (at an constituent index)
-        # the mum is the parent variable
-        self.mum = None
+        # tags for the members of the Variable set
+        self.tags: list[str] = None
+        self.number: int = None
 
     def fix(self, values: P | list[float]):
         """Fix the value of the variable"""
@@ -82,11 +84,18 @@ class V:
 
     def idx(self) -> list[tuple]:
         """index"""
-        return list(product(*[i._ if isinstance(i, I) else [i] for i in self.index]))
+        if all([isinstance(i, X) for i in self.index]):
+            return self.index
+        else:
+            return prod(self.index)._
 
     def latex(self) -> str:
         """LaTeX representation"""
         return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.index) + r'}'
+
+    def pprint(self) -> Math:
+        """Display the variables"""
+        return Math(self.latex())
 
     def sympy(self) -> IndexedBase | Symbol:
         """symbolic representation"""
@@ -122,15 +131,13 @@ class V:
         return str(self)
 
     def __len__(self):
-        return prod([len(i) if isinstance(i, I) else 1 for i in self.index])
+        return len(self.idx())
 
     def __getitem__(self, key: int | tuple):
-        if isinstance(key, (int, slice)):
-            return self._[key]
-
-        return self._[
-            [tuple([i.name for i in idx]) for idx in self.idx()].index(tuple(key))
-        ]
+        if self._fixed:
+            if isinstance(key, (int, slice)):
+                return self._[key]
+            return self._[self.idx().index(key)]
 
     def __str__(self):
         return rf'{self.name}'
@@ -203,5 +210,7 @@ class V:
     def __gt__(self, other):
         return self >= other
 
-    def __call__(self) -> str:
-        return Math(self.latex())
+    def __call__(self, *key: int | slice | tuple) -> Self:
+        if isinstance(key, (int, slice)):
+            return self.vars[key]
+        return self.vars[self.idx().index(key)]

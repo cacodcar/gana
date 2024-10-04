@@ -158,5 +158,5 @@ class F:
         """symbolic representation"""
         if len(_) == 1:
             return Math(self.latex())
-        #TODO - put eval function 
-        # else: 
+        # TODO - put eval function
+        # else:
