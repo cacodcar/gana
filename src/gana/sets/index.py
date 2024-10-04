@@ -1,15 +1,20 @@
 """A collection of objects, a set basically"""
 
-from typing import Any, Self
+from __future__ import annotations
+
+from typing import Any, Self, TYPE_CHECKING
 from itertools import product
 
 from IPython.display import Math
 from pyomo.environ import Set
 from sympy import FiniteSet
 
+if TYPE_CHECKING:
+    from ..block.program import Prg
+
 
 class I:
-    """An Index Set
+    """An Index Set is a dimensio
 
     Attributes:
         args (Any): Memebers of the Set
@@ -35,19 +40,14 @@ class I:
 
     """
 
-    def __init__(self, *_: str, name: str = 'set'):
-
-        if len(_) == 1:
-            self.is_set = False
-        else:
-            self.is_set = True
-            if sorted(_, key=str) != sorted(set(_), key=str):
-                raise ValueError('Members in Index set must be unique')
-
-        self._ = list(_)
-        self.name = name
-        # keeps a count of, updated in program
-        self.count: int = None
+    def __init__(self, *_: str):
+        # if the single element is an integer
+        # leave it so, it will be handled in the Program
+        # has only unique members
+        self._: list = list(_)
+        # number, name will be updated in Program
+        self.name: str = None
+        self.number: int = None
 
     def latex(self, descriptive: bool = False) -> str:
         """LaTeX representation"""
@@ -107,27 +107,25 @@ class I:
         return True if other in self._ else False
 
     def __eq__(self, other: Self):
-        if self.is_set:
-            return set(self._) == set(other._)
-        else:
-            return self._ == other._
+        return set(self._) == set(other._)
 
     def __and__(self, other: Self):
-        return I(*list(set(self._) & set(other._)), name=f'{self.name}&{other.name}')
+        return I(*list(set(self._) & set(other._)))
 
     def __or__(self, other: Self):
-        return I(*list(set(self._) | set(other._)), name=f'{self.name}|{other.name}')
+        return I(*list(set(self._) | set(other._)))
 
     def __xor__(self, other: Self):
-        return I(*list(set(self._) ^ set(other._)), name=f'{self.name}^{other.name}')
+        return I(*list(set(self._) ^ set(other._)))
 
     def __sub__(self, other: Self):
-        return I(*list(set(self._) - set(other._)), name=f'{self.name}-{other.name}')
+        return I(*list(set(self._) - set(other._)))
 
     def __mul__(self, other: Self):
+        # this to allow using product
         if isinstance(other, int) and other == 1:
             return self
-        return I(*list(product(self._, other._)), name=f'{self.name}*{other.name}')
+        return I(*list(product(self._, other._)))
 
     def __rmul__(self, other: Self):
         return self * other

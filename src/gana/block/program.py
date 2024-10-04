@@ -14,6 +14,7 @@ from ..sets.variable import V
 from ..sets.constraint import C
 from ..sets.function import F
 from ..sets.objective import O
+from ..sets.thing import X
 
 
 @dataclass
@@ -21,7 +22,6 @@ class Prg:
     """A mathematical program"""
 
     name: str = field(default=':p:')
-    overwrite: bool = field(default=False)
 
     def __post_init__(self):
         # names of declared modeling and relational elements
@@ -30,6 +30,7 @@ class Prg:
         # modeling elements
         (
             self.indices,
+            self.things,
             self.variables,
             self.vars_cnt,
             self.vars_itg,
@@ -40,58 +41,41 @@ class Prg:
             self.functions,
             self.constraints,
             self.objectives,
-        ) = ([] for _ in range(11))
-
-        # counts
-        # A separate counter is needed because elements, i.e.:
-        # (variables, parameters, constraints, objectives)
-        # are indexed and are a set of elements as opposed to a single element
-        self._n_t, self._n_v, self._n_p, self._n_c, self._n_o = (0 for _ in range(5))
+        ) = ([] for _ in range(12))
 
     def __setattr__(self, name, value) -> None:
 
-        if not name in [
-            'name',
-            'overwrite',
-            'indices',
-            'variables',
-            'vars_cnt',
-            'vars_itg',
-            'vars_nn',
-            'vars_bnr',
-            'parameters',
-            'thetas',
-            'functions',
-            'constraints',
-            'objectives',
-            'names',
-            '_n_t',
-            '_n_v',
-            '_n_p',
-            '_n_c',
-            '_n_o',
-        ]:
-            if name in self.names:
-                if self.overwrite:
-                    warn(f'Overwriting {name}')
-                else:
-                    raise ValueError(
-                        f'{name} is already defined, set overwrite=True to allow overwriting'
-                    )
+        # modeling elements
+        if isinstance(value, (I, X, V, P, T, F, C, O)):
+            if not isinstance(value, X) and name in self.names:
+                warn(f'Overwriting {name}')
+            value.name = name
             self.names.append(name)
 
-        # modeling elements
-        if isinstance(value, (I, V, P, T, F, C, O)):
-            value.name = name
-
         if isinstance(value, I):
-            # set the counter on the element
             self.indices.append(value)
-            value.count = len(self.indices)
-            if isinstance(value._, list):
-                for n, i in enumerate(value._):
-                    if isinstance(i, (int, float, str)):
-                        value._[n] = I(i, name=f'{i}')
+            value.number = len(self.indices)
+            if isinstance(value._, int):
+                for x in range(value._):
+                    setattr(self, f'{name}{x}', X(value))
+            else:
+                for x in value._:
+                    setattr(self, x, X(value))
+
+        if isinstance(value, X):
+            print(self.things)
+            print(name)
+            if name in self.things:
+                print('here')
+                thng = getattr(self, name)
+                print('thng', thng)
+                print('thingno', thng.number)
+                value.parents.extend(thng.parents)
+                value.number = thng.number
+                self.things[thng.number] = value
+            else:
+                value.number = len(self.things)
+                self.things.append(value)
 
         if isinstance(value, V):
             self.variables.append(value)

@@ -100,17 +100,17 @@ class P:
 
     # r<operation>
     # for the right hand side operations
-    # they only kick in when the left hand side operator 
-    # does not have the operation/the operation did not work 
+    # they only kick in when the left hand side operator
+    # does not have the operation/the operation did not work
     # in this case, we just do the equivalent self
     def __add__(self, other: Self):
-    
+
         if other == 0:
             return self
 
         if isinstance(other, P):
-            self._ = [i + j for i, j in zip(self._, other._)]
-            return self
+            print([i + j for i, j in zip(self._, other._)])
+            self._ = [i._[0] + j._[0] for i, j in zip(self._, other._)]
 
         return F(one=self, rel='+', two=other)
 
