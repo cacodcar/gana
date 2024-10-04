@@ -56,13 +56,12 @@ class Prg:
             self.indices.append(value)
             value.number = len(self.indices)
             if isinstance(value._[0], int):
-                for x in range(value._[0]):
-                    setattr(self, f'{name}{x}', X(value))
-            else:
-                for n, x in enumerate(value._):
-                    thng = X(value)
-                    value._[n] = thng
-                    setattr(self, x, thng)
+                value._ = [f'{name}{x}' for x in range(value._[0])]
+
+            for n, x in enumerate(value._):
+                thng = X(value)
+                value._[n] = thng
+                setattr(self, x, thng)
 
         if isinstance(value, X):
             if name in self.things:
@@ -76,13 +75,7 @@ class Prg:
 
         if isinstance(value, V):
             self.variables.append(value)
-            value.count = len(self.variables)
-            # if variable has index
-            # generate variables for each index
-            if value.index:
-                for n, i in enumerate(value.idx()):
-                    value._.append(V(*i, name=value.name, itg=value.itg, nn=value.nn))
-                    value._[n].mum = value
+            value.counts = len(self.variables)
 
             if value.itg:
                 # integer variable
@@ -95,10 +88,6 @@ class Prg:
             else:
                 # continuous variable
                 self.vars_cnt.append(value)
-            # if variable is non negative
-            # if value.nn:
-            # setattr(self, f'{value}^0', P(*value.index, _=0))
-            # setattr(self, f'{value}_nn', value >= getattr(self, f'{value}^0'))
 
         if isinstance(value, P):
             self.parameters.append(value)
@@ -154,6 +143,16 @@ class Prg:
     def index(self):
         """Set of all indices"""
         return I(product(*[s._ if isinstance(s, I) else [s] for s in self.indices]))
+
+    @property
+    def dim(self):
+        """Dimension of the program"""
+        return len(self.indices)
+
+    @property
+    def dscr(self):
+        """things"""
+        return len(self.things)
 
     def matrix(self):
         """Return Matrix Representation"""

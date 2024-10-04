@@ -21,6 +21,7 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 from .constraint import C
 from .function import F
 from .index import I
+from .thing import X
 
 
 if TYPE_CHECKING:
@@ -32,17 +33,17 @@ class V:
 
     def __init__(
         self,
-        *index: I,
+        *index: I | X,
         name: str = 'contvar',
         itg: bool = False,
         nn: bool = True,
         bnr: bool = False,
     ):
-
-        self.index = index
+        self.index = list(index)
+        self.indices = prod(self.index)._
+        self._: list[int | float] = None
         # This works well for variables generated at the indices
         # of a variable set
-
         self.name = name
         # if the variable is an integer variable
         self.itg = itg
@@ -71,11 +72,11 @@ class V:
     def fix(self, values: P | list[float]):
         """Fix the value of the variable"""
         # i am not running a type check for Parameter here
-        # P imports V 
+        # P imports V
         if isinstance(values, list):
             self._ = values
             self._fixed = True
-        else: 
+        else:
             self._ = values._
             self._fixed = True
 

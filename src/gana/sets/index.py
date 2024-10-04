@@ -8,6 +8,7 @@ from itertools import product
 from IPython.display import Math
 from pyomo.environ import Set
 from sympy import FiniteSet
+from .thing import X
 
 if TYPE_CHECKING:
     from ..block.program import Prg
@@ -45,7 +46,6 @@ class I:
         # leave it so, it will be handled in the Program
         # has only unique members
         self._: list = list(_)
-        print(self._)
         # number, name will be updated in Program
         self.name: str = None
         self.number: int = None
@@ -123,12 +123,35 @@ class I:
         return I(*list(set(self._) - set(other._)))
 
     def __mul__(self, other: Self):
+        print('adasd')
+        print(self, other)
         # this to allow using product
         if isinstance(other, int) and other == 1:
             return self
+        if isinstance(other, X):
+            if self in other.parents:
+                raise ValueError(
+                    f'{other} can only belong at one index of element.',
+                    f'{other} also in {self}',
+                )
+            return I(*list(product(self._, [other._])))
+
+        if isinstance(other, I):
+            if set(self._) & set(other._):
+                raise ValueError(
+                    f'{self} and {other} have common elements',
+                    f'{set(self._) & set(other._)} in both',
+                )
         return I(*list(product(self._, other._)))
 
     def __rmul__(self, other: Self):
+        if isinstance(other, X):
+            if self in other.parents:
+                raise ValueError(
+                    f'{other} can only belong at one index of element.',
+                    f'{other} also in {self}',
+                )
+            return I(*list(product([other._], self._)))
         return self * other
 
     def __iter__(self):
