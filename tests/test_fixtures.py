@@ -16,7 +16,6 @@ def p():
     prg.i2 = I('d', 'e')
     prg.i3 = I('a', 'b', 'c', 'd', 'e')
     prg.i4 = I('a', 'b', 'c')
-    prg.i5 = prg.i0 * prg.i1
     prg.v0 = V(prg.i0)
     prg.v1 = V(prg.i1)
     prg.v1_ = V(prg.i1, nn=False)

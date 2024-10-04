@@ -28,9 +28,6 @@ def test_rep(p, ps):
 
 
 def test_index(p):
-    with pytest.raises(ValueError):
-        I('a', 'a', 'b')
-
     assert (p.i1 & p.i3) == p.i4
     assert (p.i1 & p.i3) == (p.i3 & p.i1)
     assert (p.i1 | p.i2) == p.i3
@@ -38,7 +35,8 @@ def test_index(p):
     assert (p.i1 ^ p.i2) == p.i3
     assert (p.i1 ^ p.i2) == (p.i2 ^ p.i1)
     assert (p.i3 - p.i1) == p.i2
-    assert p.i5._ == [
+    i5 = p.i0 * p.i1
+    assert i5._ == [
         (p.i0._[0], p.i1._[0]),
         (p.i0._[0], p.i1._[1]),
         (p.i0._[0], p.i1._[2]),

@@ -55,21 +55,18 @@ class Prg:
         if isinstance(value, I):
             self.indices.append(value)
             value.number = len(self.indices)
-            if isinstance(value._, int):
-                for x in range(value._):
+            if isinstance(value._[0], int):
+                for x in range(value._[0]):
                     setattr(self, f'{name}{x}', X(value))
             else:
-                for x in value._:
-                    setattr(self, x, X(value))
+                for n, x in enumerate(value._):
+                    thng = X(value)
+                    value._[n] = thng
+                    setattr(self, x, thng)
 
         if isinstance(value, X):
-            print(self.things)
-            print(name)
             if name in self.things:
-                print('here')
                 thng = getattr(self, name)
-                print('thng', thng)
-                print('thingno', thng.number)
                 value.parents.extend(thng.parents)
                 value.number = thng.number
                 self.things[thng.number] = value

@@ -45,6 +45,7 @@ class I:
         # leave it so, it will be handled in the Program
         # has only unique members
         self._: list = list(_)
+        print(self._)
         # number, name will be updated in Program
         self.name: str = None
         self.number: int = None
@@ -59,7 +60,7 @@ class I:
                 + r'}'
                 + r'\in'
                 + r'\{'
-                + r', '.join(rf'{m._[0]}' for m in self._)
+                + r', '.join(str(x) for x in self._)
                 + r'\}'
             )
 
