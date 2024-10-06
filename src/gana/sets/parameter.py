@@ -135,15 +135,15 @@ class P:
         return self - other
 
     def __mul__(self, other: Self):
-        if other == 0:
-            return self
         if isinstance(other, P):
             self._ = [i * j for i, j in zip(self._, other._)]
             return self
-        return F(one=self, rel='+', two=other)
+        return F(one=self, rel='×', two=other)
 
     def __rmul__(self, other: Self):
-        return other * self
+        if other == 1:
+            return self
+        return self * other
 
     def __truediv__(self, other: Self):
         if isinstance(other, P):

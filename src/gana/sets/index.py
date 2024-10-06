@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, Self, TYPE_CHECKING
 from itertools import product
 
-from IPython.display import Math
+from IPython.display import Math, display
 from pyomo.environ import Set
 from sympy import FiniteSet
 from .thing import X
@@ -51,11 +51,6 @@ class I:
         self.number: int = None
         self.ordered: bool = False
 
-    @property
-    def tag(self) -> str:
-        """Unique tag for the index"""
-        return f'i{self.number}'
-
     def latex(self, descriptive: bool = False) -> str:
         """LaTeX representation"""
 
@@ -75,7 +70,7 @@ class I:
 
     def pprint(self, descriptive: bool = False) -> Math:
         """Display the set"""
-        return Math(self.latex(descriptive))
+        display(Math(self.latex(descriptive)))
 
     def sympy(self) -> FiniteSet:
         """Sympy representation"""

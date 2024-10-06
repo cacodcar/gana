@@ -23,7 +23,7 @@ class Prg:
     """A mathematical program"""
 
     name: str = field(default=':p:')
-    tol: float = field(default=1e-6)
+    tol: float = field(default=None)
     canonical: bool = field(default=True)
 
     def __post_init__(self):
@@ -45,7 +45,11 @@ class Prg:
             self.constraints,
             self.objectives,
         ) = ([] for _ in range(12))
-        self.n_var, self.n_par, self.n_con, self.n_fun = (0 for _ in range(4))
+
+        # counts of variable, parameter, constraint, function, objective
+        self.n_var, self.n_par, self.n_con, self.n_fun, self.n_obj = (
+            0 for _ in range(5)
+        )
 
     def __setattr__(self, name, value) -> None:
 
@@ -71,7 +75,7 @@ class Prg:
             # if only a single integer is passed
             # create an orderd set of that length
             if isinstance(value._[0], int):
-                value._ = [f'{name}{x}' for x in range(value._[0])]
+                value._ = [rf'{name}_{x}' for x in range(value._[0])]
                 value.ordered = True
 
             # if not assume string and make a set of things
@@ -187,7 +191,10 @@ class Prg:
                             P(i, name=value.rhs.name, _=[value.rhs._[n]])
                         )
                     value.rhs.pars[n].parent = value.rhs
-            if len(value) > 1: 
+            if len(value) == 1:
+                value.cons = [value]
+
+            else:
                 for n, i in enumerate(value.idx()):
 
                     if isinstance(i, tuple):
@@ -261,14 +268,14 @@ class Prg:
         for e in self.constraints + self.objectives:
             display(e.latex())
 
-    def pprint(self):
+    def pprint(self, descriptive: bool = False):
         """Pretty Print"""
 
-        for s in self.indices:
-            display(s.pprint(True))
+        for i in self.indices:
+            i.pprint(True)
 
-        for e in self.constraints + self.objectives:
-            display(e.pprint())
+        for c in self.constraints + self.objectives:
+            c.pprint(descriptive)
 
     def __str__(self):
         return rf'{self.name}'
@@ -278,19 +285,3 @@ class Prg:
 
     def __hash__(self):
         return hash(str(self))
-
-    # def __getitem__(self, key: int | tuple):
-
-    #     if isinstance(key, tuple):
-    #         return self.index[self.idx().index(key)]
-
-    #     if isinstance(key, int):
-    #         return self.index[key]
-
-    # def __call__(self):
-
-    #     for s in self.indices:
-    #         display(s(True))
-
-    #     for e in self.constraints + self.objectives:
-    #         display(e())

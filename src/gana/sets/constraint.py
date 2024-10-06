@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self, Literal
 from math import prod
 
-from IPython.display import Math
+from IPython.display import Math, display
 from pyomo.environ import Constraint
 from sympy import Rel
 
@@ -61,10 +61,6 @@ class C:
         else:
             return [(i,) if not isinstance(i, tuple) else i for i in prod(self.index)._]
 
-    def x(self):
-        """Elements in the constraint"""
-        return sum([f if isinstance(f, list) else [f] for f in self.lhs.x()], [])
-
     def __len__(self):
         return len(self.idx())
 
@@ -81,9 +77,14 @@ class C:
 
         return rf'{self.lhs.latex()} {rel} {self.rhs.latex()}'
 
-    def pprint(self) -> Math:
+    def pprint(self, descriptive: bool = False) -> Math:
         """Display the function"""
-        return Math(self.latex())
+
+        if descriptive:
+            for c in self.cons:
+                display(Math(c.latex()))
+        else:
+            display(Math(self.latex()))
 
     def sympy(self) -> LessThan | GreaterThan | Eq:
         """sympy representation"""
