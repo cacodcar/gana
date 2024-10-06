@@ -30,15 +30,14 @@ class F:
         self.two = two
         self.rel = rel
 
-        if (
-            self.one
-            and self.two
-            and not isinstance(self.two, F)
-            and not isinstance(self.one, F)
-            and is_not(self.one.mum, self.two.mum)
-            and self.one.index != self.two.index
-        ):
-            raise ValueError('Cannot operate with variables of different indices')
+        # if (
+        #     self.one
+        #     and self.two
+        #     and not isinstance(self.two, F)
+        #     and not isinstance(self.one, F)
+        #     and self.one.index != self.two.index
+        # ):
+        #     raise ValueError('Cannot operate with variables of different indices')
 
         if self.one:
             self.index = self.one.index
@@ -84,6 +83,10 @@ class F:
 
         if self.rel == '÷':
             return rf'\frac{{{self.one.latex()}}}{{{self.two.latex()}}}'
+
+    def pprint(self) -> Math:
+        """Display the function"""
+        return Math(self.latex())
 
     def sympy(self) -> Add:
         """Equation"""

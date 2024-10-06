@@ -1,7 +1,6 @@
 """A Paramter
 """
 
-from itertools import product
 from math import prod
 from typing import Self
 
@@ -13,6 +12,7 @@ from .function import F
 from .index import I
 from .variable import V
 from ..value.bigm import M
+from .thing import X
 
 
 class P:
@@ -28,12 +28,15 @@ class P:
 
         self.name = name
 
-        # keeps a count of, updated in program
-        self.count: int = None
-
         # if a parameter is declared as a child (at an constituent index)
         # the mum is the parent parameter
-        self.mum = None
+        self.parent = None
+        self.pars: list[Self] = []
+
+        # tags for the members of the Variable set
+        self.tags: list[str] = None
+        # keeps a count of, updated in program
+        self.number: int = None
 
         if len(self) != len(self._):
             raise ValueError(
@@ -47,11 +50,18 @@ class P:
 
     def idx(self) -> list[tuple]:
         """index"""
-        return list(product(*[i._ if isinstance(i, I) else [i] for i in self.index]))
+        if self.parent:
+            return self.index
+        else:
+            return [(i,) if not isinstance(i, tuple) else i for i in prod(self.index)._]
 
     def latex(self) -> str:
         """LaTeX representation"""
         return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.index) + r'}'
+
+    def pprint(self) -> Math:
+        """Display the variables"""
+        return Math(self.latex())
 
     def sympy(self) -> IndexedBase | Symbol:
         """symbolic representation"""
@@ -71,14 +81,6 @@ class P:
 
     def __len__(self):
         return prod([len(i) if isinstance(i, I) else 1 for i in self.index])
-
-    def __getitem__(self, key: int | tuple):
-        if isinstance(key, (int, slice)):
-            return self._[key]
-
-        return self._[
-            [tuple([i.name for i in idx]) for idx in self.idx()].index(tuple(key))
-        ]
 
     def __neg__(self):
         return P(*self.index, _=[-i for i in self._])
@@ -198,5 +200,12 @@ class P:
             return all([i > j for i, j in zip(self._, other._)])
         return self >= other
 
-    def __call__(self) -> str:
-        return Math(self.latex())
+    def __iter__(self):
+        for i in self.pars:
+            yield i
+
+    def __call__(self, *key: tuple[X] | X) -> Self:
+        return self.pars[self.idx().index(key)]
+
+    def __getitem__(self, *key: tuple[X]):
+        return self._[self.idx().index(key)]

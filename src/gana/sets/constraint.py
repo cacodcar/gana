@@ -51,6 +51,10 @@ class C:
 
         return rf'{self.lhs.latex()} {rel} {self.rhs.latex()}'
 
+    def pprint(self) -> Math:
+        """Display the function"""
+        return Math(self.latex())
+
     def sympy(self) -> LessThan | GreaterThan | Eq:
         """sympy representation"""
         return Rel(self.lhs.sympy(), self.rhs.sympy(), self.rel)

@@ -50,6 +50,12 @@ class Prg:
         # Things (X) can belong to multiple indices
         # Hence they can be overwritten
         if isinstance(value, (I, X, V, P, T, F, C, O)):
+
+            if name[-1] == '_':
+                warn(
+                    'Ending name with underscore is not recommended, can cause printing issues'
+                )
+
             if not isinstance(value, X) and name in self.names:
                 warn(f'Overwriting {name}')
             value.name = name
@@ -94,8 +100,6 @@ class Prg:
             ]
             if value.index:
                 for n, i in enumerate(value.idx()):
-                    print(value.vars, n)
-                    print(i)
                     value.vars.append(
                         V(
                             i,
@@ -122,8 +126,17 @@ class Prg:
                 self.vars_cnt.append(value)
 
         if isinstance(value, P):
+            value.number = len(self.parameters)
             self.parameters.append(value)
-            value.count = len(self.parameters)
+            value.tags = [
+                f'p{i}' for i in range(self.n_vrb, self.n_vrb + len(value.idx()))
+            ]
+            if value.index:
+                for n, i in enumerate(value.idx()):
+                    value.pars.append(P(i, name=value.name, _=[value._[n]]))
+                    value.pars[n].parent = value
+
+            self.n_prm += len(value.idx())
 
             # if parameter has index
             # generate parameters for each index
@@ -203,6 +216,15 @@ class Prg:
         for e in self.constraints + self.objectives:
             display(e.latex())
 
+    def pprint(self):
+        """Pretty Print"""
+
+        for s in self.indices:
+            display(s.pprint())
+
+        for e in self.constraints + self.objectives:
+            display(e.pprint())
+
     def __str__(self):
         return rf'{self.name}'
 
@@ -220,10 +242,10 @@ class Prg:
     #     if isinstance(key, int):
     #         return self.index[key]
 
-    def __call__(self):
+    # def __call__(self):
 
-        for s in self.indices:
-            display(s(True))
+    #     for s in self.indices:
+    #         display(s(True))
 
-        for e in self.constraints + self.objectives:
-            display(e())
+    #     for e in self.constraints + self.objectives:
+    #         display(e())

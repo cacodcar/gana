@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-from itertools import product
 from math import prod
 from typing import Self, TYPE_CHECKING
 
@@ -39,7 +38,6 @@ class V:
         nn: bool = True,
         bnr: bool = False,
     ):
-        print(index)
         self.index = list(index)
 
         self.name = name
@@ -84,10 +82,10 @@ class V:
 
     def idx(self) -> list[tuple]:
         """index"""
-        if all([isinstance(i, X) for i in self.index]):
+        if self.parent:
             return self.index
         else:
-            return prod(self.index)._
+            return [(i,) if not isinstance(i, tuple) else i for i in prod(self.index)._]
 
     def latex(self) -> str:
         """LaTeX representation"""
@@ -133,12 +131,6 @@ class V:
     def __len__(self):
         return len(self.idx())
 
-    def __getitem__(self, key: int | tuple):
-        if self._fixed:
-            if isinstance(key, (int, slice)):
-                return self._[key]
-            return self._[self.idx().index(key)]
-
     def __str__(self):
         return rf'{self.name}'
 
@@ -163,7 +155,6 @@ class V:
         return self + other
 
     def __sub__(self, other: Self | F):
-
         return F(one=self, two=other, rel='-')
 
     def __rsub__(self, other: Self | F | int):
@@ -191,10 +182,6 @@ class V:
         else:
             return self / other
 
-    def __iter__(self):
-        for i in self._:
-            yield i
-
     def __eq__(self, other):
         return C(lhs=+self, rhs=other, rel='eq')
 
@@ -210,7 +197,13 @@ class V:
     def __gt__(self, other):
         return self >= other
 
-    def __call__(self, *key: int | slice | tuple) -> Self:
-        if isinstance(key, (int, slice)):
-            return self.vars[key]
+    def __iter__(self):
+        for i in self.vars:
+            yield i
+
+    def __call__(self, *key: tuple[X] | X) -> Self:
         return self.vars[self.idx().index(key)]
+
+    def __getitem__(self, *key: tuple[X]):
+        if self._fixed:
+            return self._[self.idx().index(key)]
