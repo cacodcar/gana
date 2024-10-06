@@ -33,8 +33,6 @@ class P:
         self.parent = None
         self.pars: list[Self] = []
 
-        # tags for the members of the Variable set
-        self.tags: list[str] = None
         # keeps a count of, updated in program
         self.number: int = None
 
@@ -71,7 +69,13 @@ class P:
         ]
 
     def __str__(self):
-        return rf'{self.name}'.capitalize()
+        # δ is a special case, where all values are zero
+        # or some tolerance
+        # these are used in the rhs of constraints
+        if self.name == 'δ':
+            return rf'{self.name}'
+        else:
+            return rf'{self.name}'.capitalize()
 
     def __repr__(self):
         return str(self)

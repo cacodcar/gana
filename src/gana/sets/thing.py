@@ -12,9 +12,9 @@ class X:
         self.number: int = None
 
     @property
-    def tag(self) -> str:
-        """Unique tag for the thing"""
-        return f'x{self.number}'
+    def _(self):
+        """Returns itself"""
+        return [self]
 
     def __str__(self):
         return rf'{self.name}'

@@ -33,7 +33,7 @@ class V:
     def __init__(
         self,
         *index: I | X,
-        name: str = 'contvar',
+        name: str = 'var',
         itg: bool = False,
         nn: bool = True,
         bnr: bool = False,
@@ -66,7 +66,6 @@ class V:
         self._fixed = False
 
         # tags for the members of the Variable set
-        self.tags: list[str] = None
         self.number: int = None
 
     def fix(self, values: P | list[float]):
@@ -164,7 +163,6 @@ class V:
             return -self + other
 
     def __mul__(self, other: Self | F):
-
         return F(one=self, two=other, rel='×')
 
     def __rmul__(self, other: Self | F | int):

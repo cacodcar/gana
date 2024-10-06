@@ -115,6 +115,25 @@ def test_function(p):
     assert p.f4.two == p.v2
 
 
+# negative function test
+# p.f1 = p.v22 + p.v2
+# p.f2 = p.v22 - p.v2
+# p.f3 = p.v22 * p.v2
+# p.f4 = p.v22 / p.v2
+# a = -p.f1
+# b = -p.f2
+# c = -p.f3
+# d = -p.f4
+# print(p.f1.one, p.f1.rel, p.f1.two)
+# print(p.f2.one, p.f2.rel, p.f2.two)
+# print(p.f3.one, p.f3.rel, p.f3.two)
+# print(p.f4.one, p.f4.rel, p.f4.two)
+# print(a.one, a.rel, a.two)
+# print(b.one, b.rel, b.two)
+# print(c.one, c.rel, c.two)
+# print(d.one, d.rel, d.two)
+
+
 def test_constraint(p):
     assert p.c1.lhs == p.v2_
     assert p.c1.rel == 'eq'

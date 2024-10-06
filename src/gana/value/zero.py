@@ -11,7 +11,7 @@ from sympy import IndexedBase
 class Z:
     """Zero, Shunya"""
 
-    def __init__(self, _: float = None, neg: bool = False):
+    def __init__(self, _: float = 0, neg: bool = False):
         if _ and _ < 0:
             raise ValueError('Zero value cant be negative, give neg = True')
         # a tolerance value if needed

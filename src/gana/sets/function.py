@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from operator import is_not
 from typing import TYPE_CHECKING, Self
+from math import prod
 
 from IPython.display import Math
 
@@ -26,18 +27,14 @@ class F:
         rel: str = '+',
         two: P | V | Self = None,
     ):
-        self.one = one
+        self.one: P | V | Self = one
         self.two = two
         self.rel = rel
 
-        # if (
-        #     self.one
-        #     and self.two
-        #     and not isinstance(self.two, F)
-        #     and not isinstance(self.one, F)
-        #     and self.one.index != self.two.index
-        # ):
-        #     raise ValueError('Cannot operate with variables of different indices')
+        if self.one and len(self.one) != len(self.two):
+            raise ValueError(
+                'Cannot operate with variable sets with different cardinalities'
+            )
 
         if self.one:
             self.index = self.one.index
@@ -45,23 +42,29 @@ class F:
             self.index = self.two.index
 
         # keeps a count of, updated in program
-        self.count: int = None
+        self.number: int = None
+
         if self.one:
             self.name = f'{self.one}{self.rel}{self.two}'
         else:
             self.name = f'{self.rel}{self.two}'
 
-        # self._: list[Self] = []
+        self.parent: Self = None
+        self.funs: list[Self] = []
 
-    # def _(self, args: tuple) -> float:
-    #     """Function Eval"""
-    #     return
     @property
     def _(self):
         """Elements in the function"""
         return sum(
             [i._ if isinstance(i, F) else F(i) for i in [self.one, self.two] if i], []
         )
+
+    def idx(self) -> list[tuple]:
+        """index"""
+        if self.parent:
+            return self.index
+        else:
+            return [(i,) if not isinstance(i, tuple) else i for i in prod(self.index)._]
 
     def latex(self) -> str:
         """Equation"""
@@ -109,6 +112,9 @@ class F:
         if self.rel == '÷':
             return self.one.sympy() / self.two.sympy()
 
+    def __len__(self):
+        return len(self.idx())
+
     def __str__(self):
         return rf'{self.name}'
 
@@ -119,10 +125,25 @@ class F:
         return hash(str(self))
 
     def __neg__(self):
-        return F(rel='-', two=self)
+
+        if self.one:
+            one = 0 - self.one
+        else:
+            one = None
+
+        if self.rel == '+':
+            rel = '-'
+        elif self.rel == '-':
+            rel = '+'
+        else:
+            rel = self.rel
+
+        two = self.two
+
+        return F(one=one, rel=rel, two=two)
 
     def __pos__(self):
-        return F(rel='+', two=self)
+        return self
 
     def __add__(self, other: Self | P | V):
         return F(one=self, rel='+', two=other)
@@ -135,6 +156,12 @@ class F:
 
     def __sub__(self, other: Self | P | V):
         return F(one=self, rel='-', two=other)
+
+    def __rsub__(self, other: Self | P | V):
+        if other == 0:
+            return -self
+        else:
+            return -self + other
 
     def __mul__(self, other: Self | P | V):
         return F(one=self, rel='×', two=other)

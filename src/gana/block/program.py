@@ -15,6 +15,7 @@ from ..sets.constraint import C
 from ..sets.function import F
 from ..sets.objective import O
 from ..sets.thing import X
+from ..value.zero import Z
 
 
 @dataclass
@@ -22,6 +23,8 @@ class Prg:
     """A mathematical program"""
 
     name: str = field(default=':p:')
+    tol: float = field(default=1e-6)
+    canonical: bool = field(default=True)
 
     def __post_init__(self):
         # names of declared modeling and relational elements
@@ -42,7 +45,7 @@ class Prg:
             self.constraints,
             self.objectives,
         ) = ([] for _ in range(12))
-        self.n_vrb, self.n_prm, self.n_cns = (0 for _ in range(3))
+        self.n_var, self.n_par, self.n_con, self.n_fun = (0 for _ in range(4))
 
     def __setattr__(self, name, value) -> None:
 
@@ -95,24 +98,20 @@ class Prg:
         if isinstance(value, V):
             value.number = len(self.variables)
             self.variables.append(value)
-            value.tags = [
-                f'v{i}' for i in range(self.n_vrb, self.n_vrb + len(value.idx()))
-            ]
             vargs = {
                 'name': value.name,
                 'itg': value.itg,
                 'nn': value.nn,
                 'bnr': value.bnr,
             }
-            if value.index:
-                for n, i in enumerate(value.idx()):
-                    if isinstance(i, tuple):
-                        value.vars.append(V(*i, **vargs))
-                    else:
-                        value.vars.append(V(i, **vargs))
-                    value.vars[n].parent = value
-
-            self.n_vrb += len(value.idx())
+            for n, i in enumerate(value.idx()):
+                if isinstance(i, tuple):
+                    value.vars.append(V(*i, **vargs))
+                else:
+                    value.vars.append(V(i, **vargs))
+                value.vars[n].parent = value
+                value.number = self.n_var
+                self.n_var += 1
 
             if value.itg:
                 # integer variable
@@ -129,15 +128,15 @@ class Prg:
         if isinstance(value, P):
             value.number = len(self.parameters)
             self.parameters.append(value)
-            value.tags = [
-                f'p{i}' for i in range(self.n_vrb, self.n_vrb + len(value.idx()))
-            ]
-            if value.index:
-                for n, i in enumerate(value.idx()):
-                    value.pars.append(P(i, name=value.name, _=[value._[n]]))
-                    value.pars[n].parent = value
 
-            self.n_prm += len(value.idx())
+            for n, i in enumerate(value.idx()):
+                if isinstance(i, tuple):
+                    value.pars.append(P(*i, name=value.name, _=[value._[n]]))
+                else:
+                    value.pars.append(P(i, name=value.name, _=[value._[n]]))
+                value.pars[n].parent = value
+                value.number = self.n_par
+                self.n_par += 1
 
             # if parameter has index
             # generate parameters for each index
@@ -151,12 +150,20 @@ class Prg:
 
         # relational elements
         if isinstance(value, F):
+            value.number = len(self.functions)
             self.functions.append(value)
-            value.count = len(self.functions)
 
         if isinstance(value, C):
+            value.number = len(self.constraints)
             self.constraints.append(value)
-            value.count = len(self.constraints)
+            if self.canonical:
+                value.canoncial(
+                    P(
+                        *value.index,
+                        _=[Z(_=self.tol) for _ in range(len(value))],
+                        name='δ',
+                    )
+                )
 
         if isinstance(value, O):
             self.objectives.append(value)
