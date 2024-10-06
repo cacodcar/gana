@@ -30,21 +30,18 @@ class Prg:
         # names of declared modeling and relational elements
         self.names = []
 
-        # modeling elements
-        (
-            self.indices,
-            self.things,
-            self.variables,
-            self.vars_cnt,
-            self.vars_itg,
-            self.vars_nn,
-            self.vars_bnr,
-            self.parameters,
-            self.thetas,
-            self.functions,
-            self.constraints,
-            self.objectives,
-        ) = ([] for _ in range(12))
+        self.indices: list[I] = []
+        self.things: list[X] = []
+        self.variables: list[V] = []
+        self.vars_cnt: list[V] = []
+        self.vars_itg: list[V] = []
+        self.vars_nn: list[V] = []
+        self.vars_bnr: list[V] = []
+        self.parameters: list[P] = []
+        self.thetas: list[T] = []
+        self.functions: list[F] = []
+        self.constraints: list[C] = []
+        self.objectives: list[O] = []
 
         # counts of variable, parameter, constraint, function, objective
         self.n_var, self.n_par, self.n_con, self.n_fun, self.n_obj = (
