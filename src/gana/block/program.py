@@ -98,17 +98,18 @@ class Prg:
             value.tags = [
                 f'v{i}' for i in range(self.n_vrb, self.n_vrb + len(value.idx()))
             ]
+            vargs = {
+                'name': value.name,
+                'itg': value.itg,
+                'nn': value.nn,
+                'bnr': value.bnr,
+            }
             if value.index:
                 for n, i in enumerate(value.idx()):
-                    value.vars.append(
-                        V(
-                            i,
-                            name=value.name,
-                            itg=value.itg,
-                            nn=value.nn,
-                            bnr=value.bnr,
-                        )
-                    )
+                    if isinstance(i, tuple):
+                        value.vars.append(V(*i, **vargs))
+                    else:
+                        value.vars.append(V(i, **vargs))
                     value.vars[n].parent = value
 
             self.n_vrb += len(value.idx())
