@@ -110,7 +110,7 @@ class Prg:
                 else:
                     value.vars.append(V(i, **vargs))
                 value.vars[n].parent = value
-                value.number = self.n_var
+                value.vars[n].number = self.n_var
                 self.n_var += 1
 
             if value.itg:
@@ -135,7 +135,7 @@ class Prg:
                 else:
                     value.pars.append(P(i, name=value.name, _=[value._[n]]))
                 value.pars[n].parent = value
-                value.number = self.n_par
+                value.pars[n].number = self.n_par
                 self.n_par += 1
 
             # if parameter has index
@@ -153,6 +153,19 @@ class Prg:
             value.number = len(self.functions)
             self.functions.append(value)
 
+            for n, i in enumerate(value.idx()):
+                if isinstance(i, tuple):
+                    value.funs.append(
+                        F(one=value.one(*i), rel=value.rel, two=value.two(*i))
+                    )
+                else:
+                    value.funs.append(
+                        F(one=value.one(i), rel=value.rel, two=value.two(i))
+                    )
+                value.funs[n].parent = value
+                value.funs[n].number = self.n_fun
+                self.n_fun += 1
+
         if isinstance(value, C):
             value.number = len(self.constraints)
             self.constraints.append(value)
@@ -164,6 +177,30 @@ class Prg:
                         name='δ',
                     )
                 )
+                for n, i in enumerate(value.rhs.idx()):
+                    if isinstance(i, tuple):
+                        value.rhs.pars.append(
+                            P(*i, name=value.rhs.name, _=[value.rhs._[n]])
+                        )
+                    else:
+                        value.rhs.pars.append(
+                            P(i, name=value.rhs.name, _=[value.rhs._[n]])
+                        )
+                    value.rhs.pars[n].parent = value.rhs
+            if len(value) > 1: 
+                for n, i in enumerate(value.idx()):
+
+                    if isinstance(i, tuple):
+                        value.cons.append(
+                            C(lhs=value.lhs(*i), rel=value.rel, rhs=value.rhs(*i))
+                        )
+                    else:
+                        value.cons.append(
+                            C(lhs=value.lhs(i), rel=value.rel, rhs=value.rhs(i))
+                        )
+                    value.cons[n].parent = value
+                    value.cons[n].number = self.n_con
+                    self.n_con += 1
 
         if isinstance(value, O):
             self.objectives.append(value)
@@ -228,7 +265,7 @@ class Prg:
         """Pretty Print"""
 
         for s in self.indices:
-            display(s.pprint())
+            display(s.pprint(True))
 
         for e in self.constraints + self.objectives:
             display(e.pprint())

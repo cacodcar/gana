@@ -9,8 +9,6 @@ from math import prod
 from IPython.display import Math
 from pyomo.environ import Constraint
 from sympy import Rel
-from ..value.zero import Z
-from ..sets.index import I
 
 
 if TYPE_CHECKING:
@@ -19,6 +17,7 @@ if TYPE_CHECKING:
     from .parameter import P
     from .variable import V
     from .function import F
+    from .thing import X
 
 
 class C:
@@ -96,6 +95,5 @@ class C:
     def __hash__(self):
         return hash(self.name)
 
-    def __call__(self) -> LessThan | GreaterThan | Eq:
-        """symbolic representation"""
-        return Math(self.latex())
+    def __call__(self, *key: tuple[X] | X) -> Self:
+        return self.cons[self.idx().index(key)]

@@ -29,9 +29,9 @@ class X:
         return 1
 
     def __eq__(self, other: X):
-        if isinstance(other, str):
-            return self.name == other
-        return self.name == other.name
+        if isinstance(other, X):
+            return self.name == other.name
+        return self.name == other
 
     def __mul__(self, other: X):
         if isinstance(other, X):

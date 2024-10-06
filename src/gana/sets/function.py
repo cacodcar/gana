@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
     from .parameter import P
     from .variable import V
+    from .thing import X
 
 
 class F:
@@ -51,6 +52,9 @@ class F:
 
         self.parent: Self = None
         self.funs: list[Self] = []
+
+        # the flag _fixed is changed when .fix(val) is called
+        self._fixed = False
 
     @property
     def _(self):
@@ -184,9 +188,17 @@ class F:
     def __gt__(self, other: Self | P | V):
         return self >= other
 
-    def __call__(self, *_) -> str:
-        """symbolic representation"""
-        if len(_) == 1:
-            return Math(self.latex())
-        # TODO - put eval function
-        # else:
+    def __call__(self, *key: tuple[X] | X) -> Self:
+        if self.funs:
+            return self.funs[self.idx().index(key)]
+        else:
+            if self.one:
+                f = F(one=self.one(*key), rel=self.rel, two=self.two(*key))
+            else:
+                f = F(rel=self.rel, two=self.two(*key))
+            f.parent = self
+            return f
+
+    def __getitem__(self, *key: tuple[X]):
+        if self._fixed:
+            return self._[self.idx().index(key)]
