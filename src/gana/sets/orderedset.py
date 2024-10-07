@@ -2,26 +2,28 @@
 Forms the base for all element sets 
 """
 
-from typing import Self
-
 from abc import ABC, abstractmethod
-from IPython.display import Math, display
 from math import prod
+from IPython.display import Math, display
+
+from ..elements.idx import Idx
+from .index import I
 
 
-class OSet(ABC):
+class Set(ABC):
     """An Ordered Set"""
 
-    def __init__(self, *index: I | X, name: str = 'set'):
+    def __init__(self, *index: I | Idx):
         # index of the set
         self.index = list(index)
-        self.name = name
 
-        # tags for the members of the Ordered Set
-        self.number: int = None
+        self.name: str = None
+
+        # number of index set
+        self.n: int = None
 
     @abstractmethod
-    def x(self):
+    def _(self):
         """Elements of the Set"""
 
     @abstractmethod
@@ -34,15 +36,15 @@ class OSet(ABC):
 
     def matrix(self):
         """Matrix Representation"""
-        return [e.matrix() for e in self.x()]
+        return [e.matrix() for e in self._()]
 
     def idx(self) -> list[tuple]:
         """index"""
-        return [(i,) if not isinstance(i, tuple) else i for i in prod(self.index)._]
+        return [(i,) if not isinstance(i, tuple) else i for i in prod(self.index)._()]
 
     def pprint(self) -> Math:
         """Display the function"""
-        for e in self.x():
+        for e in self._():
             display(Math(e.latex()))
 
     def __len__(self):

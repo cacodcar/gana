@@ -41,15 +41,17 @@ class I:
 
     """
 
-    def __init__(self, *_: str):
+    def __init__(self, *indices: str):
         # if the single element is an integer
         # leave it so, it will be handled in the Program
         # has only unique members
-        self._: list = list(_)
+        self.indices: list = list(indices)
         # number, name will be updated in Program
         self.name: str = None
         self.number: int = None
         self.ordered: bool = False
+
+    
 
     def latex(self, descriptive: bool = False) -> str:
         """LaTeX representation"""
