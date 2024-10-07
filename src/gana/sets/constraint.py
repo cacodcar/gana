@@ -46,6 +46,10 @@ class C:
         self.parent: Self = None
         self.cons: list[Self] = []
 
+        # where this constraint is part of:
+        # g - equality constraint
+        # h - inequality constraint
+
     def canoncial(self, zeros: P) -> Self:
         """Canonical form of the constraint"""
         self.lhs = self.lhs - self.rhs

@@ -68,7 +68,7 @@ class F:
 
         return sum(
             [
-                i.x() if isinstance(i, F) else [i.number]
+                i.matrix() if isinstance(i, F) else [i.number]
                 for i in [self.one, self.two]
                 if i
             ],

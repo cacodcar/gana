@@ -41,6 +41,8 @@ class Prg:
         self.thetas: list[T] = []
         self.functions: list[F] = []
         self.constraints: list[C] = []
+        self.cons_eq: list[C] = []
+        self.cons_leq: list[C] = []
         self.objectives: list[O] = []
 
         # counts of variable, parameter, constraint, function, objective
@@ -231,7 +233,6 @@ class Prg:
 
     def matrix(self):
         """Return Matrix Representation"""
-        
 
     @property
     def index(self):
@@ -247,9 +248,6 @@ class Prg:
     def dscr(self):
         """things"""
         return len(self.things)
-
-    def matrix(self):
-        """Return Matrix Representation"""
 
     def pyomo(self):
         """Return Pyomo Model"""
