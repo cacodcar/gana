@@ -64,7 +64,7 @@ class C:
     def __len__(self):
         return len(self.idx())
 
-    def latex(self):
+    def latex(self, descriptive: bool = False) -> str:
         """Latex representation"""
         if self.rel == 'eq':
             rel = r'='
@@ -75,6 +75,9 @@ class C:
         if self.rel == 'ge':
             rel = r'\geq'
 
+        if descriptive:
+            return rf'{self.lhs.latex()} {rel} {self.rhs._[0]}'
+
         return rf'{self.lhs.latex()} {rel} {self.rhs.latex()}'
 
     def pprint(self, descriptive: bool = False) -> Math:
@@ -82,7 +85,7 @@ class C:
 
         if descriptive:
             for c in self.cons:
-                display(Math(c.latex()))
+                display(Math(c.latex(descriptive)))
         else:
             display(Math(self.latex()))
 

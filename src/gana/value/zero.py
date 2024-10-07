@@ -22,9 +22,9 @@ class Z:
     def name(self):
         """name"""
         if self.neg:
-            return '-Z'
+            return '-0'
         else:
-            return 'Z'
+            return '0'
 
     def __repr__(self):
         return self.name

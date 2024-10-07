@@ -256,14 +256,14 @@ class Prg:
     def lp(self):
         """Return LP File"""
 
-    def latex(self):
+    def latex(self, descriptive: bool = False):
         """Display LaTeX"""
 
         for s in self.indices:
             display(s.latex())
 
         for e in self.constraints + self.objectives:
-            display(e.latex())
+            display(e.latex(descriptive))
 
     def pprint(self, descriptive: bool = False):
         """Pretty Print"""

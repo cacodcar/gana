@@ -55,6 +55,8 @@ class P:
 
     def latex(self) -> str:
         """LaTeX representation"""
+        if self.parent:
+            return self._[0]
         return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.index) + r'}'
 
     def pprint(self) -> Math:
