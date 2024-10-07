@@ -229,6 +229,10 @@ class Prg:
                 self.constraints = self.constraints + prg.constraints
                 self.objectives = self.objectives + prg.objectives
 
+    def matrix(self):
+        """Return Matrix Representation"""
+        
+
     @property
     def index(self):
         """Set of all indices"""

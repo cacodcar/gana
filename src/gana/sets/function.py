@@ -63,6 +63,18 @@ class F:
             [i._ if isinstance(i, F) else F(i) for i in [self.one, self.two] if i], []
         )
 
+    def matrix(self):
+        """Variables in the function"""
+
+        return sum(
+            [
+                i.x() if isinstance(i, F) else [i.number]
+                for i in [self.one, self.two]
+                if i
+            ],
+            [],
+        )
+
     def idx(self) -> list[tuple]:
         """index"""
         if self.parent:

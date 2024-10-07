@@ -101,3 +101,6 @@ class C:
 
     def __call__(self, *key: tuple[X] | X) -> Self:
         return self.cons[self.idx().index(key)]
+
+    def __getitem__(self, key: int | str):
+        return self.cons[key]
