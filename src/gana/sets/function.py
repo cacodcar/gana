@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-from operator import is_not
 from typing import TYPE_CHECKING, Self
 from math import prod
 
