@@ -67,6 +67,11 @@ class Prg:
             value.name = name
             self.names.append(name)
 
+            if isinstance(value, (I, V, C, O, T)):
+                value.process()
+                for c in value._:
+                    setattr(self, c.name, c)
+
         if isinstance(value, I):
             self.indices.append(value)
             value.number = len(self.indices)

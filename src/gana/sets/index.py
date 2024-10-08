@@ -6,15 +6,16 @@ from typing import Any, Self, TYPE_CHECKING
 from itertools import product
 
 from IPython.display import Math, display
-from pyomo.environ import Set
+from pyomo.environ import Set as PyoSet
 from sympy import FiniteSet
-from .thing import X
+from ..element.x import X
+from .orderedset import Set
 
 if TYPE_CHECKING:
     from ..block.program import Prg
 
 
-class I:
+class I(Set):
     """An Index Set is a dimensio
 
     Attributes:
@@ -45,13 +46,26 @@ class I:
         # if the single element is an integer
         # leave it so, it will be handled in the Program
         # has only unique members
-        self.indices: list = list(indices)
-        # number, name will be updated in Program
-        self.name: str = None
-        self.number: int = None
-        self.ordered: bool = False
+        self.indices = indices
+        self.ordered: bool = None
+        super().__init__(*indices)
 
-    
+    def process(self):
+        """Process the set"""
+        if all([isinstance(x, str) for x in self.indices]):
+            self._ = [
+                X(name=x, parent=self, n=n) for n, x in enumerate(list(self.indices))
+            ]
+
+        if all([isinstance(x, int) for x in self.indices]):
+            self._ = [
+                X(name=rf'{self.name}_{n}', parent=self, n=n)
+                for n in range(sum(self.indices))
+            ]
+
+    def matrix(self):
+        """Matrix Representation"""
+        passs
 
     def latex(self, descriptive: bool = False) -> str:
         """LaTeX representation"""
@@ -80,7 +94,7 @@ class I:
 
     def pyomo(self) -> Set:
         """Pyomo representation"""
-        return Set(initialize=self._, doc=str(self))
+        return PyoSet(initialize=self._, doc=str(self))
 
     def mps(self, pos: int) -> str:
         """MPS representation

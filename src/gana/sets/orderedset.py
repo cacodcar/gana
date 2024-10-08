@@ -4,27 +4,25 @@ Forms the base for all element sets
 
 from abc import ABC, abstractmethod
 from math import prod
-from IPython.display import Math, display
-
-from ..elements.idx import Idx
-from .index import I
+from IPython.display import Math
 
 
 class Set(ABC):
     """An Ordered Set"""
 
-    def __init__(self, *index: I | Idx):
+    def __init__(self, *order):
         # index of the set
-        self.index = list(index)
-
+        self.order = order
         self.name: str = None
-
         # number of index set
         self.n: int = None
 
+        # set via the child method or taken as input
+        self._ = []
+
     @abstractmethod
-    def _(self):
-        """Elements of the Set"""
+    def process(self):
+        """Child of the set"""
 
     @abstractmethod
     def latex(self) -> str:
@@ -34,18 +32,19 @@ class Set(ABC):
     def sympy(self):
         """Symbolic representation"""
 
+    @abstractmethod
     def matrix(self):
         """Matrix Representation"""
-        return [e.matrix() for e in self._()]
+
+    @abstractmethod
+    def pprint(self) -> Math:
+        """Display the function"""
+        # for e in self._:
+        #     display(Math(e.latex()))
 
     def idx(self) -> list[tuple]:
         """index"""
-        return [(i,) if not isinstance(i, tuple) else i for i in prod(self.index)._()]
-
-    def pprint(self) -> Math:
-        """Display the function"""
-        for e in self._():
-            display(Math(e.latex()))
+        return [i for i in prod(self.order)._]
 
     def __len__(self):
         return len(self.idx())
