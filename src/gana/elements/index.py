@@ -25,14 +25,14 @@ class Idx(X):
 
     def __mul__(self, other: Self):
         if isinstance(other, Idx):
-            if sorted(set(self.parent) | (other.parent)) != sorted(
-                self.parent + other.parent
+            if sorted(set(self.parent) | set(other.parent), key=str) != sorted(
+                self.parent + other.parent, key=str
             ):
+                print(self.parent, other.parent)
                 raise ValueError(
                     f'{other} can only belong at one index of element.',
                     f'{other} also in {self}',
                 )
-        print(other)
         if other == 1:
             return self
 

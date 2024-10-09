@@ -44,9 +44,9 @@ class Set(ABC):
 
     def idx(self) -> list[tuple]:
         """index"""
-        print(self.order, type(self.order))
-        print(prod(self.order))
-        return [i for i in prod(*self.order)._]
+        if len(self.order) > 1:
+            return [i for i in prod(self.order)._]
+        return self.order[0]._
 
     def __len__(self):
         return len(self.idx())
@@ -59,3 +59,7 @@ class Set(ABC):
 
     def __hash__(self):
         return hash(str(self))
+
+    def __init_subclass__(cls):
+        cls.__repr__ = Set.__repr__
+        cls.__hash__ = Set.__hash__
