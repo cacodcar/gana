@@ -32,3 +32,5 @@ class Cons(X):
             name = f'{self.lhs} {self.rel} {self.rhs}'
 
         super().__init__(parent=parent, name=name, n=n)
+
+    

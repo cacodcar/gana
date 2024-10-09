@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Self, TYPE_CHECKING
+from IPython.display import Math
 
 from .element import X
 from .constraint import Cons
@@ -36,6 +37,43 @@ class Func(X):
                 name = f'{self.rel} {self.two}'
 
         super().__init__(parent=parent, name=name, n=n)
+
+    def latex(self) -> str:
+        """Equation"""
+        if isinstance(self.one, float):
+            one = self.one
+
+        else:
+            one = self.one.latex()
+
+        if isinstance(self.two, float):
+            two = self.two
+
+        else:
+            two = self.two.latex()
+
+        if self.rel == '+':
+            if self.one:
+                return rf'{one} + {two}'
+            else:
+                return rf'{self.two}'
+
+        if self.rel == '-':
+            if self.one:
+                return rf'{one} - {two}'
+            # this is used to generate negatives
+            else:
+                return rf'-{two}'
+
+        if self.rel == '×':
+            return rf'{one} \cdot {two}'
+
+        if self.rel == '÷':
+            return rf'\frac{{{one}}}{{{two}}}'
+
+    def pprint(self) -> Math:
+        """Display the function"""
+        return Math(self.latex())
 
     def __neg__(self):
 

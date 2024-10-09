@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Self, TYPE_CHECKING
+from IPython.display import Math
 
 from .element import X
 
@@ -33,6 +34,19 @@ class Var(X):
         self.nn = nn
 
         super().__init__(parent=parent, name=name, n=n)
+
+    def latex(self):
+        """Latex representation"""
+        return (
+            rf'{self.parent[0].name}'
+            + r'_{'
+            + rf'{self.parent[0].idx()[self.parent[0]._.index(self)]}'
+            + r'}'
+        )
+
+    def pprint(self):
+        """Pretty Print"""
+        return Math(self.latex())
 
     def __pos__(self):
         return Func(rel='+', two=self)
