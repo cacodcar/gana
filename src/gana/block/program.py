@@ -13,12 +13,13 @@ from ..sets.indices import I
 
 # from ..sets.theta import T
 from ..sets.variables import V
+from ..sets.functions import F
 
 # from ..sets.constraint import C
-# from ..sets.function import F
 # from ..sets.objective import O
 from ..elements.index import Idx
 from ..elements.variable import Var
+from ..elements.function import Func
 
 # from ..value.zero import Z
 from ..sets.ordered import Set
@@ -46,16 +47,12 @@ class Prg:
         # self.vars_bnr: list[V] = []
         # self.parameters: list[P] = []
         # self.thetas: list[T] = []
-        # self.functions: list[F] = []
+        self.funcsets: list[F] = []
+        self.functions: list[Func] = []
         # self.constraints: list[C] = []
         # self.cons_eq: list[C] = []
         # self.cons_leq: list[C] = []
         # self.objectives: list[O] = []
-
-        # counts of variable, parameter, constraint, function, objective
-        self.n_idx, self.n_var, self.n_par, self.n_cons, self.n_func, self.n_obj = (
-            0 for _ in range(6)
-        )
 
     def __setattr__(self, name, value) -> None:
 
@@ -85,16 +82,15 @@ class Prg:
                     idx = self.indices[self.indices.index(idx)]
                     idx.parent.append(value)
                     value._[n] = idx
-                    self.n_idx += 1
                 else:
                     setattr(self, idx.name, idx)
 
         if isinstance(value, Idx):
             self.indices.append(value)
+            value.n = len(self.indices)
             self.names_idx.append(value.name)
 
         if isinstance(value, V):
-
             self.varsets.append(value)
             value.n = len(self.varsets)
 
@@ -103,6 +99,18 @@ class Prg:
 
         if isinstance(value, Var):
             self.variables.append(value)
+            value.n = len(self.variables)
+
+        if isinstance(value, F):
+            self.funcsets.append(value)
+            value.n = len(self.funcsets)
+
+            for n, fun in enumerate(value._):
+                setattr(self, fun.name, fun)
+
+        if isinstance(value, Func):
+            self.functions.append(value)
+            value.n = len(self.functions)
 
         #         # if only a single integer is passed
         #         # create an orderd set of that length

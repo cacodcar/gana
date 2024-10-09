@@ -10,6 +10,7 @@ from .constraint import Cons
 
 if TYPE_CHECKING:
     from .variable import Var
+    from ..sets.functions import F
 
 
 class Func(X):
@@ -17,6 +18,9 @@ class Func(X):
 
     def __init__(
         self,
+        parent: list[F] = None,
+        name: str = None,
+        n: int = None,
         one: float | Var | Self = None,
         rel: str = None,
         two: float | Var | Self = None,
@@ -25,31 +29,32 @@ class Func(X):
         self.rel = rel
         self.two = two
 
-        super().__init__(parent=self.parent, name=self.rel, n=self.n)
+        super().__init__(parent=parent, name=name, n=n)
 
     def __neg__(self):
 
         if self.one:
-            one = 0 - self.one
-        else:
-            one = None
-
+            self.one = 0 - self.one
         if self.rel == '+':
-            rel = '-'
-        elif self.rel == '-':
-            rel = '+'
-        else:
-            rel = self.rel
 
-        two = self.two
+            self.rel = '-'
 
-        return Func(one=one, rel=rel, two=two)
+        if self.rel == '-':
+
+            self.rel = '+'
+
+        self.two = self.two
+
+        return self
 
     def __pos__(self):
         return self
 
     def __add__(self, other: float | Var | Self):
-        return Func(one=self, rel='+', two=other)
+        self.one = self
+        self.rel = '+'
+        self.two = other
+        return self
 
     def __radd__(self, other: float | Var | Self):
         if other == 0:
@@ -58,7 +63,10 @@ class Func(X):
             return self + other
 
     def __sub__(self, other: float | Var | Self):
-        return Func(one=self, rel='-', two=other)
+        self.one = self
+        self.rel = '-'
+        self.two = other
+        return self
 
     def __rsub__(self, other: float | Var | Self):
         if other == 0:
@@ -67,10 +75,16 @@ class Func(X):
             return -self + other
 
     def __mul__(self, other: float | Var | Self):
-        return Func(one=self, rel='×', two=other)
+        self.one = self
+        self.rel = '×'
+        self.two = other
+        return self
 
     def __truediv__(self, other: float | Var | Self):
-        return Func(one=self, rel='÷', two=other)
+        self.one = self
+        self.rel = '÷'
+        self.two = other
+        return self
 
     def __eq__(self, other: float | Var | Self):
         return Cons(lhs=self, rel='eq', rhs=other)

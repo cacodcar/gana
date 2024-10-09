@@ -4,12 +4,12 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self
-from math import prod
 
 from IPython.display import Math
 
 from .constraints import C
 from .ordered import Set
+from ..elements.function import Func
 
 
 if TYPE_CHECKING:
@@ -17,7 +17,8 @@ if TYPE_CHECKING:
 
     from .parameters import P
     from .variables import V
-    from ..elements.element import X
+    from ..elements.index import Idx
+    from .indices import I
 
 
 class F(Set):
@@ -33,36 +34,39 @@ class F(Set):
         self.two = two
         self.rel = rel
 
-        if self.one and len(self.one) != len(self.two):
-            raise ValueError(
-                'Cannot operate with variable sets with different cardinalities'
-            )
-
         if self.one:
-            self.index = self.one.index
+            order = self.one.order
         elif self.two:
-            self.index = self.two.index
-
-        # keeps a count of, updated in program
-        self.number: int = None
+            order = self.two.order
 
         if self.one:
             self.name = f'{self.one}{self.rel}{self.two}'
         else:
             self.name = f'{self.rel}{self.two}'
 
-        self.parent: Self = None
-        self.funs: list[Self] = []
-
+        self._: list[Func] = []
         # the flag _fixed is changed when .fix(val) is called
-        self._fixed = False
 
-    @property
-    def _(self):
-        """Elements in the function"""
-        return sum(
-            [i._ if isinstance(i, F) else F(i) for i in [self.one, self.two] if i], []
-        )
+        super().__init__(*order)
+
+    def process(self):
+
+        if self.one and len(self.one) != len(self.two):
+            raise ValueError(
+                'Cannot operate with variable sets with different cardinalities'
+            )
+
+        self._ = [
+            Func(
+                name=f'{self.name}_{n}',
+                parent=self,
+                n=n,
+                one=self.one(idx),
+                rel=self.rel,
+                two=self.two(idx),
+            )
+            for n, idx in enumerate(self.idx())
+        ]
 
     def matrix(self):
         """Variables in the function"""
@@ -182,17 +186,10 @@ class F(Set):
     def __gt__(self, other: Self | P | V):
         return self >= other
 
-    def __call__(self, *key: tuple[X] | X) -> Self:
-        if self.funs:
-            return self.funs[self.idx().index(key)]
-        else:
-            if self.one:
-                f = F(one=self.one(*key), rel=self.rel, two=self.two(*key))
-            else:
-                f = F(rel=self.rel, two=self.two(*key))
-            f.parent = self
-            return f
+    def __call__(self, *key: tuple[Idx] | Idx) -> Func:
+        if len(key) == 1:
+            return self._[self.idx().index(key[0])]
+        return self._[self.idx().index(key)]
 
-    def __getitem__(self, *key: tuple[X]):
-        if self._fixed:
-            return self._[self.idx().index(key)]
+    def __getitem__(self, *key: tuple[Idx] | Idx) -> Func:
+        return self(*key)

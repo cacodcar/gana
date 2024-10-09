@@ -55,7 +55,7 @@ class V(Set):
         # of a variable set are stored here
         # once realized, the values take a int or float value
         # value is determined when mathematical model is solved
-        self._: list[int | float] = []
+        self._: list[Var] = []
         # the flag _fixed is changed when .fix(val) is called
         self._fixed = False
 

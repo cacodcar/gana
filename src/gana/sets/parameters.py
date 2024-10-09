@@ -50,7 +50,7 @@ class P(Set):
 
     def latex(self) -> str:
         """LaTeX representation"""
-        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.index) + r'}'
+        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.order) + r'}'
 
     def matrix(self):
         """Matrix Representation"""
@@ -127,7 +127,7 @@ class P(Set):
 
     def __truediv__(self, other: Self):
         if isinstance(other, P):
-            return P(*self.index, _=[i / j for i, j in zip(self._, other._)])
+            return P(*self.order, _=[i / j for i, j in zip(self._, other._)])
         if isinstance(other, F):
             return F(one=self, two=other, rel='÷')
         if isinstance(other, V):
@@ -138,15 +138,15 @@ class P(Set):
 
     def __floordiv__(self, other: Self):
 
-        return P(*self.index, _=[i // j for i, j in zip(self._, other._)])
+        return P(*self.order, _=[i // j for i, j in zip(self._, other._)])
 
     def __mod__(self, other: Self):
 
-        return P(*self.index, _=[i % j for i, j in zip(self._, other._)])
+        return P(*self.order, _=[i % j for i, j in zip(self._, other._)])
 
     def __pow__(self, other: Self):
 
-        return P(*self.index, _=[i**j for i, j in zip(self._, other._)])
+        return P(*self.order, _=[i**j for i, j in zip(self._, other._)])
 
     def __eq__(self, other: Self):
 
