@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-from math import prod
 from typing import Self, TYPE_CHECKING
 
 from IPython.display import Math
@@ -198,4 +197,4 @@ class V(Set):
 
     def __getitem__(self, *key: tuple[Idx]):
         if self._fixed:
-            return self._[self.idx().index(*key)]
+            return self(key)
