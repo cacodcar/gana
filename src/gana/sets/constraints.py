@@ -14,10 +14,10 @@ from sympy import Rel
 if TYPE_CHECKING:
     from sympy import Eq, GreaterThan, LessThan
 
-    from .parameter import P
-    from .variable import V
-    from .function import F
-    from .thing import X
+    from .parameters import P
+    from .variables import V
+    from .functions import F
+    from ..element import X
 
 
 class C:

@@ -4,12 +4,12 @@ import pytest
 
 from IPython.display import Math
 
-from src.gana.sets.index import I
+from gana.sets.indices import I
 
-from src.gana.sets.parameter import P
-from src.gana.sets.variable import V
-from src.gana.sets.function import F
-from src.gana.sets.constraint import C
+from gana.sets.parameters import P
+from gana.sets.variables import V
+from gana.sets.functions import F
+from gana.sets.constraints import C
 from src.gana.block.program import Prg
 from src.gana.value.bigm import M
 from .test_fixtures import p, ps

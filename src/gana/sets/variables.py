@@ -17,23 +17,22 @@ from pyomo.environ import (
 )
 from sympy import Idx, IndexedBase, Symbol, symbols
 
-from .constraint import C
-from .function import F
-from .index import I
-from .thing import X
+from .constraints import C
+from .functions import F
+from .indices import I
+from ..elements.index import Idx
+from .ordered import Set
 
 
 if TYPE_CHECKING:
-    from .parameter import P
+    from .parameters import P
 
 
-class V:
+class V(Set):
     """Variable Set"""
 
     def __init__(
         self,
-        *index: I | X,
-        name: str = 'var',
         itg: bool = False,
         nn: bool = True,
         bnr: bool = False,
@@ -44,9 +43,6 @@ class V:
         # variables generated at the indices
         # of a variable set are stored here
         # once realized, the values take a int or float value
-
-        self.parent: Self = None
-        self.vars: list[Self] = []
 
         # if the variable is an integer variable
         self.itg = itg
@@ -130,14 +126,6 @@ class V:
     def __len__(self):
         return len(self.idx())
 
-    def __str__(self):
-        return rf'{self.name}'
-
-    def __repr__(self):
-        return str(self)
-
-    def __hash__(self):
-        return hash(str(self))
 
     def __neg__(self):
         return F(rel='-', two=self)
@@ -199,9 +187,9 @@ class V:
         for i in self.vars:
             yield i
 
-    def __call__(self, *key: tuple[X] | X) -> Self:
+    def __call__(self, *key: tuple[Idx] | Idx) -> Self:
         return self.vars[self.idx().index(key)]
 
-    def __getitem__(self, *key: tuple[X]):
+    def __getitem__(self, *key: tuple[Idx]):
         if self._fixed:
             return self._[self.idx().index(key)]

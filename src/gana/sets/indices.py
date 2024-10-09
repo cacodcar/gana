@@ -8,8 +8,8 @@ from itertools import product
 from IPython.display import Math, display
 from pyomo.environ import Set as PyoSet
 from sympy import FiniteSet
-from ..element.x import X
-from .orderedset import Set
+from ..elements.index import Idx
+from .ordered import Set
 
 if TYPE_CHECKING:
     from ..block.program import Prg
@@ -54,18 +54,17 @@ class I(Set):
         """Process the set"""
         if all([isinstance(x, str) for x in self.indices]):
             self._ = [
-                X(name=x, parent=self, n=n) for n, x in enumerate(list(self.indices))
+                Idx(name=x, parent=self, n=n) for n, x in enumerate(list(self.indices))
             ]
 
         if all([isinstance(x, int) for x in self.indices]):
             self._ = [
-                X(name=rf'{self.name}_{n}', parent=self, n=n)
+                Idx(name=rf'{self.name}_{n}', parent=self, n=n)
                 for n in range(sum(self.indices))
             ]
 
     def matrix(self):
         """Matrix Representation"""
-        passs
 
     def latex(self, descriptive: bool = False) -> str:
         """LaTeX representation"""
@@ -110,17 +109,7 @@ class I(Set):
         """
         return rf'_{self[pos]}'
 
-    def __str__(self):
-        return rf'{self.name}'
 
-    def __repr__(self):
-        return str(self)
-
-    def __hash__(self):
-        return hash(str(self))
-
-    def __len__(self):
-        return len(self._)
 
     def __getitem__(self, key: int | str):
         return self._[key]
@@ -129,7 +118,9 @@ class I(Set):
         return True if other in self._ else False
 
     def __eq__(self, other: Self):
-        return set(self._) == set(other._)
+        if hasattr(other, '_'):
+            return set(self._) == set(other._)
+        return False
 
     def __and__(self, other: Self):
         return I(*list(set(self._) & set(other._)))
@@ -147,8 +138,8 @@ class I(Set):
         # this to allow using product
         if isinstance(other, int) and other == 1:
             return self
-        if isinstance(other, X):
-            if self in other.parents:
+        if isinstance(other, Idx):
+            if self in other.parent:
                 raise ValueError(
                     f'{other} can only belong at one index of element.',
                     f'{other} also in {self}',
@@ -164,14 +155,13 @@ class I(Set):
         return I(*list(product(self._, other._)))
 
     def __rmul__(self, other: Self):
-        if isinstance(other, X):
-            if self in other.parents:
+        if isinstance(other, Idx):
+            if self in other.parent:
                 raise ValueError(
                     f'{other} can only belong at one index of element.',
                     f'{other} also in {self}',
                 )
             return I(*list(product([other], self._)))
-        return self * other
 
     def __iter__(self):
         return iter(self._)

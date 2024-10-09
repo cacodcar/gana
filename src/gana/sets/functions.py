@@ -8,14 +8,14 @@ from math import prod
 
 from IPython.display import Math
 
-from .constraint import C
+from .constraints import C
 
 if TYPE_CHECKING:
     from sympy import Add
 
-    from .parameter import P
-    from .variable import V
-    from .thing import X
+    from .parameters import P
+    from .variables import V
+    from ..element import X
 
 
 class F:

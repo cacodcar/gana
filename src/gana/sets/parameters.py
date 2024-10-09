@@ -7,12 +7,12 @@ from typing import Self
 from IPython.display import Math
 from sympy import Idx, IndexedBase, Symbol, symbols
 
-from .constraint import C
-from .function import F
-from .index import I
-from .variable import V
+from .constraints import C
+from .functions import F
+from .indices import I
+from .variables import V
 from ..value.bigm import M
-from .thing import X
+from ..element import X
 
 
 class P:

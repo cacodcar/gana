@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from IPython.display import Math
 
 if TYPE_CHECKING:
-    from .function import F
+    from .functions import F
 
 
 class O:
