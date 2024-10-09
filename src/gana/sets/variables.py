@@ -192,7 +192,9 @@ class V(Set):
             yield i
 
     def __call__(self, *key: tuple[Idx] | Idx) -> Self:
-        return self._[self.idx().index(*key)]
+        if len(key) == 1:
+            return self._[self.idx().index(key[0])]
+        return self._[self.idx().index(key)]
 
     def __getitem__(self, *key: tuple[Idx]):
         if self._fixed:

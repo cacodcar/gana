@@ -57,11 +57,13 @@ class I(Set):
                 Idx(name=x, parent=self, n=n) for n, x in enumerate(list(self.indices))
             ]
 
-        if all([isinstance(x, int) for x in self.indices]):
+        elif all([isinstance(x, int) for x in self.indices]):
             self._ = [
                 Idx(name=rf'{self.name}_{n}', parent=self, n=n)
                 for n in range(sum(self.indices))
             ]
+        else:
+            self._ = list(self.indices)
 
     def matrix(self):
         """Matrix Representation"""
@@ -136,13 +138,15 @@ class I(Set):
         # this to allow using product
         if isinstance(other, int) and other == 1:
             return self
+
         if isinstance(other, Idx):
             if self in other.parent:
                 raise ValueError(
                     f'{other} can only belong at one index of element.',
                     f'{other} also in {self}',
                 )
-            return I(*list(product(self._, [other])))
+
+            idxset = I(*list(product(self._, [other])))
 
         if isinstance(other, I):
             if set(self._) & set(other._):
@@ -150,7 +154,9 @@ class I(Set):
                     f'{self} and {other} have common elements',
                     f'{set(self._) & set(other._)} in both',
                 )
-        return I(*list(product(self._, other._)))
+        idxset = I(*list(product(self._, other._)))
+        idxset.process()
+        return idxset
 
     def __rmul__(self, other: Self):
         # this to allow using product

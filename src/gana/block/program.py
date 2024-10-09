@@ -18,6 +18,7 @@ from ..sets.variables import V
 # from ..sets.function import F
 # from ..sets.objective import O
 from ..elements.index import Idx
+from ..elements.variable import Var
 
 # from ..value.zero import Z
 from ..sets.ordered import Set
@@ -35,9 +36,10 @@ class Prg:
         # names of declared modeling and relational elements
         self.names = []
         self.names_idx = []
-        self.sets: list[I] = []
+        self.idxsets: list[I] = []
         self.indices: list[Idx] = []
-        self.variables: list[V] = []
+        self.varsets: list[V] = []
+        self.variables: list[Var] = []
         # self.vars_cnt: list[V] = []
         # self.vars_itg: list[V] = []
         # self.vars_nn: list[V] = []
@@ -75,8 +77,8 @@ class Prg:
             value.process()
 
         if isinstance(value, I):
-            self.sets.append(value)
-            value.n = len(self.sets)
+            self.idxsets.append(value)
+            value.n = len(self.idxsets)
 
             for n, idx in enumerate(value._):
                 if idx.name in self.names_idx:
@@ -93,11 +95,14 @@ class Prg:
 
         if isinstance(value, V):
 
-            self.variables.append(value)
-            value.n = len(self.variables)
+            self.varsets.append(value)
+            value.n = len(self.varsets)
 
             for n, var in enumerate(value._):
                 setattr(self, var.name, var)
+
+        if isinstance(value, Var):
+            self.variables.append(value)
 
         #         # if only a single integer is passed
         #         # create an orderd set of that length
@@ -289,7 +294,7 @@ class Prg:
     def latex(self, descriptive: bool = False):
         """Display LaTeX"""
 
-        for s in self.sets:
+        for s in self.idxsets:
             display(s.latex())
 
         # for e in self.constraints + self.objectives:
@@ -298,7 +303,7 @@ class Prg:
     def pprint(self, descriptive: bool = False):
         """Pretty Print"""
 
-        for i in self.sets:
+        for i in self.idxsets:
             i.pprint(True)
 
         # for c in self.constraints + self.objectives:

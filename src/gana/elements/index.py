@@ -28,7 +28,6 @@ class Idx(X):
             if sorted(set(self.parent) | set(other.parent), key=str) != sorted(
                 self.parent + other.parent, key=str
             ):
-                print(self.parent, other.parent)
                 raise ValueError(
                     f'{other} can only belong at one index of element.',
                     f'{other} also in {self}',
