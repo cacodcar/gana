@@ -331,8 +331,13 @@ class Prg:
         for s in self.idxsets:
             display(s.latex())
 
-        for e in self.conssets:  # + self.objectives:
-            display(e.latex(descriptive))
+        if descriptive:
+            for c in self.constraints:
+                display(c.latex())
+
+        else:
+            for c in self.conssets:  # + self.objectives:
+                display(c.latex())
 
     def pprint(self, descriptive: bool = False):
         """Pretty Print"""
@@ -340,8 +345,12 @@ class Prg:
         for i in self.idxsets:
             i.pprint(True)
 
-        for c in self.conssets:  # + self.objectives:
-            c.pprint(descriptive)
+        if descriptive:
+            for c in self.constraints:
+                c.pprint()
+        else:
+            for c in self.conssets:  # + self.objectives:
+                c.pprint()
 
     def __str__(self):
         return rf'{self.name}'

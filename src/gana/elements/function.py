@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import Self, TYPE_CHECKING
-from IPython.display import Math
+from IPython.display import Math, display
 
 from .element import X
 from .constraint import Cons
@@ -40,11 +40,11 @@ class Func(X):
 
     def latex(self) -> str:
         """Equation"""
-        if isinstance(self.one, float):
-            one = self.one
-
-        else:
-            one = self.one.latex()
+        if self.one:
+            if isinstance(self.one, float):
+                one = self.one
+            else:
+                one = self.one.latex()
 
         if isinstance(self.two, float):
             two = self.two
@@ -56,7 +56,7 @@ class Func(X):
             if self.one:
                 return rf'{one} + {two}'
             else:
-                return rf'{self.two}'
+                return rf'{two}'
 
         if self.rel == '-':
             if self.one:
@@ -73,7 +73,7 @@ class Func(X):
 
     def pprint(self) -> Math:
         """Display the function"""
-        return Math(self.latex())
+        display(Math(self.latex()))
 
     def __neg__(self):
 

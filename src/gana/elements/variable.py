@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import Self, TYPE_CHECKING
-from IPython.display import Math
+from IPython.display import Math, display
 
 from .element import X
 
@@ -40,13 +40,15 @@ class Var(X):
         return (
             rf'{self.parent[0].name}'
             + r'_{'
-            + rf'{self.parent[0].idx()[self.parent[0]._.index(self)]}'
+            + rf'{self.parent[0].idx()[self.parent[0]._.index(self)]}'.replace(
+                '(', ''
+            ).replace(')', '')
             + r'}'
         )
 
     def pprint(self):
         """Pretty Print"""
-        return Math(self.latex())
+        display(Math(self.latex()))
 
     def __pos__(self):
         return Func(rel='+', two=self)

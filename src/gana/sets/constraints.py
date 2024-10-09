@@ -73,7 +73,7 @@ class C(Set):
     def matrix(self):
         """Matrix Representation"""
 
-    def latex(self, descriptive: bool = False) -> str:
+    def latex(self) -> str:
         """Latex representation"""
         if self.rel == 'eq':
             rel = r'='
@@ -84,19 +84,11 @@ class C(Set):
         if self.rel == 'ge':
             rel = r'\geq'
 
-        if descriptive:
-            return rf'{self.lhs.latex()} {rel} {self.rhs._[0]}'
-
         return rf'{self.lhs.latex()} {rel} {self.rhs.latex()}'
 
-    def pprint(self, descriptive: bool = False) -> Math:
+    def pprint(self) -> Math:
         """Display the function"""
-
-        if descriptive:
-            for c in self._:
-                display(Math(c.latex(descriptive)))
-        else:
-            display(Math(self.latex()))
+        display(Math(self.latex()))
 
     def sympy(self) -> LessThan | GreaterThan | Eq:
         """sympy representation"""
