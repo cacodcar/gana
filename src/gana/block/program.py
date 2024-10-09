@@ -14,12 +14,13 @@ from ..sets.indices import I
 # from ..sets.theta import T
 from ..sets.variables import V
 from ..sets.functions import F
+from ..sets.constraints import C
 
-# from ..sets.constraint import C
 # from ..sets.objective import O
 from ..elements.index import Idx
 from ..elements.variable import Var
 from ..elements.function import Func
+from ..elements.constraint import Cons
 
 # from ..value.zero import Z
 from ..sets.ordered import Set
@@ -41,15 +42,16 @@ class Prg:
         self.indices: list[Idx] = []
         self.varsets: list[V] = []
         self.variables: list[Var] = []
-        # self.vars_cnt: list[V] = []
-        # self.vars_itg: list[V] = []
-        # self.vars_nn: list[V] = []
-        # self.vars_bnr: list[V] = []
+        self.vars_cnt: list[V] = []
+        self.vars_itg: list[V] = []
+        self.vars_nn: list[V] = []
+        self.vars_bnr: list[V] = []
         # self.parameters: list[P] = []
         # self.thetas: list[T] = []
         self.funcsets: list[F] = []
         self.functions: list[Func] = []
-        # self.constraints: list[C] = []
+        self.conssets: list[C] = []
+        self.constraints: list[Cons] = []
         # self.cons_eq: list[C] = []
         # self.cons_leq: list[C] = []
         # self.objectives: list[O] = []
@@ -101,6 +103,18 @@ class Prg:
             self.variables.append(value)
             value.n = len(self.variables)
 
+            if value.bnr:
+                self.vars_bnr.append(value)
+
+            if value.nn:
+                self.vars_nn.append(value)
+
+            if value.itg:
+                self.vars_itg.append(value)
+
+            else:
+                self.vars_cnt.append(value)
+
         if isinstance(value, F):
             self.funcsets.append(value)
             value.n = len(self.funcsets)
@@ -111,6 +125,18 @@ class Prg:
         if isinstance(value, Func):
             self.functions.append(value)
             value.n = len(self.functions)
+
+        if isinstance(value, C):
+            # value.canoncial()
+            self.conssets.append(value)
+            value.n = len(self.conssets)
+
+            for n, con in enumerate(value._):
+                setattr(self, con.name, con)
+
+        if isinstance(value, Cons):
+            self.constraints.append(value)
+            value.n = len(self.constraints)
 
         #         # if only a single integer is passed
         #         # create an orderd set of that length
@@ -305,8 +331,8 @@ class Prg:
         for s in self.idxsets:
             display(s.latex())
 
-        # for e in self.constraints + self.objectives:
-        #     display(e.latex(descriptive))
+        for e in self.conssets:  # + self.objectives:
+            display(e.latex(descriptive))
 
     def pprint(self, descriptive: bool = False):
         """Pretty Print"""
@@ -314,8 +340,8 @@ class Prg:
         for i in self.idxsets:
             i.pprint(True)
 
-        # for c in self.constraints + self.objectives:
-        #     c.pprint(descriptive)
+        for c in self.conssets:  # + self.objectives:
+            c.pprint(descriptive)
 
     def __str__(self):
         return rf'{self.name}'

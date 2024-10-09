@@ -4,13 +4,13 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self, Literal
-from math import prod
 
 from IPython.display import Math, display
 from pyomo.environ import Constraint
 from sympy import Rel
 
 from .ordered import Set
+from ..elements.constraint import Cons
 
 if TYPE_CHECKING:
     from sympy import Eq, GreaterThan, LessThan
@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from .parameters import P
     from .variables import V
     from .functions import F
+    from ..elements.index import Idx
 
 
 class C(Set):
@@ -33,20 +34,33 @@ class C(Set):
         self.rhs = rhs
         self.rel = rel
 
-        # keeps a count of, updated in program
-        self.n: int = None
         # since indices should match, take any
-        self.index = self.lhs.index
+        order = self.lhs.order
 
         # whether the constraint is binding
         self.binding = False
 
-        self.parent: Self = None
-        self.cons: list[Self] = []
+        self._: list[Cons] = []
 
         # where this constraint is part of:
         # g - equality constraint
         # h - inequality constraint
+
+        super().__init__(*order)
+
+    def process(self):
+        """Process the constraint"""
+        self._ = [
+            Cons(
+                name=f'{self.name}_{n}',
+                parent=self,
+                n=n,
+                lhs=self.lhs(idx),
+                rel=self.rel,
+                rhs=self.rhs(idx),
+            )
+            for n, idx in enumerate(self.idx())
+        ]
 
     def canoncial(self, zeros: P) -> Self:
         """Canonical form of the constraint"""
@@ -56,15 +70,8 @@ class C(Set):
             self.rel = 'le'
         self.rhs = zeros
 
-    def idx(self) -> list[tuple]:
-        """index"""
-        if self.parent:
-            return self.index
-        else:
-            return [(i,) if not isinstance(i, tuple) else i for i in prod(self.index)._]
-
-    def __len__(self):
-        return len(self.idx())
+    def matrix(self):
+        """Matrix Representation"""
 
     def latex(self, descriptive: bool = False) -> str:
         """Latex representation"""
@@ -86,7 +93,7 @@ class C(Set):
         """Display the function"""
 
         if descriptive:
-            for c in self.cons:
+            for c in self._:
                 display(Math(c.latex(descriptive)))
         else:
             display(Math(self.latex()))
@@ -95,14 +102,10 @@ class C(Set):
         """sympy representation"""
         return Rel(self.lhs.sympy(), self.rhs.sympy(), self.rel)
 
-    def __repr__(self):
-        return self.name
+    def __call__(self, *key: tuple[Idx] | Idx) -> Cons:
+        if len(key) == 1:
+            return self._[self.idx().index(key[0])]
+        return self._[self.idx().index(key)]
 
-    def __hash__(self):
-        return hash(self.name)
-
-    def __call__(self, *key: tuple[X] | X) -> Self:
-        return self.cons[self.idx().index(key)]
-
-    def __getitem__(self, key: int | str):
-        return self.cons[key]
+    def __getitem__(self, *key: tuple[Idx] | Idx) -> Cons:
+        return self(*key)

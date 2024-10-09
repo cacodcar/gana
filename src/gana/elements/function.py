@@ -29,6 +29,12 @@ class Func(X):
         self.rel = rel
         self.two = two
 
+        if not name:
+            if self.one:
+                name = f'{self.one} {self.rel} {self.two}'
+            else:
+                name = f'{self.rel} {self.two}'
+
         super().__init__(parent=parent, name=name, n=n)
 
     def __neg__(self):

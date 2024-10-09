@@ -39,6 +39,8 @@ class F(Set):
         elif self.two:
             order = self.two.order
 
+        super().__init__(*order)
+
         if self.one:
             self.name = f'{self.one}{self.rel}{self.two}'
         else:
@@ -47,26 +49,35 @@ class F(Set):
         self._: list[Func] = []
         # the flag _fixed is changed when .fix(val) is called
 
-        super().__init__(*order)
-
     def process(self):
 
         if self.one and len(self.one) != len(self.two):
             raise ValueError(
                 'Cannot operate with variable sets with different cardinalities'
             )
-
-        self._ = [
-            Func(
-                name=f'{self.name}_{n}',
-                parent=self,
-                n=n,
-                one=self.one(idx),
-                rel=self.rel,
-                two=self.two(idx),
-            )
-            for n, idx in enumerate(self.idx())
-        ]
+        if self.one:
+            self._ = [
+                Func(
+                    name=f'{self.name}_{n}',
+                    parent=self,
+                    n=n,
+                    one=self.one(idx),
+                    rel=self.rel,
+                    two=self.two(idx),
+                )
+                for n, idx in enumerate(self.idx())
+            ]
+        else:
+            self._ = [
+                Func(
+                    name=f'{self.name}_{n}',
+                    parent=self,
+                    n=n,
+                    rel=self.rel,
+                    two=self.two(idx),
+                )
+                for n, idx in enumerate(self.idx())
+            ]
 
     def matrix(self):
         """Variables in the function"""
@@ -128,27 +139,15 @@ class F(Set):
 
     def __neg__(self):
 
-        if self.one:
-            one = 0 - self.one
-        else:
-            one = None
-
-        if self.rel == '+':
-            rel = '-'
-        elif self.rel == '-':
-            rel = '+'
-        else:
-            rel = self.rel
-
-        two = self.two
-
-        return F(one=one, rel=rel, two=two)
+        self._ = [-i for i in self._]
+        return self
 
     def __pos__(self):
         return self
 
     def __add__(self, other: Self | P | V):
-        return F(one=self, rel='+', two=other)
+        self._ = [a + b for a, b in zip(self._, other._)]
+        return self
 
     def __radd__(self, other: Self | P | V | int):
         if other == 0:
@@ -157,7 +156,8 @@ class F(Set):
             return self + other
 
     def __sub__(self, other: Self | P | V):
-        return F(one=self, rel='-', two=other)
+        self._ = [a - b for a, b in zip(self._, other._)]
+        return self
 
     def __rsub__(self, other: Self | P | V):
         if other == 0:
@@ -166,10 +166,12 @@ class F(Set):
             return -self + other
 
     def __mul__(self, other: Self | P | V):
-        return F(one=self, rel='×', two=other)
+        self._ = [a * b for a, b in zip(self._, other._)]
+        return self
 
     def __truediv__(self, other: Self | P | V):
-        return F(one=self, rel='÷', two=other)
+        self._ = [a / b for a, b in zip(self._, other._)]
+        return self
 
     def __eq__(self, other: Self | P | V):
         return C(lhs=self, rel='eq', rhs=other)

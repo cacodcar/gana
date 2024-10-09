@@ -9,6 +9,7 @@ from .element import X
 if TYPE_CHECKING:
     from .variable import Var
     from .function import Func
+    from ..sets.constraints import C
 
 
 class Cons(X):
@@ -16,12 +17,18 @@ class Cons(X):
 
     def __init__(
         self,
-        lhs: Func | Var | float,
         rhs: Func | Var | float,
+        lhs: Func | Var | float,
+        parent: list[C] = None,
+        name: str = None,
+        n: int = None,
         rel: Literal['eq'] | Literal['ge'] | Literal['le'] = 'eq',
     ):
         self.lhs = lhs
         self.rhs = rhs
         self.rel = rel
 
-        super().__init__(parent=self.parent, name=self.name, n=self.n)
+        if not name:
+            name = f'{self.lhs} {self.rel} {self.rhs}'
+
+        super().__init__(parent=parent, name=name, n=n)

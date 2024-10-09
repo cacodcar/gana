@@ -95,8 +95,7 @@ class P(Set):
             return self
 
         if isinstance(other, P):
-            print([i + j for i, j in zip(self._, other._)])
-            self._ = [i._[0] + j._[0] for i, j in zip(self._, other._)]
+            self._ = [i + j for i, j in zip(self._, other._)]
 
         return F(one=self, rel='+', two=other)
 

@@ -131,13 +131,22 @@ class V(Set):
         return str(self)
 
     def __neg__(self):
-        return F(rel='-', two=self)
+        f = F(rel='-', two=self)
+        f.name = f'-{self.name}'
+        f.process()
+        return f
 
     def __pos__(self):
-        return F(rel='+', two=self)
+        f = F(rel='+', two=self)
+        f.name = f'+{self.name}'
+        f.process()
+        return f
 
     def __add__(self, other: Self | F):
-        return F(one=self, rel='+', two=other)
+        f = F(one=self, rel='+', two=other)
+        f.name = f'{self.name}+{other.name}'
+        f.process()
+        return f
 
     def __radd__(self, other: Self | F):
         if other == 0:
