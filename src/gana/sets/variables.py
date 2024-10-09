@@ -19,13 +19,14 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 
 from .constraints import C
 from .functions import F
-from .indices import I
-from ..elements.index import Idx
 from .ordered import Set
 
+from ..elements.variable import Var
 
 if TYPE_CHECKING:
     from .parameters import P
+    from .indices import I
+    from ..elements.index import Idx
 
 
 class V(Set):
@@ -33,16 +34,11 @@ class V(Set):
 
     def __init__(
         self,
+        *indices: tuple[Idx | I],
         itg: bool = False,
         nn: bool = True,
         bnr: bool = False,
     ):
-        self.index = list(index)
-
-        self.name = name
-        # variables generated at the indices
-        # of a variable set are stored here
-        # once realized, the values take a int or float value
 
         # if the variable is an integer variable
         self.itg = itg
@@ -56,13 +52,29 @@ class V(Set):
         # if the variable is non negative
         self.nn = nn
 
+        # variables generated at the indices
+        # of a variable set are stored here
+        # once realized, the values take a int or float value
         # value is determined when mathematical model is solved
         self._: list[int | float] = []
         # the flag _fixed is changed when .fix(val) is called
         self._fixed = False
 
-        # tags for the members of the Variable set
-        self.number: int = None
+        super().__init__(*indices)
+
+    def process(self):
+        """Process the set"""
+        self._ = [
+            Var(
+                name=fr'{self.name}_{n}',
+                parent=self,
+                n=n,
+                itg=self.itg,
+                nn=self.nn,
+                bnr=self.bnr,
+            )
+            for n in range(len(self.idx()))
+        ]
 
     def fix(self, values: P | list[float]):
         """Fix the value of the variable"""
@@ -75,16 +87,9 @@ class V(Set):
             self._ = values._
             self._fixed = True
 
-    def idx(self) -> list[tuple]:
-        """index"""
-        if self.parent:
-            return self.index
-        else:
-            return [(i,) if not isinstance(i, tuple) else i for i in prod(self.index)._]
-
     def latex(self) -> str:
         """LaTeX representation"""
-        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.index) + r'}'
+        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.order) + r'}'
 
     def pprint(self) -> Math:
         """Display the variables"""
@@ -93,12 +98,12 @@ class V(Set):
     def sympy(self) -> IndexedBase | Symbol:
         """symbolic representation"""
         return IndexedBase(str(self))[
-            symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
+            symbols(",".join([f'{d}' for d in self.order]), cls=Idx)
         ]
 
     def pyomo(self) -> Var:
         """Pyomo representation"""
-        idx = [i.pyomo() for i in self.index]
+        idx = [i.pyomo() for i in self.order]
 
         if self.bnr:
             return Var(*idx, domain=Binary, doc=str(self))
@@ -115,6 +120,9 @@ class V(Set):
             else:
                 return Var(*idx, domain=Reals, doc=str(self))
 
+    def matrix(self):
+        """Matrix Representation"""
+
     def mps(self) -> str:
         """MPS representation"""
         return str(self).upper()
@@ -122,10 +130,6 @@ class V(Set):
     def lp(self) -> str:
         """LP representation"""
         return str(self)
-
-    def __len__(self):
-        return len(self.idx())
-
 
     def __neg__(self):
         return F(rel='-', two=self)
@@ -184,11 +188,11 @@ class V(Set):
         return self >= other
 
     def __iter__(self):
-        for i in self.vars:
+        for i in self._:
             yield i
 
     def __call__(self, *key: tuple[Idx] | Idx) -> Self:
-        return self.vars[self.idx().index(key)]
+        return self._[self.idx().index(key)]
 
     def __getitem__(self, *key: tuple[Idx]):
         if self._fixed:

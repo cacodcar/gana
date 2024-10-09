@@ -32,3 +32,6 @@ class X:
 
     def __hash__(self):
         return hash(str(self))
+
+    def __len__(self):
+        return 1

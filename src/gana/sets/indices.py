@@ -109,8 +109,6 @@ class I(Set):
         """
         return rf'_{self[pos]}'
 
-
-
     def __getitem__(self, key: int | str):
         return self._[key]
 

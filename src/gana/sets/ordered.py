@@ -44,7 +44,9 @@ class Set(ABC):
 
     def idx(self) -> list[tuple]:
         """index"""
-        return [i for i in prod(self.order)._]
+        print(self.order, type(self.order))
+        print(prod(self.order))
+        return [i for i in prod(*self.order)._]
 
     def __len__(self):
         return len(self.idx())

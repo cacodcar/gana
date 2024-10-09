@@ -10,6 +10,7 @@ from IPython.display import Math, display
 from pyomo.environ import Constraint
 from sympy import Rel
 
+from .ordered import Set
 
 if TYPE_CHECKING:
     from sympy import Eq, GreaterThan, LessThan
@@ -17,10 +18,9 @@ if TYPE_CHECKING:
     from .parameters import P
     from .variables import V
     from .functions import F
-    from ..element import X
 
 
-class C:
+class C(Set):
     """Constraint gives the relationship between Parameters, Variables, or Expressions"""
 
     def __init__(
@@ -28,15 +28,13 @@ class C:
         lhs: F | V,
         rhs: P,
         rel: Literal['eq'] | Literal['ge'] | Literal['le'] = 'eq',
-        name: str = 'cons',
     ):
         self.lhs = lhs
         self.rhs = rhs
         self.rel = rel
-        self.name = name
 
         # keeps a count of, updated in program
-        self.number: int = None
+        self.n: int = None
         # since indices should match, take any
         self.index = self.lhs.index
 

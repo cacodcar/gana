@@ -1,24 +1,22 @@
 """An index"""
 
-from typing import Self
+from __future__ import annotations
+
+from typing import Self, TYPE_CHECKING
 
 from .element import X
+
+if TYPE_CHECKING:
+    from ..sets.indices import I
 
 
 class Idx(X):
     """An index"""
 
-    def __str__(self):
-        return rf'{self.name}'
+    def __init__(self, parent: list[I], name: str = None, n: int = None):
+        self._ = [self]
 
-    def __repr__(self):
-        return str(self)
-
-    def __hash__(self):
-        return hash(str(self))
-
-    def __len__(self):
-        return 1
+        super().__init__(parent=parent, name=name, n=n)
 
     def __eq__(self, other: Self):
         if isinstance(other, Idx):
@@ -39,3 +37,6 @@ class Idx(X):
             return self
 
         return NotImplemented
+
+    def __rmul__(self, other: Self):
+        return self * other

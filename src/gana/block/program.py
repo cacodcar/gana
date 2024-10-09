@@ -17,7 +17,7 @@ from ..sets.variables import V
 # from ..sets.constraint import C
 # from ..sets.function import F
 # from ..sets.objective import O
-from ..element.index import Idx
+from ..elements.index import Idx
 
 # from ..value.zero import Z
 from ..sets.ordered import Set

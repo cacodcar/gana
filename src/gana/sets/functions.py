@@ -9,16 +9,18 @@ from math import prod
 from IPython.display import Math
 
 from .constraints import C
+from .ordered import Set
+
 
 if TYPE_CHECKING:
     from sympy import Add
 
     from .parameters import P
     from .variables import V
-    from ..element import X
+    from ..elements.element import X
 
 
-class F:
+class F(Set):
     """Provides some relational operation between Parameters and Variables"""
 
     def __init__(
@@ -74,13 +76,6 @@ class F:
             [],
         )
 
-    def idx(self) -> list[tuple]:
-        """index"""
-        if self.parent:
-            return self.index
-        else:
-            return [(i,) if not isinstance(i, tuple) else i for i in prod(self.index)._]
-
     def latex(self) -> str:
         """Equation"""
         if self.rel == '+':
@@ -126,18 +121,6 @@ class F:
 
         if self.rel == '÷':
             return self.one.sympy() / self.two.sympy()
-
-    def __len__(self):
-        return len(self.idx())
-
-    def __str__(self):
-        return rf'{self.name}'
-
-    def __repr__(self):
-        return str(self)
-
-    def __hash__(self):
-        return hash(str(self))
 
     def __neg__(self):
 
