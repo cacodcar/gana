@@ -153,6 +153,10 @@ class I(Set):
         return I(*list(product(self._, other._)))
 
     def __rmul__(self, other: Self):
+        # this to allow using product
+        if isinstance(other, int) and other == 1:
+
+            return self
         if isinstance(other, Idx):
             if self in other.parent:
                 raise ValueError(
@@ -160,6 +164,14 @@ class I(Set):
                     f'{other} also in {self}',
                 )
             return I(*list(product([other], self._)))
+
+        if isinstance(other, I):
+            if set(self._) & set(other._):
+                raise ValueError(
+                    f'{self} and {other} have common elements',
+                    f'{set(self._) & set(other._)} in both',
+                )
+        return I(*list(product(other._, self._)))
 
     def __iter__(self):
         return iter(self._)

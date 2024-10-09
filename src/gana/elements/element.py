@@ -35,3 +35,7 @@ class X:
 
     def __len__(self):
         return 1
+
+    def __init_subclass__(cls):
+        cls.__repr__ = X.__repr__
+        cls.__hash__ = X.__hash__
