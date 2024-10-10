@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-from math import prod
 from typing import Self, TYPE_CHECKING
 
 from IPython.display import Math
@@ -17,36 +16,28 @@ from pyomo.environ import (
 )
 from sympy import Idx, IndexedBase, Symbol, symbols
 
-from .constraint import C
-from .function import F
-from .index import I
-from .thing import X
+from .constraints import C
+from .functions import F
+from .ordered import Set
 
+from ..elements.variable import Var
 
 if TYPE_CHECKING:
-    from .parameter import P
+    from .parameters import P
+    from .indices import I
+    from ..elements.index import Idx
 
 
-class V:
+class V(Set):
     """Variable Set"""
 
     def __init__(
         self,
-        *index: I | X,
-        name: str = 'var',
+        *indices: tuple[Idx | I],
         itg: bool = False,
         nn: bool = True,
         bnr: bool = False,
     ):
-        self.index = list(index)
-
-        self.name = name
-        # variables generated at the indices
-        # of a variable set are stored here
-        # once realized, the values take a int or float value
-
-        self.parent: Self = None
-        self.vars: list[Self] = []
 
         # if the variable is an integer variable
         self.itg = itg
@@ -60,13 +51,28 @@ class V:
         # if the variable is non negative
         self.nn = nn
 
+        # variables generated at the indices
+        # of a variable set are stored here
+        # once realized, the values take a int or float value
         # value is determined when mathematical model is solved
-        self._: list[int | float] = []
+        self._: list[Var] = []
         # the flag _fixed is changed when .fix(val) is called
         self._fixed = False
 
-        # tags for the members of the Variable set
-        self.number: int = None
+        super().__init__(*indices)
+
+    def process(self):
+        """Process the set"""
+        self._ = [
+            Var(
+                parent=self,
+                pos=n,
+                itg=self.itg,
+                nn=self.nn,
+                bnr=self.bnr,
+            )
+            for n in range(len(self.idx()))
+        ]
 
     def fix(self, values: P | list[float]):
         """Fix the value of the variable"""
@@ -79,16 +85,9 @@ class V:
             self._ = values._
             self._fixed = True
 
-    def idx(self) -> list[tuple]:
-        """index"""
-        if self.parent:
-            return self.index
-        else:
-            return [(i,) if not isinstance(i, tuple) else i for i in prod(self.index)._]
-
     def latex(self) -> str:
         """LaTeX representation"""
-        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.index) + r'}'
+        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.order) + r'}'
 
     def pprint(self) -> Math:
         """Display the variables"""
@@ -97,12 +96,12 @@ class V:
     def sympy(self) -> IndexedBase | Symbol:
         """symbolic representation"""
         return IndexedBase(str(self))[
-            symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
+            symbols(",".join([f'{d}' for d in self.order]), cls=Idx)
         ]
 
     def pyomo(self) -> Var:
         """Pyomo representation"""
-        idx = [i.pyomo() for i in self.index]
+        idx = [i.pyomo() for i in self.order]
 
         if self.bnr:
             return Var(*idx, domain=Binary, doc=str(self))
@@ -119,6 +118,9 @@ class V:
             else:
                 return Var(*idx, domain=Reals, doc=str(self))
 
+    def matrix(self):
+        """Matrix Representation"""
+
     def mps(self) -> str:
         """MPS representation"""
         return str(self).upper()
@@ -127,26 +129,20 @@ class V:
         """LP representation"""
         return str(self)
 
-    def __len__(self):
-        return len(self.idx())
-
-    def __str__(self):
-        return rf'{self.name}'
-
-    def __repr__(self):
-        return str(self)
-
-    def __hash__(self):
-        return hash(str(self))
-
     def __neg__(self):
-        return F(rel='-', two=self)
+        f = F(rel='-', two=self)
+        f.process()
+        return f
 
     def __pos__(self):
-        return F(rel='+', two=self)
+        f = F(rel='+', two=self)
+        f.process()
+        return f
 
     def __add__(self, other: Self | F):
-        return F(one=self, rel='+', two=other)
+        f = F(one=self, rel='+', two=other)
+        f.process()
+        return f
 
     def __radd__(self, other: Self | F):
         if other == 0:
@@ -154,7 +150,9 @@ class V:
         return self + other
 
     def __sub__(self, other: Self | F):
-        return F(one=self, two=other, rel='-')
+        f = F(one=self, two=other, rel='-')
+        f.process()
+        return f
 
     def __rsub__(self, other: Self | F | int):
         if other == 0:
@@ -163,7 +161,9 @@ class V:
             return -self + other
 
     def __mul__(self, other: Self | F):
-        return F(one=self, two=other, rel='×')
+        f = F(one=self, two=other, rel='×')
+        f.process()
+        return f
 
     def __rmul__(self, other: Self | F | int):
         if other == 1:
@@ -172,7 +172,9 @@ class V:
             return self * other
 
     def __truediv__(self, other: Self | F):
-        return F(one=self, two=other, rel='÷')
+        f = F(one=self, two=other, rel='÷')
+        f.process()
+        return f
 
     def __rtruediv__(self, other: Self | F | int):
         if other == 1:
@@ -181,13 +183,13 @@ class V:
             return self / other
 
     def __eq__(self, other):
-        return C(lhs=+self, rhs=other, rel='eq')
+        return C(funcs=self - other)
 
     def __le__(self, other):
-        return C(lhs=+self, rhs=other, rel='le')
+        return C(funcs=self - other, leq=True)
 
     def __ge__(self, other):
-        return C(lhs=+self, rhs=other, rel='ge')
+        return C(funcs=other - self, leq=True)
 
     def __lt__(self, other):
         return self <= other
@@ -196,12 +198,14 @@ class V:
         return self >= other
 
     def __iter__(self):
-        for i in self.vars:
+        for i in self._:
             yield i
 
-    def __call__(self, *key: tuple[X] | X) -> Self:
-        return self.vars[self.idx().index(key)]
+    def __call__(self, *key: tuple[Idx] | Idx) -> Self:
+        if len(key) == 1:
+            return self._[self.idx().index(key[0])]
+        return self._[self.idx().index(key)]
 
-    def __getitem__(self, *key: tuple[X]):
+    def __getitem__(self, *key: tuple[Idx]):
         if self._fixed:
-            return self._[self.idx().index(key)]
+            return self(key)

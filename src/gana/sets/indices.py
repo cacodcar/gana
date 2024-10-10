@@ -6,15 +6,16 @@ from typing import Any, Self, TYPE_CHECKING
 from itertools import product
 
 from IPython.display import Math, display
-from pyomo.environ import Set
+from pyomo.environ import Set as PyoSet
 from sympy import FiniteSet
-from .thing import X
+from ..elements.index import Idx
+from .ordered import Set
 
 if TYPE_CHECKING:
     from ..block.program import Prg
 
 
-class I:
+class I(Set):
     """An Index Set is a dimensio
 
     Attributes:
@@ -41,15 +42,32 @@ class I:
 
     """
 
-    def __init__(self, *_: str):
+    def __init__(self, *indices: str):
         # if the single element is an integer
         # leave it so, it will be handled in the Program
         # has only unique members
-        self._: list = list(_)
-        # number, name will be updated in Program
-        self.name: str = None
-        self.number: int = None
-        self.ordered: bool = False
+        self.indices = indices
+        self.ordered: bool = None
+        super().__init__(*indices)
+
+    def process(self):
+        """Process the set"""
+        if all([isinstance(x, str) for x in self.indices]):
+            self._ = [
+                Idx(name=x, parent=self, pos=n)
+                for n, x in enumerate(list(self.indices))
+            ]
+
+        elif all([isinstance(x, int) for x in self.indices]):
+            self._ = [
+                Idx(name=rf'{self.name}_{n}', parent=self, pos=n)
+                for n in range(sum(self.indices))
+            ]
+        else:
+            self._ = list(self.indices)
+
+    def matrix(self):
+        """Matrix Representation"""
 
     def latex(self, descriptive: bool = False) -> str:
         """LaTeX representation"""
@@ -78,7 +96,7 @@ class I:
 
     def pyomo(self) -> Set:
         """Pyomo representation"""
-        return Set(initialize=self._, doc=str(self))
+        return PyoSet(initialize=self._, doc=str(self))
 
     def mps(self, pos: int) -> str:
         """MPS representation
@@ -94,18 +112,6 @@ class I:
         """
         return rf'_{self[pos]}'
 
-    def __str__(self):
-        return rf'{self.name}'
-
-    def __repr__(self):
-        return str(self)
-
-    def __hash__(self):
-        return hash(str(self))
-
-    def __len__(self):
-        return len(self._)
-
     def __getitem__(self, key: int | str):
         return self._[key]
 
@@ -113,7 +119,9 @@ class I:
         return True if other in self._ else False
 
     def __eq__(self, other: Self):
-        return set(self._) == set(other._)
+        if hasattr(other, '_'):
+            return set(self._) == set(other._)
+        return False
 
     def __and__(self, other: Self):
         return I(*list(set(self._) & set(other._)))
@@ -131,13 +139,15 @@ class I:
         # this to allow using product
         if isinstance(other, int) and other == 1:
             return self
-        if isinstance(other, X):
-            if self in other.parents:
+
+        if isinstance(other, Idx):
+            if self in other.parent:
                 raise ValueError(
                     f'{other} can only belong at one index of element.',
                     f'{other} also in {self}',
                 )
-            return I(*list(product(self._, [other])))
+
+            idxset = I(*list(product(self._, [other])))
 
         if isinstance(other, I):
             if set(self._) & set(other._):
@@ -145,17 +155,30 @@ class I:
                     f'{self} and {other} have common elements',
                     f'{set(self._) & set(other._)} in both',
                 )
-        return I(*list(product(self._, other._)))
+        idxset = I(*list(product(self._, other._)))
+        idxset.process()
+        return idxset
 
     def __rmul__(self, other: Self):
-        if isinstance(other, X):
-            if self in other.parents:
+        # this to allow using product
+        if isinstance(other, int) and other == 1:
+
+            return self
+        if isinstance(other, Idx):
+            if self in other.parent:
                 raise ValueError(
                     f'{other} can only belong at one index of element.',
                     f'{other} also in {self}',
                 )
             return I(*list(product([other], self._)))
-        return self * other
+
+        if isinstance(other, I):
+            if set(self._) & set(other._):
+                raise ValueError(
+                    f'{self} and {other} have common elements',
+                    f'{set(self._) & set(other._)} in both',
+                )
+        return I(*list(product(other._, self._)))
 
     def __iter__(self):
         return iter(self._)

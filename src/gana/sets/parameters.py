@@ -1,63 +1,59 @@
 """A Paramter
 """
 
+from __future__ import annotations
+
 from math import prod
-from typing import Self
+from typing import Self, TYPE_CHECKING
 
 from IPython.display import Math
 from sympy import Idx, IndexedBase, Symbol, symbols
 
-from .constraint import C
-from .function import F
-from .index import I
-from .variable import V
+from .constraints import C
+from .functions import F
+from .variables import V
 from ..value.bigm import M
-from .thing import X
+
+from .ordered import Set
+
+if TYPE_CHECKING:
+    from .indices import I
+    from ..elements.index import Idx
 
 
-class P:
+class P(Set):
     """A Parameter"""
 
-    def __init__(self, *index: I, _: list[int | float | bool], name: str = 'Param'):
+    def __init__(
+        self, *indices: Idx | I, _: list[int | float | bool], name: str = 'Param'
+    ):
 
-        self._: list[Self] = _
+        super().__init__(*indices)
 
-        self.index = index
-        # This works well for variables generated at the indices
-        # of a variable set
+        self._: list[float | M] = _
 
-        self.name = name
-
-        # if a parameter is declared as a child (at an constituent index)
-        # the mum is the parent parameter
-        self.parent = None
-        self.pars: list[Self] = []
-
-        # keeps a count of, updated in program
-        self.number: int = None
+    def process(self):
+        # Make big Ms in list
 
         if len(self) != len(self._):
             raise ValueError(
                 f'Length of values ({len(self._)}) must be equal to the size of the index set ({len(self)})'
             )
 
-        # Make big Ms in list
-        for i, v in enumerate(self._):
-            if isinstance(v, bool) and v is True:
-                self._[i] = M()
+        for n, p in enumerate(self._):
+            if isinstance(p, bool) and p is True:
+                self._[n] = M()
+            # convert any into float
+            self._[n] = float(p)
 
-    def idx(self) -> list[tuple]:
-        """index"""
-        if self.parent:
-            return self.index
-        else:
-            return [(i,) if not isinstance(i, tuple) else i for i in prod(self.index)._]
+        self.name = self.name.capitalize()
 
     def latex(self) -> str:
         """LaTeX representation"""
-        if self.parent:
-            return self._[0]
-        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.index) + r'}'
+        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.order) + r'}'
+
+    def matrix(self):
+        """Matrix Representation"""
 
     def pprint(self) -> Math:
         """Display the variables"""
@@ -67,29 +63,11 @@ class P:
         """symbolic representation"""
 
         return IndexedBase(str(self))[
-            symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
+            symbols(",".join([f'{d}' for d in self.order]), cls=Idx)
         ]
 
-    def __str__(self):
-        # δ is a special case, where all values are zero
-        # or some tolerance
-        # these are used in the rhs of constraints
-        if self.name == 'δ':
-            return rf'{self.name}'
-        else:
-            return rf'{self.name}'.capitalize()
-
-    def __repr__(self):
-        return str(self)
-
-    def __hash__(self):
-        return hash(str(self))
-
-    def __len__(self):
-        return prod([len(i) if isinstance(i, I) else 1 for i in self.index])
-
     def __neg__(self):
-        return P(*self.index, _=[-i for i in self._])
+        return P(*self.order, _=[-i for i in self._])
         # if isinstance(self._, list):
         #     return P(*self.index, _=[-i for i in self._])
         # else:
@@ -99,7 +77,7 @@ class P:
         return self
 
     def __abs__(self):
-        return P(*self.index, _=[abs(i) for i in self._])
+        return P(*self.order, _=[abs(i) for i in self._])
 
     # --- Handling basic operations----
     # if there is a zero on the left, just return P
@@ -117,21 +95,23 @@ class P:
             return self
 
         if isinstance(other, P):
-            print([i + j for i, j in zip(self._, other._)])
-            self._ = [i._[0] + j._[0] for i, j in zip(self._, other._)]
-
-        return F(one=self, rel='+', two=other)
+            self._ = [i + j for i, j in zip(self._, other._)]
+        f = F(one=self, rel='+', two=other)
+        f.process()
+        return f
 
     def __radd__(self, other: Self):
         return self + other
 
     def __sub__(self, other: Self):
-        if other == 0:
+        if isinstance(other, int) and other == 0:
             return self
         if isinstance(other, P):
             self._ = [i - j for i, j in zip(self._, other._)]
             return self
-        return F(one=self, rel='-', two=other)
+        f = F(one=self, rel='-', two=other)
+        f.process()
+        return f
 
     def __rsub__(self, other: Self):
         return self - other
@@ -140,52 +120,58 @@ class P:
         if isinstance(other, P):
             self._ = [i * j for i, j in zip(self._, other._)]
             return self
-        return F(one=self, rel='×', two=other)
+        f = F(one=self, rel='×', two=other)
+        f.process()
+        return f
 
     def __rmul__(self, other: Self):
-        if other == 1:
+        if isinstance(other, int) and other == 1:
             return self
         return self * other
 
     def __truediv__(self, other: Self):
         if isinstance(other, P):
-            return P(*self.index, _=[i / j for i, j in zip(self._, other._)])
+            return P(*self.order, _=[i / j for i, j in zip(self._, other._)])
         if isinstance(other, F):
-            return F(one=self, two=other, rel='÷')
+            f = F(one=self, two=other, rel='÷')
+            f.process()
+            return f
         if isinstance(other, V):
-            return F(one=self, rel='÷', two=other)
+            f = F(one=self, rel='÷', two=other)
+            f.process()
+            return f
 
     def __rtruediv__(self, other: Self):
         return other * self
 
     def __floordiv__(self, other: Self):
 
-        return P(*self.index, _=[i // j for i, j in zip(self._, other._)])
+        return P(*self.order, _=[i // j for i, j in zip(self._, other._)])
 
     def __mod__(self, other: Self):
 
-        return P(*self.index, _=[i % j for i, j in zip(self._, other._)])
+        return P(*self.order, _=[i % j for i, j in zip(self._, other._)])
 
     def __pow__(self, other: Self):
 
-        return P(*self.index, _=[i**j for i, j in zip(self._, other._)])
+        return P(*self.order, _=[i**j for i, j in zip(self._, other._)])
 
     def __eq__(self, other: Self):
 
         if isinstance(other, P):
             return all([i == j for i, j in zip(self._, other._)])
-        return C(lhs=self, rhs=other, rel='eq')
+        return C(funcs=self - other)
 
     def __le__(self, other: Self):
 
         if isinstance(other, P):
             return all([i <= j for i, j in zip(self._, other._)])
-        return C(lhs=self, rhs=other, rel='le')
+        return C(funcs=self - other, leq=True)
 
     def __ge__(self, other: Self):
         if isinstance(other, P):
             return all([i >= j for i, j in zip(self._, other._)])
-        return C(lhs=self, rhs=other, rel='ge')
+        return C(funcs=other - self, leq=True)
 
     def __lt__(self, other: Self):
 
@@ -207,11 +193,13 @@ class P:
         return self >= other
 
     def __iter__(self):
-        for i in self.pars:
+        for i in self._:
             yield i
 
-    def __call__(self, *key: tuple[X] | X) -> Self:
-        return self.pars[self.idx().index(key)]
-
-    def __getitem__(self, *key: tuple[X]):
+    def __call__(self, *key: tuple[Idx] | Idx) -> Self:
+        if len(key) == 1:
+            return self._[self.idx().index(key[0])]
         return self._[self.idx().index(key)]
+
+    def __getitem__(self, *key: tuple[Idx]):
+        return self(*key)

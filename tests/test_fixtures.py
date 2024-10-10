@@ -1,8 +1,8 @@
 import pytest
 
-from src.gana.sets.index import I
-from src.gana.sets.parameter import P
-from src.gana.sets.variable import V
+from gana.sets.indices import I
+from gana.sets.parameters import P
+from gana.sets.variables import V
 from src.gana.block.program import Prg
 from pyomo.environ import ConcreteModel, Set
 
