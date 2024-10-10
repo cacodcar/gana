@@ -25,9 +25,20 @@ class Func(X):
         rel: str = None,
         two: float | Var | Self = None,
     ):
-        self.one = one
-        self.rel = rel
-        self.two = two
+        if not rel == '÷' and isinstance(two, (int, float)):
+            # always put the parameter at one
+            if rel == '-':
+                self.one = 0 - two
+                self.two = one
+                self.rel = '+'
+            else:  # * and +
+                self.one = two
+                self.rel = rel
+                self.two = one
+        else:
+            self.one = one
+            self.rel = rel
+            self.two = two
 
         super().__init__(parent=parent, pos=pos)
 

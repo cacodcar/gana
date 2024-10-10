@@ -97,7 +97,7 @@ class I(Set):
 
     def pyomo(self) -> Set:
         """Pyomo representation"""
-        return PyoSet(initialize=self._, doc=str(self))
+        return PyoSet(initialize=[i.name for i in self._], doc=str(self))
 
     def mps(self, pos: int) -> str:
         """MPS representation

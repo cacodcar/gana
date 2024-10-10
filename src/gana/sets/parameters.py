@@ -8,12 +8,14 @@ from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math
 from sympy import Idx, IndexedBase, Symbol, symbols
+from pyomo.environ import Param as PyoParam
 
 from ..value.bigm import M
 from .constraints import C
 from .functions import F
 from .ordered import Set
 from .variables import V
+
 
 if TYPE_CHECKING:
     from ..elements.index import Idx
@@ -23,9 +25,7 @@ if TYPE_CHECKING:
 class P(Set):
     """A Parameter"""
 
-    def __init__(
-        self, *indices: Idx | I, _: list[int | float | bool], name: str = 'Param'
-    ):
+    def __init__(self, *indices: Idx | I, _: list[int | float | bool]):
 
         super().__init__(*indices)
 
@@ -65,12 +65,14 @@ class P(Set):
             symbols(",".join([f'{d}' for d in self.order]), cls=Idx)
         ]
 
+    def pyomo(self) -> PyoParam:
+        """Pyomo representation"""
+        # idx = [i.pyomo() for i in self.order]
+        # return PyoParam(*idx, initialize=self._, doc=str(self))
+        return self._
+
     def __neg__(self):
         return P(*self.order, _=[-i for i in self._])
-        # if isinstance(self._, list):
-        #     return P(*self.index, _=[-i for i in self._])
-        # else:
-        #     return P(*self.index, _=-self._)
 
     def __pos__(self):
         return self
@@ -95,6 +97,8 @@ class P(Set):
 
         if isinstance(other, P):
             self._ = [i + j for i, j in zip(self._, other._)]
+            return self
+
         f = F(one=self, rel='+', two=other)
         f.process()
         return f

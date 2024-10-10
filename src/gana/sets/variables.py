@@ -6,8 +6,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math
-from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
-                           NonNegativeReals, Reals, Var)
+from pyomo.environ import Binary, Integers, NonNegativeIntegers, NonNegativeReals, Reals
+from pyomo.environ import Var as PyoVar
 from sympy import Idx, IndexedBase, Symbol, symbols
 
 from ..elements.variable import Var
@@ -95,21 +95,20 @@ class V(Set):
     def pyomo(self) -> Var:
         """Pyomo representation"""
         idx = [i.pyomo() for i in self.order]
-
         if self.bnr:
-            return Var(*idx, domain=Binary, doc=str(self))
+            return PyoVar(*idx, domain=Binary, doc=str(self))
 
         elif self.itg:
             if self.nn:
-                return Var(*idx, domain=NonNegativeIntegers, doc=str(self))
+                return PyoVar(*idx, domain=NonNegativeIntegers, doc=str(self))
             else:
-                return Var(*idx, domain=Integers, doc=str(self))
+                return PyoVar(*idx, domain=Integers, doc=str(self))
 
         else:
             if self.nn:
-                return Var(*idx, domain=NonNegativeReals, doc=str(self))
+                return PyoVar(*idx, domain=NonNegativeReals, doc=str(self))
             else:
-                return Var(*idx, domain=Reals, doc=str(self))
+                return PyoVar(*idx, domain=Reals, doc=str(self))
 
     def matrix(self):
         """Matrix Representation"""

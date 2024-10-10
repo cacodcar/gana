@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal, Self
 
 from IPython.display import Math, display
-from pyomo.environ import Constraint
+from pyomo.environ import Constraint as PyoCons
 from sympy import Rel
 
 from ..elements.constraint import Cons
@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from .functions import F
     from .parameters import P
     from .variables import V
+    from pyomo.environ import ConcreteModel as PyoModel
 
 
 class C(Set):
@@ -80,6 +81,22 @@ class C(Set):
         """sympy representation"""
 
     #     return Rel(self.funcs.one, self.rhs.sympy(), self.rel)
+
+    def pyomo(self, m: PyoModel) -> PyoCons:
+
+        idx = [i.pyomo() for i in self.order]
+
+        if self.leq:
+
+            def rule(m, *idx):
+                return self.funcs.pyomo() <= 0
+
+        else:
+
+            def rule(m, *idx):
+                return self.funcs.pyomo() == 0
+
+        return PyoCons(m, *idx, rule=rule, doc=str(self))
 
     def __call__(self, *key: tuple[Idx] | Idx) -> Cons:
         if len(key) == 1:
