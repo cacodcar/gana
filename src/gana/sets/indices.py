@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any, Self, TYPE_CHECKING
 from itertools import product
+from typing import TYPE_CHECKING, Any, Self
 
 from IPython.display import Math, display
 from pyomo.environ import Set as PyoSet
 from sympy import FiniteSet
+
 from ..elements.index import Idx
 from .ordered import Set
 

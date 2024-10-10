@@ -4,21 +4,20 @@
 from __future__ import annotations
 
 from math import prod
-from typing import Self, TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math
 from sympy import Idx, IndexedBase, Symbol, symbols
 
+from ..value.bigm import M
 from .constraints import C
 from .functions import F
-from .variables import V
-from ..value.bigm import M
-
 from .ordered import Set
+from .variables import V
 
 if TYPE_CHECKING:
-    from .indices import I
     from ..elements.index import Idx
+    from .indices import I
 
 
 class P(Set):

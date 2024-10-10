@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
+
 from IPython.display import Math, display
 
 from .element import X
 
 if TYPE_CHECKING:
-    from .variable import Var
-    from .function import Func
     from ..sets.constraints import C
+    from .function import Func
+    from .variable import Var
 
 
 class Cons(X):

@@ -7,18 +7,17 @@ from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math
 
+from ..elements.function import Func
 from .constraints import C
 from .ordered import Set
-from ..elements.function import Func
-
 
 if TYPE_CHECKING:
     from sympy import Add
 
-    from .parameters import P
-    from .variables import V
     from ..elements.index import Idx
     from .indices import I
+    from .parameters import P
+    from .variables import V
 
 
 class F(Set):

@@ -8,22 +8,23 @@ from warnings import warn
 
 from IPython.display import display
 
-# from ..sets.parameter import P
-from ..sets.indices import I
-
-# from ..sets.theta import T
-from ..sets.variables import V
-from ..sets.functions import F
-from ..sets.constraints import C
+from ..elements.constraint import Cons
+from ..elements.function import Func
 
 # from ..sets.objective import O
 from ..elements.index import Idx
 from ..elements.variable import Var
-from ..elements.function import Func
-from ..elements.constraint import Cons
+from ..sets.constraints import C
+from ..sets.functions import F
+
+# from ..sets.parameter import P
+from ..sets.indices import I
 
 # from ..value.zero import Z
 from ..sets.ordered import Set
+
+# from ..sets.theta import T
+from ..sets.variables import V
 
 
 @dataclass
@@ -141,6 +142,8 @@ class Prg:
         if isinstance(value, Cons):
             self.constraints.append(value)
             value.n = len(self.constraints)
+            if not value.name:
+                value.name = name
 
         #         # if only a single integer is passed
         #         # create an orderd set of that length

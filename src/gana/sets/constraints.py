@@ -3,22 +3,22 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self, Literal
+from typing import TYPE_CHECKING, Literal, Self
 
 from IPython.display import Math, display
 from pyomo.environ import Constraint
 from sympy import Rel
 
-from .ordered import Set
 from ..elements.constraint import Cons
+from .ordered import Set
 
 if TYPE_CHECKING:
     from sympy import Eq, GreaterThan, LessThan
 
+    from ..elements.index import Idx
+    from .functions import F
     from .parameters import P
     from .variables import V
-    from .functions import F
-    from ..elements.index import Idx
 
 
 class C(Set):

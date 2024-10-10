@@ -4,6 +4,7 @@ Forms the base for all element sets
 
 from abc import ABC, abstractmethod
 from math import prod
+
 from IPython.display import Math
 
 

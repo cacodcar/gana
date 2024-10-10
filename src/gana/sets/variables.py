@@ -3,29 +3,22 @@
 
 from __future__ import annotations
 
-from typing import Self, TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math
-from pyomo.environ import (
-    Binary,
-    Integers,
-    NonNegativeIntegers,
-    NonNegativeReals,
-    Reals,
-    Var,
-)
+from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
+                           NonNegativeReals, Reals, Var)
 from sympy import Idx, IndexedBase, Symbol, symbols
 
+from ..elements.variable import Var
 from .constraints import C
 from .functions import F
 from .ordered import Set
 
-from ..elements.variable import Var
-
 if TYPE_CHECKING:
-    from .parameters import P
-    from .indices import I
     from ..elements.index import Idx
+    from .indices import I
+    from .parameters import P
 
 
 class V(Set):

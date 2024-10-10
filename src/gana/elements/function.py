@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Self, TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
+
 from IPython.display import Math, display
 
-from .element import X
 from .constraint import Cons
-
+from .element import X
 
 if TYPE_CHECKING:
-    from .variable import Var
     from ..sets.functions import F
+    from .variable import Var
 
 
 class Func(X):
@@ -20,7 +20,6 @@ class Func(X):
     def __init__(
         self,
         parent: F | Cons | Var = None,
-        name: str = None,
         pos: int = None,
         one: float | Var | Self = None,
         rel: str = None,
@@ -32,38 +31,37 @@ class Func(X):
 
         super().__init__(parent=parent, pos=pos)
 
-        if not name:
+        if not self.name:
+
             if self.one:
-                name = f'{self.one} {self.rel} {self.two}'
+                self.name = f'{self.one} {self.rel} {self.two}'
             else:
-                name = f'{self.rel} {self.two}'
+                self.name = f'{self.rel} {self.two}'
 
     def latex(self) -> str:
         """Equation"""
         if self.one:
-            if isinstance(self.one, float):
+            if isinstance(self.one, (int, float)):
                 one = self.one
             else:
                 one = self.one.latex()
-
-        if isinstance(self.two, float):
-            two = self.two
-
         else:
-            two = self.two.latex()
+            one = ''
+
+        if self.two:
+            if isinstance(self.two, (int, float)):
+                two = self.two
+
+            else:
+                two = self.two.latex()
+        else:
+            two = ''
 
         if self.rel == '+':
-            if self.one:
-                return rf'{one} + {two}'
-            else:
-                return rf'{two}'
+            return rf'{one} + {two}'
 
         if self.rel == '-':
-            if self.one:
-                return rf'{one} - {two}'
-            # this is used to generate negatives
-            else:
-                return rf'-{two}'
+            return rf'{one} - {two}'
 
         if self.rel == '×':
             return rf'{one} \cdot {two}'

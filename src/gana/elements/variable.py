@@ -71,13 +71,13 @@ class Var(X):
             return -self + other
 
     def __mul__(self, other: Self | Func):
-        return 
+        return Func(one=self, two=other, rel='×')
 
     def __rmul__(self, other: Self | Func | int):
         if other == 1:
             return self
         else:
-            return self * other
+            return Func(one=other, two=self, rel='×')
 
     def __truediv__(self, other: Self | Func):
         return Func(one=self, two=other, rel='÷')
@@ -87,7 +87,7 @@ class Var(X):
         if other == 1:
             return self
         else:
-            return self / other
+            return Func(one=other, two=self, rel='÷')
 
     def __eq__(self, other):
         return Cons(func=self - other)
