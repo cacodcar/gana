@@ -71,7 +71,7 @@ class Var(X):
             return -self + other
 
     def __mul__(self, other: Self | Func):
-        return Func(one=self, two=other, rel='×')
+        return 
 
     def __rmul__(self, other: Self | Func | int):
         if other == 1:

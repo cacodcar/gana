@@ -95,10 +95,7 @@ class Func(X):
         return self
 
     def __add__(self, other: float | Var | Self):
-        self.one = self
-        self.rel = '+'
-        self.two = other
-        return self
+        return Func(one=self, rel='+', two=other)
 
     def __radd__(self, other: float | Var | Self):
         if other == 0:
@@ -107,10 +104,7 @@ class Func(X):
             return self + other
 
     def __sub__(self, other: float | Var | Self):
-        self.one = self
-        self.rel = '-'
-        self.two = other
-        return self
+        return Func(one=self, rel='-', two=other)
 
     def __rsub__(self, other: float | Var | Self):
         if other == 0:
@@ -119,16 +113,10 @@ class Func(X):
             return -self + other
 
     def __mul__(self, other: float | Var | Self):
-        self.one = self
-        self.rel = '×'
-        self.two = other
-        return self
+        return Func(one=self, two=other, rel='×')
 
     def __truediv__(self, other: float | Var | Self):
-        self.one = self
-        self.rel = '÷'
-        self.two = other
-        return self
+        return Func(one=self, two=other, rel='÷')
 
     def __eq__(self, other: float | Var | Self):
         return Cons(func=self - other)

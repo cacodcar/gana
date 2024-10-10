@@ -31,14 +31,13 @@ class F(Set):
         two: P | V | Self = None,
     ):
         # TODO handle 0
-        self.one: P | V | Self = one
-        if isinstance(two, (int, float)):
-            self.one = one - two
-        self.two = 0
+        self.one = one
+        self.two = two
         self.rel = rel
 
         if self.one:
             order = self.one.order
+
         elif self.two:
             order = self.two.order
 
@@ -63,27 +62,26 @@ class F(Set):
             raise ValueError(
                 'Cannot operate with variable sets with different cardinalities'
             )
-        if self.one:
-            self._ = [
-                Func(
-                    parent=self,
-                    pos=n,
-                    one=self.one(idx),
-                    rel=self.rel,
-                    two=self.two(idx),
-                )
-                for n, idx in enumerate(self.idx())
-            ]
-        else:
-            self._ = [
-                Func(
-                    parent=self,
-                    pos=n,
-                    rel=self.rel,
-                    two=self.two(idx),
-                )
-                for n, idx in enumerate(self.idx())
-            ]
+
+        for n, idx in enumerate(self.idx()):
+            if self.one:
+                if isinstance(self.one, (int, float)):
+                    one = self.one
+                else:
+                    one = self.one(idx)
+            else:
+                one = None
+
+            if self.two:
+                if isinstance(self.two, (int, float)):
+                    two = self.two
+                else:
+                    two = self.two(idx)
+
+            else:
+                two = None
+
+            self._.append(Func(parent=self, pos=n, one=one, rel=self.rel, two=two))
 
     def matrix(self):
         """Variables in the function"""
@@ -124,24 +122,24 @@ class F(Set):
 
     def sympy(self) -> Add:
         """Equation"""
-        if self.rel == '+':
-            if self.one:
-                return self.one.sympy() + self.two.sympy()
-            else:
-                return self.two.sympy()
+        # if self.rel == '+':
+        #     if self.one:
+        #         return self.one.sympy() + self.two.sympy()
+        #     else:
+        #         return self.two.sympy()
 
-        if self.rel == '-':
-            if self.one:
-                return self.one.sympy() - self.two.sympy()
-            # this is used to generate negatives
-            else:
-                return -self.two.sympy()
+        # if self.rel == '-':
+        #     if self.one:
+        #         return self.one.sympy() - self.two.sympy()
+        #     # this is used to generate negatives
+        #     else:
+        #         return -self.two.sympy()
 
-        if self.rel == '×':
-            return self.one.sympy() * self.two.sympy()
+        # if self.rel == '×':
+        #     return self.one.sympy() * self.two.sympy()
 
-        if self.rel == '÷':
-            return self.one.sympy() / self.two.sympy()
+        # if self.rel == '÷':
+        #     return self.one.sympy() / self.two.sympy()
 
     def __neg__(self):
 
