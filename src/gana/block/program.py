@@ -81,8 +81,12 @@ class Prg:
 
             for n, idx in enumerate(value._):
                 if idx.name in self.names_idx:
+                    # if index already declared as part of another index set
+                    # update her parent
+
                     idx = self.indices[self.indices.index(idx)]
                     idx.parent.append(value)
+                    idx.pos.append(n)
                     value._[n] = idx
                 else:
                     setattr(self, idx.name, idx)
@@ -302,7 +306,7 @@ class Prg:
         """Return Matrix Representation"""
 
     @property
-    def index(self):
+    def order(self):
         """Set of all indices"""
         return I(product(*[s._ if isinstance(s, I) else [s] for s in self.indices]))
 

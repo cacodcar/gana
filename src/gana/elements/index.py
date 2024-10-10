@@ -13,10 +13,15 @@ if TYPE_CHECKING:
 class Idx(X):
     """An index"""
 
-    def __init__(self, parent: list[I], name: str = None, n: int = None):
+    def __init__(self, parent: list[I], name: str = None, pos: int = None):
         self._ = [self]
 
-        super().__init__(parent=parent, name=name, n=n)
+        super().__init__(parent, pos)
+        self.name = name
+        # an index can belong to multiple index sets
+        if not isinstance(self.parent, list):
+            self.parent = [self.parent]
+            self.pos = [self.pos]
 
     def __eq__(self, other: Self):
         if isinstance(other, Idx):

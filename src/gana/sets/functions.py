@@ -58,9 +58,8 @@ class F(Set):
         if self.one:
             self._ = [
                 Func(
-                    name=f'{self.name}_{n}',
                     parent=self,
-                    n=n,
+                    pos=n,
                     one=self.one(idx),
                     rel=self.rel,
                     two=self.two(idx),
@@ -70,9 +69,8 @@ class F(Set):
         else:
             self._ = [
                 Func(
-                    name=f'{self.name}_{n}',
                     parent=self,
-                    n=n,
+                    pos=n,
                     rel=self.rel,
                     two=self.two(idx),
                 )
@@ -114,7 +112,7 @@ class F(Set):
 
     def pprint(self) -> Math:
         """Display the function"""
-        return Math(self.latex())
+        Math(self.latex())
 
     def sympy(self) -> Add:
         """Equation"""

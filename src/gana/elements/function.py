@@ -21,7 +21,7 @@ class Func(X):
         self,
         parent: list[F] = None,
         name: str = None,
-        n: int = None,
+        pos: int = None,
         one: float | Var | Self = None,
         rel: str = None,
         two: float | Var | Self = None,
@@ -30,13 +30,13 @@ class Func(X):
         self.rel = rel
         self.two = two
 
+        super().__init__(parent, pos)
+
         if not name:
             if self.one:
-                name = f'{self.one} {self.rel} {self.two}'
+                self.name = f'{self.one} {self.rel} {self.two}'
             else:
-                name = f'{self.rel} {self.two}'
-
-        super().__init__(parent=parent, name=name, n=n)
+                self.name = f'{self.rel} {self.two}'
 
     def latex(self) -> str:
         """Equation"""

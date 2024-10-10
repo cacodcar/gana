@@ -65,9 +65,8 @@ class V(Set):
         """Process the set"""
         self._ = [
             Var(
-                name=fr'{self.name}_{n}',
                 parent=self,
-                n=n,
+                pos=n,
                 itg=self.itg,
                 nn=self.nn,
                 bnr=self.bnr,

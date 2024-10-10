@@ -19,30 +19,27 @@ class Var(X):
 
     def __init__(
         self,
-        parent: list[V],
-        name: str = None,
-        n: int = None,
+        parent: V,
+        pos: int,
         itg: bool = False,
         nn: bool = True,
         bnr: bool = False,
     ):
+
         # if the variable is an integer variable
         self.itg = itg
         # if the variable is binary
         self.bnr = bnr
         # if the variable is non negative
         self.nn = nn
-
-        super().__init__(parent=parent, name=name, n=n)
+        super().__init__(parent, pos)
 
     def latex(self):
         """Latex representation"""
         return (
-            rf'{self.parent[0].name}'
+            rf'{self.parent.name}'
             + r'_{'
-            + rf'{self.parent[0].idx()[self.parent[0]._.index(self)]}'.replace(
-                '(', ''
-            ).replace(')', '')
+            + rf'{self.parent.idx()[self.pos]}'.replace('(', '').replace(')', '')
             + r'}'
         )
 

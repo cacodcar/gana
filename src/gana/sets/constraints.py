@@ -52,9 +52,8 @@ class C(Set):
         """Process the constraint"""
         self._ = [
             Cons(
-                name=f'{self.name}_{n}',
                 parent=self,
-                n=n,
+                pos=n,
                 lhs=self.lhs(idx),
                 rel=self.rel,
                 rhs=self.rhs(idx),

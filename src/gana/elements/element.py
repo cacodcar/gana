@@ -11,18 +11,19 @@ if TYPE_CHECKING:
 class X:
     """A Member of an Ordered Set"""
 
-    def __init__(self, parent: list[Set], name: str = None, n: int = None):
-        # ordered set to which the element belongs
-        if not isinstance(parent, list):
-            parent = [parent]
-
-        self.parent = parent
+    def __init__(self, parent: Set, pos: int):
 
         # name of the element
-        self.name = name
+        self.name = parent.name + rf'_{pos}'
+
+        # ordered set to which the element belongs
+        self.parent = parent
 
         # position in the ordered set
-        self.n = n
+        self.pos = pos
+
+        # position in the problem
+        self.n = None
 
     def __str__(self):
         return rf'{self.name}'

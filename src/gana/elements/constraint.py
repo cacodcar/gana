@@ -18,21 +18,17 @@ class Cons(X):
 
     def __init__(
         self,
+        pos: int,
+        parent: C,
         rhs: Func | Var | float,
         lhs: Func | Var | float,
-        parent: list[C] = None,
-        name: str = None,
-        n: int = None,
         rel: Literal['eq'] | Literal['ge'] | Literal['le'] = 'eq',
     ):
         self.lhs = lhs
         self.rhs = rhs
         self.rel = rel
 
-        if not name:
-            name = f'{self.lhs} {self.rel} {self.rhs}'
-
-        super().__init__(parent=parent, name=name, n=n)
+        super().__init__(parent, pos)
 
     def latex(self) -> str:
         """Latex representation"""

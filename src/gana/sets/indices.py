@@ -54,12 +54,13 @@ class I(Set):
         """Process the set"""
         if all([isinstance(x, str) for x in self.indices]):
             self._ = [
-                Idx(name=x, parent=self, n=n) for n, x in enumerate(list(self.indices))
+                Idx(name=x, parent=self, pos=n)
+                for n, x in enumerate(list(self.indices))
             ]
 
         elif all([isinstance(x, int) for x in self.indices]):
             self._ = [
-                Idx(name=rf'{self.name}_{n}', parent=self, n=n)
+                Idx(name=rf'{self.name}_{n}', parent=self, pos=n)
                 for n in range(sum(self.indices))
             ]
         else:
