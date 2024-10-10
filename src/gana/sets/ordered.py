@@ -46,6 +46,7 @@ class Set(ABC):
         """index"""
         if len(self.order) > 1:
             return [i for i in prod(self.order)._]
+
         return self.order[0]._
 
     def __len__(self):
@@ -63,3 +64,6 @@ class Set(ABC):
     def __init_subclass__(cls):
         cls.__repr__ = Set.__repr__
         cls.__hash__ = Set.__hash__
+
+    def __bool__(self):
+        return bool(self.name)

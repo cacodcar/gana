@@ -96,19 +96,22 @@ class P(Set):
 
         if isinstance(other, P):
             self._ = [i + j for i, j in zip(self._, other._)]
-
-        return F(one=self, rel='+', two=other)
+        f = F(one=self, rel='+', two=other)
+        f.process()
+        return f
 
     def __radd__(self, other: Self):
         return self + other
 
     def __sub__(self, other: Self):
-        if other == 0:
+        if isinstance(other, int) and other == 0:
             return self
         if isinstance(other, P):
             self._ = [i - j for i, j in zip(self._, other._)]
             return self
-        return F(one=self, rel='-', two=other)
+        f = F(one=self, rel='-', two=other)
+        f.process()
+        return f
 
     def __rsub__(self, other: Self):
         return self - other
@@ -117,10 +120,12 @@ class P(Set):
         if isinstance(other, P):
             self._ = [i * j for i, j in zip(self._, other._)]
             return self
-        return F(one=self, rel='×', two=other)
+        f = F(one=self, rel='×', two=other)
+        f.process()
+        return f
 
     def __rmul__(self, other: Self):
-        if other == 1:
+        if isinstance(other, int) and other == 1:
             return self
         return self * other
 
@@ -128,9 +133,13 @@ class P(Set):
         if isinstance(other, P):
             return P(*self.order, _=[i / j for i, j in zip(self._, other._)])
         if isinstance(other, F):
-            return F(one=self, two=other, rel='÷')
+            f = F(one=self, two=other, rel='÷')
+            f.process()
+            return f
         if isinstance(other, V):
-            return F(one=self, rel='÷', two=other)
+            f = F(one=self, rel='÷', two=other)
+            f.process()
+            return f
 
     def __rtruediv__(self, other: Self):
         return other * self
@@ -151,18 +160,18 @@ class P(Set):
 
         if isinstance(other, P):
             return all([i == j for i, j in zip(self._, other._)])
-        return C(lhs=self, rhs=other, rel='eq')
+        return C(funcs=self - other)
 
     def __le__(self, other: Self):
 
         if isinstance(other, P):
             return all([i <= j for i, j in zip(self._, other._)])
-        return C(lhs=self, rhs=other, rel='le')
+        return C(funcs=self - other, leq=True)
 
     def __ge__(self, other: Self):
         if isinstance(other, P):
             return all([i >= j for i, j in zip(self._, other._)])
-        return C(lhs=self, rhs=other, rel='ge')
+        return C(funcs=other - self, leq=True)
 
     def __lt__(self, other: Self):
 

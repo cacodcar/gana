@@ -30,8 +30,11 @@ class F(Set):
         rel: str = '+',
         two: P | V | Self = None,
     ):
+        # TODO handle 0
         self.one: P | V | Self = one
-        self.two = two
+        if isinstance(two, (int, float)):
+            self.one = one - two
+        self.two = 0
         self.rel = rel
 
         if self.one:
@@ -51,7 +54,12 @@ class F(Set):
 
     def process(self):
 
-        if self.one and len(self.one) != len(self.two):
+        if (
+            self.one
+            and not isinstance(self.one, (float, int))
+            and not isinstance(self.two, (float, int))
+            and len(self.one) != len(self.two)
+        ):
             raise ValueError(
                 'Cannot operate with variable sets with different cardinalities'
             )
@@ -144,8 +152,15 @@ class F(Set):
         return self
 
     def __add__(self, other: Self | P | V):
-        self._ = [a + b for a, b in zip(self._, other._)]
-        return self
+
+        if other == 0:
+            return self
+
+        if isinstance(other, int) and other == 0:
+            return self
+        f = F(one=self, rel='+', two=other)
+        f._ = [a + b for a, b in zip(self._, other._)]
+        return f
 
     def __radd__(self, other: Self | P | V | int):
         if other == 0:
@@ -154,8 +169,14 @@ class F(Set):
             return self + other
 
     def __sub__(self, other: Self | P | V):
-        self._ = [a - b for a, b in zip(self._, other._)]
-        return self
+        if other == 0:
+            return self
+
+        if isinstance(other, int) and other == 0:
+            return self
+        f = F(one=self, rel='-', two=other)
+        f._ = [a - b for a, b in zip(self._, other._)]
+        return f
 
     def __rsub__(self, other: Self | P | V):
         if other == 0:
@@ -164,21 +185,33 @@ class F(Set):
             return -self + other
 
     def __mul__(self, other: Self | P | V):
-        self._ = [a * b for a, b in zip(self._, other._)]
-        return self
+        if other == 1:
+            return self
+
+        if isinstance(other, int) and other == 0:
+            return self
+        f = F(one=self, rel='×', two=other)
+        f._ = [a * b for a, b in zip(self._, other._)]
+        return f
 
     def __truediv__(self, other: Self | P | V):
-        self._ = [a / b for a, b in zip(self._, other._)]
-        return self
+        if other == 1:
+            return self
+
+        if isinstance(other, int) and other == 0:
+            return self
+        f = F(one=self, rel='÷', two=other)
+        f._ = [a / b for a, b in zip(self._, other._)]
+        return f
 
     def __eq__(self, other: Self | P | V):
-        return C(lhs=self, rel='eq', rhs=other)
+        return C(funcs=self - other)
 
     def __le__(self, other: Self | P | V):
-        return C(lhs=self, rel='le', rhs=other)
+        return C(funcs=self - other, leq=True)
 
     def __ge__(self, other: Self | P | V):
-        return C(lhs=self, rel='ge', rhs=other)
+        return C(funcs=other - self, leq=True)
 
     def __lt__(self, other: Self | P | V):
         return self <= other

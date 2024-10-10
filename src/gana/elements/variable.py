@@ -32,7 +32,7 @@ class Var(X):
         self.bnr = bnr
         # if the variable is non negative
         self.nn = nn
-        super().__init__(parent, pos)
+        super().__init__(parent=parent, pos=pos)
 
     def latex(self):
         """Latex representation"""
@@ -48,7 +48,7 @@ class Var(X):
         display(Math(self.latex()))
 
     def __pos__(self):
-        return Func(rel='+', two=self)
+        return Func(one=self, rel='+')
 
     def __neg__(self):
         return Func(rel='-', two=self)
@@ -90,14 +90,14 @@ class Var(X):
             return self / other
 
     def __eq__(self, other):
-        return Cons(lhs=+self, rhs=other, rel='eq')
+        return Cons(func=self - other)
 
     def __le__(self, other):
-        return Cons(lhs=+self, rhs=other, rel='le')
+        return Cons(func=self - other, leq=True)
 
     def __ge__(self, other):
 
-        return Cons(lhs=+self, rhs=other, rel='ge')
+        return Cons(func=other - self, leq=True)
 
     def __lt__(self, other):
 

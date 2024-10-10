@@ -19,7 +19,7 @@ class Func(X):
 
     def __init__(
         self,
-        parent: list[F] = None,
+        parent: F | Cons | Var = None,
         name: str = None,
         pos: int = None,
         one: float | Var | Self = None,
@@ -30,13 +30,13 @@ class Func(X):
         self.rel = rel
         self.two = two
 
-        super().__init__(parent, pos)
+        super().__init__(parent=parent, pos=pos)
 
         if not name:
             if self.one:
-                self.name = f'{self.one} {self.rel} {self.two}'
+                name = f'{self.one} {self.rel} {self.two}'
             else:
-                self.name = f'{self.rel} {self.two}'
+                name = f'{self.rel} {self.two}'
 
     def latex(self) -> str:
         """Equation"""
@@ -131,13 +131,13 @@ class Func(X):
         return self
 
     def __eq__(self, other: float | Var | Self):
-        return Cons(lhs=self, rel='eq', rhs=other)
+        return Cons(func=self - other)
 
     def __le__(self, other: float | Var | Self):
-        return Cons(lhs=self, rel='le', rhs=other)
+        return Cons(func=self - other, leq=True)
 
     def __ge__(self, other: float | Var | Self):
-        return Cons(lhs=self, rel='ge', rhs=other)
+        return Cons(func=other - self, leq=True)
 
     def __lt__(self, other: float | Var | Self):
         return self <= other

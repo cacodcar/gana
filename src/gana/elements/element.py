@@ -11,10 +11,13 @@ if TYPE_CHECKING:
 class X:
     """A Member of an Ordered Set"""
 
-    def __init__(self, parent: Set, pos: int):
+    def __init__(self, pos: int = None, parent: Set = None):
 
         # name of the element
-        self.name = parent.name + rf'_{pos}'
+        if parent:
+            self.name = parent.name + rf'_{pos}'
+        else:
+            self.name = None
 
         # ordered set to which the element belongs
         self.parent = parent

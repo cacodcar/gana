@@ -18,43 +18,26 @@ class Cons(X):
 
     def __init__(
         self,
-        pos: int,
-        parent: C,
-        rhs: Func | Var | float,
-        lhs: Func | Var | float,
-        rel: Literal['eq'] | Literal['ge'] | Literal['le'] = 'eq',
+        func: Func | Var | float,
+        leq: bool = False,
+        pos: int = None,
+        parent: C = None,
     ):
-        self.lhs = lhs
-        self.rhs = rhs
-        self.rel = rel
+        self.func = func
+        self.leq = leq
 
-        super().__init__(parent, pos)
+        super().__init__(parent=parent, pos=pos)
 
     def latex(self) -> str:
         """Latex representation"""
 
-        if isinstance(self.rhs, float):
-            rhs = self.rhs
-
-        else:
-            rhs = self.rhs.latex()
-
-        if isinstance(self.lhs, float):
-            lhs = self.lhs
-
-        else:
-            lhs = self.lhs.latex()
-
-        if self.rel == 'eq':
-            rel = r'='
-
-        if self.rel == 'le':
+        if self.leq:
             rel = r'\leq'
 
-        if self.rel == 'ge':
-            rel = r'\geq'
+        else:
+            rel = r'='
 
-        return rf'{lhs} {rel} {rhs}'
+        return rf'{self.func.latex()} {rel} 0'
 
     def pprint(self):
         """Pretty Print"""

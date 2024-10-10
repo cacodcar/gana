@@ -131,19 +131,16 @@ class V(Set):
 
     def __neg__(self):
         f = F(rel='-', two=self)
-        f.name = f'-{self.name}'
         f.process()
         return f
 
     def __pos__(self):
         f = F(rel='+', two=self)
-        f.name = f'+{self.name}'
         f.process()
         return f
 
     def __add__(self, other: Self | F):
         f = F(one=self, rel='+', two=other)
-        f.name = f'{self.name}+{other.name}'
         f.process()
         return f
 
@@ -153,7 +150,9 @@ class V(Set):
         return self + other
 
     def __sub__(self, other: Self | F):
-        return F(one=self, two=other, rel='-')
+        f = F(one=self, two=other, rel='-')
+        f.process()
+        return f
 
     def __rsub__(self, other: Self | F | int):
         if other == 0:
@@ -162,7 +161,9 @@ class V(Set):
             return -self + other
 
     def __mul__(self, other: Self | F):
-        return F(one=self, two=other, rel='×')
+        f = F(one=self, two=other, rel='×')
+        f.process()
+        return f
 
     def __rmul__(self, other: Self | F | int):
         if other == 1:
@@ -171,7 +172,9 @@ class V(Set):
             return self * other
 
     def __truediv__(self, other: Self | F):
-        return F(one=self, two=other, rel='÷')
+        f = F(one=self, two=other, rel='÷')
+        f.process()
+        return f
 
     def __rtruediv__(self, other: Self | F | int):
         if other == 1:
@@ -180,13 +183,13 @@ class V(Set):
             return self / other
 
     def __eq__(self, other):
-        return C(lhs=+self, rhs=other, rel='eq')
+        return C(funcs=self - other)
 
     def __le__(self, other):
-        return C(lhs=+self, rhs=other, rel='le')
+        return C(funcs=self - other, leq=True)
 
     def __ge__(self, other):
-        return C(lhs=+self, rhs=other, rel='ge')
+        return C(funcs=other - self, leq=True)
 
     def __lt__(self, other):
         return self <= other

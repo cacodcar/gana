@@ -16,7 +16,7 @@ class Idx(X):
     def __init__(self, parent: list[I], name: str = None, pos: int = None):
         self._ = [self]
 
-        super().__init__(parent, pos)
+        super().__init__(parent=parent, pos=pos)
         self.name = name
         # an index can belong to multiple index sets
         if not isinstance(self.parent, list):
