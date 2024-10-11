@@ -109,9 +109,11 @@ class P(Set):
     def __sub__(self, other: Self):
         if isinstance(other, int) and other == 0:
             return self
+        
         if isinstance(other, P):
             self._ = [i - j for i, j in zip(self._, other._)]
             return self
+        
         f = F(one=self, rel='-', two=other)
         f.process()
         return f

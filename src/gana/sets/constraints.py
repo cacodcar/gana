@@ -83,7 +83,7 @@ class C(Set):
     #     return Rel(self.funcs.one, self.rhs.sympy(), self.rel)
 
     def pyomo(self, m: PyoModel) -> PyoCons:
-
+        """Pyomo representation"""
         idx = [i.pyomo() for i in self.order]
 
         if self.leq:

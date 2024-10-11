@@ -65,7 +65,7 @@ class F(Set):
         for n, idx in enumerate(self.idx()):
             if self.one:
                 if isinstance(self.one, (int, float)):
-                    one = self.one
+                    one = self.one 
                 else:
                     one = self.one(idx)
             else:
@@ -73,7 +73,7 @@ class F(Set):
 
             if self.two:
                 if isinstance(self.two, (int, float)):
-                    two = self.two
+                    two = self.two 
                 else:
                     two = self.two(idx)
 

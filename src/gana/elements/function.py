@@ -21,33 +21,28 @@ class Func(X):
         self,
         parent: F | Cons | Var = None,
         pos: int = None,
-        one: float | Var | Self = None,
+        one: float | Var | Self = 0,
         rel: str = None,
-        two: float | Var | Self = None,
+        two: float | Var | Self = 0,
     ):
-        if not rel == '÷' and isinstance(two, (int, float)):
-            # always put the parameter at one
-            if rel == '-':
-                self.one = 0 - two
-                self.two = one
-                self.rel = '+'
-            else:  # * and +
-                self.one = two
-                self.rel = rel
-                self.two = one
-        else:
-            self.one = one
-            self.rel = rel
-            self.two = two
+
+        self.one = one
+        self.rel = rel
+        self.two = two
 
         super().__init__(parent=parent, pos=pos)
 
         if not self.name:
 
             if self.one:
-                self.name = f'{self.one} {self.rel} {self.two}'
+                one = rf'{self.one}'
             else:
-                self.name = f'{self.rel} {self.two}'
+                one = ''
+            if self.two:
+                two = rf'{self.two}'
+            else:
+                two = ''
+            self.name = f'{self.one} {self.rel} {self.two}'
 
     def latex(self) -> str:
         """Equation"""
@@ -104,6 +99,33 @@ class Func(X):
         return self
 
     def __add__(self, other: float | Var | Self):
+
+        if isinstance(self.two, float):
+            if isinstance(other, (int, float)):
+                one = self.one
+                two = self.two + float(other)
+                if two < 0:
+                    rel = '-'
+                    two = -two
+                else:
+                    rel = '+'
+            else:
+                two = self.two
+                one = self.one + other
+                rel = '+'
+
+            return Func(one=one, rel=rel, two=two)
+
+        if isinstance(self.one, float):
+            if isinstance(other, (int, float)):
+                one = self.one + float(other)
+                two = self.two
+            else:
+                one = self.one
+                two = self.two + other
+
+            return Func(one=one, rel='+', two=two)
+
         return Func(one=self, rel='+', two=other)
 
     def __radd__(self, other: float | Var | Self):
@@ -113,6 +135,33 @@ class Func(X):
             return self + other
 
     def __sub__(self, other: float | Var | Self):
+
+        if isinstance(self.two, float):
+            if isinstance(other, (int, float)):
+                one = self.one
+                two = self.two - float(other)
+                if two < 0:
+                    rel = '-'
+                    two = -two
+                else:
+                    rel = '+'
+            else:
+                one = self.one - other
+                two = self.two
+                rel = '-'
+
+            return Func(one=one, rel=rel, two=two)
+
+        if isinstance(self.one, float):
+            if isinstance(other, (int, float)):
+                one = self.one - float(other)
+                two = self.two
+            else:
+                one = self.one
+                two = self.two - other
+
+            return Func(one=one, rel='-', two=two)
+
         return Func(one=self, rel='-', two=other)
 
     def __rsub__(self, other: float | Var | Self):

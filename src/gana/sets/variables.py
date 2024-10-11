@@ -150,7 +150,7 @@ class V(Set):
         if other == 0:
             return -self
         else:
-            return -self + other
+            return - self + other
 
     def __mul__(self, other: Self | F):
         f = F(one=self, two=other, rel='×')

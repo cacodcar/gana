@@ -57,18 +57,22 @@ class Var(X):
         return Func(one=self, rel='+', two=other)
 
     def __radd__(self, other: Self | Func):
-        if other == 0:
-            return self
+        if isinstance(other, (int, float)):
+            if other == 0:
+                return self
+            other = float(other)
         return self + other
 
     def __sub__(self, other: Self | Func):
-        return Func(one=self, two=other, rel='-')
+        return Func(one=self, rel='-', two=other)
 
     def __rsub__(self, other: Self | Func | int):
-        if other == 0:
-            return -self
-        else:
-            return -self + other
+
+        if isinstance(other, (int, float)):
+            if other == 0:
+                return -self
+            other = float(other)
+        return -self + other
 
     def __mul__(self, other: Self | Func):
         return Func(one=self, two=other, rel='×')
