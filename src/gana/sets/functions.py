@@ -143,9 +143,30 @@ class F(Set):
         #     return self.one.sympy() / self.two.sympy()
 
     def __neg__(self):
+        if self.one:
+            one = -self.one
+        else:
+            one = None
 
-        self._ = [-i for i in self._]
-        return self
+        if self.two:
+            two = self.two
+
+        else:
+            two = None
+
+        if self.rel == '+':
+
+            rel = '-'
+
+        elif self.rel == '-':
+
+            rel = '+'
+        else:
+            rel = self.rel
+
+        f = F(one=one, rel=rel, two=two)
+        f._ = [-i for i in self._]
+        return f
 
     def __pos__(self):
         return self
@@ -171,8 +192,6 @@ class F(Set):
         if other == 0:
             return self
 
-        if isinstance(other, int) and other == 0:
-            return self
         f = F(one=self, rel='-', two=other)
         f._ = [a - b for a, b in zip(self._, other._)]
         return f

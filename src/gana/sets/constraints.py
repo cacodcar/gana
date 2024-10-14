@@ -73,9 +73,14 @@ class C(Set):
 
         return rf'{self.funcs.latex()} {rel} 0'
 
-    def pprint(self) -> Math:
+    def pprint(self, descriptive: bool = False) -> Math:
         """Display the function"""
-        display(Math(self.latex()))
+
+        if descriptive:
+            for c in self._:
+                display(Math(c.latex()))
+        else:
+            display(Math(self.latex()))
 
     def sympy(self) -> LessThan | GreaterThan | Eq:
         """sympy representation"""
