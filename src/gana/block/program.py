@@ -237,6 +237,10 @@ class Prg:
             for c in self.conssets:  # + self.objectives:
                 c.pprint()
 
+            for c in self.constraints:
+                if not c.parent:
+                    c.pprint()
+
     def __str__(self):
         return rf'{self.name}'
 
