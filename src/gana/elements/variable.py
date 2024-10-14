@@ -54,6 +54,8 @@ class Var(X):
         return Func(rel='-', two=self)
 
     def __add__(self, other: Self | Func):
+        if other == 0:
+            return self
         return Func(one=self, rel='+', two=other)
 
     def __radd__(self, other: Self | Func):
@@ -64,6 +66,8 @@ class Var(X):
         return self + other
 
     def __sub__(self, other: Self | Func):
+        if other == 0:
+            return self
         return Func(one=self, rel='-', two=other)
 
     def __rsub__(self, other: Self | Func | int):

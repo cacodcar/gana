@@ -132,6 +132,8 @@ class V(Set):
         return f
 
     def __add__(self, other: Self | F):
+        if other == 0:
+            return self
         f = F(one=self, rel='+', two=other)
         f.process()
         return f
@@ -142,6 +144,8 @@ class V(Set):
         return self + other
 
     def __sub__(self, other: Self | F):
+        if other == 0:
+            return self
         f = F(one=self, two=other, rel='-')
         f.process()
         return f
@@ -150,7 +154,7 @@ class V(Set):
         if other == 0:
             return -self
         else:
-            return - self + other
+            return -self + other
 
     def __mul__(self, other: Self | F):
         f = F(one=self, two=other, rel='×')

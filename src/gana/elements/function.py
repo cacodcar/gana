@@ -21,9 +21,9 @@ class Func(X):
         self,
         parent: F | Cons | Var = None,
         pos: int = None,
-        one: float | Var | Self = 0,
+        one: float | Var | Self = None,
         rel: str = None,
-        two: float | Var | Self = 0,
+        two: float | Var | Self = None,
     ):
 
         self.one = one
@@ -32,17 +32,18 @@ class Func(X):
 
         super().__init__(parent=parent, pos=pos)
 
-        if not self.name:
+        # if not self.name:
 
-            if self.one:
-                one = rf'{self.one}'
-            else:
-                one = ''
-            if self.two:
-                two = rf'{self.two}'
-            else:
-                two = ''
-            self.name = f'{self.one} {self.rel} {self.two}'
+        if self.one:
+            one = rf'{self.one}'
+        else:
+            one = ''
+
+        if self.two:
+            two = rf'{self.two}'
+        else:
+            two = ''
+        self.name = f'{one} {self.rel} {two}'
 
     def latex(self) -> str:
         """Equation"""
@@ -82,20 +83,27 @@ class Func(X):
     def __neg__(self):
 
         if self.one:
-            self.one = 0 - self.one
+            one = -self.one
+        else:
+            one = None
 
         if self.two:
-            self.two = 0 - self.two
+            two = self.two
+
+        else:
+            two = None
 
         if self.rel == '+':
 
-            self.rel = '-'
+            rel = '-'
 
-        if self.rel == '-':
+        elif self.rel == '-':
 
-            self.rel = '+'
+            rel = '+'
+        else:
+            rel = self.rel
 
-        return self
+        return Func(one=one, rel=rel, two=two)
 
     def __pos__(self):
         return self

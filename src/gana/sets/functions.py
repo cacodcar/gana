@@ -39,6 +39,9 @@ class F(Set):
         elif self.two:
             order = self.two.order
 
+        else:
+            raise ValueError('one or two must be provided')
+
         super().__init__(*order)
 
         if self.one:
@@ -64,7 +67,7 @@ class F(Set):
         for n, idx in enumerate(self.idx()):
             if self.one:
                 if isinstance(self.one, (int, float)):
-                    one = self.one 
+                    one = self.one
                 else:
                     one = self.one(idx)
             else:
@@ -72,7 +75,7 @@ class F(Set):
 
             if self.two:
                 if isinstance(self.two, (int, float)):
-                    two = self.two 
+                    two = self.two
                 else:
                     two = self.two(idx)
 
