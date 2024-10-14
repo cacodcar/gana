@@ -229,8 +229,13 @@ class Prg:
         for i in self.idxsets:
             i.pprint(True)
 
-        for c in self.conssets:
-            c.pprint(descriptive)
+        if descriptive:
+            for c in self.constraints:
+                c.pprint()
+
+        else:
+            for c in self.conssets:  # + self.objectives:
+                c.pprint()
 
     def __str__(self):
         return rf'{self.name}'

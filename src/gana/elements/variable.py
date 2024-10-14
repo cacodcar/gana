@@ -54,7 +54,7 @@ class Var(X):
         return Func(rel='-', two=self)
 
     def __add__(self, other: Self | Func):
-        if other == 0:
+        if isinstance(other, int) and other == 0:
             return self
         return Func(one=self, rel='+', two=other)
 
