@@ -83,6 +83,10 @@ class Func(X):
 
         if self.one:
             self.one = 0 - self.one
+
+        if self.two:
+            self.two = 0 - self.two
+
         if self.rel == '+':
 
             self.rel = '-'
@@ -90,8 +94,6 @@ class Func(X):
         if self.rel == '-':
 
             self.rel = '+'
-
-        self.two = self.two
 
         return self
 
@@ -183,7 +185,7 @@ class Func(X):
         return Cons(func=self - other, leq=True)
 
     def __ge__(self, other: float | Var | Self):
-        return Cons(func=other - self, leq=True)
+        return Cons(func=-self + other, leq=True)
 
     def __lt__(self, other: float | Var | Self):
         return self <= other

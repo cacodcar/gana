@@ -29,7 +29,6 @@ class F(Set):
         rel: str = '+',
         two: P | V | Self = None,
     ):
-        # TODO handle 0
         self.one = one
         self.two = two
         self.rel = rel
@@ -208,7 +207,7 @@ class F(Set):
         return C(funcs=self - other, leq=True)
 
     def __ge__(self, other: Self | P | V):
-        return C(funcs=other - self, leq=True)
+        return C(funcs=-self + other, leq=True)
 
     def __lt__(self, other: Self | P | V):
         return self <= other
