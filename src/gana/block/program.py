@@ -80,8 +80,8 @@ class Prg:
             value.process()
 
         if isinstance(value, I):
-            self.idxsets.append(value)
             value.n = len(self.idxsets)
+            self.idxsets.append(value)
 
             for n, idx in enumerate(value._):
                 if idx.name in self.names_idx:
@@ -96,24 +96,24 @@ class Prg:
                     setattr(self, idx.name, idx)
 
         if isinstance(value, Idx):
-            self.indices.append(value)
             value.n = len(self.indices)
+            self.indices.append(value)
             self.names_idx.append(value.name)
 
         if isinstance(value, P):
-            self.parsets.append(value)
             value.n = len(self.parsets)
+            self.parsets.append(value)
 
         if isinstance(value, V):
-            self.varsets.append(value)
             value.n = len(self.varsets)
+            self.varsets.append(value)
 
             for n, var in enumerate(value._):
                 setattr(self, var.name, var)
 
         if isinstance(value, Var):
-            self.variables.append(value)
             value.n = len(self.variables)
+            self.variables.append(value)
 
             if value.bnr:
                 self.vars_bnr.append(value)
@@ -128,27 +128,27 @@ class Prg:
                 self.vars_cnt.append(value)
 
         if isinstance(value, F):
-            self.funcsets.append(value)
             value.n = len(self.funcsets)
+            self.funcsets.append(value)
 
-            for n, fun in enumerate(value._):
+            for fun in value._:
                 setattr(self, fun.name, fun)
 
         if isinstance(value, Func):
-            self.functions.append(value)
             value.n = len(self.functions)
+            self.functions.append(value)
 
         if isinstance(value, C):
             # value.canoncial()
-            self.conssets.append(value)
             value.n = len(self.conssets)
+            self.conssets.append(value)
 
-            for n, con in enumerate(value._):
+            for con in value._:
                 setattr(self, con.name, con)
 
         if isinstance(value, Cons):
-            self.constraints.append(value)
             value.n = len(self.constraints)
+            self.constraints.append(value)
             if not value.name:
                 value.name = name
 
@@ -173,6 +173,15 @@ class Prg:
 
     def matrix(self):
         """Return Matrix Representation"""
+        a = []
+        b = []
+        for c in self.constraints:
+            row = [0] * len(self.variables)
+            for pos, value in zip(c.func.struct, c.func.a):
+                row[pos] = value
+            a.append(row)
+            b.append(c.func.b)
+        return a, b
 
     @property
     def order(self):
