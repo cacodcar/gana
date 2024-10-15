@@ -74,9 +74,12 @@ class Func(X):
             elif isinstance(self.one, Func):
                 self.a += self.one.a
                 self.b += self.one.b
+                self.struct += self.one.struct
 
             else:
                 # assumed to be a Var
+                self.struct.append(self.one.n)
+
                 if self.rel == '+' or self.rel == '-':
                     self.a.append(1)
 
@@ -109,8 +112,11 @@ class Func(X):
 
                 self.a += self.two.a
                 self.b += self.two.b
+                self.struct += self.two.struct
 
             else:
+                self.struct.append(self.two.n)
+
                 if self.rel == '+':
 
                     self.a.append(1)
