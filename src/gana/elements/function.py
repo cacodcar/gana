@@ -36,7 +36,7 @@ class Func(X):
         super().__init__(parent=parent, pos=pos)
 
         self.a = []  # variable vector
-        self.b = 0  # parameter added or subtracted goes in the parameter vector
+        self.b = 0.0  # parameter added or subtracted goes in the parameter vector
         self.struct = []
 
         # we deal with the following forms of a function at the basic level
@@ -49,15 +49,7 @@ class Func(X):
         # VI func . par
         # VII func . func
 
-        if not self.one:
-
-            self.b = 0
-
-            if isinstance(self.two, (Func, int, float)) or self.rel == '×':
-                raise ValueError('This operation is not possible')
-
         if self.one:
-            one = rf'{self.one}'
 
             if isinstance(self.one, (int, float)):
                 self.one = float(self.one)
@@ -67,9 +59,6 @@ class Func(X):
 
                 if self.rel == '-':
                     self.b = -self.one
-
-                if self.rel == '×':
-                    self.b = 0
 
             elif isinstance(self.one, Func):
                 self.a += self.one.a
@@ -81,20 +70,18 @@ class Func(X):
                 self.struct.append(self.one.n)
 
                 if self.rel == '+' or self.rel == '-':
-                    self.a.append(1)
+                    self.a.append(1.0)
 
                 if self.rel == '×':
                     if isinstance(self.two, (int, float)):
                         self.a.append(self.two)
 
-                self.b = 0
-
         else:
-            one = ''
+            if isinstance(self.two, (Func, int, float)) or self.rel == '×':
+                raise ValueError('This operation is not possible')
 
         if self.two:
-            two = rf'{self.two}'
-
+            
             if isinstance(self.two, (int, float)):
 
                 self.two = float(self.two)
@@ -104,9 +91,6 @@ class Func(X):
 
                 if self.rel == '-':
                     self.b = self.two
-
-                if self.rel == '×':
-                    self.b = 0
 
             elif isinstance(self.two, Func):
 
@@ -119,21 +103,16 @@ class Func(X):
 
                 if self.rel == '+':
 
-                    self.a.append(1)
+                    self.a.append(1.0)
 
                 if self.rel == '-':
-                    self.a.append(-1)
+                    self.a.append(-1.0)
 
                 if self.rel == '×':
                     if isinstance(self.one, (int, float)):
                         self.a.append(self.one)
 
-                self.b = 0
-
-        else:
-            two = ''
-
-        self.name = one + self.rel + two
+        self.name = f'{self.one or ""} {self.rel} {self.two or ""}'
 
     def latex(self) -> str:
         """Equation"""
