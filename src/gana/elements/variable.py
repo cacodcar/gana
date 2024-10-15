@@ -48,7 +48,7 @@ class Var(X):
         display(Math(self.latex()))
 
     def __pos__(self):
-        return Func(one=self, rel='+')
+        return Func(rel='+', two=self)
 
     def __neg__(self):
         return Func(rel='-', two=self)
