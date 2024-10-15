@@ -22,6 +22,7 @@ class Mtx:
     # constaint matrices
     # equality functions = 0 (with some tolerance)
     h: list[list[float]] = field(default_factory=list)
+    
     # inequality functions <= 0 (with some tolerance)
     g: list[list[float]] = field(default_factory=list)
 

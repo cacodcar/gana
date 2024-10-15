@@ -52,6 +52,8 @@ class F(Set):
         self._: list[Func] = []
         # the flag _fixed is changed when .fix(val) is called
 
+        self.a, self.b = [], []
+
     def process(self):
 
         if (
@@ -85,16 +87,10 @@ class F(Set):
             self._.append(Func(parent=self, pos=n, one=one, rel=self.rel, two=two))
 
     def matrix(self):
-        """Variables in the function"""
+        """Variable and Parameter Vectors"""
 
-        return sum(
-            [
-                i.matrix() if isinstance(i, F) else [i.number]
-                for i in [self.one, self.two]
-                if i
-            ],
-            [],
-        )
+    def par(self):
+        """Parameters in the function"""
 
     def latex(self) -> str:
         """Equation"""
@@ -144,7 +140,7 @@ class F(Set):
 
     def __neg__(self):
         if self.one:
-            one = -self.one
+            one = self.one
         else:
             one = None
 

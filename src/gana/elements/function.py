@@ -29,21 +29,68 @@ class Func(X):
         self.one = one
         self.rel = rel
         self.two = two
+        # the relation between one and two
+        # presented as a dictionary
+        self._ = [self.one, self.two]
 
         super().__init__(parent=parent, pos=pos)
 
-        # if not self.name:
+        self.a = []  # variable vector
+        self.b = 0  # parameter added or subtracted goes in the parameter vector
 
-        if self.one:
+        if self.one and isinstance(self.one, (int, float)):
+            if self.rel in ['+', '-']:
+                self.b = float(self.one)
+                
+            if self.rel in ['×']:
+                self.a.append(float(self.one))
+            self.basic = True
+
+
+        if self.two and isinstance(self.two, (int, float)):
+            if self.rel in ['+', '-']:
+                self.b = float(self.two)
+
+            if isinstance(self.one, Func):
+
+                self.a += self.one.a
+                self.b += self.one.b
+
             one = rf'{self.one}'
         else:
             one = ''
 
         if self.two:
+
             two = rf'{self.two}'
+
+            if isinstance(self.two, (int, float)):
+                if self.rel in ['+', '-']:
+                    self.b = self.two
+                if self.rel in ['×']:
+                    self.a.append(float(self.two))
+                self.basic = True
+
+            if isinstance(self.two, Func):
+                self.a += self.two.a
+                self.b += self.two.b
+
         else:
             two = ''
+
         self.name = f'{one} {self.rel} {two}'
+
+    # def x(self):
+
+    #     for i in self._:
+    #         if isinstance(i, Func):
+    #             self.a += i.a
+    #             self.b += i.b
+    #         elif isinstance(i, (int, float)):
+    #             self.b += i
+    #         else:
+    #             if self.rel = '+':
+    #                 self.a.append(1)
 
     def latex(self) -> str:
         """Equation"""
@@ -76,6 +123,9 @@ class Func(X):
         if self.rel == '÷':
             return rf'\frac{{{one}}}{{{two}}}'
 
+    def matrix(self) -> list:
+        """Variables in the function"""
+
     def pprint(self) -> Math:
         """Display the function"""
         display(Math(self.latex()))
@@ -83,7 +133,7 @@ class Func(X):
     def __neg__(self):
 
         if self.one:
-            one = -self.one
+            one = self.one.__neg__()
         else:
             one = None
 
@@ -109,7 +159,7 @@ class Func(X):
         return self
 
     def __add__(self, other: float | Var | Self):
-
+        # the number element is always taken at number two
         if isinstance(self.two, float):
             if isinstance(other, (int, float)):
                 one = self.one
