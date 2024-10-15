@@ -171,7 +171,7 @@ class Prg:
     #             self.constraints = self.constraints + prg.constraints
     #             self.objectives = self.objectives + prg.objectives
 
-    def matrix(self):
+    def matrix(self) -> tuple[list[list[float]], list[float]]:
         """Return Matrix Representation"""
         a = []
         b = []
@@ -182,6 +182,10 @@ class Prg:
             a.append(row)
             b.append(c.func.b)
         return a, b
+
+    def struct(self) -> list[list[int]]:
+        """Return Structure"""
+        return [c.func.struct for c in self.constraints]
 
     def pyomo(self):
         """Return Pyomo Model"""
