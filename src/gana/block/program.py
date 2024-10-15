@@ -183,16 +183,6 @@ class Prg:
             b.append(c.func.b)
         return a, b
 
-    @property
-    def order(self):
-        """Set of all indices"""
-        return I(product(*[s._ if isinstance(s, I) else [s] for s in self.indices]))
-
-    @property
-    def dim(self):
-        """Dimension of the program"""
-        return len(self.indices)
-
     def pyomo(self):
         """Return Pyomo Model"""
 
