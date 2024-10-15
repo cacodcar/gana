@@ -36,7 +36,7 @@ class Func(X):
         super().__init__(parent=parent, pos=pos)
 
         self.a = []  # variable vector
-        self.b = 0.0  # parameter added or subtracted goes in the parameter vector
+        self.b = 0  # parameter added or subtracted goes in the parameter vector
         self.struct = []
 
         # we deal with the following forms of a function at the basic level

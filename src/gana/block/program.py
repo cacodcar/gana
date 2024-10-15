@@ -176,7 +176,7 @@ class Prg:
         a = []
         b = []
         for c in self.constraints:
-            row = [0.0] * len(self.variables)
+            row = [0] * len(self.variables)
             for pos, value in zip(c.func.struct, c.func.a):
                 row[pos] = value
             a.append(row)
