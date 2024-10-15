@@ -37,46 +37,24 @@ class Func(X):
 
         self.a = []  # variable vector
         self.b = 0  # parameter added or subtracted goes in the parameter vector
+        self.struct = []
 
         # we deal with the following forms of a function at the basic level
-
-        # I None +- var
-        # II par +- var
-        # III var +- par
-        # IV var +- var
-        # V par . var
-        # VI var . par
-        # VII var . var
+        # note that func can just be a var
+        # I None +- func
+        # II par +- func
+        # III func +- par
+        # IV func +- func
+        # V par . func
+        # VI func . par
+        # VII func . func
 
         if not self.one:
 
             self.b = 0
 
-            if isinstance(self.two, Func):
-                if self.rel == '+':
-                    self.a = self.two.a
-                if self.rel == '-':
-                    self.a = [-i for i in self.two.a]
-                if self.rel == '×':
-                    raise ValueError(
-                        'Cannot have a multiplication operation with only a function'
-                    )
-
-            elif isinstance(self.two, (int, float)):
-                raise ValueError('Cannot create a function with only a parameter')
-
-            else:
-                # assumed to be a Var
-                if self.rel == '+':
-                    self.a.append(1)
-
-                if self.rel == '-':
-                    self.a.append(-1)
-
-                if self.rel == '×':
-                    raise ValueError(
-                        'Cannot have a multiplication operation with only a variable'
-                    )
+            if isinstance(self.two, (Func, int, float)) or self.rel == '×':
+                raise ValueError('This operation is not possible')
 
         if self.one:
             one = rf'{self.one}'
@@ -86,15 +64,12 @@ class Func(X):
 
                 if self.rel == '+':
                     self.b = -self.one
-                    self.a.append(1)
 
                 if self.rel == '-':
                     self.b = -self.one
-                    self.a.append(-1)
 
                 if self.rel == '×':
                     self.b = 0
-                    self.a.append(self.one)
 
             elif isinstance(self.one, Func):
                 self.a += self.one.a
@@ -102,7 +77,13 @@ class Func(X):
 
             else:
                 # assumed to be a Var
-                self.a.append(1)
+                if self.rel == '+' or self.rel == '-':
+                    self.a.append(1)
+
+                if self.rel == '×':
+                    if isinstance(self.two, (int, float)):
+                        self.a.append(self.two)
+
                 self.b = 0
 
         else:
@@ -117,15 +98,12 @@ class Func(X):
 
                 if self.rel == '+':
                     self.b = -self.two
-                    self.a.append(1)
 
                 if self.rel == '-':
                     self.b = self.two
-                    self.a.append(1)
 
                 if self.rel == '×':
                     self.b = 0
-                    self.a.append(self.two)
 
             elif isinstance(self.two, Func):
 
@@ -134,13 +112,15 @@ class Func(X):
 
             else:
                 if self.rel == '+':
+
                     self.a.append(1)
 
                 if self.rel == '-':
                     self.a.append(-1)
 
                 if self.rel == '×':
-                    self.a.append(1)
+                    if isinstance(self.one, (int, float)):
+                        self.a.append(self.one)
 
                 self.b = 0
 
