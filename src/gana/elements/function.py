@@ -53,21 +53,6 @@ class Func(X):
         self.two = two
         self.rel = rel
 
-        # the relation between one and two
-        # presented as a dictionary
-        self._ = sum(
-            [i._ if isinstance(i, Func) else [i] for i in [self.one, self.two]], []
-        )
-
-        self.rels = []
-        if isinstance(self.one, Func):
-            self.rels += self.one.rels
-
-        self.rels += [self.rel]
-
-        if isinstance(self.two, Func):
-            self.rels += self.two.rels
-
         super().__init__(parent=parent, pos=pos)
 
         # self.a = []  # variable vector
@@ -86,41 +71,104 @@ class Func(X):
     # VI func . par
     # VII func . func
 
-    def b(self, zero: bool = False) -> list[float | None]:
-        """RHS Parameter vector"""
+    def elms(self):
+        """Elements (Variables and Parameters) of the function"""
+        return sum(
+            [i.elms() if isinstance(i, Func) else [i] for i in [self.one, self.two]],
+            [],
+        )
 
-        if isinstance(self.two, float):
-            if self.rel == '+':
-                return -self.two
-            if self.rel == '-':
-                return self.two
+    def rels(self):
+        """Relations between variables"""
+        rels = []
+        if isinstance(self.one, Func):
+            rels += self.one.rels()
 
-        elif isinstance(self.two, Func):
-            if self.two.b():
-                if self.b():
-                    return self.two.b() + self.b()
-                return self.two.b()
+        rels += [self.rel]
+
+        if isinstance(self.two, Func):
+            rels += self.two.rels()
+        return rels
+
+    @property
+    def _(self):
+        """The function as a list"""
+        x = []
+        for n, e in enumerate(self.elms()):
+            if n > 0:
+                x.append(self.rels()[n - 1])
+            x.append(e)
+
+        if x[0] is None:
+            x = x[1:]
         else:
-            if zero:
-                return 0
+            x = ['+'] + x
+
+        return x
+
+    def b(self, zero: bool = False) -> int | float | None:
+        """Parameter
+        Args:
+            zero (bool, optional): returns 0 instead of None. Defaults to False.
+        """
+
+        if isinstance(self._[-1], float):
+            if self._[-2] == '+':
+                return -self._[-1]
+            if self._[-2] == '-':
+                return self._[-1]
+        if zero:
+            return 0
+
+    def a(self) -> list[float]:
+        """Variable coefficient vector"""
+        x = self._
+        if isinstance(self._[-1], float) and self._[-2] in ['+', '-']:
+            x = x[:-2]
+
+        return x
+        # a_ = []
+
+        # for n, i in enumerate(x):
+        #     if i == '+':
+        #         a_.append(1.0)
+        #     if i == '-':
+        #         a_.append(-1.0)
+        #     if i == '×':
+        #         a_[n - 1] = a_[n - 1] * x[n + 1]
+
+        # return a_
+
+    def azzz(self) -> list[float | None]:
+        """Matrix of variable coefficients"""
 
         if isinstance(self.one, Func):
+            a += self.one.a()
 
-            if self.one.b():
-                if self.b():
-                    return self.one.b() + self.b()
-                else:
-                    return self.one.b()
+        else:
+            if self.rel == '+' or self.rel == '-':
+                a.append(1.0)
 
-    # def a(self, zero: bool = False) -> list[float | None]:
-    #     """ "Matrix of variable coefficients"""
+            if self.rel == '×' and isinstance(self.two, float):
+                a.append(self.two)
+
+        if isinstance(self.two, Func):
+            a += self.two.a()
+
+        else:
+            if self.rel == '+':
+                a.append(1.0)
+
+            if self.rel == '-':
+                a.append(-1.0)
+
+            if self.rel == '×' and isinstance(self.one, float):
+                a.append(self.one)
 
     #     # if not self.one and not self.two:
     #     #     raise ValueError('Function must have at least one element')
 
     #     if self.one:
-
-            
 
     #         if isinstance(self.one, (int, float)):
     #             self.one = float(self.one)

@@ -29,12 +29,18 @@ class Cons(X):
 
         super().__init__(parent=parent, pos=pos)
 
+    @property
+    def _(self):
+        """Constraint as a list"""
+        return self.func._
+
+    def b(self, zero: bool = False) -> int | float | None:
+        """RHS parameter"""
+        return self.func.b(zero)
+
     def a(self) -> list[float | None]:
         """The variable vector"""
-        return self.func.a
-
-
-
+        return self.func.a()
 
     def latex(self) -> str:
         """Latex representation"""
