@@ -140,9 +140,9 @@ class Func(X):
                     a_.append(-1.0)
         return a_
 
-    def struct(self) -> list[int]:
+    def x(self) -> list[int]:
         """Structure of the function
-        given as a list of number tags (n) for the variables
+        given as a list of number tags (n) for the variables (x)
         """
         x = self._
         if isinstance(self._[-1], float) and self._[-2] in ['+', '-']:

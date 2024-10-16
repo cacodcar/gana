@@ -42,9 +42,11 @@ class Cons(X):
         """The variable vector"""
         return self.func.a()
 
-    def struct(self) -> list[int]:
-        """The structure of the constraint"""
-        return self.func.struct()
+    def x(self) -> list[int]:
+        """The structure of the constraint
+        given as a list of the number tags of variables
+        """
+        return self.func.x()
 
     def latex(self) -> str:
         """Latex representation"""

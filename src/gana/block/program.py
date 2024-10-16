@@ -9,15 +9,18 @@ from pyomo.environ import ConcreteModel
 from ..elements.constraint import Cons
 from ..elements.element import X
 from ..elements.function import Func
+
 # from ..sets.objective import O
 from ..elements.index import Idx
 from ..elements.variable import Var
 from ..sets.constraints import C
 from ..sets.functions import F
 from ..sets.indices import I
+
 # from ..value.zero import Z
 from ..sets.ordered import Set
 from ..sets.parameters import P
+
 # from ..sets.theta import T
 from ..sets.variables import V
 
@@ -164,11 +167,23 @@ class Prg:
 
             else:
                 row = [None] * len(self.variables)
-            for n, value in zip(c.struct(), c.a()):
+            for n, value in zip(c.x(), c.a()):
                 row[n] = value
             a_.append(row)
 
         return a_
+
+    def g(self, zero: bool = False) -> list[float | None]:
+        """Matrix of Variable coefficients for type:
+
+        g < = 0
+        """
+
+    def h(self, zero: bool = False) -> list[float | None]:
+        """Matrix of Variable coefficients for type:
+
+        h = 0
+        """
 
     def pyomo(self):
         """Pyomo Model"""
