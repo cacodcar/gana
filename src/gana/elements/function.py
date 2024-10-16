@@ -25,23 +25,29 @@ class Func(X):
         one: float | Var | Self = None,
         two: float | Var | Self = None,
     ):
-        #pwr is the higher power of any variable in the function    
-        if rel == '×': 
 
-            if isinstance(one, int):
-                one = float(one)
-                
-              
+        pwr_one, pwr_two = 0, 0
 
-            elif isinstance(two, int):
-                one_ = float(two) 
-                two = one
-                one = one_
+        if one:
+            # any parameter goes to two
+            if isinstance(one, (float, int)):
+                one_ = float(one)
+                one = two
+                two = one_
+            else:
+                pwr_one = one.pwr
 
-            else: 
-                self.pwr = one.pwr + two.pwr 
-                else:
-                    self.pwr = max(one.pwr, two.pwr)
+        if two:
+            if isinstance(two, (float, int)):
+                two = float(two)
+            else:
+                pwr_two = two.pwr
+
+        if rel == '×':
+            self.pwr = pwr_one + pwr_two
+
+        if rel == '+' or rel == '-':
+            self.pwr = max(pwr_one, pwr_two)
 
         self.one = one
         self.two = two
@@ -49,111 +55,141 @@ class Func(X):
 
         # the relation between one and two
         # presented as a dictionary
-        self._ = [self.one, self.two]
+        self._ = sum(
+            [i._ if isinstance(i, Func) else [i] for i in [self.one, self.two]], []
+        )
 
+        self.rels = []
+        if isinstance(self.one, Func):
+            self.rels += self.one.rels
+
+        self.rels += [self.rel]
+
+        if isinstance(self.two, Func):
+            self.rels += self.two.rels
 
         super().__init__(parent=parent, pos=pos)
 
         # self.a = []  # variable vector
         # self.b = None  # parameter added or subtracted goes in the parameter vector
-        self.struct = []   
-                
-        
-
-    def b(self, zero: bool = False) -> list[float | None]:
-        """Variable vector"""
-        
-        if self.pwr == 1: 
-            
-
-
-
-
-        # we deal with the following forms of a function at the basic level
-        # note that func can just be a var
-        # I None +- func
-        # II par +- func
-        # III func +- par
-        # IV func +- func
-        # V par . func
-        # VI func . par
-        # VII func . func
-
-        if not self.one and not self.two:
-            raise ValueError('Function must have at least one element')
-
-        if self.one:
-
-            if isinstance(self.one, (int, float)):
-                self.one = float(self.one)
-
-                if self.rel == '+':
-                    self.b = -self.one
-
-                if self.rel == '-':
-                    self.b = -self.one
-
-            elif isinstance(self.one, Func):
-                self.a += self.one.a
-                self.struct += self.one.struct
-
-                if self.one.b:
-                    if self.b:
-                        self.b += self.one.b
-                    else:
-                        self.b = self.one.b
-
-            else:
-                # assumed to be a Var
-                self.struct.append(self.one.n)
-
-                if self.rel == '+' or self.rel == '-':
-                    self.a.append(1.0)
-
-                if self.rel == '×':
-                    if isinstance(self.two, (int, float)):
-                        self.a.append(self.two)
-
-        else:
-            if isinstance(self.two, (Func, int, float)) or self.rel == '×':
-                raise ValueError('This operation is not possible')
-
-        if self.two:
-
-            if isinstance(self.two, (int, float)):
-
-                if self.rel == '+':
-                    self.b = -self.two
-
-                if self.rel == '-':
-                    self.b = self.two
-
-            elif isinstance(self.two, Func):
-                self.a += self.two.a
-                self.struct += self.two.struct
-
-                if self.two.b:
-                    if self.b:
-                        self.b += self.two.b
-                    else:
-                        self.b = self.two.b
-
-            else:
-                # assumed to be a Var
-                self.struct.append(self.two.n)
-
-                if self.rel == '+':
-
-                    self.a.append(1.0)
-
-                if self.rel == '-':
-                    self.a.append(-1.0)
-
-                if self.rel == '×':
-                    if isinstance(self.one, (int, float)):
-                        self.a.append(self.one)
+        self.struct = []
 
         self.name = f'{self.one or ""} {self.rel} {self.two or ""}'
+
+    # we deal with the following forms of a function at the basic level
+    # note that func can just be a var
+    # I None +- func
+    # II par +- func
+    # III func +- par
+    # IV func +- func
+    # V par . func
+    # VI func . par
+    # VII func . func
+
+    def b(self, zero: bool = False) -> list[float | None]:
+        """RHS Parameter vector"""
+
+        if isinstance(self.two, float):
+            if self.rel == '+':
+                return -self.two
+            if self.rel == '-':
+                return self.two
+
+        elif isinstance(self.two, Func):
+            if self.two.b():
+                if self.b():
+                    return self.two.b() + self.b()
+                return self.two.b()
+        else:
+            if zero:
+                return 0
+
+        if isinstance(self.one, Func):
+
+            if self.one.b():
+                if self.b():
+                    return self.one.b() + self.b()
+                else:
+                    return self.one.b()
+
+    # def a(self, zero: bool = False) -> list[float | None]:
+    #     """ "Matrix of variable coefficients"""
+
+    #     # if not self.one and not self.two:
+    #     #     raise ValueError('Function must have at least one element')
+
+    #     if self.one:
+
+            
+
+    #         if isinstance(self.one, (int, float)):
+    #             self.one = float(self.one)
+
+    #             if self.rel == '+':
+    #                 self.b = -self.one
+
+    #             if self.rel == '-':
+    #                 self.b = -self.one
+
+    #         elif isinstance(self.one, Func):
+    #             self.a += self.one.a
+    #             self.struct += self.one.struct
+
+    #             if self.one.b:
+    #                 if self.b:
+    #                     self.b += self.one.b
+    #                 else:
+    #                     self.b = self.one.b
+
+    #         else:
+    #             # assumed to be a Var
+    #             self.struct.append(self.one.n)
+
+    #             if self.rel == '+' or self.rel == '-':
+    #                 self.a.append(1.0)
+
+    #             if self.rel == '×':
+    #                 if isinstance(self.two, (int, float)):
+    #                     self.a.append(self.two)
+
+    #     else:
+    #         if isinstance(self.two, (Func, int, float)) or self.rel == '×':
+    #             raise ValueError('This operation is not possible')
+
+    #     if self.two:
+
+    #         if isinstance(self.two, (int, float)):
+
+    #             if self.rel == '+':
+    #                 self.b = -self.two
+
+    #             if self.rel == '-':
+    #                 self.b = self.two
+
+    #         elif isinstance(self.two, Func):
+    #             self.a += self.two.a
+    #             self.struct += self.two.struct
+
+    #             if self.two.b:
+    #                 if self.b:
+    #                     self.b += self.two.b
+    #                 else:
+    #                     self.b = self.two.b
+
+    #         else:
+    #             # assumed to be a Var
+    #             self.struct.append(self.two.n)
+
+    #             if self.rel == '+':
+
+    #                 self.a.append(1.0)
+
+    #             if self.rel == '-':
+    #                 self.a.append(-1.0)
+
+    #             if self.rel == '×':
+    #                 if isinstance(self.one, (int, float)):
+    #                     self.a.append(self.one)
 
     def latex(self) -> str:
         """Equation"""
