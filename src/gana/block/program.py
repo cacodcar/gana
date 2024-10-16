@@ -147,10 +147,10 @@ class Prg:
 
         if isinstance(value, Cons):
             value.n = len(self.constraints)
-            print(value.n)
             self.constraints.append(value)
             if not value.name:
                 value.name = name
+            setattr(self, value.name + '_f', value.func)
 
         super().__setattr__(name, value)
 
