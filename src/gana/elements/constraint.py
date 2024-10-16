@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
 from IPython.display import Math, display
 
@@ -38,9 +38,13 @@ class Cons(X):
         """RHS parameter"""
         return self.func.b(zero)
 
-    def a(self) -> list[float | None]:
+    def a(self) -> list[float]:
         """The variable vector"""
         return self.func.a()
+
+    def struct(self) -> list[int]:
+        """The structure of the constraint"""
+        return self.func.struct()
 
     def latex(self) -> str:
         """Latex representation"""

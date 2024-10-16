@@ -55,10 +55,6 @@ class Func(X):
 
         super().__init__(parent=parent, pos=pos)
 
-        # self.a = []  # variable vector
-        # self.b = None  # parameter added or subtracted goes in the parameter vector
-        self.struct = []
-
         self.name = f'{self.one or ""} {self.rel} {self.two or ""}'
 
     # we deal with the following forms of a function at the basic level
@@ -124,120 +120,35 @@ class Func(X):
         """Variable coefficient vector"""
         x = self._
         if isinstance(self._[-1], float) and self._[-2] in ['+', '-']:
+            # if there is a parameter in the end, that goes to the b matrix
             x = x[:-2]
 
-        return x
-        # a_ = []
+        # here you get a list of tuples (rel, variable)
+        x = list(zip(x[::2], x[1::2]))
 
-        # for n, i in enumerate(x):
-        #     if i == '+':
-        #         a_.append(1.0)
-        #     if i == '-':
-        #         a_.append(-1.0)
-        #     if i == '×':
-        #         a_[n - 1] = a_[n - 1] * x[n + 1]
+        a_ = []
 
-        # return a_
+        for n, i in enumerate(x):
+            if isinstance(i[1], float):
+                # if multiplication by float
+                if i[0] == '×':
+                    a_[n - 1] = a_[n - 1] * i[1]
+            else:
+                if i[0] == '+':
+                    a_.append(1.0)
+                if i[0] == '-':
+                    a_.append(-1.0)
+        return a_
 
-    def azzz(self) -> list[float | None]:
-        """Matrix of variable coefficients"""
-
-        if isinstance(self.one, Func):
-            a += self.one.a()
-
-        else:
-            if self.rel == '+' or self.rel == '-':
-                a.append(1.0)
-
-            if self.rel == '×' and isinstance(self.two, float):
-                a.append(self.two)
-
-        if isinstance(self.two, Func):
-            a += self.two.a()
-
-        else:
-            if self.rel == '+':
-                a.append(1.0)
-
-            if self.rel == '-':
-                a.append(-1.0)
-
-            if self.rel == '×' and isinstance(self.one, float):
-                a.append(self.one)
-
-    #     # if not self.one and not self.two:
-    #     #     raise ValueError('Function must have at least one element')
-
-    #     if self.one:
-
-    #         if isinstance(self.one, (int, float)):
-    #             self.one = float(self.one)
-
-    #             if self.rel == '+':
-    #                 self.b = -self.one
-
-    #             if self.rel == '-':
-    #                 self.b = -self.one
-
-    #         elif isinstance(self.one, Func):
-    #             self.a += self.one.a
-    #             self.struct += self.one.struct
-
-    #             if self.one.b:
-    #                 if self.b:
-    #                     self.b += self.one.b
-    #                 else:
-    #                     self.b = self.one.b
-
-    #         else:
-    #             # assumed to be a Var
-    #             self.struct.append(self.one.n)
-
-    #             if self.rel == '+' or self.rel == '-':
-    #                 self.a.append(1.0)
-
-    #             if self.rel == '×':
-    #                 if isinstance(self.two, (int, float)):
-    #                     self.a.append(self.two)
-
-    #     else:
-    #         if isinstance(self.two, (Func, int, float)) or self.rel == '×':
-    #             raise ValueError('This operation is not possible')
-
-    #     if self.two:
-
-    #         if isinstance(self.two, (int, float)):
-
-    #             if self.rel == '+':
-    #                 self.b = -self.two
-
-    #             if self.rel == '-':
-    #                 self.b = self.two
-
-    #         elif isinstance(self.two, Func):
-    #             self.a += self.two.a
-    #             self.struct += self.two.struct
-
-    #             if self.two.b:
-    #                 if self.b:
-    #                     self.b += self.two.b
-    #                 else:
-    #                     self.b = self.two.b
-
-    #         else:
-    #             # assumed to be a Var
-    #             self.struct.append(self.two.n)
-
-    #             if self.rel == '+':
-
-    #                 self.a.append(1.0)
-
-    #             if self.rel == '-':
-    #                 self.a.append(-1.0)
-
-    #             if self.rel == '×':
-    #                 if isinstance(self.one, (int, float)):
-    #                     self.a.append(self.one)
+    def struct(self) -> list[int]:
+        """Structure of the function
+        given as a list of number tags (n) for the variables
+        """
+        x = self._
+        if isinstance(self._[-1], float) and self._[-2] in ['+', '-']:
+            x = x[:-2]
+        x: list[Var] = x[1::2]
+        return [i.n for i in x if not isinstance(i, float)]
 
     def latex(self) -> str:
         """Equation"""
