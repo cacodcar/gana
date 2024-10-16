@@ -6,7 +6,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math
-from pyomo.environ import Binary, Integers, NonNegativeIntegers, NonNegativeReals, Reals
+from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
+                           NonNegativeReals, Reals)
 from pyomo.environ import Var as PyoVar
 from sympy import Idx, IndexedBase, Symbol, symbols
 

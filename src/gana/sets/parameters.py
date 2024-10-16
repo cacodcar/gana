@@ -6,15 +6,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math
-from sympy import Idx, IndexedBase, Symbol, symbols
 from pyomo.environ import Param as PyoParam
+from sympy import Idx, IndexedBase, Symbol, symbols
 
 from ..value.bigm import M
 from .constraints import C
 from .functions import F
 from .ordered import Set
 from .variables import V
-
 
 if TYPE_CHECKING:
     from ..elements.index import Idx

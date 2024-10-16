@@ -1,31 +1,25 @@
 """Mathematical Program"""
 
 from dataclasses import dataclass, field
-
 from typing import Self
 
 from IPython.display import display
+from pyomo.environ import ConcreteModel
 
 from ..elements.constraint import Cons
+from ..elements.element import X
 from ..elements.function import Func
-
 # from ..sets.objective import O
 from ..elements.index import Idx
 from ..elements.variable import Var
-
 from ..sets.constraints import C
 from ..sets.functions import F
-from ..sets.parameters import P
 from ..sets.indices import I
-
 # from ..value.zero import Z
 from ..sets.ordered import Set
-
+from ..sets.parameters import P
 # from ..sets.theta import T
 from ..sets.variables import V
-
-
-from pyomo.environ import ConcreteModel
 
 
 @dataclass
@@ -38,6 +32,7 @@ class Prg:
 
     def __post_init__(self):
         # names of declared modeling and relational elements
+        self.restricted_names = ['a', 'b']
         self.names = []
         self.names_idx = []
         self.idxsets: list[I] = []
@@ -59,6 +54,9 @@ class Prg:
         # self.objectives: list[O] = []
 
     def __setattr__(self, name, value) -> None:
+
+        if isinstance(value, (Set, X)) and name in self.restricted_names:
+            raise ValueError(f'Cannot use {name} as a name')
 
         # Collect names here
         # indices can belong to multiple sets
@@ -153,31 +151,24 @@ class Prg:
         super().__setattr__(name, value)
 
     def b(self, zero: bool = False) -> list[float | None]:
-        """Parameter vector"""
+        """RHS Parameter vector"""
+        return [c.func.b(zero) for c in self.constraints]
 
-        if zero:
-            return 
+    def a(self, zero: bool = False) -> list[float | None]:
+        """Matrix of Variable coefficients"""
+        a_ = []
 
-        return [c.func.b for c in self.constraints]
-
-
-    def a(self) -> list[float | None]:
-        """Matrix of coefficients"""
-        a = []
         for c in self.constraints:
-            row = [None] * len(self.variables)
-            for pos, value in zip(c.func.struct, c.func.a):
-                row[pos] = value
-            a.append(row)
-        return a
+            if zero:
+                row = [0] * len(self.variables)
 
-    def matrix(self) -> tuple[list[list[float]], list[float]]:
-        """Matrix Representation"""
-        a = [[x if x else 0 for x in row] for row in a]
+            else:
+                row = [None] * len(self.variables)
+            for n, value in zip(c.struct(), c.a()):
+                row[n] = value
+            a_.append(row)
 
-        b = [x if x else 0 for x in b]
-
-        return a, b
+        return a_
 
     def pyomo(self):
         """Pyomo Model"""

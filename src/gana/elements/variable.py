@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Self, TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
+
 from IPython.display import Math, display
 
-from .element import X
-
-from .function import Func
 from .constraint import Cons
+from .element import X
+from .function import Func
 
 if TYPE_CHECKING:
     from ..sets.variables import V

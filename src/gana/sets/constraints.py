@@ -13,13 +13,13 @@ from ..elements.constraint import Cons
 from .ordered import Set
 
 if TYPE_CHECKING:
+    from pyomo.environ import ConcreteModel as PyoModel
     from sympy import Eq, GreaterThan, LessThan
 
     from ..elements.index import Idx
     from .functions import F
     from .parameters import P
     from .variables import V
-    from pyomo.environ import ConcreteModel as PyoModel
 
 
 class C(Set):

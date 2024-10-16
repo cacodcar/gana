@@ -181,8 +181,9 @@ class Func(X):
         if self.rel == '÷':
             return rf'\frac{{{one}}}{{{two}}}'
 
-    def matrix(self) -> list:
-        """Variables in the function"""
+    def matrix(self) -> tuple[list[float], int | float | None]:
+        """Matrix representation"""
+        return self.a(), self.b()
 
     def pprint(self) -> Math:
         """Display the function"""
