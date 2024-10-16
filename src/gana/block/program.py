@@ -174,6 +174,10 @@ class Prg:
 
         return a_
 
+    def x(self) -> list[list[int]]:
+        """Structure of the constraint matrix"""
+        return [c.x() for c in self.constraints]
+
     def g(self, zero: bool = False) -> list[float | None]:
         """Matrix of Variable coefficients for type:
 
