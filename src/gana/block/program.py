@@ -1,10 +1,8 @@
 """Mathematical Program"""
 
 from dataclasses import dataclass, field
-from itertools import product
 
-# from typing import Self
-from warnings import warn
+from typing import Self
 
 from IPython.display import display
 
@@ -171,24 +169,32 @@ class Prg:
     #             self.constraints = self.constraints + prg.constraints
     #             self.objectives = self.objectives + prg.objectives
 
-    def matrix(self) -> tuple[list[list[float]], list[float]]:
-        """Return Matrix Representation"""
+    def struct(self) -> tuple[list[list[float | None]], list[float | None]]:
+        """Program structure"""
         a = []
         b = []
         for c in self.constraints:
-            row = [0] * len(self.variables)
+            row = [None] * len(self.variables)
             for pos, value in zip(c.func.struct, c.func.a):
                 row[pos] = value
+
             a.append(row)
             b.append(c.func.b)
         return a, b
 
-    def struct(self) -> list[list[int]]:
-        """Return Structure"""
-        return [c.func.struct for c in self.constraints]
+    def matrix(self) -> tuple[list[list[float]], list[float]]:
+        """Matrix Representation"""
+
+        a, b = self.struct()
+
+        a = [[x if x else 0 for x in row] for row in a]
+
+        b = [x if x else 0 for x in b]
+
+        return a, b
 
     def pyomo(self):
-        """Return Pyomo Model"""
+        """Pyomo Model"""
 
         m = ConcreteModel()
 
@@ -207,10 +213,10 @@ class Prg:
         return m
 
     def mps(self):
-        """Return MPS File"""
+        """MPS File"""
 
     def lp(self):
-        """Return LP File"""
+        """LP File"""
 
     def latex(self, descriptive: bool = False):
         """Display LaTeX"""
@@ -252,3 +258,32 @@ class Prg:
 
     def __hash__(self):
         return hash(str(self))
+
+    def __add__(self, other: Self):
+        """Add two programs"""
+
+        if not isinstance(other, Prg):
+            raise ValueError('Can only add programs')
+
+        prg = Prg(name=rf'{self.name}_{other.name}')
+
+        for i in (
+            self.idxsets
+            + self.varsets
+            + self.parsets
+            + self.funcsets
+            + self.conssets
+            + other.idxsets
+            + other.varsets
+            + other.parsets
+            + other.funcsets
+            + other.conssets
+        ):
+            setattr(prg, i.name, i)
+
+        for c in self.constraints + other.constraints:
+            if c not in prg.constraints + other.constraints:
+                setattr(prg, c.name, c)
+
+        return prg
+

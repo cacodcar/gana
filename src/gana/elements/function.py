@@ -19,10 +19,10 @@ class Func(X):
 
     def __init__(
         self,
+        rel: str,
         parent: F | Cons | Var = None,
         pos: int = None,
         one: float | Var | Self = None,
-        rel: str = None,
         two: float | Var | Self = None,
     ):
 
@@ -36,7 +36,7 @@ class Func(X):
         super().__init__(parent=parent, pos=pos)
 
         self.a = []  # variable vector
-        self.b = 0  # parameter added or subtracted goes in the parameter vector
+        self.b = None  # parameter added or subtracted goes in the parameter vector
         self.struct = []
 
         # we deal with the following forms of a function at the basic level
@@ -48,6 +48,9 @@ class Func(X):
         # V par . func
         # VI func . par
         # VII func . func
+
+        if not self.one and not self.two:
+            raise ValueError('Function must have at least one element')
 
         if self.one:
 
@@ -62,8 +65,13 @@ class Func(X):
 
             elif isinstance(self.one, Func):
                 self.a += self.one.a
-                self.b += self.one.b
                 self.struct += self.one.struct
+
+                if self.one.b:
+                    if self.b:
+                        self.b += self.one.b
+                    else:
+                        self.b = self.one.b
 
             else:
                 # assumed to be a Var
@@ -81,7 +89,7 @@ class Func(X):
                 raise ValueError('This operation is not possible')
 
         if self.two:
-            
+
             if isinstance(self.two, (int, float)):
 
                 self.two = float(self.two)
@@ -93,12 +101,17 @@ class Func(X):
                     self.b = self.two
 
             elif isinstance(self.two, Func):
-
                 self.a += self.two.a
-                self.b += self.two.b
                 self.struct += self.two.struct
 
+                if self.two.b:
+                    if self.b:
+                        self.b += self.two.b
+                    else:
+                        self.b = self.two.b
+
             else:
+                # assumed to be a Var
                 self.struct.append(self.two.n)
 
                 if self.rel == '+':
