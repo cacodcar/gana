@@ -29,6 +29,13 @@ class Cons(X):
 
         super().__init__(parent=parent, pos=pos)
 
+    def a(self) -> list[float | None]:
+        """The variable vector"""
+        return self.func.a
+
+
+
+
     def latex(self) -> str:
         """Latex representation"""
 

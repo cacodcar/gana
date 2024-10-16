@@ -152,41 +152,27 @@ class Prg:
 
         super().__setattr__(name, value)
 
-    # def combine(self, *prgs: tuple[Self]):
-    #     """Club Programs"""
-    #     for prg in prgs:
-    #         if isinstance(prg, Prg):
-    #             # modeling elements
-    #             self.indices = self.indices + prg.indices
-    #             self.variables = self.variables + prg.variables
-    #             self.vars_cnt = self.vars_cnt + prg.vars_cnt
-    #             self.vars_itg = self.vars_itg + prg.vars_itg
-    #             self.vars_nn = self.vars_nn + prg.vars_nn
-    #             self.vars_bnr = self.vars_bnr + prg.vars_bnr
-    #             self.thetas = self.thetas + prg.thetas
-    #             self.parameters = self.parameters + prg.parameters
-    #             self.functions = self.functions + prg.functions
-    #             self.constraints = self.constraints + prg.constraints
-    #             self.objectives = self.objectives + prg.objectives
+    def b(self, zero: bool = False) -> list[float | None]:
+        """Parameter vector"""
 
-    def struct(self) -> tuple[list[list[float | None]], list[float | None]]:
-        """Program structure"""
+        if zero:
+            return 
+
+        return [c.func.b for c in self.constraints]
+
+
+    def a(self) -> list[float | None]:
+        """Matrix of coefficients"""
         a = []
-        b = []
         for c in self.constraints:
             row = [None] * len(self.variables)
             for pos, value in zip(c.func.struct, c.func.a):
                 row[pos] = value
-
             a.append(row)
-            b.append(c.func.b)
-        return a, b
+        return a
 
     def matrix(self) -> tuple[list[list[float]], list[float]]:
         """Matrix Representation"""
-
-        a, b = self.struct()
-
         a = [[x if x else 0 for x in row] for row in a]
 
         b = [x if x else 0 for x in b]
@@ -282,8 +268,7 @@ class Prg:
             setattr(prg, i.name, i)
 
         for c in self.constraints + other.constraints:
-            if c not in prg.constraints + other.constraints:
+            if c not in prg.constraints:
                 setattr(prg, c.name, c)
 
         return prg
-

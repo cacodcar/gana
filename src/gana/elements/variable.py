@@ -24,6 +24,7 @@ class Var(X):
         itg: bool = False,
         nn: bool = True,
         bnr: bool = False,
+        pwr: int = 1,
     ):
 
         # if the variable is an integer variable
@@ -32,6 +33,12 @@ class Var(X):
         self.bnr = bnr
         # if the variable is non negative
         self.nn = nn
+        # the power of the variable
+        self.pwr = pwr
+
+        # the value taken by the variable
+        self._ = None
+
         super().__init__(parent=parent, pos=pos)
 
     def latex(self):
@@ -114,3 +121,6 @@ class Var(X):
     def __gt__(self, other):
 
         return self >= other
+
+    def __pow__(self, other: int):
+        return Func(one=self, two=other, rel='^')

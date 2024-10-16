@@ -25,19 +25,49 @@ class Func(X):
         one: float | Var | Self = None,
         two: float | Var | Self = None,
     ):
+        #pwr is the higher power of any variable in the function    
+        if rel == '×': 
+
+            if isinstance(one, int):
+                one = float(one)
+                
+              
+
+            elif isinstance(two, int):
+                one_ = float(two) 
+                two = one
+                one = one_
+
+            else: 
+                self.pwr = one.pwr + two.pwr 
+                else:
+                    self.pwr = max(one.pwr, two.pwr)
 
         self.one = one
-        self.rel = rel
         self.two = two
+        self.rel = rel
+
         # the relation between one and two
         # presented as a dictionary
         self._ = [self.one, self.two]
 
+
         super().__init__(parent=parent, pos=pos)
 
-        self.a = []  # variable vector
-        self.b = None  # parameter added or subtracted goes in the parameter vector
-        self.struct = []
+        # self.a = []  # variable vector
+        # self.b = None  # parameter added or subtracted goes in the parameter vector
+        self.struct = []   
+                
+        
+
+    def b(self, zero: bool = False) -> list[float | None]:
+        """Variable vector"""
+        
+        if self.pwr == 1: 
+            
+
+
+
 
         # we deal with the following forms of a function at the basic level
         # note that func can just be a var
@@ -91,8 +121,6 @@ class Func(X):
         if self.two:
 
             if isinstance(self.two, (int, float)):
-
-                self.two = float(self.two)
 
                 if self.rel == '+':
                     self.b = -self.two
