@@ -126,6 +126,9 @@ class Prg:
             else:
                 self.vars_cnt.append(value)
 
+            if value.nn: 
+                setattr(self, value.name + '_nn', value >= 0)
+
         if isinstance(value, F):
             value.n = len(self.funcsets)
             self.funcsets.append(value)
@@ -183,12 +186,14 @@ class Prg:
 
         g < = 0
         """
+        return [a for n, a in enumerate(self.a(zero)) if self.constraints[n].leq]
 
     def h(self, zero: bool = False) -> list[float | None]:
         """Matrix of Variable coefficients for type:
 
         h = 0
         """
+        return [a for n, a in enumerate(self.a(zero)) if not self.constraints[n].leq]
 
     def pyomo(self):
         """Pyomo Model"""
