@@ -218,5 +218,5 @@ class P(Set):
             return self._[self.idx().index(key[0])]
         return self._[self.idx().index(key)]
 
-    def __getitem__(self, *key: tuple[Idx]):
-        return self(*key)
+    def __getitem__(self, pos: int) -> float | int | M:
+        return self._[pos]

@@ -132,27 +132,6 @@ class F(Set):
         """Display the function"""
         Math(self.latex())
 
-    def sympy(self) -> Add:
-        """Equation"""
-        # if self.rel == '+':
-        #     if self.one:
-        #         return self.one.sympy() + self.two.sympy()
-        #     else:
-        #         return self.two.sympy()
-
-        # if self.rel == '-':
-        #     if self.one:
-        #         return self.one.sympy() - self.two.sympy()
-        #     # this is used to generate negatives
-        #     else:
-        #         return -self.two.sympy()
-
-        # if self.rel == '×':
-        #     return self.one.sympy() * self.two.sympy()
-
-        # if self.rel == '÷':
-        #     return self.one.sympy() / self.two.sympy()
-
     def __neg__(self):
         if self.one:
             one = self.one
@@ -253,5 +232,5 @@ class F(Set):
             return self._[self.idx().index(key[0])]
         return self._[self.idx().index(key)]
 
-    def __getitem__(self, *key: tuple[Idx] | Idx) -> Func:
-        return self(*key)
+    def __getitem__(self, pos: int) -> Func:
+        return self._[pos]

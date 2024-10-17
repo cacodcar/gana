@@ -201,6 +201,5 @@ class V(Set):
             return self._[self.idx().index(key[0])]
         return self._[self.idx().index(key)]
 
-    def __getitem__(self, *key: tuple[Idx]):
-        if self._fixed:
-            return self(key)
+    def __getitem__(self, pos: int) -> Var:
+        return self._[pos]

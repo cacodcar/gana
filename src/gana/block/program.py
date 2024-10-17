@@ -5,10 +5,13 @@ from typing import Self
 
 from IPython.display import display
 from pyomo.environ import ConcreteModel
+from pyomo.environ import Constraint as PyoCons
+
 
 from ..elements.constraint import Cons
 from ..elements.element import X
 from ..elements.function import Func
+from ..elements.objective import Obj
 
 # from ..sets.objective import O
 from ..elements.index import Idx
@@ -54,7 +57,12 @@ class Prg:
         self.constraints: list[Cons] = []
         # self.cons_eq: list[C] = []
         # self.cons_leq: list[C] = []
-        # self.objectives: list[O] = []
+        self.objectives: list[Obj] = []
+
+        # indices for non negativity constraints
+        self.pos_nn = []
+        self.pos_eq = []
+        self.pos_leq = []
 
     def __setattr__(self, name, value) -> None:
 
@@ -155,6 +163,12 @@ class Prg:
                 value.name = name
             setattr(self, value.name + '_f', value.func)
 
+        if isinstance(value, Obj):
+            value.n = len(self.objectives)
+            self.objectives.append(value)
+            value.name = name
+            setattr(self, value.name + '_f', value.func)
+
         super().__setattr__(name, value)
 
     def b(self, zero: bool = False) -> list[float | None]:
@@ -168,13 +182,14 @@ class Prg:
 
         for v in self.vars_cnt:
             if v.nn:
+                self.pos_nn.append(len(self.constraints))
                 setattr(self, v.name + '_nn', v >= 0)
 
     def a(self, zero: bool = False) -> list[list[float | None]]:
         """Matrix of Variable coefficients"""
         a_ = []
-
-        self.make_nn()
+        if not self.pos_nn:
+            self.make_nn()
 
         for c in self.constraints:
             if zero:
@@ -251,6 +266,9 @@ class Prg:
             for c in self.conssets:  # + self.objectives:
                 display(c.latex())
 
+        for o in self.objectives:
+            display(o.latex())
+
     def pprint(self, descriptive: bool = False):
         """Pretty Print"""
 
@@ -268,6 +286,9 @@ class Prg:
             for c in self.constraints:
                 if not c.parent:
                     c.pprint()
+
+        for o in self.objectives:
+            o.pprint()
 
     def __str__(self):
         return rf'{self.name}'

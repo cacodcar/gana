@@ -27,23 +27,24 @@ class Func(X):
     ):
 
         pwr_one, pwr_two = 0, 0
-
+        print(one, two)
         if one:
             # any parameter goes to two
-            if isinstance(one, (float, int)):
-                one_ = float(one)
-                one = two
-                two = one_
+            if isinstance(one, (float, int, list)):
+                one, two = two, one
+
             else:
                 pwr_one = one.pwr
 
-        if two:
-            if isinstance(two, (float, int)):
-                two = float(two)
-            else:
-                pwr_two = two.pwr
+        if two and not isinstance(two, (float, int, list)):
+            pwr_two = two.pwr
 
         if rel == '×':
+            if isinstance(one, Func) and isinstance(two, float):
+                one.one = one.one * two
+                if isinstance(one.two, Func):
+                    one.two = one.two * two
+
             self.pwr = pwr_one + pwr_two
 
         if rel == '+' or rel == '-':
@@ -55,7 +56,20 @@ class Func(X):
 
         super().__init__(parent=parent, pos=pos)
 
-        self.name = f'{self.one or ""} {self.rel} {self.two or ""}'
+        # self.name = f'{self.one or ""} {self.rel} {self.two or ""}'
+        self.name = ''.join([str(i) for i in self._])
+
+    def __setattr__(self, name, value):
+
+        if name in ['one', 'two']:
+
+            if isinstance(value, (int, float)):
+                value = float(value)
+
+            if isinstance(value, list):
+                value = [float(i) for i in value]
+
+        super().__setattr__(name, value)
 
     # we deal with the following forms of a function at the basic level
     # note that func can just be a var
@@ -99,7 +113,6 @@ class Func(X):
             x = x[1:]
         else:
             x = ['+'] + x
-
         return x
 
     def b(self, zero: bool = False) -> int | float | None:
@@ -209,6 +222,7 @@ class Func(X):
         elif self.rel == '-':
 
             rel = '+'
+
         else:
             rel = self.rel
 
@@ -290,7 +304,17 @@ class Func(X):
             return -self + other
 
     def __mul__(self, other: float | Var | Self):
+        if isinstance(self.one, (int, float)):
+            if other == 1:
+                return self
         return Func(one=self, two=other, rel='×')
+
+    def __rmul__(self, other: float | Var | Self):
+        if isinstance(other, (int, float)):
+            if other == 1:
+                return self
+            return Func(one=self, rel='×', two=float(other))
+        return Func(one=other, rel='×', two=self)
 
     def __truediv__(self, other: float | Var | Self):
         return Func(one=self, two=other, rel='÷')

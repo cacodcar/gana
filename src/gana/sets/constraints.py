@@ -3,19 +3,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, Self
+from typing import TYPE_CHECKING
 
 from IPython.display import Math, display
-from pyomo.environ import Constraint as PyoCons
-from sympy import Rel
 
 from ..elements.constraint import Cons
 from .ordered import Set
 
 if TYPE_CHECKING:
-    from pyomo.environ import ConcreteModel as PyoModel
-    from sympy import Eq, GreaterThan, LessThan
-
     from ..elements.index import Idx
     from .functions import F
     from .parameters import P
@@ -82,31 +77,17 @@ class C(Set):
         else:
             display(Math(self.latex()))
 
-    def sympy(self) -> LessThan | GreaterThan | Eq:
-        """sympy representation"""
+    # def rule(self) -> function:
+    #     """The rule of the constraint"""
+    #     return self.funcs
 
-    #     return Rel(self.funcs.one, self.rhs.sympy(), self.rel)
+        
 
-    def pyomo(self, m: PyoModel) -> PyoCons:
-        """Pyomo representation"""
-        idx = [i.pyomo() for i in self.order]
-
-        if self.leq:
-
-            def rule(m, *idx):
-                return self.funcs.pyomo() <= 0
-
-        else:
-
-            def rule(m, *idx):
-                return self.funcs.pyomo() == 0
-
-        return PyoCons(m, *idx, rule=rule, doc=str(self))
 
     def __call__(self, *key: tuple[Idx] | Idx) -> Cons:
         if len(key) == 1:
             return self._[self.idx().index(key[0])]
         return self._[self.idx().index(key)]
 
-    def __getitem__(self, *key: tuple[Idx] | Idx) -> Cons:
-        return self(*key)
+    def __getitem__(self, pos: int) -> Cons:
+        return self._[pos]

@@ -30,18 +30,12 @@ class Set(ABC):
         """LaTeX representation"""
 
     @abstractmethod
-    def sympy(self):
-        """Symbolic representation"""
-
-    @abstractmethod
     def matrix(self):
         """Matrix Representation"""
 
     @abstractmethod
     def pprint(self) -> Math:
         """Display the function"""
-        # for e in self._:
-        #     display(Math(e.latex()))
 
     def idx(self) -> list[tuple]:
         """index"""
