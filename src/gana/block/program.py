@@ -68,7 +68,7 @@ class Prg:
 
             if name[-1] == '_':
                 raise ValueError(
-                    'Ending name with underscore is not recommended, can cause printing issues'
+                    'Ending name with underscore can cause printing issues'
                 )
 
             if name in self.names:

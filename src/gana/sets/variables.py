@@ -157,6 +157,14 @@ class V(Set):
         f.process()
         return f
 
+    def __rmul__(self, other: Self | F | int):
+        if isinstance(other, (int, float)):
+            if other == 1:
+                return self
+            other = float(other)
+        f = F(one=other, rel='×', two=self)
+        f.process()
+        return f
 
     def __truediv__(self, other: Self | F):
         f = F(one=self, two=other, rel='÷')

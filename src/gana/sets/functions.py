@@ -29,18 +29,36 @@ class F(Set):
         rel: str = '+',
         two: P | V | Self = None,
     ):
+        ord_one, ord_two = None, None
+        if one:
+            if not isinstance(one, (int, float)):
+                ord_one = one.order
+            else:
+                one = float(one)
+                ord_one = two.order
+
+        if two:
+            if not isinstance(two, (int, float)):
+                ord_two = two.order
+            else:
+                two = float(two)
+                ord_two = one.order
+
+        if not two and not one:
+            raise ValueError('one or two must be provided')
+
+        if ord_one and ord_two:
+            order = max(ord_one, ord_two)
+        elif ord_one and not ord_two:
+            order = ord_one
+        elif not ord_one and ord_two:
+            order = ord_two
+        else:
+            raise ValueError('Cannot operate with two constants')
+
         self.one = one
         self.two = two
         self.rel = rel
-
-        if self.one:
-            order = self.one.order
-
-        elif self.two:
-            order = self.two.order
-
-        else:
-            raise ValueError('one or two must be provided')
 
         super().__init__(*order)
 

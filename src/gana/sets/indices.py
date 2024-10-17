@@ -52,9 +52,6 @@ class I(Set):
         self.ordered: bool = None
         super().__init__(*indices)
 
-        if len(self.indices) == 1 and isinstance(self.indices[0], int):
-            self._ = True
-
         self.name = 'I'
 
     def process(self):
