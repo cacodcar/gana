@@ -26,6 +26,8 @@ class P(Set):
 
     def __init__(self, *indices: Idx | I, _: list[int | float | bool]):
 
+        name = None
+
         if len(indices) == 1 and isinstance(indices[0], int):
             if isinstance(_, (int, float)):
                 name = rf'{_}'
@@ -34,9 +36,6 @@ class P(Set):
             i.name = 'i'
             i.process()
             indices = (i,)
-
-        else:
-            name = None
 
         super().__init__(*indices)
 

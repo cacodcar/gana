@@ -111,7 +111,6 @@ class Var(X):
         return Cons(func=self - other, leq=True)
 
     def __ge__(self, other):
-
         return Cons(func=other - self, leq=True)
 
     def __lt__(self, other):

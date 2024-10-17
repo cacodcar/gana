@@ -126,8 +126,8 @@ class Prg:
             else:
                 self.vars_cnt.append(value)
 
-            if value.nn:
-                setattr(self, value.name + '_nn', value >= 0)
+            # if value.nn:
+            #     setattr(self, value.name + '_nn', value >= 0)
 
         if isinstance(value, F):
             value.n = len(self.funcsets)
@@ -161,21 +161,38 @@ class Prg:
         """RHS Parameter vector"""
         return [c.func.b(zero) for c in self.constraints]
 
-    def a(self, zero: bool = False) -> list[float | None]:
+    def make_nn(self):
+        """Makes non negativity constraints
+        for variables
+        """
+
+        for v in self.vars_cnt:
+            if v.nn:
+                setattr(self, v.name + '_nn', v >= 0)
+
+    def a(self, zero: bool = False) -> list[list[float | None]]:
         """Matrix of Variable coefficients"""
         a_ = []
 
+        self.make_nn()
+
         for c in self.constraints:
             if zero:
-                row = [0] * len(self.variables)
+                row = [0] * len(self.vars_cnt)
 
             else:
-                row = [None] * len(self.variables)
+                row = [None] * len(self.vars_cnt)
             for n, value in zip(c.x(), c.a()):
                 row[n] = value
             a_.append(row)
 
         return a_
+
+    def matrix(
+        self, zero: bool = False
+    ) -> tuple[list[list[float | None]], list[float | None]]:
+        """Matrix Representation"""
+        return self.a(zero), self.b(zero)
 
     def x(self) -> list[list[int]]:
         """Structure of the constraint matrix"""
