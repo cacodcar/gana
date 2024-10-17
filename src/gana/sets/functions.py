@@ -44,10 +44,7 @@ class F(Set):
 
         super().__init__(*order)
 
-        if self.one:
-            self.name = f'{self.one}{self.rel}{self.two}'
-        else:
-            self.name = f'{self.rel}{self.two}'
+        self.name = f'{self.one or ""}{self.rel}{self.two or ""}'
 
         self._: list[Func] = []
         # the flag _fixed is changed when .fix(val) is called

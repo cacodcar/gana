@@ -126,7 +126,7 @@ class Prg:
             else:
                 self.vars_cnt.append(value)
 
-            if value.nn: 
+            if value.nn:
                 setattr(self, value.name + '_nn', value >= 0)
 
         if isinstance(value, F):
@@ -271,14 +271,14 @@ class Prg:
 
         for i in (
             self.idxsets
-            + self.varsets
-            + self.parsets
-            + self.funcsets
-            + self.conssets
             + other.idxsets
+            + self.varsets
             + other.varsets
+            + self.parsets
             + other.parsets
+            + self.funcsets
             + other.funcsets
+            + self.conssets
             + other.conssets
         ):
             setattr(prg, i.name, i)

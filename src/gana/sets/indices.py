@@ -47,25 +47,33 @@ class I(Set):
         # if the single element is an integer
         # leave it so, it will be handled in the Program
         # has only unique members
+
         self.indices = indices
         self.ordered: bool = None
         super().__init__(*indices)
 
+        if len(self.indices) == 1 and isinstance(self.indices[0], int):
+            self._ = True
+
+        self.name = 'I'
+
     def process(self):
         """Process the set"""
-        if all([isinstance(x, str) for x in self.indices]):
-            self._ = [
-                Idx(name=x, parent=self, pos=n)
-                for n, x in enumerate(list(self.indices))
-            ]
+        if not self._:
+            if all([isinstance(x, str) for x in self.indices]):
+                self._ = [
+                    Idx(name=x, parent=self, pos=n)
+                    for n, x in enumerate(list(self.indices))
+                ]
 
-        elif all([isinstance(x, int) for x in self.indices]):
-            self._ = [
-                Idx(name=rf'{self.name}_{n}', parent=self, pos=n)
-                for n in range(sum(self.indices))
-            ]
-        else:
-            self._ = list(self.indices)
+            elif all([isinstance(x, int) for x in self.indices]):
+                self._ = [
+                    Idx(name=rf'{self.name}_{n}', parent=self, pos=n)
+                    for n in range(sum(self.indices))
+                ]
+
+            else:
+                self._ = list(self.indices)
 
     def matrix(self):
         """Matrix Representation"""

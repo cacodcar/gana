@@ -6,8 +6,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math
-from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
-                           NonNegativeReals, Reals)
+from pyomo.environ import Binary, Integers, NonNegativeIntegers, NonNegativeReals, Reals
 from pyomo.environ import Var as PyoVar
 from sympy import Idx, IndexedBase, Symbol, symbols
 
@@ -151,18 +150,13 @@ class V(Set):
         if other == 0:
             return -self
         else:
-            return - self + other
+            return -self + other
 
     def __mul__(self, other: Self | F):
         f = F(one=self, two=other, rel='×')
         f.process()
         return f
 
-    def __rmul__(self, other: Self | F | int):
-        if other == 1:
-            return self
-        else:
-            return self * other
 
     def __truediv__(self, other: Self | F):
         f = F(one=self, two=other, rel='÷')

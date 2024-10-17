@@ -15,9 +15,10 @@ from .functions import F
 from .ordered import Set
 from .variables import V
 
+from .indices import I
+
 if TYPE_CHECKING:
     from ..elements.index import Idx
-    from .indices import I
 
 
 class P(Set):
@@ -25,7 +26,21 @@ class P(Set):
 
     def __init__(self, *indices: Idx | I, _: list[int | float | bool]):
 
+        if len(indices) == 1 and isinstance(indices[0], int):
+            if isinstance(_, (int, float)):
+                name = rf'{_}'
+                _ = [float(_)] * indices[0]
+            i = I(indices[0])
+            i.name = 'i'
+            i.process()
+            indices = (i,)
+
+        else:
+            name = None
+
         super().__init__(*indices)
+
+        self.name = name
 
         self._: list[float | M] = _
 
@@ -107,11 +122,11 @@ class P(Set):
     def __sub__(self, other: Self):
         if isinstance(other, int) and other == 0:
             return self
-        
+
         if isinstance(other, P):
             self._ = [i - j for i, j in zip(self._, other._)]
             return self
-        
+
         f = F(one=self, rel='-', two=other)
         f.process()
         return f
