@@ -641,18 +641,59 @@ class Opn(X):
                         # (p*v)*(v1 + v2) = p*v*v1 + p*v*v2
                         return Opn(one=self * other.one, add=True, two=self * other.two)
 
-        if self.haspar:
             if self.add:
-                # (v + p)*v1 = v*v1 + p*v1
-                return Opn(one=self.one * other, add=True, two=self.two * other)
+                if other.add:
+                    # (v1 + v2)*(v3 + v4) = v1*v3 + v1*v4 + v2*v3 + v2*v4
+                    return Opn(one=self.one * other, add=True, two=self.two * other)
+                if other.sub:
+                    # (v1 + v2)*(v3 - v4) = v1*v3  + v2*v3 - v1*v4 - v2*v4
+                    return Opn(one=self.one * other, sub=True, two=self.two * other)
+
+                if other.mul:
+                    # (v1 + v2)*(p*v) = v1*p*v + v2*p*v
+                    return Opn(
+                        one=self.one * other.two, add=True, two=self.two * other.two
+                    )
 
             if self.sub:
-                # (v - p)*v1 = v*v1 - p*v1
-                return Opn(one=self.one * other, sub=True, two=self.two * other)
+                if other.add:
+                    # (v1 - v2)*(v3 + v4) = v1*(v3 + v4) - v2*(v3 + v4)
+                    return Opn(one=self.one * other, sub=True, two=self.two * other)
+
+                if other.sub:
+                    # (v1 - v2)*(v3 - v4) = v1*(v3 - v4) - v2*(v3 - v4)
+                    return Opn(one=self.one * other, sub=True, two=self.two * other)
+
+                if other.mul:
+                    # (v1 - v2)*(p*v) = p+v*v1 - p*v*v2
+                    return Opn(one=other * self.one, sub=True, two=other * self.two)
 
             if self.mul:
-                # (p*v)*v1 = p*v*v1
-                return Opn(one=self.one, mul=True, two=self.two * other)
+                if other.add:
+                    # (p*v)*(v1 + v2) = p*v*v1 + p*v*v2
+                    return Opn(one=self * other.one, add=True, two=self * other.two)
+
+                if other.sub:
+                    # (p*v)*(v1 - v2) = p*v*v1 - p*v*v2
+                    return Opn(one=self * other.one, sub=True, two=self * other.two)
+
+                if other.mul:
+                    # (p*v)*(p1*v1) = p*p1*v*v1
+                    return Opn(
+                        one=self.one * other.one, mul=True, two=self.two * other.two
+                    )
+
+        if self.add:
+            # (v + p)*v1 = v*v1 + p*v1
+            return Opn(one=self.one * other, add=True, two=self.two * other)
+
+        if self.sub:
+            # (v - p)*v1 = v*v1 - p*v1
+            return Opn(one=self.one * other, sub=True, two=self.two * other)
+
+        if self.mul:
+            # (p*v)*v1 = p*v*v1
+            return Opn(one=self.one, mul=True, two=self.two * other)
 
         return Opn(one=self, mul=True, two=other)
 
@@ -662,8 +703,8 @@ class Opn(X):
                 return self
             return self * other
 
-    # def __truediv__(self, other: float | Var | Self):
-    #     return Opn(one=self, two=other, rel='÷')
+    def __truediv__(self, other: float | Var | Self):
+        return Opn(one=self, div=True, two=other)
 
     def __eq__(self, other: float | Var | Self):
         return Cons(func=self - other)
