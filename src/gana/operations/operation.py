@@ -16,28 +16,28 @@ if TYPE_CHECKING:
 
 class Opn(X):
     """A Mathematical Operation
-    
-    Operations are only betweeen two elements, one and two 
+
+    Operations are only betweeen two elements, one and two
     and have a rel betwen them, mul, add, sub, div
 
     elements can be a number (int, float), a variable (Var) or another operation (Opn)
 
-    In the base form of an Opn haspar is True 
-    
+    In the base form of an Opn haspar is True
+
     add (v + p)
     sub (v - p)
     mul (p*v)
-    
+
     the placement of parameters (float, int) is consistent
     add/sub after the variable, mul before the variable
 
-    Generally, if haspar is False operations can be:  
+    Generally, if haspar is False operations can be:
 
     add (v1 + v2) or (opn + opn) or (v1 + opn) or (opn + v1)
     sub (v1 - v2) or (opn - opn) or (v1 - opn) or (opn - v1)
     mul (v1*v2) or (opn*opn) or (v1*opn) or (opn*v1)
 
-    An Opn cannot be defined but is rather generated when operating on: 
+    An Opn cannot be defined but is rather generated when operating on:
     variables or constants or operations themselves
     """
 
@@ -244,11 +244,11 @@ class Opn(X):
 
     def __pos__(self):
         return self
-    
-    # the choice of how to deal with the operation is determined by the following
-    # in order: 
 
-    # 1. what is the type of the other element 
+    # the choice of how to deal with the operation is determined by the following
+    # in order:
+
+    # 1. what is the type of the other element
     # number -int, float
     # operation - Opn
     # variable - Var
@@ -258,9 +258,8 @@ class Opn(X):
     # if self is add, sub, mul
 
     # 3. if the other is an Opn and has a parameter
-    # there are of type Opn(Opn(v, p) Opn(v, p)) 
-    
- 
+    # there are of type Opn(Opn(v, p) Opn(v, p))
+
     def __add__(self, other: int | float | Var | Self):
         # the number element is always taken at number two
 
@@ -497,26 +496,30 @@ class Opn(X):
     def __mul__(self, other: float | Var | Self):
 
         if isinstance(other, (int, float)):
-            if self.haspar: 
+            if self.haspar:
                 if self.add:
                     # (v + p)*p1 = v*p1 + p*p1)
-                    return Opn(one=self.one*other, add=True, two=self.two * other)
-                
+                    return Opn(one=self.one * other, add=True, two=self.two * other)
+
                 if self.sub:
                     # (v - p)*p1 = v*p1 - p*p1)
-                    return Opn(one=self.one*other, sub=True, two=self.two * other)
-                
-            if self.add: 
-                # (v1+ v2)*p = 
-                return Opn(one=other*self.one, add=True, two=other*self.two)
-            
+                    return Opn(one=self.one * other, sub=True, two=self.two * other)
+
+                if self.mul:
+                    # (p*v)*p1 = p*p1*v
+                    return Opn(one=self.one * other, mul=True, two=self.two)
+
+            if self.add:
+                # (v1+ v2)*p
+                return Opn(one=other * self.one, add=True, two=other * self.two)
+
             if self.sub:
-                # (v1 - v2)*p = 
-                return Opn(one=other*self.one, sub=True, two=other*self.two)
-            
+                # (v1 - v2)*p
+                return Opn(one=other * self.one, sub=True, two=other * self.two)
+
             if self.mul:
-                # (v1*v2)*p = 
-                return Opn(one=other*self.one, mul=True, two=self.two)
+                # (v1*v2)*p = p * (v1*v2)
+                return Opn(one=other, mul=True, two=self)
 
         if isinstance(other, Opn):
             if self.haspar:
@@ -524,99 +527,143 @@ class Opn(X):
                     if self.add:
                         if other.add:
                             # (v1 + p1)*(v2 + p2) = v1*v2 + v1*p2 + p1*v2 + p1*p2
-                            return Opn(one=self.one*other.one + self.one*other.two + other.one*self.two, add=True, two=self.two*other.two)
-                        
+                            return Opn(
+                                one=self.one * other.one
+                                + self.one * other.two
+                                + other.one * self.two,
+                                add=True,
+                                two=self.two * other.two,
+                            )
+
                         if other.sub:
                             # (v1 + p1)*(v2 - p2) = v1*v2 + v1*p2 - p1*v2 - p1*p2
-                            return Opn(one=self.one*other.one - self.one*other.two - other.one*self.two, sub=True, two=self.two*other.two)
-                        
+                            return Opn(
+                                one=self.one * other.one
+                                - self.one * other.two
+                                - other.one * self.two,
+                                sub=True,
+                                two=self.two * other.two,
+                            )
+
                         if other.mul:
                             # (v1 + p1)*(p2*v2) = v1*p2*v2 + p1*p2*v2
-                            return Opn(one=other.one*self.one*other.two, add=True, two=other.one*self.one*self.two)
-                        
+                            return Opn(
+                                one=other.one * self.one * other.two,
+                                add=True,
+                                two=other.one * self.one * self.two,
+                            )
+
                     if self.sub:
                         if other.add:
                             # (v1 - p1)*(v2 + p2) = v1*v2 + v1*p2 - p1*v2 - p1*p2
-                            return Opn(one=self.one*other.one + other.two*self.one - self.two*other.one, sub=True, two=self.two*other.two)
-                        
+                            return Opn(
+                                one=self.one * other.one
+                                + other.two * self.one
+                                - self.two * other.one,
+                                sub=True,
+                                two=self.two * other.two,
+                            )
+
                         if other.sub:
                             # (v1 - p1)*(v2 - p2) = v1*v2 + v1*p2 - p1*v2 - p1*p2
-                            return Opn(one=self.one*other.one + other.two*self.one - self.two*other.two, sub=True, two=self.two*other.two)
-                        
+                            return Opn(
+                                one=self.one * other.one
+                                + other.two * self.one
+                                - self.two * other.two,
+                                sub=True,
+                                two=self.two * other.two,
+                            )
+
                         if other.mul:
                             # (v1 - p1)*(p2*v2) = v1*p2*v2 - p1*p2*v2
-                            return Opn(one=other.one*self.one*other.two, sub=True, two=other.two*self.two*other.two)
-                        
+                            return Opn(
+                                one=other.one * self.one * other.two,
+                                sub=True,
+                                two=other.two * self.two * other.two,
+                            )
+
                     if self.mul:
                         if other.add:
                             # (p1*v1)*(v2 + p2) = p1*v1*v2 + p1*v1*p2
-                            return Opn(one=self.one*self.two*other.two, add=True, two=self.one*other.one*self.two)
-                        
+                            return Opn(
+                                one=self.one * self.two * other.two,
+                                add=True,
+                                two=self.one * other.one * self.two,
+                            )
+
                         if other.sub:
                             # (p1*v1)*(v2 - p2) = p1*v1*v2 - p1*v1*p2
-                            return Opn(one=self.one*self.two*other.two, sub=True, two=self.one*other.one*self.two)
-                        
+                            return Opn(
+                                one=self.one * self.two * other.two,
+                                sub=True,
+                                two=self.one * other.one * self.two,
+                            )
+
                         if other.mul:
                             # (p1*v1)*(p2*v2) = p1*p2*v1*v2
-                            return Opn(one= self.one*other.one, mul=True, two=self.two*other.two)
+                            return Opn(
+                                one=self.one * other.one,
+                                mul=True,
+                                two=self.two * other.two,
+                            )
 
                 # if the other opn has no parameter
 
                 if self.add:
                     if other.add:
                         # (v + p)*(v1 + v2) = v*v1 + v*v2 + p*v1 + p*v2
-                        return Opn(one=self.one*other, add=True, two=self.two*other)
-                    if other.sub: 
+                        return Opn(one=self.one * other, add=True, two=self.two * other)
+                    if other.sub:
                         # (v + p)*(v1 - v2) = v*v1 - v*v2 + p*v1 - p*v2
-                        return Opn(one=self.one*other, sub=True, two=self.two*other)
-                    
-                    if other.mul: 
+                        return Opn(one=self.one * other, sub=True, two=self.two * other)
+
+                    if other.mul:
                         # (v + p)*(p1*v) = v*p1*v + p*p1*v
-                        return Opn(one=self.one*other.two, add=True, two=self.two*other.two)
-                    
+                        return Opn(
+                            one=self.one * other.two, add=True, two=self.two * other.two
+                        )
+
                 if self.sub:
-                    if other.add: 
+                    if other.add:
                         # (v - p)*(v1 + v2) = v*v1 + v*v2 - p*v1 - p*v2
-                        return Opn(one=self.one*other, sub=True, two=self.two*other)
-                    
+                        return Opn(one=self.one * other, sub=True, two=self.two * other)
+
                     if other.sub:
                         # (v - p)*(v1 - v2) = v*v1 - v*v2 - p*v1 + p*v2
-                        return Opn(one=self.one*other, sub=True, two=self.two*other)
-                    
+                        return Opn(one=self.one * other, sub=True, two=self.two * other)
+
                     if other.mul:
                         # (v - p)*(p1*v) = v*p1*v - p*p1*v
-                        return Opn(one=self.one*other, sub=True, two=self.two*other)
-                    
+                        return Opn(one=self.one * other, sub=True, two=self.two * other)
+
                 if self.mul:
                     if other.add:
                         # (p*v)*(v1 + v2) = p*v*v1 + p*v*v2
-                        return Opn(one=self.one*other, add=True, two=self.two*other)
-                    
+                        return Opn(one=self * other.one, add=True, two=self * other.two)
 
+        if self.haspar:
+            if self.add:
+                # (v + p)*v1 = v*v1 + p*v1
+                return Opn(one=self.one * other, add=True, two=self.two * other)
 
+            if self.sub:
+                # (v - p)*v1 = v*v1 - p*v1
+                return Opn(one=self.one * other, sub=True, two=self.two * other)
 
+            if self.mul:
+                # (p*v)*v1 = p*v*v1
+                return Opn(one=self.one, mul=True, two=self.two * other)
 
-        if isinstance(other, Opn):
-
-
-
-        
-        if isinstance(self.one, (int, float)):
-            if other == 1:
-                return self
-            
-
-        return Opn(one=self, two=other, rel='×')
+        return Opn(one=self, mul=True, two=other)
 
     def __rmul__(self, other: float | Var | Self):
         if isinstance(other, (int, float)):
             if other == 1:
                 return self
-            return Opn(one=self, rel='×', two=float(other))
-        return Opn(one=other, rel='×', two=self)
+            return self * other
 
-    def __truediv__(self, other: float | Var | Self):
-        return Opn(one=self, two=other, rel='÷')
+    # def __truediv__(self, other: float | Var | Self):
+    #     return Opn(one=self, two=other, rel='÷')
 
     def __eq__(self, other: float | Var | Self):
         return Cons(func=self - other)
