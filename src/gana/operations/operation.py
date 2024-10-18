@@ -15,7 +15,31 @@ if TYPE_CHECKING:
 
 
 class Opn(X):
-    """A operation"""
+    """A Mathematical Operation
+    
+    Operations are only betweeen two elements, one and two 
+    and have a rel betwen them, mul, add, sub, div
+
+    elements can be a number (int, float), a variable (Var) or another operation (Opn)
+
+    In the base form of an Opn haspar is True 
+    
+    add (v + p)
+    sub (v - p)
+    mul (p*v)
+    
+    the placement of parameters (float, int) is consistent
+    add/sub after the variable, mul before the variable
+
+    Generally, if haspar is False operations can be:  
+
+    add (v1 + v2) or (opn + opn) or (v1 + opn) or (opn + v1)
+    sub (v1 - v2) or (opn - opn) or (v1 - opn) or (opn - v1)
+    mul (v1*v2) or (opn*opn) or (v1*opn) or (opn*v1)
+
+    An Opn cannot be defined but is rather generated when operating on: 
+    variables or constants or operations themselves
+    """
 
     def __init__(
         self,
@@ -220,8 +244,24 @@ class Opn(X):
 
     def __pos__(self):
         return self
+    
+    # the choice of how to deal with the operation is determined by the following
+    # in order: 
 
-    def __add__(self, other: float | Var | Self):
+    # 1. what is the type of the other element 
+    # number -int, float
+    # operation - Opn
+    # variable - Var
+
+    # 2. whether self has a parameter or not
+    # if haspar
+    # if self is add, sub, mul
+
+    # 3. if the other is an Opn and has a parameter
+    # there are of type Opn(Opn(v, p) Opn(v, p)) 
+    
+ 
+    def __add__(self, other: int | float | Var | Self):
         # the number element is always taken at number two
 
         if isinstance(other, (int, float)):
@@ -551,7 +591,6 @@ class Opn(X):
                     if other.add:
                         # (p*v)*(v1 + v2) = p*v*v1 + p*v*v2
                         return Opn(one=self.one*other, add=True, two=self.two*other)
-                    #TODO
                     
 
 
