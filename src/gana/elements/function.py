@@ -1,4 +1,4 @@
-"""Function"""
+"""Basic operations"""
 
 from __future__ import annotations
 
@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math, display
 
-from .constraint import Cons
-from .element import X
+from ..elements.constraint import Cons
+from ..elements.element import X
 
 if TYPE_CHECKING:
     from ..sets.functions import F
@@ -15,44 +15,92 @@ if TYPE_CHECKING:
 
 
 class Func(X):
-    """A function"""
+    """A Mathematical Operation
+
+    Operations are only betweeen two elements, one and two
+    and have a rel betwen them, mul, add, sub, div
+
+    elements can be a number (int, float), a variable (Var) or another operation (Func)
+
+    In the base form of an Func haspar is True
+
+    add (v + p)
+    sub (v - p)
+    mul (p*v)
+
+    the placement of parameters (float, int) is consistent
+    add/sub after the variable, mul before the variable
+
+    Generally, if haspar is False operations can be:
+
+    add (v1 + v2) or (opn + opn) or (v1 + opn) or (opn + v1)
+    sub (v1 - v2) or (opn - opn) or (v1 - opn) or (opn - v1)
+    mul (v1*v2) or (opn*opn) or (v1*opn) or (opn*v1)
+
+    An Func cannot be defined but is rather generated when operating on:
+    variables or constants or operations themselves
+    """
 
     def __init__(
         self,
-        rel: str,
+        one: float | Var | Self = 0,
+        two: float | Var | Self = 0,
+        mul: bool = False,
+        add: bool = False,
+        sub: bool = False,
+        div: bool = False,
         parent: F | Cons | Var = None,
         pos: int = None,
-        one: float | Var | Self = None,
-        two: float | Var | Self = None,
     ):
 
-        pwr_one, pwr_two = 0, 0
-        print(one, two)
-        if one:
-            # any parameter goes to two
-            if isinstance(one, (float, int, list)):
+        # if either one or two is a number
+        # set haspar to True
+        if isinstance(one, (int, float)):
+            if isinstance(two, (int, float)):
+                raise ValueError('Cannot multiply two numbers')
+            self.haspar = True
+
+        elif isinstance(two, (int, float)):
+            self.haspar = True
+
+        else:
+            self.haspar = False
+
+        if mul and add and sub and div:
+            raise ValueError('Only one operation allowed')
+
+        if mul and isinstance(two, (int, float)):
+            # keep number before the variable/operation
+            # multiplications are also p*v
+            one, two = two, one
+
+        if add and isinstance(one, (int, float)):
+            # keep number after the variable/operation
+            # additions are always v + p
+            one, two = two, one
+
+        if sub and isinstance(one, (int, float)):
+            # if negation, write as -1 * var
+            if one == 0:
+                # This is a negation
+                one = -1
+                mul = True
+                sub = False
+            else:
+                # keep number after the variable
+                # subtractions are always v - p
                 one, two = two, one
 
-            else:
-                pwr_one = one.pwr
+        if div and two == 0:
 
-        if two and not isinstance(two, (float, int, list)):
-            pwr_two = two.pwr
-
-        if rel == '×':
-            if isinstance(one, Func) and isinstance(two, float):
-                one.one = one.one * two
-                if isinstance(one.two, Func):
-                    one.two = one.two * two
-
-            self.pwr = pwr_one + pwr_two
-
-        if rel == '+' or rel == '-':
-            self.pwr = max(pwr_one, pwr_two)
+            raise ValueError('Division by zero')
 
         self.one = one
         self.two = two
-        self.rel = rel
+        self.mul = mul
+        self.add = add
+        self.sub = sub
+        self.div = div
 
         super().__init__(parent=parent, pos=pos)
 
@@ -60,26 +108,13 @@ class Func(X):
         self.name = ''.join([str(i) for i in self._])
 
     def __setattr__(self, name, value):
-
+        # change any number to float
         if name in ['one', 'two']:
 
             if isinstance(value, (int, float)):
                 value = float(value)
 
-            if isinstance(value, list):
-                value = [float(i) for i in value]
-
         super().__setattr__(name, value)
-
-    # we deal with the following forms of a function at the basic level
-    # note that func can just be a var
-    # I None +- func
-    # II par +- func
-    # III func +- par
-    # IV func +- func
-    # V par . func
-    # VI func . par
-    # VII func . func
 
     def elms(self):
         """Elements (Variables and Parameters) of the function"""
@@ -203,99 +238,255 @@ class Func(X):
         display(Math(self.latex()))
 
     def __neg__(self):
-
-        if self.one:
-            one = self.one.__neg__()
-        else:
-            one = None
-
-        if self.two:
-            two = self.two
-
-        else:
-            two = None
-
-        if self.rel == '+':
-
-            rel = '-'
-
-        elif self.rel == '-':
-
-            rel = '+'
-
-        else:
-            rel = self.rel
-
-        return Func(one=one, rel=rel, two=two)
+        return Func(one=0, sub=True, two=self)
 
     def __pos__(self):
         return self
 
-    def __add__(self, other: float | Var | Self):
+    # the choice of how to deal with the operation is determined by the following
+    # in order:
+
+    # 1. what is the type of the other element
+    # number -int, float
+    # operation - Func
+    # variable - Var
+
+    # 2. whether self has a parameter or not
+    # if haspar
+    # if self is add, sub, mul
+
+    # 3. if the other is an Func and has a parameter
+    # there are of type Func(Func(v, p) Func(v, p))
+
+    def __add__(self, other: int | float | Var | Self):
         # the number element is always taken at number two
-        if isinstance(self.two, float):
-            if isinstance(other, (int, float)):
-                one = self.one
-                two = self.two + float(other)
-                if two < 0:
-                    rel = '-'
-                    two = -two
-                else:
-                    rel = '+'
-            else:
-                two = self.two
-                one = self.one + other
-                rel = '+'
+        if isinstance(other, (int, float)):
+            if self.haspar:
+                if self.add:
+                    # v + p + p1 = v + (p + p1)
+                    return Func(one=self.one, add=True, two=self.two + other)
+                if self.sub:
+                    # v - p + p1  = v + (- p + p1)
+                    if self.two > other:
+                        return Func(one=self.one, sub=True, two=self.two - other)
+                    return Func(one=self.one, add=True, two=other - self.two)
 
-            return Func(one=one, rel=rel, two=two)
+        if isinstance(other, Func):
 
-        if isinstance(self.one, float):
-            if isinstance(other, (int, float)):
-                one = self.one + float(other)
-                two = self.two
-            else:
-                one = self.one
-                two = self.two + other
+            if self.haspar:
+                if other.haspar:
+                    if self.add:
+                        if other.add:
+                            # v + p + v1 + p1 = (v + v1) + (p + p1)
+                            return Func(
+                                one=self.one + other.one,
+                                add=True,
+                                two=self.two + other.two,
+                            )
 
-            return Func(one=one, rel='+', two=two)
+                        if other.sub:
+                            # v + p + v1 - p1 = (v + v1) + (p - p1)
+                            if self.two > other.two:
+                                return Func(
+                                    one=self.one + other.one,
+                                    add=True,
+                                    two=self.two - other.two,
+                                )
+                            return Func(
+                                one=self.one + other.one,
+                                add=True,
+                                two=other.two - self.two,
+                            )
+                        if other.mul:
+                            # v + p + p1*v = v + p1*v + p
+                            return Func(one=self.one + other, add=True, two=self.two)
 
-        return Func(one=self, rel='+', two=other)
+                    if self.sub:
+                        if other.add:
+                            # v - p + v1 + p1 = (v + v1) + (p + p1)
+                            if self.two > other.two:
+                                return Func(
+                                    one=self.one + other.one,
+                                    add=True,
+                                    two=self.two - other.two,
+                                )
+                            return Func(
+                                one=self.one + other.one, add=True, two=other - self.two
+                            )
 
-    def __radd__(self, other: float | Var | Self):
+                        if other.sub:
+                            # v - p + v1 - p1 = (v + v1) - (p + p1)
+                            return Func(
+                                one=self.one + other.one,
+                                sub=True,
+                                two=self.two + other.two,
+                            )
+
+                        if other.mul:
+                            # v - p + p1*v = v + p1*v - p
+                            return Func(
+                                one=self.one + other.two, sub=True, two=self.two
+                            )
+
+                    if self.mul:
+
+                        if other.add:
+                            # p*v + v1 + p1 = (p*v + v1) + p1
+                            return Func(one=self + other.one, add=True, two=other.two)
+
+                        if other.sub:
+                            # p*v + v1 - p1 = (p*v + v1) - p1
+                            return Func(one=self + other.one, sub=True, two=other.two)
+
+                # if the other opn has no parameter
+
+                if self.add:
+                    # v + p + v1 + v2 = (v + v1 + v2) + p
+                    # v + p + v1 - v2 = (v + v1 - v2) + p
+                    return Func(one=self.one + other, add=True, two=self.two)
+
+                if self.sub:
+                    # v - p + v1 + v2 = (v + v1 + v2) - p
+                    # v - p + v1 - v2 = (v + v1 - v2) - p
+                    # v - p + v1*v2 = (v + v1*v2) - p
+                    return Func(one=self.one + other, sub=True, two=self.two)
+
+        # if not Func or float should be Var
+        if self.haspar:
+            if self.add:
+                # v + p + v1 = v + v1 + p)
+                return Func(one=self.one + other, add=True, two=self.two)
+            if self.sub:
+                # v - p + v1 = v + v1 -p
+                return Func(one=self.one + other, sub=True, two=self.two)
+
+        # p*v + p1*v1 = (p*v) + p1*v1
+        # v + p*v = (v) + p*v
+        # p*v + v1
+        # if no parameter in self
+        # v1 + v2  + v3
+        # v1 - v2  + v3
+        # v1*v2 + v3
+        return Func(one=self, add=True, two=other)
+
+    def __radd__(self, other: float):
+
         if other == 0:
             return self
-        else:
-            return self + other
+
+        return self + other
 
     def __sub__(self, other: float | Var | Self):
 
-        if isinstance(self.two, float):
-            if isinstance(other, (int, float)):
-                one = self.one
-                two = self.two - float(other)
-                if two < 0:
-                    rel = '-'
-                    two = -two
-                else:
-                    rel = '+'
-            else:
-                one = self.one - other
-                two = self.two
-                rel = '-'
+        if isinstance(other, (int, float)):
+            if self.haspar:
+                if self.sub:
+                    # v - p - p1 = v + (p + p1)
+                    return Func(one=self.one, sub=True, two=self.two + other)
 
-            return Func(one=one, rel=rel, two=two)
+                if self.add:
+                    # v + p - p1  = v +  (p - p1)
+                    if self.two > other:
+                        return Func(one=self.one, add=True, two=self.two - other)
+                    return Func(one=self.one, sub=True, two=other - self.two)
 
-        if isinstance(self.one, float):
-            if isinstance(other, (int, float)):
-                one = self.one - float(other)
-                two = self.two
-            else:
-                one = self.one
-                two = self.two - other
+        if isinstance(other, Func):
+            if self.haspar:
+                if other.haspar:
+                    if self.add:
+                        if other.add:
+                            # v + p - (v1 + p1) = (v - v1) + (p - p1)
+                            if self.two > other.two:
+                                return Func(
+                                    one=self.one + other.one,
+                                    add=True,
+                                    two=self.two - other.two,
+                                )
+                            return Func(
+                                one=self.one - other.one,
+                                sub=True,
+                                two=other.two - self.two,
+                            )
 
-            return Func(one=one, rel='-', two=two)
+                        if other.sub:
+                            # v + p - (v1 - p1) = (v - v1) + (p + p1)
+                            return Func(
+                                one=self.one - other.one,
+                                add=True,
+                                two=self.two + other.two,
+                            )
 
-        return Func(one=self, rel='-', two=other)
+                        if other.mul:
+                            # v + p + p1*v = v + p1*v + p
+                            return Func(one=self.one - other, add=True, two=self.two)
+
+                    if self.sub:
+                        if other.add:
+                            # v - p - (v1 + p1) = (v + v1) - (p + p1)
+                            return Func(
+                                one=self.one + other.one, sub=True, two=other + self.two
+                            )
+
+                        if other.sub:
+                            # v - p - (v1 - p1) = (v - v1) - p + p1
+                            if self.two > other.two:
+                                return Func(
+                                    one=self.one - other.one,
+                                    sub=True,
+                                    two=self.two - other.two,
+                                )
+                            return Func(
+                                one=self.one - other.one,
+                                add=True,
+                                two=other.two - self.two,
+                            )
+
+                        if other.mul:
+                            # v - p + p1*v = v + p1*v - p
+                            return Func(
+                                one=self.one - other.two, sub=True, two=self.two
+                            )
+
+                    if self.mul:
+
+                        if other.add:
+                            # p*v - (v1 + p1) = (p*v - v1) - p1
+                            return Func(one=self - other.one, sub=True, two=other.two)
+
+                        if other.sub:
+                            # p*v - (v1 - p1) = (p*v - v1) + p1
+                            return Func(one=self - other.one, sub=True, two=other.two)
+
+                # if the other opn has no parameter
+
+                if self.add:
+                    # v + p + v1 + v2 = (v + v1 + v2) + p
+                    # v + p + v1 - v2 = (v + v1 - v2) + p
+                    return Func(one=self.one - other, add=True, two=self.two)
+
+                if self.sub:
+                    # v - p + v1 + v2 = (v + v1 + v2) - p
+                    # v - p + v1 - v2 = (v + v1 - v2) - p
+                    # v - p + v1*v2 = (v + v1*v2) - p
+                    return Func(one=self.one - other, sub=True, two=self.two)
+
+        # if not Func or float should be Var
+        if self.haspar:
+            if self.add:
+                # v + p - v1 = v - v1 + p
+                return Func(one=self.one - other, add=True, two=self.two)
+            if self.sub:
+                # v - p - v1 = v - v1 -p
+                return Func(one=self.one - other, sub=True, two=self.two)
+
+        # p*v + p1*v1 = (p*v) + p1*v1
+        # v + p*v = (v) + p*v
+        # p*v + v1
+        # if no parameter in self
+        # v1 + v2  + v3
+        # v1 - v2  + v3
+        # v1*v2 + v3
+        return Func(one=self, sub=True, two=other)
 
     def __rsub__(self, other: float | Var | Self):
         if other == 0:
@@ -304,20 +495,229 @@ class Func(X):
             return -self + other
 
     def __mul__(self, other: float | Var | Self):
-        if isinstance(self.one, (int, float)):
-            if other == 1:
-                return self
-        return Func(one=self, two=other, rel='×')
+
+        if isinstance(other, (int, float)):
+            if self.haspar:
+                if self.add:
+                    # (v + p)*p1 = v*p1 + p*p1)
+                    return Func(one=self.one * other, add=True, two=self.two * other)
+
+                if self.sub:
+                    # (v - p)*p1 = v*p1 - p*p1)
+                    return Func(one=self.one * other, sub=True, two=self.two * other)
+
+                if self.mul:
+                    # (p*v)*p1 = p*p1*v
+                    return Func(one=self.one * other, mul=True, two=self.two)
+
+            if self.add:
+                # (v1+ v2)*p
+                return Func(one=other * self.one, add=True, two=other * self.two)
+
+            if self.sub:
+                # (v1 - v2)*p
+                return Func(one=other * self.one, sub=True, two=other * self.two)
+
+            if self.mul:
+                # (v1*v2)*p = p * (v1*v2)
+                return Func(one=other, mul=True, two=self)
+
+        if isinstance(other, Func):
+            if self.haspar:
+                if other.haspar:
+                    if self.add:
+                        if other.add:
+                            # (v1 + p1)*(v2 + p2) = v1*v2 + v1*p2 + p1*v2 + p1*p2
+                            return Func(
+                                one=self.one * other.one
+                                + self.one * other.two
+                                + other.one * self.two,
+                                add=True,
+                                two=self.two * other.two,
+                            )
+
+                        if other.sub:
+                            # (v1 + p1)*(v2 - p2) = v1*v2 + v1*p2 - p1*v2 - p1*p2
+                            return Func(
+                                one=self.one * other.one
+                                - self.one * other.two
+                                - other.one * self.two,
+                                sub=True,
+                                two=self.two * other.two,
+                            )
+
+                        if other.mul:
+                            # (v1 + p1)*(p2*v2) = v1*p2*v2 + p1*p2*v2
+                            return Func(
+                                one=other.one * self.one * other.two,
+                                add=True,
+                                two=other.one * self.one * self.two,
+                            )
+
+                    if self.sub:
+                        if other.add:
+                            # (v1 - p1)*(v2 + p2) = v1*v2 + v1*p2 - p1*v2 - p1*p2
+                            return Func(
+                                one=self.one * other.one
+                                + other.two * self.one
+                                - self.two * other.one,
+                                sub=True,
+                                two=self.two * other.two,
+                            )
+
+                        if other.sub:
+                            # (v1 - p1)*(v2 - p2) = v1*v2 + v1*p2 - p1*v2 - p1*p2
+                            return Func(
+                                one=self.one * other.one
+                                + other.two * self.one
+                                - self.two * other.two,
+                                sub=True,
+                                two=self.two * other.two,
+                            )
+
+                        if other.mul:
+                            # (v1 - p1)*(p2*v2) = v1*p2*v2 - p1*p2*v2
+                            return Func(
+                                one=other.one * self.one * other.two,
+                                sub=True,
+                                two=other.two * self.two * other.two,
+                            )
+
+                    if self.mul:
+                        if other.add:
+                            # (p1*v1)*(v2 + p2) = p1*v1*v2 + p1*v1*p2
+                            return Func(
+                                one=self.one * self.two * other.two,
+                                add=True,
+                                two=self.one * other.one * self.two,
+                            )
+
+                        if other.sub:
+                            # (p1*v1)*(v2 - p2) = p1*v1*v2 - p1*v1*p2
+                            return Func(
+                                one=self.one * self.two * other.two,
+                                sub=True,
+                                two=self.one * other.one * self.two,
+                            )
+
+                        if other.mul:
+                            # (p1*v1)*(p2*v2) = p1*p2*v1*v2
+                            return Func(
+                                one=self.one * other.one,
+                                mul=True,
+                                two=self.two * other.two,
+                            )
+
+                # if the other opn has no parameter
+
+                if self.add:
+                    if other.add:
+                        # (v + p)*(v1 + v2) = v*v1 + v*v2 + p*v1 + p*v2
+                        return Func(
+                            one=self.one * other, add=True, two=self.two * other
+                        )
+                    if other.sub:
+                        # (v + p)*(v1 - v2) = v*v1 - v*v2 + p*v1 - p*v2
+                        return Func(
+                            one=self.one * other, sub=True, two=self.two * other
+                        )
+
+                    if other.mul:
+                        # (v + p)*(p1*v) = v*p1*v + p*p1*v
+                        return Func(
+                            one=self.one * other.two, add=True, two=self.two * other.two
+                        )
+
+                if self.sub:
+                    if other.add:
+                        # (v - p)*(v1 + v2) = v*v1 + v*v2 - p*v1 - p*v2
+                        return Func(
+                            one=self.one * other, sub=True, two=self.two * other
+                        )
+
+                    if other.sub:
+                        # (v - p)*(v1 - v2) = v*v1 - v*v2 - p*v1 + p*v2
+                        return Func(
+                            one=self.one * other, sub=True, two=self.two * other
+                        )
+
+                    if other.mul:
+                        # (v - p)*(p1*v) = v*p1*v - p*p1*v
+                        return Func(
+                            one=self.one * other, sub=True, two=self.two * other
+                        )
+
+                if self.mul:
+                    if other.add:
+                        # (p*v)*(v1 + v2) = p*v*v1 + p*v*v2
+                        return Func(
+                            one=self * other.one, add=True, two=self * other.two
+                        )
+
+            if self.add:
+                if other.add:
+                    # (v1 + v2)*(v3 + v4) = v1*v3 + v1*v4 + v2*v3 + v2*v4
+                    return Func(one=self.one * other, add=True, two=self.two * other)
+                if other.sub:
+                    # (v1 + v2)*(v3 - v4) = v1*v3  + v2*v3 - v1*v4 - v2*v4
+                    return Func(one=self.one * other, sub=True, two=self.two * other)
+
+                if other.mul:
+                    # (v1 + v2)*(p*v) = v1*p*v + v2*p*v
+                    return Func(
+                        one=self.one * other.two, add=True, two=self.two * other.two
+                    )
+
+            if self.sub:
+                if other.add:
+                    # (v1 - v2)*(v3 + v4) = v1*(v3 + v4) - v2*(v3 + v4)
+                    return Func(one=self.one * other, sub=True, two=self.two * other)
+
+                if other.sub:
+                    # (v1 - v2)*(v3 - v4) = v1*(v3 - v4) - v2*(v3 - v4)
+                    return Func(one=self.one * other, sub=True, two=self.two * other)
+
+                if other.mul:
+                    # (v1 - v2)*(p*v) = p+v*v1 - p*v*v2
+                    return Func(one=other * self.one, sub=True, two=other * self.two)
+
+            if self.mul:
+                if other.add:
+                    # (p*v)*(v1 + v2) = p*v*v1 + p*v*v2
+                    return Func(one=self * other.one, add=True, two=self * other.two)
+
+                if other.sub:
+                    # (p*v)*(v1 - v2) = p*v*v1 - p*v*v2
+                    return Func(one=self * other.one, sub=True, two=self * other.two)
+
+                if other.mul:
+                    # (p*v)*(p1*v1) = p*p1*v*v1
+                    return Func(
+                        one=self.one * other.one, mul=True, two=self.two * other.two
+                    )
+
+        if self.add:
+            # (v + p)*v1 = v*v1 + p*v1
+            return Func(one=self.one * other, add=True, two=self.two * other)
+
+        if self.sub:
+            # (v - p)*v1 = v*v1 - p*v1
+            return Func(one=self.one * other, sub=True, two=self.two * other)
+
+        if self.mul:
+            # (p*v)*v1 = p*v*v1
+            return Func(one=self.one, mul=True, two=self.two * other)
+
+        return Func(one=self, mul=True, two=other)
 
     def __rmul__(self, other: float | Var | Self):
         if isinstance(other, (int, float)):
             if other == 1:
                 return self
-            return Func(one=self, rel='×', two=float(other))
-        return Func(one=other, rel='×', two=self)
+            return self * other
 
     def __truediv__(self, other: float | Var | Self):
-        return Func(one=self, two=other, rel='÷')
+        return Func(one=self, div=True, two=other)
 
     def __eq__(self, other: float | Var | Self):
         return Cons(func=self - other)

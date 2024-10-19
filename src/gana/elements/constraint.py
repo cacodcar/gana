@@ -11,7 +11,7 @@ from .element import X
 if TYPE_CHECKING:
     from ..sets.constraints import C
     from .function import Func
-    from .variable import Var
+    from ..operations.Unit import Var
 
 
 class Cons(X):

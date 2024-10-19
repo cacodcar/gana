@@ -11,27 +11,16 @@ from IPython.display import Math
 class Set(ABC):
     """An Ordered Set"""
 
-    def __init__(self, *order):
+    def __init__(self, *order, name: str = None):
         # index of the set
         self.order = order
-        self.name: str = None
-        # number of index set
+        self.name = name
+        # order in Program
         self.n: int = None
-
-        # set via the child method or taken as input
-        self._ = []
 
     @abstractmethod
     def process(self):
         """Child of the set"""
-
-    @abstractmethod
-    def latex(self) -> str:
-        """LaTeX representation"""
-
-    @abstractmethod
-    def matrix(self):
-        """Matrix Representation"""
 
     @abstractmethod
     def pprint(self) -> Math:
@@ -39,9 +28,12 @@ class Set(ABC):
 
     def idx(self) -> list[tuple]:
         """index"""
-        if len(self.order) > 1:
-            return [i for i in prod(self.order)._]
+        if isinstance(self.order, int):
+            return [(i,) for i in range(self.order)]
 
+        if len(self.order) > 1:
+            # Index Set
+            return [i for i in prod(self.order)._]
         return self.order[0]._
 
     def __len__(self):

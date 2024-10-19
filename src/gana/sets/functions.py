@@ -10,12 +10,12 @@ from IPython.display import Math
 from ..elements.function import Func
 from .constraints import C
 from .ordered import Set
+from .indices import I
 
 if TYPE_CHECKING:
     from sympy import Add
 
     from ..elements.index import Idx
-    from .indices import I
     from .parameters import P
     from .variables import V
 
@@ -25,63 +25,52 @@ class F(Set):
 
     def __init__(
         self,
-        one: P | V | Self = None,
-        rel: str = '+',
-        two: P | V | Self = None,
+        one: P | V | Self = 0,
+        two: P | V | Self = 0,
+        mul: bool = False,
+        add: bool = False,
+        sub: bool = False,
+        div: bool = False,
     ):
-        ord_one, ord_two = None, None
-        if one:
-            if not isinstance(one, (int, float)):
-                ord_one = one.order
-            else:
-                one = float(one)
-                ord_one = two.order
+        self._: list[Func]= []
 
-        if two:
-            if not isinstance(two, (int, float)):
-                ord_two = two.order
-            else:
-                two = float(two)
-                ord_two = one.order
-
-        if not two and not one:
-            raise ValueError('one or two must be provided')
-
-        if ord_one and ord_two:
-            order = max(ord_one, ord_two)
-        elif ord_one and not ord_two:
-            order = ord_one
-        elif not ord_one and ord_two:
-            order = ord_two
+        if mul:
+            rel = '×'
+        elif add:
+            rel = '+'
+        elif sub:
+            rel = '-'
+        elif div:
+            rel = '÷'
         else:
-            raise ValueError('Cannot operate with two constants')
+            raise ValueError('one of mul, add, sub or div must be True')
 
-        self.one = one
-        self.two = two
-        self.rel = rel
+        if isinstance(one, list):
+            if isinstance(two, list):
+                raise ValueError('Cannot operate with two lists')
+            order = (I(len(one)), two.order)
 
-        super().__init__(*order)
+        elif isinstance(two, list): 
+            order = (one.order, I(len(two)))
 
-        self.name = f'{self.one or ""}{self.rel}{self.two or ""}'
+        elif isinstance(one, (int, float)):
+            if isinstance(two, (int, float)):
+                raise ValueError('Cannot operate with two constants')
+            order = (one.order, I(len(two))) 
 
-        self._: list[Func] = []
-        # the flag _fixed is changed when .fix(val) is called
+        elif isinstance(two, (int, float)):
+            order = (I(len(one)), two.order)
+            
+        else:
+            order = (one.order, two.order)
 
-        self.a, self.b = [], []
+        name = f'{one or ""}{rel}{two or ""}'
 
-    def process(self):
-
-        if (
-            self.one
-            and not isinstance(self.one, (float, int))
-            and not isinstance(self.two, (float, int))
-            and len(self.one) != len(self.two)
-        ):
-            raise ValueError(
-                'Cannot operate with variable sets with different cardinalities'
-            )
+        super().__init__(*order, name=name)
 
         for n, idx in enumerate(self.idx()):
+
+
             if self.one:
                 if isinstance(self.one, (int, float)):
                     one = self.one
@@ -99,7 +88,26 @@ class F(Set):
             else:
                 two = None
 
-            self._.append(Func(parent=self, pos=n, one=one, rel=self.rel, two=two))
+                self._.append(Func(parent=self, pos=n, one=one, rel=self.rel, two=two))
+            
+
+
+
+
+        self.one = one
+        self.two = two
+        self.rel = rel
+        self.mul = mul
+        self.add = add
+        self.sub = sub
+        self.div = div
+
+        # the flag _fixed is changed when .fix(val) is called
+
+        self.a, self.b = [], []
+
+    def process(self):
+
 
     def matrix(self):
         """Variable and Parameter Vectors"""
