@@ -122,19 +122,13 @@ class V(Set):
         return str(self)
 
     def __neg__(self):
-        f = F(rel='-', two=self)
-        f.process()
-        return f
+        return F(sub=True, two=self)
 
     def __pos__(self):
-        f = F(rel='+', two=self)
-        f.process()
-        return f
+        return F(add=True, two=self)
 
     def __add__(self, other: Self | F):
-        f = F(one=self, rel='+', two=other)
-        f.process()
-        return f
+        return F(one=self, add=True, two=other)
 
     def __radd__(self, other: Self | F):
         if other == 0:
@@ -142,9 +136,7 @@ class V(Set):
         return self + other
 
     def __sub__(self, other: Self | F):
-        f = F(one=self, two=other, rel='-')
-        f.process()
-        return f
+        return F(one=self, sub=True, two=other)
 
     def __rsub__(self, other: Self | F | int):
         if other == 0:
@@ -153,23 +145,17 @@ class V(Set):
             return -self + other
 
     def __mul__(self, other: Self | F):
-        f = F(one=self, two=other, rel='×')
-        f.process()
-        return f
+        return F(one=self, mul=True, two=other)
 
     def __rmul__(self, other: Self | F | int):
         if isinstance(other, (int, float)):
             if other == 1:
                 return self
             other = float(other)
-        f = F(one=other, rel='×', two=self)
-        f.process()
-        return f
+        return F(one=other, mul=True, two=self)
 
     def __truediv__(self, other: Self | F):
-        f = F(one=self, two=other, rel='÷')
-        f.process()
-        return f
+        return F(one=self, two=other, div=True)
 
     def __rtruediv__(self, other: Self | F | int):
         if other == 1:

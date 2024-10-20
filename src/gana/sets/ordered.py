@@ -18,14 +18,6 @@ class Set(ABC):
         # order in Program
         self.n: int = None
 
-    @abstractmethod
-    def process(self):
-        """Child of the set"""
-
-    @abstractmethod
-    def pprint(self) -> Math:
-        """Display the function"""
-
     def idx(self) -> list[tuple]:
         """index"""
         if isinstance(self.order, int):

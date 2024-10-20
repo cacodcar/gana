@@ -60,7 +60,7 @@ class F(Set):
 
         elif isinstance(two, (int, float)):
             order = (I(len(one)), two.order)
-            
+
         else:
             order = (one.order, two.order)
 
@@ -71,10 +71,9 @@ class F(Set):
         for n, idx in enumerate(self.idx()):
 
 
-            if self.one:
-                if isinstance(self.one, (int, float)):
-                    one = self.one
-                else:
+            if one:
+                if isinstance(one, (int, float)):
+               
                     one = self.one(idx)
             else:
                 one = None
@@ -105,9 +104,6 @@ class F(Set):
         # the flag _fixed is changed when .fix(val) is called
 
         self.a, self.b = [], []
-
-    def process(self):
-
 
     def matrix(self):
         """Variable and Parameter Vectors"""
