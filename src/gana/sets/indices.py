@@ -52,7 +52,7 @@ class I(Set):
         self.ordered: bool = None
         super().__init__(*indices)
 
-        self.name = 'I'
+        self._: list[Idx] = None 
 
     def process(self):
         """Process the set"""
@@ -72,8 +72,15 @@ class I(Set):
             else:
                 self._ = list(self.indices)
 
-    def matrix(self):
-        """Matrix Representation"""
+    def __setattr__(self, name, value):
+
+        if isinstance(value, Idx): 
+
+            
+
+        super().__setattr__(name, value)
+
+
 
     def latex(self, descriptive: bool = False) -> str:
         """LaTeX representation"""

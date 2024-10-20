@@ -499,7 +499,7 @@ class Func(X):
         if isinstance(other, (int, float)):
             if self.haspar:
                 if self.add:
-                    # (v + p)*p1 = v*p1 + p*p1)
+                    # (v + p)*p1 = v*p1 + p*p1
                     return Func(one=self.one * other, add=True, two=self.two * other)
 
                 if self.sub:
