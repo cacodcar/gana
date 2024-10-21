@@ -75,8 +75,8 @@ class I(Set):
     def __setattr__(self, name, value):
 
         if isinstance(value, Idx): 
-
             
+
 
         super().__setattr__(name, value)
 
