@@ -2,13 +2,10 @@
 Forms the base for all element sets 
 """
 
-from abc import ABC, abstractmethod
 from math import prod
 
-from IPython.display import Math
 
-
-class Set(ABC):
+class Set:
     """An Ordered Set"""
 
     def __init__(self, *order, name: str = None):
