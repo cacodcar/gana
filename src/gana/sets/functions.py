@@ -32,7 +32,7 @@ class F(Set):
         sub: bool = False,
         div: bool = False,
     ):
-        self._: list[Func]= []
+        self._: list[Func] = []
 
         if mul:
             rel = '×'
@@ -48,18 +48,18 @@ class F(Set):
         if isinstance(one, list):
             if isinstance(two, list):
                 raise ValueError('Cannot operate with two lists')
-            order = (I(len(one)), two.order)
+            order = (I(size=len(one)), two.order)
 
-        elif isinstance(two, list): 
-            order = (one.order, I(len(two)))
+        elif isinstance(two, list):
+            order = (one.order, I(size=len(two)))
 
         elif isinstance(one, (int, float)):
             if isinstance(two, (int, float)):
                 raise ValueError('Cannot operate with two constants')
-            order = (one.order, I(len(two))) 
+            order = (one.order, I(size=len(two)))
 
         elif isinstance(two, (int, float)):
-            order = (I(len(one)), two.order)
+            order = (I(size=len(one)), two.order)
 
         else:
             order = (one.order, two.order)
@@ -70,10 +70,9 @@ class F(Set):
 
         for n, idx in enumerate(self.idx()):
 
-
             if one:
                 if isinstance(one, (int, float)):
-               
+
                     one = self.one(idx)
             else:
                 one = None
@@ -88,10 +87,6 @@ class F(Set):
                 two = None
 
                 self._.append(Func(parent=self, pos=n, one=one, rel=self.rel, two=two))
-            
-
-
-
 
         self.one = one
         self.two = two

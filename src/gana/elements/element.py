@@ -14,15 +14,16 @@ class X:
     def __init__(self, pos: int = None, parent: Set = None):
 
         # name of the element
-        if parent:
-            self.name = parent.name + rf'_{pos}'
+        if hasattr(parent, 'name'):
+            self.name = parent.name + rf'{pos}'
         else:
-            self.name = None
+            self.name = 'X'
 
         # ordered set to which the element belongs
         self.parent = parent
 
-        # position in the ordered set
+        # position in the ordered
+        # ordinality
         self.pos = pos
 
         # position in the problem

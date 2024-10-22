@@ -12,13 +12,11 @@ class Set:
         # index of the set
         self.order = order
         self.name = name
-        # order in Program
+        # position of the set in the program
         self.n: int = None
 
     def idx(self) -> list[tuple]:
         """index"""
-        if isinstance(self.order, int):
-            return [(i,) for i in range(self.order)]
 
         if len(self.order) > 1:
             # Index Set
@@ -42,4 +40,5 @@ class Set:
         cls.__hash__ = Set.__hash__
 
     def __bool__(self):
-        return bool(self.name)
+        if self.order:
+            return True

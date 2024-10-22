@@ -84,7 +84,6 @@ class Prg:
 
             value.name = name
             self.names.append(name)
-            value.process()
 
         if isinstance(value, I):
             value.n = len(self.idxsets)

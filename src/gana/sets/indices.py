@@ -43,44 +43,36 @@ class I(Set):
 
     """
 
-    def __init__(self, *indices: str):
+    def __init__(self, *members: str, size: int = None):
         # if the single element is an integer
         # leave it so, it will be handled in the Program
         # has only unique members
 
-        self.indices = indices
-        self.ordered: bool = None
-        super().__init__(*indices)
+        if all([isinstance(x, str) for x in members]):
+            self.members = [
+                Idx(name=x, parent=self, pos=n) for n, x in enumerate(list(members))
+            ]
+            self.ordered = False
 
-        self._: list[Idx] = None 
+        if size:
+            self.members = [
+                Idx(name=f'idx{x}', parent=self, pos=x) for x in range(size)
+            ]
+            self.ordered = True
 
-    def process(self):
-        """Process the set"""
-        if not self._:
-            if all([isinstance(x, str) for x in self.indices]):
-                self._ = [
-                    Idx(name=x, parent=self, pos=n)
-                    for n, x in enumerate(list(self.indices))
-                ]
+        super().__init__(*members)
 
-            elif all([isinstance(x, int) for x in self.indices]):
-                self._ = [
-                    Idx(name=rf'{self.name}_{n}', parent=self, pos=n)
-                    for n in range(sum(self.indices))
-                ]
-
-            else:
-                self._ = list(self.indices)
+    @property
+    def _(self):
+        return self.members
 
     def __setattr__(self, name, value):
 
-        if isinstance(value, Idx): 
-            
-
+        if name == 'name' and value and self.ordered:
+            for m in self.members:
+                m.name = rf'{value}{m.pos}'
 
         super().__setattr__(name, value)
-
-
 
     def latex(self, descriptive: bool = False) -> str:
         """LaTeX representation"""
@@ -169,7 +161,6 @@ class I(Set):
                     f'{set(self._) & set(other._)} in both',
                 )
         idxset = I(*list(product(self._, other._)))
-        idxset.process()
         return idxset
 
     def __rmul__(self, other: Self):
