@@ -33,19 +33,12 @@ class F(ESet):
         div: bool = False,
     ):
         self._: list[Func] = []
-
-        if mul:
-            rel = '×'
-        elif add:
-            rel = '+'
-        elif sub:
-            rel = '-'
-        elif div:
-            rel = '÷'
-        else:
-            raise ValueError('one of mul, add, sub or div must be True')
-
-        name = f'{one or ""}{rel}{two or ""}'
+        self.one = one
+        self.two = two
+        self.mul = mul
+        self.add = add
+        self.sub = sub
+        self.div = div
 
         if isinstance(one, list):
             if isinstance(two, list):
@@ -65,6 +58,8 @@ class F(ESet):
 
         else:
             order = (one.order, two.order)
+
+        name = f'{one or ""}{self.rel}{two or ""}'
 
         super().__init__(*order, name=name)
 
@@ -103,17 +98,23 @@ class F(ESet):
                 )
             )
 
-        self.one = one
-        self.two = two
-        self.rel = rel
-        self.mul = mul
-        self.add = add
-        self.sub = sub
-        self.div = div
-
         # the flag _fixed is changed when .fix(val) is called
 
         self.a, self.b = [], []
+
+    @property
+    def rel(self):
+        """Relation between the two elements"""
+        if self.mul:
+            return '×'
+        elif self.add:
+            return '+'
+        elif self.sub:
+            return '-'
+        elif self.div:
+            return '÷'
+        else:
+            raise ValueError('one of mul, add, sub or div must be True')
 
     def matrix(self):
         """Variable and Parameter Vectors"""

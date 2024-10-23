@@ -134,6 +134,7 @@ class P(ESet):
 
         if isinstance(other, F):
             return F(one=self, div=True, two=other)
+        
         if isinstance(other, V):
             return F(one=self, div=True, two=other)
 

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from IPython.display import Math, display
 
 from ..elements.constraint import Cons
-from .ordered import Set
+from .ordered import ESet
 
 if TYPE_CHECKING:
     from ..elements.index import Idx
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from .variables import V
 
 
-class C(Set):
+class C(ESet):
     """Constraint gives the relationship between Parameters, Variables, or Expressions"""
 
     def __init__(
@@ -29,7 +29,6 @@ class C(Set):
         self.leq = leq
 
         # since indices should match, take any
-        order = self.funcs.order
 
         # whether the constraint is binding
         self.binding = False
@@ -40,19 +39,24 @@ class C(Set):
         # g - equality constraint
         # h - inequality constraint
 
-        super().__init__(*order)
+        super().__init__()
 
-    def process(self):
-        """Process the constraint"""
-        self._ = [
-            Cons(
-                parent=self,
-                pos=n,
-                func=self.funcs(idx),
-                leq=self.leq,
-            )
-            for n, idx in enumerate(self.idx())
-        ]
+        self.order = self.funcs.order
+
+    def __setattr__(self, name, value):
+
+        if name == 'n' and isinstance(value, int) and value >= 0:
+            self._ = [
+                Cons(
+                    parent=self,
+                    pos=n,
+                    func=self.funcs[n],
+                    leq=self.leq,
+                )
+                for n in range(len(self))
+            ]
+
+        super().__setattr__(name, value)
 
     def matrix(self):
         """Matrix Representation"""
@@ -80,9 +84,6 @@ class C(Set):
     # def rule(self) -> function:
     #     """The rule of the constraint"""
     #     return self.funcs
-
-        
-
 
     def __call__(self, *key: tuple[Idx] | Idx) -> Cons:
         if len(key) == 1:

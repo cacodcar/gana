@@ -53,17 +53,6 @@ class Func(X):
         pos: int = None,
     ):
 
-        if mul:
-            rel = '×'
-        elif add:
-            rel = '+'
-        elif sub:
-            rel = '-'
-        elif div:
-            rel = '÷'
-        else:
-            raise ValueError('one of mul, add, sub or div must be True')
-
         # if either one or two is a number
         # set haspar to True
         if isinstance(one, (int, float)):
@@ -112,7 +101,6 @@ class Func(X):
         self.add = add
         self.sub = sub
         self.div = div
-        self.rel = rel
 
         super().__init__(parent=parent, pos=pos)
 
@@ -127,6 +115,20 @@ class Func(X):
                 value = float(value)
 
         super().__setattr__(name, value)
+
+    @property
+    def rel(self):
+        """Relation between the two elements"""
+        if self.mul:
+            return '×'
+        elif self.add:
+            return '+'
+        elif self.sub:
+            return '-'
+        elif self.div:
+            return '÷'
+        else:
+            raise ValueError('one of mul, add, sub or div must be True')
 
     def elms(self):
         """Elements (Variables and Parameters) of the function"""
