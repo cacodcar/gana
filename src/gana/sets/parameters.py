@@ -99,9 +99,7 @@ class P(ESet):
             self._ = [i + j for i, j in zip(self._, other._)]
             return self
 
-        f = F(one=self, rel='+', two=other)
-        f.process()
-        return f
+        return F(one=self, add=True, two=other)
 
     def __radd__(self, other: Self):
         return self + other
@@ -114,9 +112,7 @@ class P(ESet):
             self._ = [i - j for i, j in zip(self._, other._)]
             return self
 
-        f = F(one=self, rel='-', two=other)
-        f.process()
-        return f
+        return F(one=self, sub=True, two=other)
 
     def __rsub__(self, other: Self):
         return self - other
@@ -125,9 +121,7 @@ class P(ESet):
         if isinstance(other, P):
             self._ = [i * j for i, j in zip(self._, other._)]
             return self
-        f = F(one=self, rel='×', two=other)
-        f.process()
-        return f
+        return F(one=self, mul=True, two=other)
 
     def __rmul__(self, other: Self):
         if isinstance(other, int) and other == 1:
@@ -137,14 +131,11 @@ class P(ESet):
     def __truediv__(self, other: Self):
         if isinstance(other, P):
             return P(*self.order, _=[i / j for i, j in zip(self._, other._)])
+
         if isinstance(other, F):
-            f = F(one=self, two=other, rel='÷')
-            f.process()
-            return f
+            return F(one=self, div=True, two=other)
         if isinstance(other, V):
-            f = F(one=self, rel='÷', two=other)
-            f.process()
-            return f
+            return F(one=self, div=True, two=other)
 
     def __rtruediv__(self, other: Self):
         return other * self

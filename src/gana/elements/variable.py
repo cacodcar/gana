@@ -44,7 +44,9 @@ class Var(X):
         return (
             rf'{self.parent.name}'
             + r'_{'
-            + rf'{self.parent.idx()[self.pos]}'.replace('(', '').replace(')', '')
+            + rf'{self.parent.idx()[self.pos].latex()}'.replace('(', '').replace(
+                ')', ''
+            )
             + r'}'
         )
 

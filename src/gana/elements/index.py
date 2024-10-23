@@ -23,6 +23,13 @@ class Idx(X):
             self.parent = [self.parent]
             self.pos = [self.pos]
 
+    def latex(self):
+        """Latex representation"""
+
+        if self.parent[0].ordered:
+            return self.pos[0]
+        return rf'{self.name}'
+
     def __eq__(self, other: Self):
         if isinstance(other, Idx):
             return self.name == other.name
