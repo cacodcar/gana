@@ -23,6 +23,10 @@ class Set:
             return [i for i in prod(self.order)._]
         return self.order[0]._
 
+    def ord(self) -> list:
+        """order"""
+        return len(self.order)
+
     def __len__(self):
         return len(self.idx())
 

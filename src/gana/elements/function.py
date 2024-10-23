@@ -53,6 +53,17 @@ class Func(X):
         pos: int = None,
     ):
 
+        if mul:
+            rel = '×'
+        elif add:
+            rel = '+'
+        elif sub:
+            rel = '-'
+        elif div:
+            rel = '÷'
+        else:
+            raise ValueError('one of mul, add, sub or div must be True')
+
         # if either one or two is a number
         # set haspar to True
         if isinstance(one, (int, float)):
@@ -101,6 +112,7 @@ class Func(X):
         self.add = add
         self.sub = sub
         self.div = div
+        self.rel = rel
 
         super().__init__(parent=parent, pos=pos)
 

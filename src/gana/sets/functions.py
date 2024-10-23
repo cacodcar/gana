@@ -69,14 +69,28 @@ class F(Set):
         super().__init__(*order, name=name)
 
         for n, idx in enumerate(self.idx()):
-
+            print(one, two)
+            print(type(one), type(two))
+            one_, two_ = one, two
             if one and not isinstance(one, (int, float)):
-                one = one(idx)
+                one_ = one(idx[: one.ord()])
 
             if two and not isinstance(two, (int, float)):
-                two = two(idx)
+                two_ = two(idx[two.ord() :])
 
-            # self._.append(Func(parent=self, pos=n, one=one, rel=self.rel, two=two))
+            self._.append(
+                Func(
+                    one=one_,
+                    mul=mul,
+                    add=add,
+                    sub=sub,
+                    div=div,
+                    two=two_,
+                    parent=self,
+                    pos=n,
+                )
+            )
+            print(self._)
 
         self.one = one
         self.two = two

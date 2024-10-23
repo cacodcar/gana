@@ -48,19 +48,20 @@ class I(Set):
         # leave it so, it will be handled in the Program
         # has only unique members
 
+        ordered = False
         if all([isinstance(x, str) for x in members]):
-            self.members = [
+            members = [
                 Idx(name=x, parent=self, pos=n) for n, x in enumerate(list(members))
             ]
-            self.ordered = False
 
         if size:
-            self.members = [
-                Idx(name=f'idx{x}', parent=self, pos=x) for x in range(size)
-            ]
-            self.ordered = True
+            members = [Idx(name=f'idx{x}', parent=self, pos=x) for x in range(size)]
+            ordered = True
 
         super().__init__(*members)
+
+        self.members: list[Idx] = members
+        self.ordered = ordered
 
     @property
     def _(self):

@@ -54,18 +54,21 @@ class V(Set):
 
         super().__init__(*indices)
 
-    def process(self):
-        """Process the set"""
-        self._ = [
-            Var(
-                parent=self,
-                pos=n,
-                itg=self.itg,
-                nn=self.nn,
-                bnr=self.bnr,
-            )
-            for n in range(len(self.idx()))
-        ]
+    def __setattr__(self, name, value):
+
+        if name == 'n' and isinstance(value, int) and value >= 0:
+            self._ = [
+                Var(
+                    parent=self,
+                    pos=n,
+                    itg=self.itg,
+                    nn=self.nn,
+                    bnr=self.bnr,
+                )
+                for n in range(len(self.idx()))
+            ]
+
+        super().__setattr__(name, value)
 
     def fix(self, values: P | list[float]):
         """Fix the value of the variable"""
@@ -184,7 +187,7 @@ class V(Set):
 
     def __call__(self, *key: tuple[Idx] | Idx) -> Self:
         if len(key) == 1:
-            return self._[self.idx().index(key[0])]
+            return self._[self.idx().index(*key[0])]
         return self._[self.idx().index(key)]
 
     def __getitem__(self, pos: int) -> Var:
