@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self
 
-from IPython.display import Math
+from IPython.display import Math, display
 
 from ..elements.function import Func
 from .constraints import C
@@ -45,6 +45,8 @@ class F(ESet):
         else:
             raise ValueError('one of mul, add, sub or div must be True')
 
+        name = f'{one or ""}{rel}{two or ""}'
+
         if isinstance(one, list):
             if isinstance(two, list):
                 raise ValueError('Cannot operate with two lists')
@@ -56,26 +58,37 @@ class F(ESet):
         elif isinstance(one, (int, float)):
             if isinstance(two, (int, float)):
                 raise ValueError('Cannot operate with two constants')
-            order = (one.order, I(size=len(two)))
+            order = (I(size=len(two)), two.order)
 
         elif isinstance(two, (int, float)):
-            order = (I(size=len(one)), two.order)
+            order = (one.order, I(size=len(one)))
 
         else:
             order = (one.order, two.order)
-
-        name = f'{one or ""}{rel}{two or ""}'
 
         super().__init__(*order, name=name)
 
         for n, idx in enumerate(self.idx()):
 
-            one_, two_ = one, two
-            if one and not isinstance(one, (int, float)):
-                one_ = one(idx[0])
+            if one:
+                if isinstance(one, list):
+                    one_ = one[n]
+                elif isinstance(one, (int, float)):
+                    one_ = one
+                else:
+                    one_ = one(idx[0])
+            else:
+                one_ = None
 
-            if two and not isinstance(two, (int, float)):
-                two_ = two(idx[1])
+            if two:
+                if isinstance(two, list):
+                    two_ = two[n]
+                elif isinstance(two, (int, float)):
+                    two_ = two
+                else:
+                    two_ = two(idx[1])
+            else:
+                two_ = None
 
             self._.append(
                 Func(
@@ -110,64 +123,59 @@ class F(ESet):
 
     def latex(self) -> str:
         """Equation"""
-        if self.rel == '+':
-            if self.one:
-                return rf'{self.one.latex()} + {self.two.latex()}'
+        if self.one:
+            if isinstance(self.one, (int, float)):
+                one = self.one
             else:
-                return rf'{self.two.latex()}'
+                one = self.one.latex()
+        else:
+            one = None
 
-        if self.rel == '-':
-            if self.one:
-                return rf'{self.one.latex()} - {self.two.latex()}'
-            # this is used to generate negatives
+        if self.two:
+            if isinstance(self.two, (int, float)):
+                two = self.two
             else:
-                return rf'-{self.two.latex()}'
+                two = self.two.latex()
+        else:
+            two = None
 
-        if self.rel == '×':
-            return rf'{self.one.latex()} \cdot {self.two.latex()}'
+        if self.add:
+            return rf'{one or ""} + {two or ""}'
 
-        if self.rel == '÷':
-            return rf'\frac{{{self.one.latex()}}}{{{self.two.latex()}}}'
+        if self.sub:
+            return rf'{one or ""} - {two or ""}'
+
+        if self.mul:
+            return rf'{one or ""} \cdot {two or ""}'
+
+        if self.div:
+            return rf'\frac{{{one or ""}}}{{{two or ""}}}'
 
     def pprint(self) -> Math:
         """Display the function"""
-        Math(self.latex())
+        display(Math(self.latex()))
 
     def __neg__(self):
-        one, two = None, None
-        if self.one:
-            one = self.one
 
-        if self.two:
-            two = self.two
+        if self.add:
+            return F(one=-self.one, sub=True, two=self.two)
 
-        if self.rel == '+':
+        if self.sub:
+            return F(one=-self.one, add=True, two=self.two)
 
-            rel = '-'
+        if self.mul:
+            return F(one=-self.one, mul=True, two=self.two)
 
-        elif self.rel == '-':
-
-            rel = '+'
-        else:
-            rel = self.rel
-
-        f = F(one=one, rel=rel, two=two)
-        f._ = [-i for i in self._]
-        return f
+        if self.div:
+            return F(one=-self.one, div=True, two=self.two)
 
     def __pos__(self):
         return self
 
     def __add__(self, other: Self | P | V):
-
-        if other == 0:
-            return self
-
         if isinstance(other, int) and other == 0:
             return self
-        f = F(one=self, rel='+', two=other)
-        f._ = [a + b for a, b in zip(self._, other._)]
-        return f
+        return F(one=self, add=True, two=other)
 
     def __radd__(self, other: Self | P | V | int):
         if other == 0:
@@ -178,10 +186,7 @@ class F(ESet):
     def __sub__(self, other: Self | P | V):
         if other == 0:
             return self
-
-        f = F(one=self, rel='-', two=other)
-        f._ = [a - b for a, b in zip(self._, other._)]
-        return f
+        return F(one=self, sub=True, two=other)
 
     def __rsub__(self, other: Self | P | V):
         if other == 0:
@@ -195,9 +200,7 @@ class F(ESet):
 
         if isinstance(other, int) and other == 0:
             return self
-        f = F(one=self, rel='×', two=other)
-        f._ = [a * b for a, b in zip(self._, other._)]
-        return f
+        return F(one=self, mul=True, two=other)
 
     def __truediv__(self, other: Self | P | V):
         if other == 1:
@@ -205,9 +208,7 @@ class F(ESet):
 
         if isinstance(other, int) and other == 0:
             return self
-        f = F(one=self, rel='÷', two=other)
-        f._ = [a / b for a, b in zip(self._, other._)]
-        return f
+        return F(one=self, div=True, two=other)
 
     def __eq__(self, other: Self | P | V):
         return C(funcs=self - other)

@@ -30,6 +30,8 @@ class P(ESet):
 
         super().__init__(*indices, name=name)
 
+        self.indices = indices
+
         self._: list[float | M] = _
 
         for n, p in enumerate(self._):
@@ -47,7 +49,7 @@ class P(ESet):
 
     def latex(self) -> str:
         """LaTeX representation"""
-        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.order) + r'}'
+        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.indices) + r'}'
 
     def matrix(self):
         """Matrix Representation"""

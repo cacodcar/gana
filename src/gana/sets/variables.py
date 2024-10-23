@@ -53,6 +53,7 @@ class V(ESet):
         self._fixed = False
 
         super().__init__(*indices)
+        self.indices = indices
 
     def __setattr__(self, name, value):
 
@@ -83,7 +84,7 @@ class V(ESet):
 
     def latex(self) -> str:
         """LaTeX representation"""
-        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.order) + r'}'
+        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.indices) + r'}'
 
     def pprint(self) -> Math:
         """Display the variables"""
@@ -186,7 +187,7 @@ class V(ESet):
             yield i
 
     def __call__(self, *key: tuple[Idx] | Idx) -> Self:
-        if len(key) == 1: 
+        if len(key) == 1:
             return self._[self.idx().index(key[0])]
         return self._[self.idx().index(key)]
 
