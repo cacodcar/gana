@@ -48,21 +48,21 @@ class F(Set):
         if isinstance(one, list):
             if isinstance(two, list):
                 raise ValueError('Cannot operate with two lists')
-            order = (I(size=len(one)), two.order)
+            order = (I(size=len(one)), *two.order)
 
         elif isinstance(two, list):
-            order = (one.order, I(size=len(two)))
+            order = (*one.order, I(size=len(two)))
 
         elif isinstance(one, (int, float)):
             if isinstance(two, (int, float)):
                 raise ValueError('Cannot operate with two constants')
-            order = (one.order, I(size=len(two)))
+            order = (*one.order, I(size=len(two)))
 
         elif isinstance(two, (int, float)):
-            order = (I(size=len(one)), two.order)
+            order = (I(size=len(one)), *two.order)
 
         else:
-            order = (one.order, two.order)
+            order = (*one.order, *two.order)
 
         name = f'{one or ""}{rel}{two or ""}'
 
@@ -70,23 +70,13 @@ class F(Set):
 
         for n, idx in enumerate(self.idx()):
 
-            if one:
-                if isinstance(one, (int, float)):
+            if one and not isinstance(one, (int, float)):
+                one = one(idx)
 
-                    one = self.one(idx)
-            else:
-                one = None
+            if two and not isinstance(two, (int, float)):
+                two = two(idx)
 
-            if self.two:
-                if isinstance(self.two, (int, float)):
-                    two = self.two
-                else:
-                    two = self.two(idx)
-
-            else:
-                two = None
-
-                self._.append(Func(parent=self, pos=n, one=one, rel=self.rel, two=two))
+            # self._.append(Func(parent=self, pos=n, one=one, rel=self.rel, two=two))
 
         self.one = one
         self.two = two

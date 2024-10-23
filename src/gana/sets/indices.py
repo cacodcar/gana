@@ -146,22 +146,21 @@ class I(Set):
             return self
 
         if isinstance(other, Idx):
-            if self in other.parent:
-                raise ValueError(
-                    f'{other} can only belong at one index of element.',
-                    f'{other} also in {self}',
-                )
+            # if self in other.parent:
+            #     raise ValueError(
+            #         f'{other} can only belong at one index of element.',
+            #         f'{other} also in {self}',
+            #     )
 
-            idxset = I(*list(product(self._, [other])))
+            return I(*list(product(self._, [other])))
 
-        if isinstance(other, I):
-            if set(self._) & set(other._):
-                raise ValueError(
-                    f'{self} and {other} have common elements',
-                    f'{set(self._) & set(other._)} in both',
-                )
-        idxset = I(*list(product(self._, other._)))
-        return idxset
+        # if isinstance(other, I):
+        #     if set(self._) & set(other._):
+        #         raise ValueError(
+        #             f'{self} and {other} have common elements',
+        #             f'{set(self._) & set(other._)} in both',
+        #         )
+        return I(*list(product(self._, other._)))
 
     def __rmul__(self, other: Self):
         # this to allow using product
