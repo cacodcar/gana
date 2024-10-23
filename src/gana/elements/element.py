@@ -15,7 +15,7 @@ class X:
 
         # name of the element
         if hasattr(parent, 'name'):
-            self.name = parent.name + rf'{pos}'
+            self.name = parent.name + rf'_{pos}'
         else:
             self.name = 'X'
 

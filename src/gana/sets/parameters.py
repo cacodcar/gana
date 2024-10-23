@@ -12,7 +12,7 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 from ..value.bigm import M
 from .constraints import C
 from .functions import F
-from .ordered import Set
+from .ordered import ESet
 from .variables import V
 
 from .indices import I
@@ -21,35 +21,16 @@ if TYPE_CHECKING:
     from ..elements.index import Idx
 
 
-class P(Set):
+class P(ESet):
     """A Parameter"""
 
     def __init__(self, *indices: Idx | I, _: list[int | float | bool]):
 
         name = None
 
-        if len(indices) == 1 and isinstance(indices[0], int):
-            if isinstance(_, (int, float)):
-                name = rf'{_}'
-                _ = [float(_)] * indices[0]
-            i = I(indices[0])
-            i.name = 'i'
-            i.process()
-            indices = (i,)
-
-        super().__init__(*indices)
-
-        self.name = name
+        super().__init__(*indices, name=name)
 
         self._: list[float | M] = _
-
-    def process(self):
-        # Make big Ms in list
-
-        if len(self) != len(self._):
-            raise ValueError(
-                f'Length of values ({len(self._)}) must be equal to the size of the index set ({len(self)})'
-            )
 
         for n, p in enumerate(self._):
             if isinstance(p, bool) and p is True:
@@ -57,7 +38,12 @@ class P(Set):
             # convert any into float
             self._[n] = float(p)
 
-        self.name = self.name.capitalize()
+    def __setattr__(self, name, value):
+
+        if name == 'name' and isinstance(value, str) and value:
+            value = value.capitalize()
+
+        super().__setattr__(name, value)
 
     def latex(self) -> str:
         """LaTeX representation"""

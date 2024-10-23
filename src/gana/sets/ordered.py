@@ -15,21 +15,6 @@ class Set:
         # position of the set in the program
         self.n: int = None
 
-    def idx(self) -> list[tuple]:
-        """index"""
-
-        if len(self.order) > 1:
-            # Index Set
-            return [i for i in prod(self.order)._]
-        return self.order[0]._
-
-    def ord(self) -> list:
-        """order"""
-        return len(self.order)
-
-    def __len__(self):
-        return len(self.idx())
-
     def __str__(self):
         return rf'{self.name}'
 
@@ -46,3 +31,26 @@ class Set:
     def __bool__(self):
         if self.order:
             return True
+
+
+class ESet(Set):
+    """An Element Set"""
+
+    def __init__(self, *order, name: str = None):
+
+        super().__init__(*order, name=name)
+
+        self._len = len(self.order)
+
+        self.order = prod(self.order)
+
+    def idx(self) -> list:
+        """index"""
+        return list(self.order._)
+
+    def ord(self) -> list:
+        """order"""
+        return self._len 
+
+    def __len__(self):
+        return len(self.idx())

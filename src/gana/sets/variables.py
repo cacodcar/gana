@@ -13,7 +13,7 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 from ..elements.variable import Var
 from .constraints import C
 from .functions import F
-from .ordered import Set
+from .ordered import ESet
 
 if TYPE_CHECKING:
     from ..elements.index import Idx
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from .parameters import P
 
 
-class V(Set):
+class V(ESet):
     """Variable Set"""
 
     def __init__(
@@ -186,8 +186,8 @@ class V(Set):
             yield i
 
     def __call__(self, *key: tuple[Idx] | Idx) -> Self:
-        if len(key) == 1:
-            return self._[self.idx().index(*key[0])]
+        if len(key) == 1: 
+            return self._[self.idx().index(key[0])]
         return self._[self.idx().index(key)]
 
     def __getitem__(self, pos: int) -> Var:

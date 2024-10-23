@@ -43,7 +43,7 @@ class I(Set):
 
     """
 
-    def __init__(self, *members: str, size: int = None):
+    def __init__(self, *members: str, size: int = None, name: str = 'I'):
         # if the single element is an integer
         # leave it so, it will be handled in the Program
         # has only unique members
@@ -58,25 +58,26 @@ class I(Set):
             members = [Idx(name=f'idx{x}', parent=self, pos=x) for x in range(size)]
             ordered = True
 
-        super().__init__(*members)
-
-        self.members: list[Idx] = members
         self.ordered = ordered
+        self._: list[Idx] = members
 
-    @property
-    def _(self):
-        return self.members
+        super().__init__(*members, name=name)
 
     def __setattr__(self, name, value):
 
         if name == 'name' and value and self.ordered:
-            for m in self.members:
+            for m in self._:
                 m.name = rf'{value}{m.pos}'
 
         super().__setattr__(name, value)
 
     def latex(self, descriptive: bool = False) -> str:
         """LaTeX representation"""
+
+        if self.ordered:
+            itr = list(range(len(self)))
+        else:
+            itr = self._
 
         if descriptive:
             return (
@@ -85,7 +86,7 @@ class I(Set):
                 + r'}'
                 + r'\in'
                 + r'\{'
-                + r', '.join(str(x) for x in self._)
+                + r', '.join(str(x) for x in itr)
                 + r'\}'
             )
 
@@ -118,6 +119,9 @@ class I(Set):
         """
         return rf'_{self[pos]}'
 
+    def __len__(self):
+        return len(self._)
+
     def __getitem__(self, key: int | str):
         return self._[key]
 
@@ -147,21 +151,9 @@ class I(Set):
             return self
 
         if isinstance(other, Idx):
-            # if self in other.parent:
-            #     raise ValueError(
-            #         f'{other} can only belong at one index of element.',
-            #         f'{other} also in {self}',
-            #     )
+            return I(*list(product(self._, [other])), name=f'{self}_{other}')
 
-            return I(*list(product(self._, [other])))
-
-        # if isinstance(other, I):
-        #     if set(self._) & set(other._):
-        #         raise ValueError(
-        #             f'{self} and {other} have common elements',
-        #             f'{set(self._) & set(other._)} in both',
-        #         )
-        return I(*list(product(self._, other._)))
+        return I(*list(product(self._, other._)), name=f'{self}_{other}')
 
     def __rmul__(self, other: Self):
         # this to allow using product
@@ -174,7 +166,7 @@ class I(Set):
                     f'{other} can only belong at one index of element.',
                     f'{other} also in {self}',
                 )
-            return I(*list(product([other], self._)))
+            return I(*list(product([other], self._)), name=f'{self}_{other}')
 
         if isinstance(other, I):
             if set(self._) & set(other._):
@@ -182,7 +174,7 @@ class I(Set):
                     f'{self} and {other} have common elements',
                     f'{set(self._) & set(other._)} in both',
                 )
-        return I(*list(product(other._, self._)))
+        return I(*list(product(other._, self._)), name=f'{self}_{other}')
 
     def __iter__(self):
         return iter(self._)

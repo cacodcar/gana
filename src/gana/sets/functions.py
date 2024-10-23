@@ -9,7 +9,7 @@ from IPython.display import Math
 
 from ..elements.function import Func
 from .constraints import C
-from .ordered import Set
+from .ordered import ESet
 from .indices import I
 
 if TYPE_CHECKING:
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from .variables import V
 
 
-class F(Set):
+class F(ESet):
     """Provides some relational operation between Parameters and Variables"""
 
     def __init__(
@@ -48,35 +48,34 @@ class F(Set):
         if isinstance(one, list):
             if isinstance(two, list):
                 raise ValueError('Cannot operate with two lists')
-            order = (I(size=len(one)), *two.order)
+            order = (I(size=len(one)), two.order)
 
         elif isinstance(two, list):
-            order = (*one.order, I(size=len(two)))
+            order = (one.order, I(size=len(two)))
 
         elif isinstance(one, (int, float)):
             if isinstance(two, (int, float)):
                 raise ValueError('Cannot operate with two constants')
-            order = (*one.order, I(size=len(two)))
+            order = (one.order, I(size=len(two)))
 
         elif isinstance(two, (int, float)):
-            order = (I(size=len(one)), *two.order)
+            order = (I(size=len(one)), two.order)
 
         else:
-            order = (*one.order, *two.order)
+            order = (one.order, two.order)
 
         name = f'{one or ""}{rel}{two or ""}'
 
         super().__init__(*order, name=name)
 
         for n, idx in enumerate(self.idx()):
-            print(one, two)
-            print(type(one), type(two))
+
             one_, two_ = one, two
             if one and not isinstance(one, (int, float)):
-                one_ = one(idx[: one.ord()])
+                one_ = one(idx[0])
 
             if two and not isinstance(two, (int, float)):
-                two_ = two(idx[two.ord() :])
+                two_ = two(idx[1])
 
             self._.append(
                 Func(
@@ -90,7 +89,6 @@ class F(Set):
                     pos=n,
                 )
             )
-            print(self._)
 
         self.one = one
         self.two = two
@@ -136,16 +134,12 @@ class F(Set):
         Math(self.latex())
 
     def __neg__(self):
+        one, two = None, None
         if self.one:
             one = self.one
-        else:
-            one = None
 
         if self.two:
             two = self.two
-
-        else:
-            two = None
 
         if self.rel == '+':
 

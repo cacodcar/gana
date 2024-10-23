@@ -102,7 +102,7 @@ class Func(X):
                 # subtractions are always v - p
                 one, two = two, one
 
-        if div and two == 0:
+        if div and isinstance(two, (int, float)) and two == 0:
 
             raise ValueError('Division by zero')
 
