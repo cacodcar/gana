@@ -40,6 +40,8 @@ class F(ESet):
         self.sub = sub
         self.div = div
 
+
+        self.msc = True 
         if isinstance(one, list):
             if isinstance(two, list):
                 raise ValueError('Cannot operate with two lists')
@@ -57,12 +59,16 @@ class F(ESet):
             order = (one.order, I(size=len(one)))
             
         else:
-            order = (one.order, two.order)
+            if one.order == two.order:
+                order = (one.order,)
+                self.msc = False 
+            else:
+                order = (one.order, two.order)
 
         name = f'{one or ""}{self.rel}{two or ""}'
 
         super().__init__(*order, name=name)
-
+        
         for n, idx in enumerate(self.idx()):
 
             if one:
@@ -71,7 +77,10 @@ class F(ESet):
                 elif isinstance(one, (int, float)):
                     one_ = one
                 else:
-                    one_ = one(idx[0])
+                    if self.msc: 
+                        one_ = one(idx[0])
+                    else: 
+                        one_ = one(idx)
             else:
                 one_ = None
 
@@ -81,7 +90,10 @@ class F(ESet):
                 elif isinstance(two, (int, float)):
                     two_ = two
                 else:
-                    two_ = two(idx[1])
+                    if self.msc:
+                        two_ = two(idx[1])
+                    else: 
+                        two_ = two(idx)
             else:
                 two_ = None
 
