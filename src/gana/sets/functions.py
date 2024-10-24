@@ -55,7 +55,7 @@ class F(ESet):
 
         elif isinstance(two, (int, float)):
             order = (one.order, I(size=len(one)))
-
+            
         else:
             order = (one.order, two.order)
 
