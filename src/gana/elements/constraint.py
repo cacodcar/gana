@@ -9,9 +9,9 @@ from IPython.display import Math, display
 from .element import X
 
 if TYPE_CHECKING:
-    from ..sets.constraints import C
+    from ..sets.constraint import C
     from .function import Func
-    from ..operations.Unit import Var
+    from .variable import Var
 
 
 class Cons(X):
@@ -19,34 +19,71 @@ class Cons(X):
 
     def __init__(
         self,
-        func: Func | Var | float,
+        func: Func | Var,
         leq: bool = False,
         pos: int = None,
         parent: C = None,
     ):
-        self.func = func
-        self.leq = leq
 
         super().__init__(parent=parent, pos=pos)
 
+        self.func = func
+
+        if leq:
+            self.name = self.func.name + r'<=0'
+        else:
+            self.name = self.func.name + r'=0'
+
+        self.leq = leq
+
+        for v in func.vars():
+            if not self.nn and v:
+                v.features.append(self)
+
+    @property
+    def nn(self):
+        """Non-negativity Constraint"""
+        if self.func.isnnvar() and self.leq:
+            return True
+
+    @property
+    def eq(self):
+        """Equality Constraint"""
+        return not self.leq
+
+    @property
+    def one(self):
+        """element one in function"""
+        return self.func.one
+
+    @property
+    def two(self):
+        """element two in function"""
+        return self.func.two
+
+    @property
+    def elms(self):
+        """Constraint elements as a list"""
+        return self.func.elms
+
     @property
     def _(self):
-        """Constraint as a list"""
+        """Value of the lhs"""
         return self.func._
 
-    def b(self, zero: bool = False) -> int | float | None:
+    def B(self, zero: bool = True) -> int | float | None:
         """RHS parameter"""
-        return self.func.b(zero)
+        return self.func.B(zero)
 
-    def a(self) -> list[float]:
+    def A(self) -> list[float]:
         """The variable vector"""
-        return self.func.a()
+        return self.func.A()
 
-    def x(self) -> list[int]:
+    def X(self) -> list[int]:
         """The structure of the constraint
         given as a list of the number tags of variables
         """
-        return self.func.x()
+        return self.func.X()
 
     def latex(self) -> str:
         """Latex representation"""
@@ -59,6 +96,15 @@ class Cons(X):
 
         return rf'{self.func.latex()} {rel} 0'
 
+    def sol(self):
+        """Solution"""
+        if self.leq:
+            display(Math(self.func.latex() + r'=' + rf'{self._}'))
+
     def pprint(self):
         """Pretty Print"""
         display(Math(self.latex()))
+
+    def mps(self):
+        """Name in MPS file"""
+        return f'C{self.n}'

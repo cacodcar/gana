@@ -15,18 +15,18 @@ class X:
 
         # name of the element
         if hasattr(parent, 'name'):
-            self.name = parent.name + rf'_{pos}'
+            self.name = f'{parent}_{pos}'
         else:
-            self.name = 'X'
+            self.name = f'x_{pos}'
 
         # ordered set to which the element belongs
         self.parent = parent
 
-        # position in the ordered
+        # position in an ordered set
         # ordinality
         self.pos = pos
 
-        # position in the problem
+        # position in the program
         self.n = None
 
     def __str__(self):
@@ -37,9 +37,6 @@ class X:
 
     def __hash__(self):
         return hash(str(self))
-
-    def __len__(self):
-        return 1
 
     def __init_subclass__(cls):
         cls.__repr__ = X.__repr__

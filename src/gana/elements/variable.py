@@ -12,7 +12,7 @@ from .element import X
 from ..elements.function import Func
 
 if TYPE_CHECKING:
-    from ..sets.variables import V
+    from ..sets.variable import V
 
 
 class Var(X):
@@ -39,20 +39,47 @@ class Var(X):
 
         super().__init__(parent=parent, pos=pos)
 
+        # in what constraints the variable appears
+        self.features: list[Cons] = []
+
     def latex(self):
         """Latex representation"""
+
+        name, sup = self.parent.nsplit()
         return (
-            rf'{self.parent.name}'
+            name
+            + sup
             + r'_{'
-            + rf'{self.parent.idx()[self.pos]}'.replace('(', '').replace(
-                ')', ''
-            )
+            + rf'{self.parent.index[self.pos]}'.replace('(', '').replace(')', '')
             + r'}'
         )
 
     def pprint(self):
         """Pretty Print"""
         display(Math(self.latex()))
+
+    def sol(self):
+        """Solution"""
+        display(Math(self.latex() + r'=' + rf'{self._}'))
+
+    def mps(self):
+        """Name in MPS file"""
+        if self.bnr:
+            return f'X{self.n}'
+        return f'V{self.n}'
+
+    def vars(self):
+        """Self"""
+        return [self]
+
+    def isnnvar(self):
+        """Is nnvar"""
+        return self.nn
+
+    def isfix(self):
+        """Is fixed"""
+        if self._:
+            return True
 
     def __pos__(self):
         return Func(add=True, two=self)
@@ -63,45 +90,59 @@ class Var(X):
     def __add__(self, other: Self | Func):
         # useful for the case of 0 + x
         # comes up when using sum()
-        if isinstance(other, int) and other == 0:
+        if other is None:
+            return self
+        if isinstance(other, (int, float)) and other in [0, 0.0]:
             return self
         return Func(one=self, add=True, two=other)
 
     def __radd__(self, other: Self | Func):
+        if other is None:
+            return self
         if isinstance(other, (int, float)):
-            if other == 0:
+            if other in [0, 0.0]:
                 return self
             other = float(other)
         return self + other
 
     def __sub__(self, other: Self | Func):
-        if other == 0:
+        if other is None:
+            return self
+        if isinstance(other, (int, float)) and other in [0, 0.0]:
             return self
         return Func(one=self, sub=True, two=other)
 
     def __rsub__(self, other: Self | Func | int):
-
+        if other is None:
+            return -self
         if isinstance(other, (int, float)):
-            if other == 0:
+            if other in [0, 0.0]:
                 return -self
             other = float(other)
         return -self + other
 
     def __mul__(self, other: Self | Func):
+        if isinstance(other, (int, float)):
+            if other in [1, 1.0]:
+                return self
+            if other in [0, 0.0]:
+                return 0
         return Func(one=self, mul=True, two=other)
 
     def __rmul__(self, other: Self | Func | int):
-        if other == 1:
-            return self
-        else:
-            return Func(one=other, two=self, mul=True)
+        if isinstance(other, (int, float)):
+            if other in [1, 1.0]:
+                return self
+            if other in [0, 0.0]:
+                return 0
+        return Func(one=other, mul=True, two=self)
 
     def __truediv__(self, other: Self | Func):
         return Func(one=self, div=True, two=other)
 
     def __rtruediv__(self, other: Self | Func | int):
 
-        if other == 1:
+        if isinstance(other, (int, float)) and other in [1, 1.0]:
             return self
         else:
             return Func(one=other, div=True, two=self)

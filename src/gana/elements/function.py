@@ -10,7 +10,7 @@ from ..elements.constraint import Cons
 from ..elements.element import X
 
 if TYPE_CHECKING:
-    from ..sets.functions import F
+    from ..sets.function import F
     from .variable import Var
 
 
@@ -57,7 +57,7 @@ class Func(X):
         # set haspar to True
         if isinstance(one, (int, float)):
             if isinstance(two, (int, float)):
-                raise ValueError('Cannot multiply two numbers')
+                raise ValueError('Cannot operate between two numbers')
             self.haspar = True
 
         elif isinstance(two, (int, float)):
@@ -79,9 +79,9 @@ class Func(X):
             # additions are always v + p
             one, two = two, one
 
-        if sub and isinstance(one, (int, float)):
+        if sub and (isinstance(one, (int, float)) or not one):
             # if negation, write as -1 * var
-            if one == 0:
+            if one == 0 or not one:
                 # This is a negation
                 one = -1
                 mul = True
@@ -89,7 +89,9 @@ class Func(X):
             else:
                 # keep number after the variable
                 # subtractions are always v - p
-                one, two = two, one
+                one, two = -two, one
+                add = True
+                sub = False
 
         if div and isinstance(two, (int, float)) and two == 0:
 
@@ -105,16 +107,55 @@ class Func(X):
         super().__init__(parent=parent, pos=pos)
 
         # self.name = f'{self.one or ""} {self.rel} {self.two or ""}'
-        self.name = ''.join([str(i) for i in self._])
+        self.name = ''.join([str(i) for i in self.elms])
 
     def __setattr__(self, name, value):
         # change any number to float
         if name in ['one', 'two']:
-
             if isinstance(value, (int, float)):
-                value = float(value)
+                if value in [0, 0.0]:
+                    value = 0
+                else:
+                    value = float(value)
 
         super().__setattr__(name, value)
+
+    @property
+    def _(self):
+        """Value of the function"""
+        return self.eval()
+
+    def eval(self, one: int | float = None, two: int | float = None):
+        """Evaluate the function"""
+
+        if one is None:
+            if isinstance(self.one, Func):
+                one_ = self.one.eval()
+            elif isinstance(self.one, (int, float)):
+                one_ = self.one
+            else:
+                one_ = self.one._
+        else:
+            one_ = one
+
+        if two is None:
+            if isinstance(self.two, Func):
+                two_ = self.two.eval()
+            elif isinstance(self.two, (int, float)):
+                two_ = self.two
+            else:
+                two_ = self.two._
+        else:
+            two_ = two
+
+        if self.mul:
+            return one_ * two_
+        if self.div:
+            return one_ / two_
+        if self.add:
+            return one_ + two_
+        if self.sub:
+            return one_ - two_
 
     @property
     def rel(self):
@@ -130,12 +171,16 @@ class Func(X):
         else:
             raise ValueError('one of mul, add, sub or div must be True')
 
-    def elms(self):
+    def array(self):
         """Elements (Variables and Parameters) of the function"""
         return sum(
-            [i.elms() if isinstance(i, Func) else [i] for i in [self.one, self.two]],
+            [i.array() if isinstance(i, Func) else [i] for i in [self.one, self.two]],
             [],
         )
+
+    def vars(self) -> list[Var]:
+        """Variables in the function"""
+        return [i for i in self.array() if not isinstance(i, (int, float))]
 
     def rels(self):
         """Relations between variables"""
@@ -150,10 +195,10 @@ class Func(X):
         return rels
 
     @property
-    def _(self):
+    def elms(self):
         """The function as a list"""
         x = []
-        for n, e in enumerate(self.elms()):
+        for n, e in enumerate(self.array()):
             if n > 0:
                 x.append(self.rels()[n - 1])
             x.append(e)
@@ -161,27 +206,30 @@ class Func(X):
         if x[0] is None:
             x = x[1:]
         else:
-            x = ['+'] + x
+            if isinstance(x[0], (float, int)) and x[0] < 0:
+                x = ['-', -x[0]] + x[1:]
+            else:
+                x = ['+'] + x
         return x
 
-    def b(self, zero: bool = False) -> int | float | None:
+    def B(self, zero: bool = False) -> int | float | None:
         """Parameter
         Args:
             zero (bool, optional): returns 0 instead of None. Defaults to False.
         """
 
-        if isinstance(self._[-1], float):
-            if self._[-2] == '+':
-                return -self._[-1]
-            if self._[-2] == '-':
-                return self._[-1]
+        if isinstance(self.elms[-1], float):
+            if self.elms[-2] == '+':
+                return -self.elms[-1]
+            if self.elms[-2] == '-':
+                return self.elms[-1]
         if zero:
             return 0
 
-    def a(self) -> list[float]:
+    def A(self) -> list[float]:
         """Variable coefficient vector"""
-        x = self._
-        if isinstance(self._[-1], float) and self._[-2] in ['+', '-']:
+        x = self.elms
+        if isinstance(self.elms[-1], float) and self.elms[-2] in ['+', '-']:
             # if there is a parameter in the end, that goes to the b matrix
             x = x[:-2]
 
@@ -190,11 +238,13 @@ class Func(X):
 
         a_ = []
 
-        for n, i in enumerate(x):
+        for i in x:
             if isinstance(i[1], float):
                 # if multiplication by float
-                if i[0] == '×':
-                    a_[n - 1] = a_[n - 1] * i[1]
+                if i[0] == '+':
+                    a_.append(i[1])
+                if i[0] == '-':
+                    a_.append(-i[1])
             else:
                 if i[0] == '+':
                     a_.append(1.0)
@@ -202,19 +252,19 @@ class Func(X):
                     a_.append(-1.0)
         return a_
 
-    def x(self) -> list[int]:
+    def X(self) -> list[int]:
         """Structure of the function
         given as a list of number tags (n) for the variables (x)
         """
-        x = self._
-        if isinstance(self._[-1], float) and self._[-2] in ['+', '-']:
+        x = self.elms
+        if isinstance(self.elms[-1], float) and self.elms[-2] in ['+', '-']:
             x = x[:-2]
         x: list[Var] = x[1::2]
-        return [i.n for i in x if not isinstance(i, float)]
+        return [i.n for i in x if not isinstance(i, (float, int))]
 
     def latex(self) -> str:
         """Equation"""
-        if self.one:
+        if self.one is not None:
             if isinstance(self.one, (int, float)):
                 one = self.one
             else:
@@ -222,7 +272,7 @@ class Func(X):
         else:
             one = ''
 
-        if self.two:
+        if self.two is not None:
             if isinstance(self.two, (int, float)):
                 two = self.two
 
@@ -231,28 +281,49 @@ class Func(X):
         else:
             two = ''
 
-        if self.rel == '+':
+        if self.add:
             return rf'{one} + {two}'
 
-        if self.rel == '-':
+        if self.sub:
             return rf'{one} - {two}'
 
-        if self.rel == '×':
+        if self.mul:
+            # handling negation case,
+            if isinstance(one, (int, float)) and float(one) == -1.0:
+                return rf'-{two}'
             return rf'{one} \cdot {two}'
 
-        if self.rel == '÷':
+        if self.div:
             return rf'\frac{{{one}}}{{{two}}}'
 
     def matrix(self) -> tuple[list[float], int | float | None]:
         """Matrix representation"""
-        return self.a(), self.b()
+        return self.A(), self.B()
 
-    def pprint(self) -> Math:
+    def pprint(self):
         """Display the function"""
         display(Math(self.latex()))
 
+    def isnnvar(self):
+        """Is this a neg variable"""
+        if (
+            isinstance(self.one, (int, float))
+            and self.one in [-1, -1.0]
+            and self.mul
+            and not isinstance(self.two, Func)
+        ):
+            return True
+
     def __neg__(self):
-        return Func(one=0, sub=True, two=self)
+        if self.add:
+            return Func(one=-self.one, sub=True, two=self.two)
+        if self.sub:
+            return Func(one=-self.one, add=True, two=self.two)
+        if self.mul:
+            return Func(one=-self.one, mul=True, two=self.two)
+        if self.div:
+            return Func(one=-self.one, div=True, two=self.two)
+        # return Func(one=0, sub=True, two=self)
 
     def __pos__(self):
         return self
@@ -274,7 +345,12 @@ class Func(X):
 
     def __add__(self, other: int | float | Var | Self):
         # the number element is always taken at number two
+        if other is None:
+            return self
         if isinstance(other, (int, float)):
+            if other in [0, 0.0]:
+                print(self, other)
+                return self
             if self.haspar:
                 if self.add:
                     # v + p + p1 = v + (p + p1)
@@ -351,9 +427,8 @@ class Func(X):
                         if other.sub:
                             # p*v + v1 - p1 = (p*v + v1) - p1
                             return Func(one=self + other.one, sub=True, two=other.two)
-
+                
                 # if the other opn has no parameter
-
                 if self.add:
                     # v + p + v1 + v2 = (v + v1 + v2) + p
                     # v + p + v1 - v2 = (v + v1 - v2) + p
@@ -384,15 +459,20 @@ class Func(X):
         return Func(one=self, add=True, two=other)
 
     def __radd__(self, other: float):
-
-        if other == 0:
+        if other is None:
+            return self
+        if isinstance(other, (int, float)) and other in [0, 0.0]:
             return self
 
         return self + other
 
     def __sub__(self, other: float | Var | Self):
+        if other is None:
+            return self
 
         if isinstance(other, (int, float)):
+            if other in [0, 0.0]:
+                return self
             if self.haspar:
                 if self.sub:
                     # v - p - p1 = v + (p + p1)
@@ -503,7 +583,9 @@ class Func(X):
         return Func(one=self, sub=True, two=other)
 
     def __rsub__(self, other: float | Var | Self):
-        if other == 0:
+        if other is None:
+            return -self
+        if isinstance(other, (int, float)) and other in [0, 0.0]:
             return -self
         else:
             return -self + other
@@ -511,6 +593,13 @@ class Func(X):
     def __mul__(self, other: float | Var | Self):
 
         if isinstance(other, (int, float)):
+
+            if other in [1, 1.0]:
+                return self
+
+            if other in [0, 0.0]:
+                return 0
+
             if self.haspar:
                 if self.add:
                     # (v + p)*p1 = v*p1 + p*p1
@@ -726,8 +815,10 @@ class Func(X):
 
     def __rmul__(self, other: float | Var | Self):
         if isinstance(other, (int, float)):
-            if other == 1:
+            if other in [1, 1.0]:
                 return self
+            if other in [0, 0.0]:
+                return 0
             return self * other
 
     def __truediv__(self, other: float | Var | Self):

@@ -8,16 +8,16 @@ from typing import TYPE_CHECKING
 from IPython.display import Math, display
 
 from ..elements.constraint import Cons
-from .ordered import ESet
+from .ordered import Set
 
 if TYPE_CHECKING:
     from ..elements.index import Idx
-    from .functions import F
-    from .parameters import P
-    from .variables import V
+    from .function import F
+    from .parameter import P
+    from .variable import V
 
 
-class C(ESet):
+class C(Set):
     """Constraint gives the relationship between Parameters, Variables, or Expressions"""
 
     def __init__(
@@ -41,7 +41,14 @@ class C(ESet):
 
         super().__init__()
 
-        self.order = self.funcs.order
+        self.index = self.funcs.index
+
+
+        if self.leq:
+            self.name = self.funcs.name + r'<=0'
+
+        else:
+            self.name = self.funcs.name + r'=0'
 
     def __setattr__(self, name, value):
 
@@ -53,10 +60,31 @@ class C(ESet):
                     func=self.funcs[n],
                     leq=self.leq,
                 )
-                for n in range(len(self))
+                for n in range(len(self.funcs))
             ]
 
         super().__setattr__(name, value)
+
+    @property
+    def nn(self):
+        """Non-negativity Constraint"""
+        if self.funcs.isnnvar() and self.leq:
+            return True
+        
+    @property
+    def eq(self):
+        """Equality Constraint"""
+        return not self.leq
+
+    @property
+    def one(self):
+        """element one in function"""
+        return self.funcs.one 
+    
+    @property
+    def two(self):
+        """element two in function"""
+        return self.funcs.two
 
     def matrix(self):
         """Matrix Representation"""
@@ -72,7 +100,7 @@ class C(ESet):
 
         return rf'{self.funcs.latex()} {rel} 0'
 
-    def pprint(self, descriptive: bool = False) -> Math:
+    def pprint(self, descriptive: bool = False):
         """Display the function"""
 
         if descriptive:
@@ -81,14 +109,20 @@ class C(ESet):
         else:
             display(Math(self.latex()))
 
-    # def rule(self) -> function:
-    #     """The rule of the constraint"""
-    #     return self.funcs
+    def sol(self):
+        """Solution"""
+        for c in self._:
+            c.sol()
 
     def __call__(self, *key: tuple[Idx] | Idx) -> Cons:
         if len(key) == 1:
-            return self._[self.idx().index(key[0])]
-        return self._[self.idx().index(key)]
+            return self._[self.idx[key[0]]]
+        return self[self.idx[key]]
 
     def __getitem__(self, pos: int) -> Cons:
         return self._[pos]
+
+
+    def __iter__(self):
+        for i in self._:
+            yield i
