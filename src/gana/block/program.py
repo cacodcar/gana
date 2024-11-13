@@ -476,18 +476,18 @@ class Prg:
 
         prg = Prg(name=rf'{self.name}_{other.name}')
 
-        for i in self.sets.index: 
-            if i in other.sets.index:
-                i = i | getattr(other.sets, i.name)
-            setattr(prg, i.name, i)
-        for i in other.sets.index:
-            if i in self.sets.index:
-                i = i | getattr(self.sets, i.name)
-            setattr(prg, i.name, i)
+        # for i in self.sets.index: 
+        #     if i in other.sets.index:
+        #         i = i | getattr(other.sets, i.name)
+        #     setattr(prg, i.name, i)
+        # for i in other.sets.index:
+        #     if i in self.sets.index:
+        #         i = i | getattr(self.sets, i.name)
+        #     setattr(prg, i.name, i)
 
-        for v in self.sets.variable:
-            if v in other.sets.variable:
-                v = V(v)   
+        # for v in self.sets.variable:
+        #     if v in other.sets.variable:
+        #         v = V(v)   
 
 
         for i in (
