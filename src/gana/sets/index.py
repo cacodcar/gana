@@ -1,13 +1,19 @@
 """A collection of objects, a set basically"""
 
+from __future__ import annotations
+
 from itertools import product
-from typing import Self
+from typing import Self, TYPE_CHECKING
 
 from IPython.display import Math, display
 from pyomo.environ import Set as PyoSet
 from sympy import FiniteSet
 
 from ..elements.index import Idx, Skip
+
+if TYPE_CHECKING:
+    from ..sets.variable import V
+    from ..sets.parameter import P
 
 
 class I:
@@ -64,6 +70,8 @@ class I:
         # Assigned by the Program
         self.name = ''
         self.n = None
+        # index of what elements in the program
+        self.of: list[V | P] = []
 
     def __setattr__(self, name, value):
 
@@ -191,9 +199,12 @@ class I:
         return True if other in self._ else False
 
     def __eq__(self, other: Self):
-        if hasattr(other, '_'):
+        if isinstance(other, I):
+            if self.name == other.name:
+                return True
             return set(self._) == set(other._)
-        return False
+        if isinstance(other, tuple):
+            return self.name == str(other)
 
     def __and__(self, other: Self):
 
@@ -245,15 +256,16 @@ class I:
             return self
 
         if isinstance(other, Idx):
-            return I(*list(product(self._, [other])))
-
-        return I(*list(product(self._, other._)))
+            idx = I(*list(product(self._, [other])))
+        idx = I(*list(product(self._, other._)))
+        idx.name = str((self, other))
+        return idx
 
     def __rmul__(self, other: Self):
         # this to allow using product
         if isinstance(other, int) and other == 1:
-
             return self
+
         if isinstance(other, Idx):
             if self in other.parent:
                 raise ValueError(

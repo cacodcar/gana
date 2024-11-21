@@ -56,9 +56,6 @@ class V(Set):
 
         super().__init__(*index)
 
-        if not self.index.name:
-            self.index.name = rf'{index}'
-
     def __setattr__(self, name, value):
 
         if (
@@ -91,18 +88,6 @@ class V(Set):
         else:
             self._ = values._
             self._fixed = True
-
-    def latex(self) -> str:
-        """LaTeX representation"""
-        name, sup = self.nsplit()
-
-        return (
-            name
-            + sup
-            + r'_{'
-            + rf'{self.index}'.replace('(', '').replace(')', '')
-            + r'}'
-        )
 
     def sol(self, aslist: bool = False) -> list[float] | None:
         """Solution"""
@@ -226,18 +211,24 @@ class V(Set):
         for i in self._:
             yield i
 
-    def __call__(self, *key: tuple[Idx | I]) -> Self:
+    def __call__(self, *key: tuple[int | Idx | I]) -> Self:
 
-        if len(key) == 1: 
+        key = tuple([Idx(i) if isinstance(i, int) else i for i in key])
+
+        if len(key) == 1:
             key = key[0]
-            if key == self.index: 
-                return self
+
+        if self.index == key:
+            return self
+
+        # if key in self.index:
+        #     return self[self.idx[str(key)]]
 
         try:
             return self[self.idx[str(key)]]
-        
-        except:
-            #TODO - do better 
+
+        except KeyError:
+            # TODO - do better
             v = V(*key, itg=self.itg, nn=self.nn, bnr=self.bnr)
             v.n = self.n
             v.name = self.name

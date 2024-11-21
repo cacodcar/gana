@@ -38,12 +38,10 @@ class P(Set):
             if p:
                 self._[n] = float(p)
 
-        if not self.index.name:
-            self.index.name = f'{index}'
-
     def __setattr__(self, name, value):
-
-        if name == 'name' and isinstance(value, str) and value and value[0] != '-':
+        # if negative, already made from another parameter, so
+        # do not capitalize
+        if name == 'name' and value and isinstance(value, str) and value[0] != '-':
             value = value.capitalize()
 
         super().__setattr__(name, value)
@@ -51,17 +49,6 @@ class P(Set):
     def isneg(self):
         """Check if the parameter is negative"""
         return self.name[0] == '-'
-
-    def latex(self) -> str:
-        """LaTeX representation"""
-        name, sup = self.nsplit()
-        return (
-            name
-            + sup
-            + r'_{'
-            + rf'{self.index}'.replace('(', '').replace(')', '')
-            + r'}'
-        )
 
     def matrix(self):
         """Matrix Representation"""

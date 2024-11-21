@@ -11,9 +11,22 @@ from .index import I
 class Set:
     """An ordered Element Set"""
 
-    def __init__(self, *index: tuple[Idx | I]):
+    def __init__(self, *index: tuple[Idx | int | I]):
 
-        self.index = index
+        index = tuple([Idx(i) if isinstance(i, int) else i for i in index])
+
+        if all([isinstance(i, Idx) for i in index]):
+            if len(index) == 1:
+                index = index[0]
+            self.index = I(index)
+            self.index.of.append((0, self))
+        else:
+            for n, idx in enumerate(index):
+                idx.of.append((n, self))
+            self.index: I = prod(index)
+
+        # if not self.index.name:
+        #     self.index.name = f'{index}'
 
         # name is set by the program
         self.name = ''
@@ -21,23 +34,10 @@ class Set:
         self.n: int = None
 
         if self.index:
-            self.idx = {i: n for n,i in enumerate(self.index._)}
+            self.idx = {i: n for n, i in enumerate(self.index._)}
+            
         else:
             self.idx = {}
-
-    def __setattr__(self, name, value):
-    
-        if name == 'index' and value: 
-
-            if all([isinstance(i, (Idx, int)) for i in value]):
-                value = tuple([Idx(i) if isinstance(i, int) else i for i in value])
-                if len(value) == 1:
-                    value = value[0]
-                value = I(value)
-            else:
-                value: I = prod(value)
-
-        super().__setattr__(name, value)
 
     def nsplit(self):
         """Split the name"""
@@ -46,6 +46,17 @@ class Set:
             return name, r'^{' + sup + r'}'
         return self.name, ''
 
+    def latex(self) -> str:
+        """LaTeX representation"""
+        name, sup = self.nsplit()
+
+        return (
+            name
+            + sup
+            + r'_{'
+            + rf'{self.index}'.replace('(', '').replace(')', '')
+            + r'}'
+        )
 
     def order(self) -> list:
         """order"""

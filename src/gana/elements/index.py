@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
     from ..sets.index import I
+    from ..sets.parameter import P
+    from ..sets.variable import V
 
 
 class Skip:
@@ -43,7 +45,7 @@ class Idx:
             if not isinstance(name, (str, int, Skip)):
                 raise ValueError('Index name must be a string or integer')
             self.name = rf'{name}'
-            self._ = [name]
+            self._ = [self]
 
         # an index can belong to multiple index sets
         # hence has multiple parents and positions in them
@@ -51,6 +53,9 @@ class Idx:
         self.pos: list[int] = []
         # n is only taken when declared first time
         self.n: int = None
+
+        # index of what elements in the program
+        self.of: list[V | P] = []
 
     def skip(self):
         """Skip an index"""
@@ -63,7 +68,7 @@ class Idx:
 
     def latex(self):
         """Latex representation"""
-        #TODO - put \in parents with \cup 
+        # TODO - put \in parents with \cup
 
         if self.parent[0].ordered:
             return self.pos[0]
