@@ -1,96 +1,105 @@
 """A Paramter
 """
 
-from __future__ import annotations
+from typing import Self
 
-from typing import TYPE_CHECKING, Self
-
-from IPython.display import Math
+from IPython.display import Math, display
 from pyomo.environ import Param as PyoParam
 from sympy import Idx, IndexedBase, Symbol, symbols
 
 from ..value.bigm import M
-from .constraints import C
-from .functions import F
+from .constraint import C
+from .function import F
 from .ordered import Set
-from .variables import V
+from .variable import V
 
-from .indices import I
-
-if TYPE_CHECKING:
-    from ..elements.index import Idx
+from .index import I
+from ..elements.index import Idx
 
 
 class P(Set):
     """A Parameter"""
 
-    def __init__(self, *indices: Idx | I, _: list[int | float | bool]):
+    def __init__(
+        self, *index: Idx | I, _: list[int | float | bool] = None, tag: str = None
+    ):
+        self.tag = tag
+        super().__init__(*index)
 
-        name = None
-
-        if len(indices) == 1 and isinstance(indices[0], int):
-            if isinstance(_, (int, float)):
-                name = rf'{_}'
-                _ = [float(_)] * indices[0]
-            i = I(indices[0])
-            i.name = 'i'
-            i.process()
-            indices = (i,)
-
-        super().__init__(*indices)
-
-        self.name = name
+        if not _:
+            _ = [_]
 
         self._: list[float | M] = _
-
-    def process(self):
-        # Make big Ms in list
-
-        if len(self) != len(self._):
-            raise ValueError(
-                f'Length of values ({len(self._)}) must be equal to the size of the index set ({len(self)})'
-            )
 
         for n, p in enumerate(self._):
             if isinstance(p, bool) and p is True:
                 self._[n] = M()
             # convert any into float
-            self._[n] = float(p)
+            if p:
+                self._[n] = float(p)
 
-        self.name = self.name.capitalize()
+        if not self.index.name:
+            self.index.name = f'{index}'
+
+    def __setattr__(self, name, value):
+
+        if name == 'name' and isinstance(value, str) and value and value[0] != '-':
+            value = value.capitalize()
+
+        super().__setattr__(name, value)
+
+    def isneg(self):
+        """Check if the parameter is negative"""
+        return self.name[0] == '-'
 
     def latex(self) -> str:
         """LaTeX representation"""
-        return str(self) + r'_{' + ', '.join(rf'{m}' for m in self.order) + r'}'
+        name, sup = self.nsplit()
+        return (
+            name
+            + sup
+            + r'_{'
+            + rf'{self.index}'.replace('(', '').replace(')', '')
+            + r'}'
+        )
 
     def matrix(self):
         """Matrix Representation"""
 
-    def pprint(self) -> Math:
+    def pprint(self):
         """Display the variables"""
-        return Math(self.latex())
+        display(Math(self.latex()))
 
     def sympy(self) -> IndexedBase | Symbol:
         """symbolic representation"""
 
         return IndexedBase(str(self))[
-            symbols(",".join([f'{d}' for d in self.order]), cls=Idx)
+            symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
         ]
 
     def pyomo(self) -> PyoParam:
         """Pyomo representation"""
-        # idx = [i.pyomo() for i in self.order]
+        # idx = [i.pyomo() for i in self.index]
         # return PyoParam(*idx, initialize=self._, doc=str(self))
         return self._
 
     def __neg__(self):
-        return P(*self.order, _=[-i for i in self._])
+        # self._ = [-i for i in self._]
+        # return self
+        p = P(self.index, _=[-i for i in self._])
+        if self.isneg():
+            p.name = self.name[1:]
+        else:
+            p.name = r'-' + rf'{self.name}'
+        p.n = self.n
+        return p
+        # return P(*self.index, _=[-i for i in self._])
 
     def __pos__(self):
         return self
 
     def __abs__(self):
-        return P(*self.order, _=[abs(i) for i in self._])
+        return P(*self.index, _=[abs(i) for i in self._])
 
     # --- Handling basic operations----
     # if there is a zero on the left, just return P
@@ -111,9 +120,7 @@ class P(Set):
             self._ = [i + j for i, j in zip(self._, other._)]
             return self
 
-        f = F(one=self, rel='+', two=other)
-        f.process()
-        return f
+        return F(one=self, add=True, two=other)
 
     def __radd__(self, other: Self):
         return self + other
@@ -126,52 +133,57 @@ class P(Set):
             self._ = [i - j for i, j in zip(self._, other._)]
             return self
 
-        f = F(one=self, rel='-', two=other)
-        f.process()
-        return f
+        return F(one=self, sub=True, two=other)
 
     def __rsub__(self, other: Self):
         return self - other
 
-    def __mul__(self, other: Self):
+    def __mul__(self, other: Self | int | float | V | F):
+        if isinstance(other, (int, float)):
+            if other in [1, 1.0]:
+                return self
+            if other in [0, 0.0]:
+                return 0
         if isinstance(other, P):
             self._ = [i * j for i, j in zip(self._, other._)]
+            self.name = f'{self.name} * {other.name}'
             return self
-        f = F(one=self, rel='×', two=other)
-        f.process()
-        return f
+        if isinstance(other, F):
+            if other.add:
+                return F(one=self * other.one, add=True, two=self * other.two)
+            if other.sub:
+                return F(one=self * other.one, sub=True, two=self * other.two)
+        return F(one=self, mul=True, two=other)
 
     def __rmul__(self, other: Self):
         if isinstance(other, int) and other == 1:
             return self
-        return self * other
+        return other * self
 
     def __truediv__(self, other: Self):
         if isinstance(other, P):
-            return P(*self.order, _=[i / j for i, j in zip(self._, other._)])
+            return P(*self.index, _=[i / j for i, j in zip(self._, other._)])
+
         if isinstance(other, F):
-            f = F(one=self, two=other, rel='÷')
-            f.process()
-            return f
+            return F(one=self, div=True, two=other)
+
         if isinstance(other, V):
-            f = F(one=self, rel='÷', two=other)
-            f.process()
-            return f
+            return F(one=self, div=True, two=other)
 
     def __rtruediv__(self, other: Self):
         return other * self
 
     def __floordiv__(self, other: Self):
 
-        return P(*self.order, _=[i // j for i, j in zip(self._, other._)])
+        return P(*self.index, _=[i // j for i, j in zip(self._, other._)])
 
     def __mod__(self, other: Self):
 
-        return P(*self.order, _=[i % j for i, j in zip(self._, other._)])
+        return P(*self.index, _=[i % j for i, j in zip(self._, other._)])
 
     def __pow__(self, other: Self):
 
-        return P(*self.order, _=[i**j for i, j in zip(self._, other._)])
+        return P(*self.index, _=[i**j for i, j in zip(self._, other._)])
 
     def __eq__(self, other: Self):
 
@@ -213,10 +225,19 @@ class P(Set):
         for i in self._:
             yield i
 
-    def __call__(self, *key: tuple[Idx] | Idx) -> Self:
+    def __call__(self, *key: tuple[Idx | I]) -> Self:
+
         if len(key) == 1:
-            return self._[self.idx().index(key[0])]
-        return self._[self.idx().index(key)]
+            key = key[0]
+
+        if key in self.index._:
+            return self[self.idx[str(key)]]
+
+        p = P(*key)
+        p.n = self.n
+        p.name = self.name
+        p._ = [self[self.idx[i]] if not i.skip() else None for i in p.index._]
+        return p
 
     def __getitem__(self, pos: int) -> float | int | M:
         return self._[pos]

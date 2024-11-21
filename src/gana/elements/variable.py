@@ -8,10 +8,11 @@ from IPython.display import Math, display
 
 from .constraint import Cons
 from .element import X
-from .function import Func
+
+from ..elements.function import Func
 
 if TYPE_CHECKING:
-    from ..sets.variables import V
+    from ..sets.variable import V
 
 
 class Var(X):
@@ -24,7 +25,6 @@ class Var(X):
         itg: bool = False,
         nn: bool = True,
         bnr: bool = False,
-        pwr: int = 1,
     ):
 
         # if the variable is an integer variable
@@ -33,20 +33,24 @@ class Var(X):
         self.bnr = bnr
         # if the variable is non negative
         self.nn = nn
-        # the power of the variable
-        self.pwr = pwr
 
         # the value taken by the variable
         self._ = None
 
         super().__init__(parent=parent, pos=pos)
 
+        # in what constraints the variable appears
+        self.features: list[Cons] = []
+
     def latex(self):
         """Latex representation"""
+
+        name, sup = self.parent.nsplit()
         return (
-            rf'{self.parent.name}'
+            name
+            + sup
             + r'_{'
-            + rf'{self.parent.idx()[self.pos]}'.replace('(', '').replace(')', '')
+            + rf'{self.parent.index[self.pos]}'.replace('(', '').replace(')', '')
             + r'}'
         )
 
@@ -54,55 +58,94 @@ class Var(X):
         """Pretty Print"""
         display(Math(self.latex()))
 
+    def sol(self):
+        """Solution"""
+        display(Math(self.latex() + r'=' + rf'{self._}'))
+
+    def mps(self):
+        """Name in MPS file"""
+        if self.bnr:
+            return f'X{self.n}'
+        return f'V{self.n}'
+
+    def vars(self):
+        """Self"""
+        return [self]
+
+    def isnnvar(self):
+        """Is nnvar"""
+        return self.nn
+
+    def isfix(self):
+        """Is fixed"""
+        if self._:
+            return True
+
     def __pos__(self):
-        return Func(rel='+', two=self)
+        return Func(add=True, two=self)
 
     def __neg__(self):
-        return Func(rel='-', two=self)
+        return Func(sub=True, two=self)
 
     def __add__(self, other: Self | Func):
-        if isinstance(other, int) and other == 0:
+        # useful for the case of 0 + x
+        # comes up when using sum()
+        if other is None:
             return self
-        return Func(one=self, rel='+', two=other)
+        if isinstance(other, (int, float)) and other in [0, 0.0]:
+            return self
+        return Func(one=self, add=True, two=other)
 
     def __radd__(self, other: Self | Func):
+        if other is None:
+            return self
         if isinstance(other, (int, float)):
-            if other == 0:
+            if other in [0, 0.0]:
                 return self
             other = float(other)
         return self + other
 
     def __sub__(self, other: Self | Func):
-        if other == 0:
+        if other is None:
             return self
-        return Func(one=self, rel='-', two=other)
+        if isinstance(other, (int, float)) and other in [0, 0.0]:
+            return self
+        return Func(one=self, sub=True, two=other)
 
     def __rsub__(self, other: Self | Func | int):
-
+        if other is None:
+            return -self
         if isinstance(other, (int, float)):
-            if other == 0:
+            if other in [0, 0.0]:
                 return -self
             other = float(other)
         return -self + other
 
     def __mul__(self, other: Self | Func):
-        return Func(one=self, two=other, rel='×')
+        if isinstance(other, (int, float)):
+            if other in [1, 1.0]:
+                return self
+            if other in [0, 0.0]:
+                return 0
+        return Func(one=self, mul=True, two=other)
 
     def __rmul__(self, other: Self | Func | int):
-        if other == 1:
-            return self
-        else:
-            return Func(one=other, two=self, rel='×')
+        if isinstance(other, (int, float)):
+            if other in [1, 1.0]:
+                return self
+            if other in [0, 0.0]:
+                return 0
+        return Func(one=other, mul=True, two=self)
 
     def __truediv__(self, other: Self | Func):
-        return Func(one=self, two=other, rel='÷')
+        return Func(one=self, div=True, two=other)
 
     def __rtruediv__(self, other: Self | Func | int):
 
-        if other == 1:
+        if isinstance(other, (int, float)) and other in [1, 1.0]:
             return self
         else:
-            return Func(one=other, two=self, rel='÷')
+            return Func(one=other, div=True, two=self)
 
     def __eq__(self, other):
         return Cons(func=self - other)
@@ -122,4 +165,7 @@ class Var(X):
         return self >= other
 
     def __pow__(self, other: int):
-        return Func(one=self, two=other, rel='^')
+        f = self
+        for _ in range(other - 1):
+            f *= self
+        return f

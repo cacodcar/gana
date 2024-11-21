@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from sympy import Idx, IndexedBase, Symbol, symbols
 
 if TYPE_CHECKING:
-    from .indices import I
+    from .index import I
 
 
 class T:

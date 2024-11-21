@@ -2,50 +2,57 @@
 Forms the base for all element sets 
 """
 
-from abc import ABC, abstractmethod
 from math import prod
 
-from IPython.display import Math
+from ..elements.index import Idx
+from .index import I
 
 
-class Set(ABC):
-    """An Ordered Set"""
+class Set:
+    """An ordered Element Set"""
 
-    def __init__(self, *order):
-        # index of the set
-        self.order = order
-        self.name: str = None
-        # number of index set
+    def __init__(self, *index: tuple[Idx | I]):
+
+        self.index = index
+
+        # name is set by the program
+        self.name = ''
+        # number of the set in the program
         self.n: int = None
 
-        # set via the child method or taken as input
-        self._ = []
+        if self.index:
+            self.idx = {i: n for n,i in enumerate(self.index._)}
+        else:
+            self.idx = {}
 
-    @abstractmethod
-    def process(self):
-        """Child of the set"""
+    def __setattr__(self, name, value):
+    
+        if name == 'index' and value: 
 
-    @abstractmethod
-    def latex(self) -> str:
-        """LaTeX representation"""
+            if all([isinstance(i, (Idx, int)) for i in value]):
+                value = tuple([Idx(i) if isinstance(i, int) else i for i in value])
+                if len(value) == 1:
+                    value = value[0]
+                value = I(value)
+            else:
+                value: I = prod(value)
 
-    @abstractmethod
-    def matrix(self):
-        """Matrix Representation"""
+        super().__setattr__(name, value)
 
-    @abstractmethod
-    def pprint(self) -> Math:
-        """Display the function"""
+    def nsplit(self):
+        """Split the name"""
+        if '_' in self.name:
+            name, sup = self.name.split('_')
+            return name, r'^{' + sup + r'}'
+        return self.name, ''
 
-    def idx(self) -> list[tuple]:
-        """index"""
-        if len(self.order) > 1:
-            return [i for i in prod(self.order)._]
 
-        return self.order[0]._
+    def order(self) -> list:
+        """order"""
+        return len(self.index)
 
     def __len__(self):
-        return len(self.idx())
+        return len(self.index._)
 
     def __str__(self):
         return rf'{self.name}'
@@ -59,6 +66,3 @@ class Set(ABC):
     def __init_subclass__(cls):
         cls.__repr__ = Set.__repr__
         cls.__hash__ = Set.__hash__
-
-    def __bool__(self):
-        return bool(self.name)
