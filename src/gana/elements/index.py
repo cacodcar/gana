@@ -63,6 +63,7 @@ class Idx:
 
     def latex(self):
         """Latex representation"""
+        #TODO - put \in parents with \cup 
 
         if self.parent[0].ordered:
             return self.pos[0]

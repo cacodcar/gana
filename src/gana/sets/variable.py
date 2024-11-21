@@ -237,6 +237,7 @@ class V(Set):
             return self[self.idx[str(key)]]
         
         except:
+            #TODO - do better 
             v = V(*key, itg=self.itg, nn=self.nn, bnr=self.bnr)
             v.n = self.n
             v.name = self.name

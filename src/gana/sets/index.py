@@ -108,7 +108,7 @@ class I:
             if self.ordered:
                 if int_not:
                     return (
-                        r'\{ i \in '
+                        r'\{ i = '
                         + r'\mathbb{'
                         + name
                         + sup
@@ -124,7 +124,7 @@ class I:
                         + name
                         + sup
                         + r'}'
-                        + r'\in'
+                        + r'='
                         + r'\{'
                         + r', '.join(str(x) for x in self._)
                         + r'\}'
@@ -135,7 +135,7 @@ class I:
                     + name
                     + sup
                     + r'}'
-                    + r'\in'
+                    + r'='
                     + r'\{'
                     + rf'{self._[0]}'
                     + r',..,'
@@ -147,7 +147,7 @@ class I:
                 + name
                 + sup
                 + r'}'
-                + r'\in'
+                + r'='
                 + r'\{'
                 + r', '.join(str(x) for x in self._)
                 + r'\}'
