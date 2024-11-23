@@ -1,4 +1,9 @@
-"""An index"""
+"""Index elements 
+Skip - do not use the index
+Idx - index
+Pair - pair of indices
+
+"""
 
 from __future__ import annotations
 
@@ -104,14 +109,9 @@ class Idx:
         return self.name == str(other)
 
     def __mul__(self, other: Self):
-        if isinstance(other, int) and other == 1:
-            return self
-        return NotImplemented
-
-    def __rmul__(self, other: Self):
-        if isinstance(other, int) and other == 1:
-            return self
-        return NotImplemented
+        if isinstance(other, Idx):
+            return Pair(self, other)
+        return NotImplementedError
 
     def __str__(self):
         return self.name
@@ -124,3 +124,35 @@ class Idx:
 
     def __getitem__(self, pos: int) -> Idx:
         return self._[pos]
+
+
+class Pair:
+    """A pair of indices
+    Can be a nested, so essentially a tuple
+    """
+
+    def __init__(self, i: Idx, j: Idx):
+        self.i = i
+        self.j = j
+        self.name = rf'{tuple(self._)}'
+
+    @property
+    def _(self):
+        return sum(
+            [idx._ if isinstance(idx, Pair) else [idx] for idx in [self.i, self.j]], []
+        )
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def __eq__(self, other: Self):
+        return self.i == other.i and self.j == other.j
+
+    def __mul__(self, other: Self):
+        return Pair(self, other)
