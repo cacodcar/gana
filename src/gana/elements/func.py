@@ -6,12 +6,12 @@ from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math, display
 
-from ..elements.constraint import Cons
-from ..elements.element import X
+from .cons import Cons
+from .x import X
 
 if TYPE_CHECKING:
     from ..sets.function import F
-    from .variable import Var
+    from .var import Var
 
 
 class Func(X):

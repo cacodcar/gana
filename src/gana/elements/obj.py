@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING
 
 from IPython.display import Math, display
 
-from .element import X
+from .x import X
 
 if TYPE_CHECKING:
-    from .function import Func
+    from .func import Func
     from ..sets.function import F
 
 

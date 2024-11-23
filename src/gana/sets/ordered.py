@@ -4,7 +4,7 @@ Forms the base for all element sets
 
 from math import prod
 
-from ..elements.index import Idx
+from ..elements.idx import Idx
 from .index import I
 
 
@@ -19,10 +19,10 @@ class Set:
             if len(index) == 1:
                 index = index[0]
             self.index = I(index)
-            self.index.of.append((0, self))
+            # self.index.of.append((0, self))
         else:
-            for n, idx in enumerate(index):
-                idx.of.append((n, self))
+            # for n, idx in enumerate(index):
+            #     idx.of.append((n, self))
             self.index: I = prod(index)
 
         # if not self.index.name:
@@ -35,7 +35,7 @@ class Set:
 
         if self.index:
             self.idx = {i: n for n, i in enumerate(self.index._)}
-            
+
         else:
             self.idx = {}
 

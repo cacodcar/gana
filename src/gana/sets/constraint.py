@@ -7,11 +7,11 @@ from typing import TYPE_CHECKING
 
 from IPython.display import Math, display
 
-from ..elements.constraint import Cons
+from ..elements.cons import Cons
 from .ordered import Set
 
 if TYPE_CHECKING:
-    from ..elements.index import Idx
+    from ..elements.idx import Idx
     from .function import F
     from .parameter import P
     from .variable import V

@@ -14,7 +14,7 @@ from .ordered import Set
 from .variable import V
 
 from .index import I
-from ..elements.index import Idx
+from ..elements.idx import Idx
 
 
 class P(Set):

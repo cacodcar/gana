@@ -13,17 +13,17 @@ from gurobipy import read as gpread
 
 
 # from ..elements.element import X
-from ..elements.objective import Obj
+from ..elements.obj import Obj
 
 from ..sets.index import I
-from ..elements.index import Idx
+from ..elements.idx import Idx
 from ..sets.variable import V
-from ..elements.variable import Var
+from ..elements.var import Var
 from ..sets.parameter import P
 from ..sets.function import F
-from ..elements.function import Func
+from ..elements.func import Func
 from ..sets.constraint import C
-from ..elements.constraint import Cons
+from ..elements.cons import Cons
 
 
 # from ..value.zero import Z
@@ -83,8 +83,8 @@ class Prg:
 
                     idx = self.indices[self.indices.index(idx)]
                     if not value in idx.parent:
-                        idx.parent.append(value)
-                        idx.pos.append(n)
+                        idx._parent.append(value)
+                        idx._pos.append(n)
                         value._[n] = idx
                 else:
                     setattr(self, idx.name, idx)

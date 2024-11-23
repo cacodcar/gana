@@ -1,7 +1,7 @@
 """Function Compositions"""
 
-from ..elements.function import Func
-from ..elements.objective import Obj
+from ..elements.func import Func
+from ..elements.obj import Obj
 
 
 def inf(func: Func) -> Func:

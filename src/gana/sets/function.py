@@ -9,11 +9,11 @@ from IPython.display import Math, display
 
 from math import prod
 
-from ..elements.function import Func
+from ..elements.func import Func
 from .constraint import C
 from .ordered import Set
 from .index import I
-from ..elements.index import Idx
+from ..elements.idx import Idx
 
 if TYPE_CHECKING:
     from .parameter import P
@@ -85,7 +85,7 @@ class F(Set):
         if not self.index.name:
             self.index.name = rf'{index}'
 
-        self._:list[Func] = []
+        self._: list[Func] = []
 
         for idx, n in self.idx.items():
             if self.one is not None:

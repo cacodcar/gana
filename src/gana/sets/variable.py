@@ -9,14 +9,14 @@ from pyomo.environ import Binary, Integers, NonNegativeIntegers, NonNegativeReal
 from pyomo.environ import Var as PyoVar
 from sympy import Idx, IndexedBase, Symbol, symbols
 
-from ..elements.variable import Var
+from ..elements.var import Var
 from .constraint import C
 from .function import F
 from .ordered import Set
-from ..elements.index import Idx
+from ..elements.idx import Idx
+from .index import I
 
 if TYPE_CHECKING:
-    from .index import I
     from .parameter import P
 
 
@@ -213,7 +213,7 @@ class V(Set):
 
     def __call__(self, *key: tuple[int | Idx | I]) -> Self:
 
-        key = tuple([Idx(i) if isinstance(i, int) else i for i in key])
+        key = tuple([Idx(i, I(), i) if isinstance(i, int) else i for i in key])
 
         if len(key) == 1:
             key = key[0]

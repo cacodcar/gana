@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math, display
 
-from .constraint import Cons
-from .element import X
+from .cons import Cons
+from .x import X
 
-from ..elements.function import Func
+from .func import Func
 
 if TYPE_CHECKING:
     from ..sets.variable import V

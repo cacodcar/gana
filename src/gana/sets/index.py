@@ -9,7 +9,7 @@ from IPython.display import Math, display
 from pyomo.environ import Set as PyoSet
 from sympy import FiniteSet
 
-from ..elements.index import Idx, Skip
+from ..elements.idx import Idx, Skip
 
 if TYPE_CHECKING:
     from ..sets.variable import V
@@ -58,11 +58,16 @@ class I:
             )
 
         if members:
-            members = [Idx(i) if not isinstance(i, (Idx, Skip)) else i for i in members]
+            members = [
+                Idx(i, self, n) if not isinstance(i, (Idx, Skip)) else i.update(self, n)
+                for n, i in enumerate(members)
+            ]
             self.ordered = False
 
         if size:
-            members = [Idx(i) for i in range(size)]
+            # members = [Idx(i, self, i) for i in range(size)]
+            members = list(range(size))
+
             self.ordered = True
 
         self._: list[Idx] = members
@@ -71,19 +76,19 @@ class I:
         self.name = ''
         self.n = None
         # index of what elements in the program
-        self.of: list[V | P] = []
+        # self.of: list[V | P] = []
 
-    def __setattr__(self, name, value):
+    # def __setattr__(self, name, value):
 
-        if name == 'name' and value:
-            for pos, m in enumerate(self._):
-                if isinstance(m, Idx):
-                    m.parent.append(self)
-                    m.pos.append(pos)
+    #     if name == 'name' and value:
+    #         for pos, m in enumerate(self._):
+    #             # if isinstance(m, Idx):
+    #             m.parent.append(self)
+    #             m.pos.append(pos)
 
-                # can be Skip too
+    #             # can be Skip too
 
-        super().__setattr__(name, value)
+    #     super().__setattr__(name, value)
 
     def step(self, i: int) -> list[Idx]:
         """Step up or down the index set"""
