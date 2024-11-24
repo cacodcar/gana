@@ -50,45 +50,30 @@ class I:
 
         self.tag = tag
 
-        self.members = list(members)
-
         if members and size:
             raise ValueError(
                 'An index set can either be defined by members or size, not both'
             )
 
-        if members:
-            members = [
-                Idx(i, self, n) if not isinstance(i, (Idx, Skip)) else i.update(self, n)
+        if size:
+            # make an ordered set of some size
+            self._ = [Idx(i, self, i, True) for i in range(size)]
+            self.ordered = True
+
+        else:
+            self._ = [
+                (
+                    Idx(i, self, n)
+                    if not isinstance(i, (Idx, Skip))
+                    else i.update(self, n)
+                )
                 for n, i in enumerate(members)
             ]
             self.ordered = False
 
-        if size:
-            # members = [Idx(i, self, i) for i in range(size)]
-            members = list(range(size))
-
-            self.ordered = True
-
-        self._: list[Idx] = members
-
         # Assigned by the Program
         self.name = ''
         self.n = None
-        # index of what elements in the program
-        # self.of: list[V | P] = []
-
-    # def __setattr__(self, name, value):
-
-    #     if name == 'name' and value:
-    #         for pos, m in enumerate(self._):
-    #             # if isinstance(m, Idx):
-    #             m.parent.append(self)
-    #             m.pos.append(pos)
-
-    #             # can be Skip too
-
-    #     super().__setattr__(name, value)
 
     def step(self, i: int) -> list[Idx]:
         """Step up or down the index set"""
@@ -256,15 +241,13 @@ class I:
         return self.step(other)
 
     def __mul__(self, other: Self | int):
-        # this to allow using product
-        if isinstance(other, int) and other == 1:
-            return self
-
+        i = I()
         if isinstance(other, Idx):
             idx = I(*list(product(self._, [other])))
-        idx = I(*list(product(self._, other._)))
-        idx.name = str((self, other))
-        return idx
+        # idx = I(*[i & j for i, j in product(self._, other._)])
+        # idx.name = str((self, other))
+        i._ = [i & j for i, j in product(self._, other._)]
+        return i
 
     def __rmul__(self, other: Self):
         # this to allow using product
