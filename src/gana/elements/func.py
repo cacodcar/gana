@@ -7,14 +7,13 @@ from typing import TYPE_CHECKING, Self
 from IPython.display import Math, display
 
 from .cons import Cons
-from .x import X
 
 if TYPE_CHECKING:
     from ..sets.function import F
     from .var import Var
 
 
-class Func(X):
+class Func:
     """A Mathematical Operation
 
     Operations are only betweeen two elements, one and two
@@ -104,7 +103,9 @@ class Func(X):
         self.sub = sub
         self.div = div
 
-        super().__init__(parent=parent, pos=pos)
+        self.parent = parent
+        self.pos = pos
+        self.n = None
 
         # self.name = f'{self.one or ""} {self.rel} {self.two or ""}'
         self.name = ''.join([str(i) for i in self.elms])
@@ -314,6 +315,15 @@ class Func(X):
         ):
             return True
 
+    def __str__(self):
+        return rf'{self.name}'
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash(str(self))
+
     def __neg__(self):
         if self.add:
             return Func(one=-self.one, sub=True, two=self.two)
@@ -427,7 +437,7 @@ class Func(X):
                         if other.sub:
                             # p*v + v1 - p1 = (p*v + v1) - p1
                             return Func(one=self + other.one, sub=True, two=other.two)
-                
+
                 # if the other opn has no parameter
                 if self.add:
                     # v + p + v1 + v2 = (v + v1 + v2) + p

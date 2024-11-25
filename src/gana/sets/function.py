@@ -64,6 +64,8 @@ class F(Set):
         if not lone % ltwo == 0 and not ltwo % lone == 0:
             raise ValueError('The indices are not compatible')
 
+        # Handles the case when indices are mismatched
+
         if lone > ltwo:
             idxone = index[0]._
             idxtwo = index[1]._ * int(lone / ltwo)

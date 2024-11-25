@@ -9,7 +9,7 @@ from IPython.display import Math, display
 from pyomo.environ import Set as PyoSet
 from sympy import FiniteSet
 
-from ..elements.idx import Idx, Skip
+from ..elements.idx import X, Skip
 
 if TYPE_CHECKING:
     from ..sets.variable import V
@@ -57,14 +57,14 @@ class I:
 
         if size:
             # make an ordered set of some size
-            self._ = [Idx(i, self, i, True) for i in range(size)]
+            self._ = [X(name=i, parent=self, ordered=True) for i in range(size)]
             self.ordered = True
 
         else:
             self._ = [
                 (
-                    Idx(i, self, n)
-                    if not isinstance(i, (Idx, Skip))
+                    X(name=i, parent=self, pos=n)
+                    if not isinstance(i, (X, Skip))
                     else i.update(self, n)
                 )
                 for n, i in enumerate(members)
@@ -75,7 +75,7 @@ class I:
         self.name = ''
         self.n = None
 
-    def step(self, i: int) -> list[Idx]:
+    def step(self, i: int) -> list[X]:
         """Step up or down the index set"""
         ret = I(
             *[
@@ -185,7 +185,7 @@ class I:
     def __getitem__(self, key: int | str):
         return self._[key]
 
-    def __contains__(self, other: Idx):
+    def __contains__(self, other: X):
         return True if other in self._ else False
 
     def __eq__(self, other: Self):
@@ -242,7 +242,7 @@ class I:
 
     def __mul__(self, other: Self | int):
         i = I()
-        if isinstance(other, Idx):
+        if isinstance(other, X):
             idx = I(*list(product(self._, [other])))
         # idx = I(*[i & j for i, j in product(self._, other._)])
         # idx.name = str((self, other))
@@ -254,7 +254,7 @@ class I:
         if isinstance(other, int) and other == 1:
             return self
 
-        if isinstance(other, Idx):
+        if isinstance(other, X):
             if self in other.parent:
                 raise ValueError(
                     f'{other} can only belong at one index of element.',

@@ -46,37 +46,48 @@ class V(Set):
         # if the variable is non negative
         self.nn = nn
 
+        super().__init__(*index)
+
         # variables generated at the indices
         # of a variable set are stored here
         # once realized, the values take a int or float value
         # value is determined when mathematical model is solved
-        self._: list[Var] = []
+        # self._: list[Var] = []
+        self._ = [
+            Var(
+                parent=self,
+                pos=n,
+                itg=self.itg,
+                nn=self.nn,
+                bnr=self.bnr,
+            )
+            for n in range(len(self))
+        ]
+
         # the flag _fixed is changed when .fix(val) is called
         self._fixed = False
 
-        super().__init__(*index)
+    # def __setattr__(self, name, value):
 
-    def __setattr__(self, name, value):
+    #     if (
+    #         hasattr(self, 'name')
+    #         and self.name
+    #         and name == 'n'
+    #         and isinstance(value, int)
+    #         and value >= 0
+    #     ):
+    #         self._ = [
+    #             Var(
+    #                 parent=self,
+    #                 pos=n,
+    #                 itg=self.itg,
+    #                 nn=self.nn,
+    #                 bnr=self.bnr,
+    #             )
+    #             for n in range(len(self))
+    #         ]
 
-        if (
-            hasattr(self, 'name')
-            and self.name
-            and name == 'n'
-            and isinstance(value, int)
-            and value >= 0
-        ):
-            self._ = [
-                Var(
-                    parent=self,
-                    pos=n,
-                    itg=self.itg,
-                    nn=self.nn,
-                    bnr=self.bnr,
-                )
-                for n in range(len(self))
-            ]
-
-        super().__setattr__(name, value)
+    #     super().__setattr__(name, value)
 
     def fix(self, values: P | list[float]):
         """Fix the value of the variable"""

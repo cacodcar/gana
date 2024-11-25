@@ -98,9 +98,9 @@ class Prg:
             for e in value._:
                 setattr(self, e.name, e)
 
-        if isinstance(value, V):
-            if value.nn:
-                setattr(self, value.name + '_nn', -value <= 0)
+        # if isinstance(value, V):
+        #     if value.nn:
+        #         setattr(self, value.name + '_nn', -value <= 0)
 
         if isinstance(value, Var):
             value.n = len(self.variables)

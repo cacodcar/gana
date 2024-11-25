@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Self
 from IPython.display import Math, display
 
 from .cons import Cons
-from .x import X
 
 from .func import Func
 
@@ -15,7 +14,7 @@ if TYPE_CHECKING:
     from ..sets.variable import V
 
 
-class Var(X):
+class Var:
     """A variable"""
 
     def __init__(
@@ -37,10 +36,17 @@ class Var(X):
         # the value taken by the variable
         self._ = None
 
-        super().__init__(parent=parent, pos=pos)
+        self.parent = parent
+        self.pos = pos
+        self.n = None
 
         # in what constraints the variable appears
         self.features: list[Cons] = []
+
+    @property
+    def name(self):
+        """name of the element"""
+        return f'{self.parent}_{self.pos}'
 
     def latex(self):
         """Latex representation"""
@@ -80,6 +86,15 @@ class Var(X):
         """Is fixed"""
         if self._:
             return True
+
+    def __str__(self):
+        return rf'{self.name}'
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash(str(self))
 
     def __pos__(self):
         return Func(add=True, two=self)

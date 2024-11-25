@@ -6,15 +6,13 @@ from typing import TYPE_CHECKING
 
 from IPython.display import Math, display
 
-from .x import X
-
 if TYPE_CHECKING:
     from ..sets.constraint import C
     from .func import Func
     from .var import Var
 
 
-class Cons(X):
+class Cons:
     """A constraint"""
 
     def __init__(
@@ -25,7 +23,9 @@ class Cons(X):
         parent: C = None,
     ):
 
-        super().__init__(parent=parent, pos=pos)
+        self.parent = parent
+        self.pos = pos
+        self.n = None
 
         self.func = func
 
@@ -108,3 +108,12 @@ class Cons(X):
     def mps(self):
         """Name in MPS file"""
         return f'C{self.n}'
+
+    def __str__(self):
+        return rf'{self.name}'
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash(str(self))

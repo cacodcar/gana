@@ -6,24 +6,28 @@ from typing import TYPE_CHECKING
 
 from IPython.display import Math, display
 
-from .x import X
 
 if TYPE_CHECKING:
     from .func import Func
     from ..sets.function import F
 
 
-class Obj(X):
+class Obj:
     """Objective Function"""
 
     def __init__(self, func: Func):
 
         self.func = func
 
-        super().__init__()
+        self.n = None
 
         for v in func.vars():
             v.features.append(self)
+
+    @property
+    def name(self):
+        """name of the element"""
+        return f'min({self.func})'
 
     def A(self) -> list[float | None]:
         """Parameter values"""
@@ -55,3 +59,12 @@ class Obj(X):
     def mps(self):
         """Name in MPS file"""
         return f'O{self.n}'
+
+    def __str__(self):
+        return rf'{self.name}'
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash(str(self))
