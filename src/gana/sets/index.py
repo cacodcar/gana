@@ -1,19 +1,13 @@
-"""A collection of objects, a set basically"""
-
-from __future__ import annotations
+"""A set of index elements (X)"""
 
 from itertools import product
-from typing import Self, TYPE_CHECKING
+from typing import Self
 
 from IPython.display import Math, display
 from pyomo.environ import Set as PyoSet
 from sympy import FiniteSet
 
-from ..elements.idx import X, Skip
-
-if TYPE_CHECKING:
-    from ..sets.variable import V
-    from ..sets.parameter import P
+from ..elements.idx import X, Skip, Idx
 
 
 class I:
@@ -47,7 +41,6 @@ class I:
         # if the single element is an integer
         # leave it so, it will be handled in the Program
         # has only unique members
-
         self.tag = tag
 
         if members and size:
@@ -60,7 +53,8 @@ class I:
             self._ = [X(name=i, parent=self, ordered=True) for i in range(size)]
             self.ordered = True
 
-        else:
+        if members:
+            # This is an unordered set, has string elements
             self._ = [
                 (
                     X(name=i, parent=self, pos=n)
@@ -73,6 +67,7 @@ class I:
 
         # Assigned by the Program
         self.name = ''
+        # number of the index set in the program
         self.n = None
 
     def step(self, i: int) -> list[X]:
@@ -110,7 +105,8 @@ class I:
                         + r'\mathbb{'
                         + name
                         + sup
-                        + r'} \mid'
+                        + r'}'
+                        + r'\mid'
                         + rf'{self._[0]}'
                         + r'\leq i \leq '
                         + rf'{self._[-1]}'
@@ -188,26 +184,16 @@ class I:
     def __contains__(self, other: X):
         return True if other in self._ else False
 
+    # Avoid running instance checks
     def __eq__(self, other: Self):
-        if isinstance(other, I):
-            if self.name == other.name:
-                return True
-            return set(self._) == set(other._)
-        if isinstance(other, tuple):
-            return self.name == str(other)
+        return self.name == str(other)
 
     def __and__(self, other: Self):
-
         new = []
         for i in self._:
             if i in other._:
                 new.append(i)
         return I(*new)
-
-        # maintains order
-        # set(self._) & set(other._) would be simpler
-
-        # return I(*list(set(self._) & set(other._)))
 
     def __or__(self, other: Self):
         new = [i for i in self._]
@@ -215,8 +201,6 @@ class I:
             if not i in new:
                 new.append(i)
         return I(*new)
-
-        # return I(*list(set(self._) | set(other._)))
 
     def __xor__(self, other: Self):
         new = []
@@ -227,7 +211,6 @@ class I:
             if not i in self._:
                 new.append(i)
         return I(*new)
-        # return I(*list(set(self._) ^ set(other._)))
 
     def __sub__(self, other: Self | int):
 
@@ -240,12 +223,11 @@ class I:
     def __add__(self, other: int):
         return self.step(other)
 
-    def __mul__(self, other: Self | int):
+    def __mul__(self, other: Self | Idx | X):
         i = I()
-        if isinstance(other, X):
-            idx = I(*list(product(self._, [other])))
-        # idx = I(*[i & j for i, j in product(self._, other._)])
-        # idx.name = str((self, other))
+        if isinstance(other, (X, Idx, Skip)):
+            i._ = [i & j for i, j in product(self._, [other])]
+            return i
         i._ = [i & j for i, j in product(self._, other._)]
         return i
 
