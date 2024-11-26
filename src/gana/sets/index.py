@@ -52,6 +52,8 @@ class I:
             # make an ordered set of some size
             self._ = [X(name=i, parent=self, ordered=True) for i in range(size)]
             self.ordered = True
+        else:
+            self.ordered = False
 
         if members:
             # This is an unordered set, has string elements
@@ -63,9 +65,8 @@ class I:
                 )
                 for n, i in enumerate(members)
             ]
-            self.ordered = False
 
-        # Assigned by the Program
+        # can be overwritten by program
         self.name = ''
         # number of the index set in the program
         self.n = None
@@ -227,31 +228,21 @@ class I:
         i = I()
         if isinstance(other, (X, Idx, Skip)):
             i._ = [i & j for i, j in product(self._, [other])]
-            return i
-        i._ = [i & j for i, j in product(self._, other._)]
+        else:
+            i._ = [i & j for i, j in product(self._, other._)]
+        i.name = rf'{(self, other)}'
         return i
 
     def __rmul__(self, other: Self):
-        # this to allow using product
+        # this to allow using math.prod
+        # in V and P for single Indices
+        # makes X into Idx
         if isinstance(other, int) and other == 1:
-            return self
-
-        if isinstance(other, X):
-            if self in other.parent:
-                raise ValueError(
-                    f'{other} can only belong at one index of element.',
-                    f'{other} also in {self}',
-                )
-            return I(*list(product([other], self._)))
-
-        if isinstance(other, I):
-            if set(self._) & set(other._):
-                raise ValueError(
-                    f'{self} and {other} have common elements',
-                    f'{set(self._) & set(other._)} in both',
-                )
-
-        return I(*list(product(other._, self._)))
+            i = I()
+            i._ = [i & None for i in self._]
+            i.name = rf'{(self)}'
+            return i
+        return other * self
 
     def __iter__(self):
         return iter(self._)

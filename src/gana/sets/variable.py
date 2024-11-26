@@ -67,27 +67,7 @@ class V(Set):
         # the flag _fixed is changed when .fix(val) is called
         self._fixed = False
 
-    # def __setattr__(self, name, value):
 
-    #     if (
-    #         hasattr(self, 'name')
-    #         and self.name
-    #         and name == 'n'
-    #         and isinstance(value, int)
-    #         and value >= 0
-    #     ):
-    #         self._ = [
-    #             Var(
-    #                 parent=self,
-    #                 pos=n,
-    #                 itg=self.itg,
-    #                 nn=self.nn,
-    #                 bnr=self.bnr,
-    #             )
-    #             for n in range(len(self))
-    #         ]
-
-    #     super().__setattr__(name, value)
 
     def fix(self, values: P | list[float]):
         """Fix the value of the variable"""
@@ -222,29 +202,29 @@ class V(Set):
         for i in self._:
             yield i
 
-    def __call__(self, *key: tuple[int | Idx | I]) -> Self:
+    # def __call__(self, *key: tuple[int | Idx | I]) -> Self:
 
-        key = tuple([Idx(i, I(), i) if isinstance(i, int) else i for i in key])
+        # key = tuple([Idx(i, I(), i) if isinstance(i, int) else i for i in key])
 
-        if len(key) == 1:
-            key = key[0]
+        # if len(key) == 1:
+        #     key = key[0]
 
-        if self.index == key:
-            return self
+        # if self.index == key:
+        #     return self
 
-        # if key in self.index:
+        # # if key in self.index:
+        # #     return self[self.idx[str(key)]]
+
+        # try:
         #     return self[self.idx[str(key)]]
 
-        try:
-            return self[self.idx[str(key)]]
-
-        except KeyError:
-            # TODO - do better
-            v = V(*key, itg=self.itg, nn=self.nn, bnr=self.bnr)
-            v.n = self.n
-            v.name = self.name
-            v._ = [self[self.idx[i]] if not i.skip() else None for i in v.index._]
-            return v
+        # except KeyError:
+        #     # TODO - do better
+        #     v = V(*key, itg=self.itg, nn=self.nn, bnr=self.bnr)
+        #     v.n = self.n
+        #     v.name = self.name
+        #     v._ = [self[self.idx[i]] if not i.skip() else None for i in v.index._]
+        #     return v
 
     def __getitem__(self, pos: int) -> Var:
         return self._[pos]

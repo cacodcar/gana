@@ -3,41 +3,19 @@ Forms the base for all element sets
 """
 
 from math import prod
-
-from ..elements.idx import Idx
 from .index import I
 
 
 class Set:
     """An ordered Element Set"""
 
-    def __init__(self, *index: tuple[Idx | int | I]):
+    def __init__(self, *index: tuple[I]):
 
-        index = tuple([Idx(i) if isinstance(i, int) else i for i in index])
+        self.index: I = prod(index)
 
-        if all([isinstance(i, Idx) for i in index]):
-            if len(index) == 1:
-                index = index[0]
-            self.index = I(index)
-            # self.index.of.append((0, self))
-        else:
-            # for n, idx in enumerate(index):
-            #     idx.of.append((n, self))
-            self.index: I = prod(index)
-
-        # if not self.index.name:
-        #     self.index.name = f'{index}'
-
-        # name is set by the program
         self.name = ''
         # number of the set in the program
         self.n: int = None
-
-        if self.index:
-            self.idx = {i: n for n, i in enumerate(self.index._)}
-
-        else:
-            self.idx = {}
 
     def nsplit(self):
         """Split the name"""

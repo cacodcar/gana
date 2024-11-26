@@ -125,7 +125,7 @@ class X:
         # TODO - put \in parents with \cup
 
         if self.ordered:
-            return self.pos[0]
+            return self._pos
         return rf'{self.name}'
 
     # check only on the basis of the name
@@ -143,7 +143,7 @@ class X:
             return Skip()
         return Idx(self, other)
 
-    def __rand__(self, other: Self):
+    def __rand__(self, other: Self | int):
         if isinstance(other, Skip):
             return Skip()
         return Idx(other, self)

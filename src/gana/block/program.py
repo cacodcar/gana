@@ -16,7 +16,7 @@ from gurobipy import read as gpread
 from ..elements.obj import Obj
 
 from ..sets.index import I
-from ..elements.idx import Idx
+from ..elements.idx import X
 from ..sets.variable import V
 from ..elements.var import Var
 from ..sets.parameter import P
@@ -47,7 +47,7 @@ class Prg:
         self.reserved = []
         self.sets = Sets()
         self.names_idx = []
-        self.indices: list[Idx] = []
+        self.indices: list[X] = []
         self.variables: list[Var] = []
         # self.thetas: list[Th] = []
         self.functions: list[Func] = []
@@ -89,7 +89,7 @@ class Prg:
                 else:
                     setattr(self, idx.name, idx)
 
-        if isinstance(value, Idx):
+        if isinstance(value, X):
             value.n = len(self.indices)
             self.indices.append(value)
             self.names_idx.append(value.name)
