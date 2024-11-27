@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from IPython.display import Math, display
 
 from ..elements.cons import Cons
-from .ordered import Set
+
 
 if TYPE_CHECKING:
     from ..elements.idx import Idx
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from .variable import V
 
 
-class C(Set):
+class C:
     """Constraint gives the relationship between Parameters, Variables, or Expressions"""
 
     def __init__(
@@ -33,16 +33,17 @@ class C(Set):
         # whether the constraint is binding
         self.binding = False
 
-        self._: list[Cons] = []
-
-        # where this constraint is part of:
-        # g - equality constraint
-        # h - inequality constraint
-
-        super().__init__()
+        self._ = [
+            Cons(
+                parent=self,
+                pos=n,
+                func=f,
+                leq=self.leq,
+            )
+            for n, f in enumerate(self.funcs)
+        ]
 
         self.index = self.funcs.index
-
 
         if self.leq:
             self.name = self.funcs.name + r'<=0'
@@ -50,27 +51,15 @@ class C(Set):
         else:
             self.name = self.funcs.name + r'=0'
 
-    def __setattr__(self, name, value):
-
-        if name == 'n' and isinstance(value, int) and value >= 0:
-            self._ = [
-                Cons(
-                    parent=self,
-                    pos=n,
-                    func=self.funcs[n],
-                    leq=self.leq,
-                )
-                for n in range(len(self.funcs))
-            ]
-
-        super().__setattr__(name, value)
+        # number of the set in the program
+        self.n: int = None
 
     @property
     def nn(self):
         """Non-negativity Constraint"""
         if self.funcs.isnnvar() and self.leq:
             return True
-        
+
     @property
     def eq(self):
         """Equality Constraint"""
@@ -79,8 +68,8 @@ class C(Set):
     @property
     def one(self):
         """element one in function"""
-        return self.funcs.one 
-    
+        return self.funcs.one
+
     @property
     def two(self):
         """element two in function"""
@@ -122,7 +111,22 @@ class C(Set):
     def __getitem__(self, pos: int) -> Cons:
         return self._[pos]
 
-
     def __iter__(self):
         for i in self._:
             yield i
+
+    def order(self) -> list:
+        """order"""
+        return len(self.index)
+
+    def __len__(self):
+        return len(self.index._)
+
+    def __str__(self):
+        return rf'{self.name}'
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash(str(self))

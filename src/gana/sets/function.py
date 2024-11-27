@@ -1,5 +1,10 @@
-"""Expression 
+"""Function
 """
+
+# A basic Function is of the type
+# P*V, V + P, V - P
+# P can be a number (int or float), parameter set (P) or list[int | float]
+# for multiplication P comes before variable
 
 from __future__ import annotations
 
@@ -7,26 +12,24 @@ from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math, display
 
-from math import prod
 
 from ..elements.func import Func
 from .constraint import C
-from .ordered import Set
 from .index import I
-from ..elements.idx import Idx
+
 
 if TYPE_CHECKING:
     from .parameter import P
     from .variable import V
 
 
-class F(Set):
+class F:
     """Provides some relational operation between Parameters and Variables"""
 
     def __init__(
         self,
-        one: P | V | Self = 0,
-        two: P | V | Self = 0,
+        one: int | float | list[int | float] | P | V | Self = 0,
+        two: int | float | list[int | float] | P | V | Self = 0,
         mul: bool = False,
         add: bool = False,
         sub: bool = False,
@@ -39,101 +42,119 @@ class F(Set):
         self.one = one
         self.two = two
 
-        if isinstance(one, list):
-            if isinstance(two, list):
-                raise ValueError('Cannot operate with two lists')
-            index = (I(size=len(one)), two.index)
+        self.consistent()
 
-        elif isinstance(two, list):
-            index = (one.index, I(size=len(two)))
+        # These are of the type P*V, V + P, V - P
+        # indices should match in these cases
+        from .parameter import P
 
-        elif isinstance(one, (int, float)):
-            if isinstance(two, (int, float)):
-                raise ValueError('Cannot operate with two constants')
-            index = (I(size=len(two)), two.index)
+        # if operating with V and a number
+        if isinstance(self.one, (int, float)):
+            one_ = self.one
+            self.one = P(_=[self.one] * len(self.two))
+            self.one.index = self.two.index
+            self.one.name = str(one_)
 
-        elif isinstance(two, (int, float)):
-            index = (one.index, I(size=len(one)))
+        elif isinstance(self.two, (int, float)):
+            two_ = self.two
+            self.two = P(_=[self.two] * len(self.one))
+            self.two.index = self.one.index
+            self.two.name = str(two_)
 
-        else:
-            index = (one.index, two.index)
+        elif isinstance(self.one, list):
+            self.one = P(I(size=len(self.one)), _=self.one)
+            self.one.name = rf'Par{self.two.name.capitalize()}'
 
-        lone = len(index[0])
-        ltwo = len(index[1])
+        elif isinstance(self.two, list):
+            self.two = P(I(size=len(self.two)), _=self.two)
+            self.two.name = rf'Par{self.one.name.capitalize()}'
 
-        if not lone % ltwo == 0 and not ltwo % lone == 0:
-            raise ValueError('The indices are not compatible')
+        # At this point, both one and two are gana elements
+        # P, V or F
+        # There could be mismatches in the indices
+        # Check for mismatched indices
 
-        # Handles the case when indices are mismatched
+        self.index = self.one.index + self.two.index
 
-        if lone > ltwo:
-            idxone = index[0]._
-            idxtwo = index[1]._ * int(lone / ltwo)
+        self.name = f'{self.one or ""}{self.rel}{self.two or ""}'
 
-        if ltwo > lone:
-            idxone = index[0]._ * int(ltwo / lone)
-            idxtwo = index[1]._
-
-        if lone == ltwo:
-            idxone = index[0]._
-            idxtwo = index[1]._
-
-        index = (I(*[idx for idx in zip(idxone, idxtwo)]),)
-
-        super().__init__(*index)
-
-        self.name = f'{one or ""}{self.rel}{two or ""}'
-
-        if not self.index.name:
-            self.index.name = rf'{index}'
+        # order of declaration in the program
+        self.n: int = None
 
         self._: list[Func] = []
 
-        for idx, n in self.idx.items():
-            if self.one is not None:
-                if isinstance(self.one, list):
-                    one_ = self.one[n]
-                elif isinstance(self.one, (int, float)):
-                    one_ = self.one
-                else:
-                    one_ = self.one(idx[0])
-            else:
-                one_ = None
+        mis = self.mismatch()
 
-            if self.two is not None:
-                if isinstance(self.two, list):
-                    two_ = self.two[n]
-                elif isinstance(self.two, (int, float)):
-                    two_ = self.two
-                else:
-                    two_ = self.two(idx[1])
-            else:
-                two_ = None
+        if mis < 1:
+            # two is longer
+            one_ = self.one._ * (-mis)
+            two_ = self.two._
 
-            if (self.add or self.sub) and two_ is None:
-                self._.append(one_)
-                continue
+        elif mis > 1:
+            # one is longer
+            one_ = self.one._
+            two_ = self.two._ * mis
 
-            if self.mul and (one_ is None or one_ in [0, 0.0]):
-                self._.append(0)
-                continue
+        else:
+            # one and two are of the same length
+            one_ = self.one._
+            two_ = self.two._
 
-            if not one_ and not two_:
-                self._.append(0)
-                continue
+        for n, o in enumerate(one_):
 
             self._.append(
                 Func(
-                    one=one_,
+                    one=o,
                     mul=self.mul,
                     add=self.add,
                     sub=self.sub,
                     div=self.div,
-                    two=two_,
+                    two=two_[n],
                     parent=self,
                     pos=n,
                 )
             )
+
+    def consistent(self):
+        """Make function consistent"""
+        from .parameter import P
+        from .variable import V
+
+        if isinstance(self.one, (int, float, list, P)) and isinstance(self.two, (V, F)):
+            if self.add:
+                # keep number after the variable/operation
+                # additions are always v + p
+                self.two, self.one = self.one, self.two
+            if self.sub:
+                # if negation, write as -1 * var
+                if self.one == 0 or not self.one:
+                    self.one = -1
+                    self.mul = True
+                    self.sub = False
+
+                else:
+                    # keep number after the variable
+                    # subtractions are always v - p
+                    self.two, self.one = self.one, -self.two
+
+        if isinstance(self.two, (int, float, list, P)) and isinstance(self.one, (V, F)):
+            if self.mul:
+                # keep number before the variable/operation
+                # multiplications are also p*v
+                self.two, self.one = self.one, self.two
+
+    def mismatch(self):
+        """Determine mismatch between indices"""
+        lone = len(self.one)
+        ltwo = len(self.two)
+        if not lone % ltwo == 0 and not ltwo % lone == 0:
+            raise ValueError('The indices are not compatible')
+        if lone > ltwo:
+            return int(lone / ltwo)
+        if ltwo > lone:
+            # negative to indicate that two is greater than one
+            return -int(ltwo / lone)
+        return 1
 
     @property
     def rel(self):
@@ -260,6 +281,9 @@ class F(Set):
         if self.sub:
             return F(one=other * self.one, sub=True, two=other * self.two)
 
+        if self.mul:
+            return F(one=other * self.one, mul=True, two=self.two)
+
         return F(one=self, mul=True, two=other)
 
     def __truediv__(self, other: Self | P | V):
@@ -285,10 +309,10 @@ class F(Set):
     def __gt__(self, other: Self | P | V):
         return self >= other
 
-    def __call__(self, *key: tuple[Idx | I]) -> Func:
-        if len(key) == 1 and isinstance(key[0], (int, Idx, I)):
-            key = key[0]
-        return self[self.idx[key]]
+    # def __call__(self, *key: tuple[Idx | I]) -> Func:
+    #     if len(key) == 1 and isinstance(key[0], (int, Idx, I)):
+    #         key = key[0]
+    #     return self[self.idx[key]]
 
     def __getitem__(self, pos: int) -> Func:
         return self._[pos]
@@ -296,3 +320,19 @@ class F(Set):
     def __iter__(self):
         for i in self._:
             yield i
+
+    def order(self) -> list:
+        """order"""
+        return len(self.index)
+
+    def __len__(self):
+        return len(self.index._)
+
+    def __str__(self):
+        return rf'{self.name}'
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash(str(self))

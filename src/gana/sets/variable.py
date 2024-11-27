@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self
+from math import prod
 from IPython.display import Math, display
 from pyomo.environ import Binary, Integers, NonNegativeIntegers, NonNegativeReals, Reals
 from pyomo.environ import Var as PyoVar
@@ -12,7 +13,6 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 from ..elements.var import Var
 from .constraint import C
 from .function import F
-from .ordered import Set
 from ..elements.idx import Idx
 from .index import I
 
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from .parameter import P
 
 
-class V(Set):
+class V:
     """Variable Set"""
 
     def __init__(
@@ -46,7 +46,12 @@ class V(Set):
         # if the variable is non negative
         self.nn = nn
 
-        super().__init__(*index)
+
+        self.index: I = prod(index)
+
+        self.name = ''
+        # number of the set in the program
+        self.n: int = None
 
         # variables generated at the indices
         # of a variable set are stored here
@@ -66,8 +71,6 @@ class V(Set):
 
         # the flag _fixed is changed when .fix(val) is called
         self._fixed = False
-
-
 
     def fix(self, values: P | list[float]):
         """Fix the value of the variable"""
@@ -121,6 +124,25 @@ class V(Set):
                 return PyoVar(*idx, domain=NonNegativeReals, doc=str(self))
             else:
                 return PyoVar(*idx, domain=Reals, doc=str(self))
+
+    def nsplit(self):
+        """Split the name"""
+        if '_' in self.name:
+            name, sup = self.name.split('_')
+            return name, r'^{' + sup + r'}'
+        return self.name, ''
+
+    def latex(self) -> str:
+        """LaTeX representation"""
+        name, sup = self.nsplit()
+
+        return (
+            name
+            + sup
+            + r'_{'
+            + rf'{self.index}'.replace('(', '').replace(')', '')
+            + r'}'
+        )
 
     def matrix(self):
         """Matrix Representation"""
@@ -202,29 +224,53 @@ class V(Set):
         for i in self._:
             yield i
 
+    def __pow__(self, other: int):
+        f = self
+        for _ in range(other - 1):
+            f *= self
+        return f
+
+
     # def __call__(self, *key: tuple[int | Idx | I]) -> Self:
 
-        # key = tuple([Idx(i, I(), i) if isinstance(i, int) else i for i in key])
+    # key = tuple([Idx(i, I(), i) if isinstance(i, int) else i for i in key])
 
-        # if len(key) == 1:
-        #     key = key[0]
+    # if len(key) == 1:
+    #     key = key[0]
 
-        # if self.index == key:
-        #     return self
+    # if self.index == key:
+    #     return self
 
-        # # if key in self.index:
-        # #     return self[self.idx[str(key)]]
+    # # if key in self.index:
+    # #     return self[self.idx[str(key)]]
 
-        # try:
-        #     return self[self.idx[str(key)]]
+    # try:
+    #     return self[self.idx[str(key)]]
 
-        # except KeyError:
-        #     # TODO - do better
-        #     v = V(*key, itg=self.itg, nn=self.nn, bnr=self.bnr)
-        #     v.n = self.n
-        #     v.name = self.name
-        #     v._ = [self[self.idx[i]] if not i.skip() else None for i in v.index._]
-        #     return v
+    # except KeyError:
+    #     # TODO - do better
+    #     v = V(*key, itg=self.itg, nn=self.nn, bnr=self.bnr)
+    #     v.n = self.n
+    #     v.name = self.name
+    #     v._ = [self[self.idx[i]] if not i.skip() else None for i in v.index._]
+    #     return v
+
 
     def __getitem__(self, pos: int) -> Var:
         return self._[pos]
+
+    def order(self) -> list:
+        """order"""
+        return len(self.index)
+
+    def __len__(self):
+        return len(self.index._)
+
+    def __str__(self):
+        return rf'{self.name}'
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash(str(self))

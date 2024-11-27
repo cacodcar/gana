@@ -163,7 +163,8 @@ class X:
     # required only in the case of using math.prod
     # to create multi-indices easily
     def __rmul__(self, other: int):
-        return self
+        if isinstance(other, int) and other == 1:
+            return Idx(self)
 
     def __str__(self):
         return rf'{self.name}'

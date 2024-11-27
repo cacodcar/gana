@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from IPython.display import Math, display
 
 from .cons import Cons
 
-from .func import Func
 
 if TYPE_CHECKING:
     from ..sets.variable import V
@@ -95,92 +94,3 @@ class Var:
 
     def __hash__(self):
         return hash(str(self))
-
-    def __pos__(self):
-        return Func(add=True, two=self)
-
-    def __neg__(self):
-        return Func(sub=True, two=self)
-
-    def __add__(self, other: Self | Func):
-        # useful for the case of 0 + x
-        # comes up when using sum()
-        if other is None:
-            return self
-        if isinstance(other, (int, float)) and other in [0, 0.0]:
-            return self
-        return Func(one=self, add=True, two=other)
-
-    def __radd__(self, other: Self | Func):
-        if other is None:
-            return self
-        if isinstance(other, (int, float)):
-            if other in [0, 0.0]:
-                return self
-            other = float(other)
-        return self + other
-
-    def __sub__(self, other: Self | Func):
-        if other is None:
-            return self
-        if isinstance(other, (int, float)) and other in [0, 0.0]:
-            return self
-        return Func(one=self, sub=True, two=other)
-
-    def __rsub__(self, other: Self | Func | int):
-        if other is None:
-            return -self
-        if isinstance(other, (int, float)):
-            if other in [0, 0.0]:
-                return -self
-            other = float(other)
-        return -self + other
-
-    def __mul__(self, other: Self | Func):
-        if isinstance(other, (int, float)):
-            if other in [1, 1.0]:
-                return self
-            if other in [0, 0.0]:
-                return 0
-        return Func(one=self, mul=True, two=other)
-
-    def __rmul__(self, other: Self | Func | int):
-        if isinstance(other, (int, float)):
-            if other in [1, 1.0]:
-                return self
-            if other in [0, 0.0]:
-                return 0
-        return Func(one=other, mul=True, two=self)
-
-    def __truediv__(self, other: Self | Func):
-        return Func(one=self, div=True, two=other)
-
-    def __rtruediv__(self, other: Self | Func | int):
-
-        if isinstance(other, (int, float)) and other in [1, 1.0]:
-            return self
-        else:
-            return Func(one=other, div=True, two=self)
-
-    def __eq__(self, other):
-        return Cons(func=self - other)
-
-    def __le__(self, other):
-        return Cons(func=self - other, leq=True)
-
-    def __ge__(self, other):
-        return Cons(func=other - self, leq=True)
-
-    def __lt__(self, other):
-
-        return self <= other
-
-    def __gt__(self, other):
-
-        return self >= other
-
-    def __pow__(self, other: int):
-        f = self
-        for _ in range(other - 1):
-            f *= self
-        return f

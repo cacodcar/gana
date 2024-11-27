@@ -2,6 +2,7 @@
 """
 
 from typing import Self
+from math import prod
 
 from IPython.display import Math, display
 from pyomo.environ import Param as PyoParam
@@ -10,21 +11,22 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 from ..value.bigm import M
 from .constraint import C
 from .function import F
-from .ordered import Set
 from .variable import V
 
 from .index import I
 from ..elements.idx import Idx
 
 
-class P(Set):
+class P:
     """A Parameter"""
 
     def __init__(
-        self, *index: Idx | I, _: list[int | float | bool] = None, tag: str = None
+        self,
+        *index: tuple[Idx | I],
+        _: list[int | float | bool] = None,
+        tag: str = None,
     ):
         self.tag = tag
-        super().__init__(*index)
 
         if not _:
             _ = [_]
@@ -38,6 +40,12 @@ class P(Set):
             if p:
                 self._[n] = float(p)
 
+        self.index: I = prod(index)
+
+        self.name = ''
+        # number of the set in the program
+        self.n: int = None
+
     def __setattr__(self, name, value):
         # if negative, already made from another parameter, so
         # do not capitalize
@@ -49,6 +57,25 @@ class P(Set):
     def isneg(self):
         """Check if the parameter is negative"""
         return self.name[0] == '-'
+
+    def nsplit(self):
+        """Split the name"""
+        if '_' in self.name:
+            name, sup = self.name.split('_')
+            return name, r'^{' + sup + r'}'
+        return self.name, ''
+
+    def latex(self) -> str:
+        """LaTeX representation"""
+        name, sup = self.nsplit()
+
+        return (
+            name
+            + sup
+            + r'_{'
+            + rf'{self.index}'.replace('(', '').replace(')', '')
+            + r'}'
+        )
 
     def matrix(self):
         """Matrix Representation"""
@@ -212,19 +239,35 @@ class P(Set):
         for i in self._:
             yield i
 
-    def __call__(self, *key: tuple[Idx | I]) -> Self:
+    def order(self) -> list:
+        """order"""
+        return len(self.index)
 
-        if len(key) == 1:
-            key = key[0]
+    def __len__(self):
+        return len(self.index._)
 
-        if key in self.index._:
-            return self[self.idx[str(key)]]
+    def __str__(self):
+        return rf'{self.name}'
 
-        p = P(*key)
-        p.n = self.n
-        p.name = self.name
-        p._ = [self[self.idx[i]] if not i.skip() else None for i in p.index._]
-        return p
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash(str(self))
+
+    # def __call__(self, *key: tuple[Idx | I]) -> Self:
+
+    #     if len(key) == 1:
+    #         key = key[0]
+
+    #     if key in self.index._:
+    #         return self[self.idx[str(key)]]
+
+    #     p = P(*key)
+    #     p.n = self.n
+    #     p.name = self.name
+    #     p._ = [self[self.idx[i]] if not i.skip() else None for i in p.index._]
+    #     return p
 
     def __getitem__(self, pos: int) -> float | int | M:
         return self._[pos]

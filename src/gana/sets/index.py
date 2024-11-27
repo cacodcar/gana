@@ -221,8 +221,17 @@ class I:
         if isinstance(other, int):
             return self.step(-other)
 
-    def __add__(self, other: int):
-        return self.step(other)
+    def __add__(self, other: int | Self):
+
+        if isinstance(other, int):
+            return self.step(other)
+        i = I()
+        if isinstance(other, (X, Idx, Skip)):
+            i._ = [i + j for i, j in product(self._, [other])]
+        else:
+            i._ = [i + j for i, j in product(self._, other._)]
+        i.name = rf'{[self, other]}'
+        return i
 
     def __mul__(self, other: Self | Idx | X):
         i = I()
@@ -237,12 +246,16 @@ class I:
         # this to allow using math.prod
         # in V and P for single Indices
         # makes X into Idx
+        i = I()
         if isinstance(other, int) and other == 1:
-            i = I()
             i._ = [i & None for i in self._]
             i.name = rf'{(self)}'
             return i
-        return other * self
+        # will not give error if I and I
+        # safe to say that other is not I but X, Idx, or Skip
+        i._ = [i & j for i, j in product([other], self._)]
+        i.name = rf'{(other, self)}'
+        return i
 
     def __iter__(self):
         return iter(self._)
