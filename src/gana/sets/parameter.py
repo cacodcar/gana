@@ -14,7 +14,7 @@ from .function import F
 from .variable import V
 
 from .index import I
-from ..elements.idx import Idx
+from ..elements.idx import Idx, X
 
 
 class P:
@@ -254,6 +254,10 @@ class P:
 
     def __hash__(self):
         return hash(str(self))
+
+    def __call__(self, *key: tuple[X | Idx | I]) -> Self:
+        if prod(key) == self.index:
+            return self
 
     # def __call__(self, *key: tuple[Idx | I]) -> Self:
 

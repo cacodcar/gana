@@ -13,8 +13,9 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 from ..elements.var import Var
 from .constraint import C
 from .function import F
-from ..elements.idx import Idx
+from ..elements.idx import Idx, X
 from .index import I
+
 
 if TYPE_CHECKING:
     from .parameter import P
@@ -45,7 +46,6 @@ class V:
 
         # if the variable is non negative
         self.nn = nn
-
 
         self.index: I = prod(index)
 
@@ -230,6 +230,9 @@ class V:
             f *= self
         return f
 
+    def __call__(self, *key: tuple[X | Idx | I]) -> Self:
+        if prod(key) == self.index:
+            return self
 
     # def __call__(self, *key: tuple[int | Idx | I]) -> Self:
 
@@ -254,7 +257,6 @@ class V:
     #     v.name = self.name
     #     v._ = [self[self.idx[i]] if not i.skip() else None for i in v.index._]
     #     return v
-
 
     def __getitem__(self, pos: int) -> Var:
         return self._[pos]
