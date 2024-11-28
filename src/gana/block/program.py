@@ -120,7 +120,6 @@ class Prg:
         if isinstance(value, Obj):
             value.n = len(self.objectives)
             self.objectives.append(value)
-            value.name = name
             setattr(self, value.name + '_f', value.func)
 
         super().__setattr__(name, value)
@@ -192,7 +191,7 @@ class Prg:
                 row[n] = value
             a_.append(row)
         return a_
-    
+
     def _A(self) -> list[list[float]]:
         """Matrix of Variable coefficients"""
         a_ = []
@@ -203,7 +202,6 @@ class Prg:
                 row[n] = value
             a_.append(row)
         return a_
-
 
     def C(self, zero: bool = True) -> list[float]:
         """Objective Coefficients"""
@@ -476,7 +474,7 @@ class Prg:
 
         prg = Prg(name=rf'{self.name}_{other.name}')
 
-        # for i in self.sets.index: 
+        # for i in self.sets.index:
         #     if i in other.sets.index:
         #         i = i | getattr(other.sets, i.name)
         #     setattr(prg, i.name, i)
@@ -487,8 +485,7 @@ class Prg:
 
         # for v in self.sets.variable:
         #     if v in other.sets.variable:
-        #         v = V(v)   
-
+        #         v = V(v)
 
         for i in (
             self.sets.index
@@ -502,13 +499,13 @@ class Prg:
             + self.sets.constraint
             + other.sets.constraint
         ):
-            if i.name not in prg.names:  
+            if i.name not in prg.names:
                 setattr(prg, i.name, i)
 
         for c in self.constraints + other.constraints:
             if c not in prg.constraints:
                 setattr(prg, c.name, c)
-                
+
         for o in self.objectives + other.objectives:
             setattr(prg, o.name, o)
 

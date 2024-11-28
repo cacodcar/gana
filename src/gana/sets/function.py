@@ -127,7 +127,7 @@ class F:
                 self.two, self.one = self.one, self.two
             if self.sub:
                 # if negation, write as -1 * var
-                if self.one == 0 or not self.one:
+                if isinstance(self.one, int) and (self.one == 0 or not self.one):
                     self.one = -1
                     self.mul = True
                     self.sub = False

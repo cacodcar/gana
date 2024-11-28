@@ -56,15 +56,23 @@ class I:
             self.ordered = False
 
         if members:
-            # This is an unordered set, has string elements
-            self._ = [
-                (
-                    X(name=i, parent=self, pos=n)
-                    if not isinstance(i, (X, Skip))
-                    else i.update(self, n)
-                )
-                for n, i in enumerate(members)
-            ]
+            self._ = []
+            for n, i in enumerate(members):
+                if isinstance(i, X):
+                    self._.append(i.update(self, n))
+                elif isinstance(i, Skip):
+                    self._.append(Skip())
+                else:
+                    self._.append(X(name=i, parent=self, pos=n))
+            # # This is an unordered set, has string elements
+            # self._ = [
+            #     (
+            #         X(name=i, parent=self, pos=n)
+            #         if not isinstance(i, (X, Skip))
+            #         else i.update(self, n)
+            #     )
+            #     for n, i in enumerate(members)
+            # ]
 
         # can be overwritten by program
         self.name = ''

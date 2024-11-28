@@ -15,13 +15,13 @@ if TYPE_CHECKING:
 class Obj:
     """Objective Function"""
 
-    def __init__(self, func: Func):
+    def __init__(self, func: F):
 
-        self.func = func
+        self.func: Func = func._[0]
 
         self.n = None
 
-        for v in func.vars():
+        for v in self.func.vars():
             v.features.append(self)
 
     @property

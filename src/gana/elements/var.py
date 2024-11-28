@@ -86,6 +86,16 @@ class Var:
         if self._:
             return True
 
+    def __rmul__(self, other: int):
+        # useful when using prod()
+        if isinstance(other, int) and other == 1:
+            return self
+
+    def __radd__(self, other: int):
+        # useful when using sum()
+        if isinstance(other, int) and other == 0:
+            return self
+
     def __str__(self):
         return rf'{self.name}'
 

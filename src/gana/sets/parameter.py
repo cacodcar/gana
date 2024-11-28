@@ -7,6 +7,7 @@ from math import prod
 from IPython.display import Math, display
 from pyomo.environ import Param as PyoParam
 from sympy import Idx, IndexedBase, Symbol, symbols
+from functools import reduce
 
 from ..value.bigm import M
 from .constraint import C
@@ -29,7 +30,7 @@ class P:
         self.tag = tag
 
         if not _:
-            _ = [_]
+            _ = []
 
         self._: list[float | M] = _
 
@@ -40,11 +41,16 @@ class P:
             if p:
                 self._[n] = float(p)
 
-        self.index: I = prod(index)
+        if index:
+            index: I = prod(index)
+
+        self.index = index
 
         self.name = ''
         # number of the set in the program
         self.n: int = None
+
+        self.idx = {idx: var for idx, var in zip(self.index, self)}
 
     def __setattr__(self, name, value):
         # if negative, already made from another parameter, so
@@ -159,9 +165,9 @@ class P:
             if other in [0, 0.0]:
                 return 0
         if isinstance(other, P):
-            self._ = [i * j for i, j in zip(self._, other._)]
-            self.name = f'{self.name} * {other.name}'
-            return self
+            par = P(self.index, _=[i * j for i, j in zip(self._, other._)])
+            par.name = f'{self.name} * {other.name}'
+            return par
         if isinstance(other, F):
             if other.add:
                 return F(one=self * other.one, add=True, two=self * other.two)
@@ -176,7 +182,7 @@ class P:
 
     def __truediv__(self, other: Self):
         if isinstance(other, P):
-            return P(*self.index, _=[i / j for i, j in zip(self._, other._)])
+            return P(self.index, _=[i / j for i, j in zip(self._, other._)])
 
         if isinstance(other, F):
             return F(one=self, div=True, two=other)
@@ -189,15 +195,15 @@ class P:
 
     def __floordiv__(self, other: Self):
 
-        return P(*self.index, _=[i // j for i, j in zip(self._, other._)])
+        return P(self.index, _=[i // j for i, j in zip(self._, other._)])
 
     def __mod__(self, other: Self):
 
-        return P(*self.index, _=[i % j for i, j in zip(self._, other._)])
+        return P(self.index, _=[i % j for i, j in zip(self._, other._)])
 
     def __pow__(self, other: Self):
 
-        return P(*self.index, _=[i**j for i, j in zip(self._, other._)])
+        return P(self.index, _=[i**j for i, j in zip(self._, other._)])
 
     def __eq__(self, other: Self):
 
@@ -256,8 +262,24 @@ class P:
         return hash(str(self))
 
     def __call__(self, *key: tuple[X | Idx | I]) -> Self:
+        # if the whole set is called
         if prod(key) == self.index:
             return self
+
+        par = P(tag=self.tag)
+        par.n = self.n
+        par.name = self.name
+        # if a subset is called
+        if isinstance(prod(key), I):
+            par.index = prod(key)
+            par._ = [self.idx[idx] for idx in prod(key)]
+            return par
+
+        # if a single index is called
+        key = reduce(lambda a, b: a & b, key)
+        par.index = key
+        par._ = [self.idx[key]]
+        return par
 
     # def __call__(self, *key: tuple[Idx | I]) -> Self:
 

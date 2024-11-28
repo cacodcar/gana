@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self
 from math import prod
+from functools import reduce
+
 from IPython.display import Math, display
 from pyomo.environ import Binary, Integers, NonNegativeIntegers, NonNegativeReals, Reals
 from pyomo.environ import Var as PyoVar
@@ -13,7 +15,7 @@ from sympy import Idx, IndexedBase, Symbol, symbols
 from ..elements.var import Var
 from .constraint import C
 from .function import F
-from ..elements.idx import Idx, X
+from ..elements.idx import Idx, X, Skip
 from .index import I
 
 
@@ -46,8 +48,10 @@ class V:
 
         # if the variable is non negative
         self.nn = nn
+        if index:
+            index: I = prod(index)
 
-        self.index: I = prod(index)
+        self.index = index
 
         self.name = ''
         # number of the set in the program
@@ -57,20 +61,30 @@ class V:
         # of a variable set are stored here
         # once realized, the values take a int or float value
         # value is determined when mathematical model is solved
-        # self._: list[Var] = []
-        self._ = [
-            Var(
-                parent=self,
-                pos=n,
-                itg=self.itg,
-                nn=self.nn,
-                bnr=self.bnr,
-            )
-            for n in range(len(self))
-        ]
+        if self.index:
+            self._ = [
+                Var(
+                    **self.args(),
+                    parent=self,
+                    pos=n,
+                )
+                for n in range(len(self))
+            ]
+        else:
+            self._ = []
 
         # the flag _fixed is changed when .fix(val) is called
         self._fixed = False
+
+        self.idx = {idx: var for idx, var in zip(self.index, self._)}
+
+    def args(self) -> dict:
+        """Arguments"""
+        return {
+            'itg': self.itg,
+            'nn': self.nn,
+            'bnr': self.bnr,
+        }
 
     def fix(self, values: P | list[float]):
         """Fix the value of the variable"""
@@ -221,8 +235,8 @@ class V:
         return self >= other
 
     def __iter__(self):
-        for i in self._:
-            yield i
+        for i in self.index:
+            yield self(i)
 
     def __pow__(self, other: int):
         f = self
@@ -231,32 +245,26 @@ class V:
         return f
 
     def __call__(self, *key: tuple[X | Idx | I]) -> Self:
+        # if the whole set is called
         if prod(key) == self.index:
             return self
 
-    # def __call__(self, *key: tuple[int | Idx | I]) -> Self:
+        var = V(**self.args(), tag=self.tag)
+        var.n = self.n
+        var.name = self.name
+        # if a subset is called
+        if isinstance(prod(key), I):
+            var.index = prod(key)
+            var._ = [
+                self.idx[idx] if not isinstance(idx, Skip) else 0 for idx in prod(key)
+            ]
+            return var
 
-    # key = tuple([Idx(i, I(), i) if isinstance(i, int) else i for i in key])
-
-    # if len(key) == 1:
-    #     key = key[0]
-
-    # if self.index == key:
-    #     return self
-
-    # # if key in self.index:
-    # #     return self[self.idx[str(key)]]
-
-    # try:
-    #     return self[self.idx[str(key)]]
-
-    # except KeyError:
-    #     # TODO - do better
-    #     v = V(*key, itg=self.itg, nn=self.nn, bnr=self.bnr)
-    #     v.n = self.n
-    #     v.name = self.name
-    #     v._ = [self[self.idx[i]] if not i.skip() else None for i in v.index._]
-    #     return v
+        # if a single index is called
+        key = reduce(lambda a, b: a & b, key)
+        var.index = key
+        var._ = [self.idx[key]]
+        return var
 
     def __getitem__(self, pos: int) -> Var:
         return self._[pos]

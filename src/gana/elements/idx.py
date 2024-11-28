@@ -111,8 +111,10 @@ class X:
         """Update the parent and position of the index element"""
         # only used for unordered indices
         # no need to run check, because append will exclude the ordered indices anyway
-        self._parent.append(parent)
-        self._pos.append(pos)
+
+        if not self.ordered:
+            self._parent.append(parent)
+            self._pos.append(pos)
         return self
 
     # def skip(self):
@@ -146,6 +148,8 @@ class X:
     def __rand__(self, other: Self | int):
         if isinstance(other, Skip):
             return Skip()
+        if other is None:
+            return Idx(self)
         return Idx(other, self)
 
     # This creates a multi-index
