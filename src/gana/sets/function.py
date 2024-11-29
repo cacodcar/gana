@@ -86,25 +86,35 @@ class F:
         mis = self.mismatch()
 
         if mis < 1:
+            print('a')
             # two is longer
             one_ = self.one._ * (-mis)
             two_ = self.two._
 
         elif mis > 1:
+            print('b')
+
             # one is longer
             one_ = self.one._
             two_ = self.two._ * mis
 
         else:
+            print('c')
+
             # one and two are of the same length
             one_ = self.one._
             two_ = self.two._
 
-        for n, o in enumerate(one_):
+        print('asdasd', one_, self.rel, two_)
+        # one_ is None or 0 for negation
+        if not one_:
+            one_ = [None] * len(two_)
+
+        for n, _ in enumerate(one_):
 
             self._.append(
                 Func(
-                    one=o,
+                    one=one_[n],
                     mul=self.mul,
                     add=self.add,
                     sub=self.sub,
