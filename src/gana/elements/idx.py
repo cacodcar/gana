@@ -241,6 +241,10 @@ class Idx:
     def __rand__(self, other: Self):
         if isinstance(other, Skip):
             return Skip()
+
+        if other is None:
+            return self
+
         return Idx(other, self)
 
     # Idx + (Idx or X) creates a Mutli-Index(Pair)

@@ -286,6 +286,14 @@ class F:
 
         return F(one=self, mul=True, two=other)
 
+    def __rmul__(self, other: Self | P | V | int | float):
+        if isinstance(other, (int, float)):
+            if other in [0, 0.0]:
+                return 0
+            if other in [1, 1.0]:
+                return self
+        return self * other
+
     def __truediv__(self, other: Self | P | V):
         if isinstance(other, (int, float)) and other in [1, 1.0]:
             return self

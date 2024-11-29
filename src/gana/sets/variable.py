@@ -261,7 +261,10 @@ class V:
             return var
 
         # if a single index is called
-        key = reduce(lambda a, b: a & b, key)
+        if len(key) == 1:
+            key = None & key[0]
+        else:
+            key = reduce(lambda a, b: a & b, key)
         var.index = key
         var._ = [self.idx[key]]
         return var
