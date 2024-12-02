@@ -104,6 +104,7 @@ class P:
         return self._
 
     def __neg__(self):
+
         # self._ = [-i for i in self._]
         # return self
         p = P(self.index, _=[-i for i in self._])
@@ -116,7 +117,13 @@ class P:
         # return P(*self.index, _=[-i for i in self._])
 
     def __pos__(self):
-        return self
+        if self.isneg():
+            p = P(self.index, _=[-i for i in self._])
+            p.name = self.name[1:]
+            p.n = self.n
+            return p
+        else:
+            return self
 
     def __abs__(self):
         return P(*self.index, _=[abs(i) for i in self._])

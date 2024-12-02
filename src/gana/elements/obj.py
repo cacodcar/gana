@@ -19,7 +19,11 @@ class Obj:
 
         self.func: Func = func._[0]
 
+        # number in the program
         self.n = None
+
+        # name given by user in program
+        self.pname: str = None
 
         for v in self.func.vars():
             v.features.append(self)

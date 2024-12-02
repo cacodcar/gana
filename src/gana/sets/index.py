@@ -237,7 +237,24 @@ class I:
         if isinstance(other, (X, Idx, Skip)):
             i._ = [i + j for i, j in product(self._, [other])]
         else:
-            i._ = [i + j for i, j in product(self._, other._)]
+            lself = len(self)
+            lother = len(other)
+
+            if not lself % lother == 0 and not lother % lself == 0:
+                raise ValueError(f'{self}, {other}: indices are not compatible')
+
+            elif lself > lother:
+                self_ = self._
+                other_ = [x for x in other._ for _ in range(int(lself / lother))]
+
+            elif lother > lself:
+                self_ = [x for x in self._ for _ in range(int(lother / lself))]
+                other_ = other._
+            else:
+                self_ = self._
+                other_ = other._
+
+            i._ = [i + j for i, j in zip(self_, other_)]
         i.name = rf'{[self, other]}'
         return i
 

@@ -42,6 +42,9 @@ class F:
         self.one = one
         self.two = two
 
+        # if the function is -1*v (negation)
+        self.isnnvar = False
+
         self.consistent()
 
         # These are of the type P*V, V + P, V - P
@@ -80,32 +83,30 @@ class F:
 
         # order of declaration in the program
         self.n: int = None
+        # name given by user in program
+        self.pname: str = None
 
         self._: list[Func] = []
 
         mis = self.mismatch()
 
         if mis < 1:
-            print('a')
             # two is longer
-            one_ = self.one._ * (-mis)
+            one_ = [x for x in self.one._ for _ in range(-mis)]
             two_ = self.two._
 
         elif mis > 1:
-            print('b')
 
             # one is longer
             one_ = self.one._
-            two_ = self.two._ * mis
+            two_ = [x for x in self.two._ for _ in range(mis)]
 
         else:
-            print('c')
 
             # one and two are of the same length
             one_ = self.one._
             two_ = self.two._
 
-        print('asdasd', one_, self.rel, two_)
         # one_ is None or 0 for negation
         if not one_:
             one_ = [None] * len(two_)
@@ -141,11 +142,14 @@ class F:
                     self.one = -1
                     self.mul = True
                     self.sub = False
+                    self.isnnvar = True
 
                 else:
                     # keep number after the variable
                     # subtractions are always v - p
                     self.two, self.one = self.one, -self.two
+                    self.sub = False
+                    self.add = True
 
         if isinstance(self.two, (int, float, list, P)) and isinstance(self.one, (V, F)):
             if self.mul:
@@ -228,16 +232,6 @@ class F:
                 display(Math(f.latex()))
         else:
             display(Math(self.latex()))
-
-    def isnnvar(self):
-        """Is this a neg variable"""
-        if (
-            isinstance(self.one, (int, float))
-            and self.one == 0
-            and self.sub
-            and not isinstance(self.two, F)
-        ):
-            return True
 
     def __neg__(self):
 

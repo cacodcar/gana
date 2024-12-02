@@ -73,7 +73,7 @@ class Func:
     def eval(self, one: int | float = None, two: int | float = None):
         """Evaluate the function"""
 
-        if one is None:
+        if one is None and self.one:
             if isinstance(self.one, Func):
                 one_ = self.one.eval()
             elif isinstance(self.one, (int, float)):
@@ -83,7 +83,7 @@ class Func:
         else:
             one_ = one
 
-        if two is None:
+        if two is None and self.two:
             if isinstance(self.two, Func):
                 two_ = self.two.eval()
             elif isinstance(self.two, (int, float)):
@@ -94,12 +94,24 @@ class Func:
             two_ = two
 
         if self.mul:
+            if not one_:
+                one_ = 1
+            if not two_:
+                two_ = 1
             return one_ * two_
         if self.div:
             return one_ / two_
         if self.add:
+            if not one_:
+                one_ = 0
+            if not two_:
+                two_ = 0
             return one_ + two_
         if self.sub:
+            if not one_:
+                one_ = 0
+            if not two_:
+                two_ = 0
             return one_ - two_
 
     @property
@@ -190,6 +202,10 @@ class Func:
                     a_.append(i[1])
                 if i[0] == '-':
                     a_.append(-i[1])
+            elif i[1] is None:
+                continue
+            elif isinstance(i[1], int) and i[1] == 0:
+                a_.append(0.0)
             else:
                 if i[0] == '+':
                     a_.append(1.0)
@@ -205,7 +221,7 @@ class Func:
         if isinstance(self.elms[-1], float) and self.elms[-2] in ['+', '-']:
             x = x[:-2]
         x: list[Var] = x[1::2]
-        return [i.n for i in x if not isinstance(i, (float, int))]
+        return [i.n for i in x if i and not isinstance(i, (float, int))]
 
     def latex(self) -> str:
         """Equation"""

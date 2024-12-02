@@ -256,7 +256,7 @@ class V:
         if isinstance(prod(key), I):
             var.index = prod(key)
             var._ = [
-                self.idx[idx] if not isinstance(idx, Skip) else 0 for idx in prod(key)
+                self.idx[idx] if not isinstance(idx, Skip) else None for idx in prod(key)
             ]
             return var
 

@@ -73,6 +73,11 @@ class Prg:
             # set all element sets onto sets
             setattr(self.sets, name, value)
 
+        if isinstance(value, (F, C, Obj)):
+            # name given by user in program
+            # names of constraints and functions are otherwise the operation they perform
+            value.pname = name
+
         # Indices
         if isinstance(value, I) and not value.ordered:
 
@@ -494,19 +499,21 @@ class Prg:
             + other.sets.variable
             + self.sets.parameter
             + other.sets.parameter
-            + self.sets.function
-            + other.sets.function
-            + self.sets.constraint
-            + other.sets.constraint
         ):
             if i.name not in prg.names:
                 setattr(prg, i.name, i)
 
-        for c in self.constraints + other.constraints:
-            if c not in prg.constraints:
-                setattr(prg, c.name, c)
-
-        for o in self.objectives + other.objectives:
-            setattr(prg, o.name, o)
+        for i in (
+            self.sets.function
+            + other.sets.function
+            + self.sets.leqcons()
+            + self.sets.eqcons()
+            + other.sets.leqcons()
+            + other.sets.eqcons()
+            + self.objectives
+            + other.objectives
+        ):
+            if i.name not in prg.names:
+                setattr(prg, i.pname, i)
 
         return prg

@@ -54,10 +54,13 @@ class C:
         # number of the set in the program
         self.n: int = None
 
+        # name given by user in program
+        self.pname: str = None
+
     @property
     def nn(self):
         """Non-negativity Constraint"""
-        if self.funcs.isnnvar() and self.leq:
+        if self.funcs.isnnvar and self.leq:
             return True
 
     @property
