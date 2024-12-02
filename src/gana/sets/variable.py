@@ -57,6 +57,8 @@ class V:
         # number of the set in the program
         self.n: int = None
 
+        self.args = {'itg': self.itg, 'nn': self.nn, 'bnr': self.bnr}
+
         # variables generated at the indices
         # of a variable set are stored here
         # once realized, the values take a int or float value
@@ -64,7 +66,7 @@ class V:
         if self.index:
             self._ = [
                 Var(
-                    **self.args(),
+                    **self.args,
                     parent=self,
                     pos=n,
                 )
@@ -78,13 +80,13 @@ class V:
 
         self.idx = {idx: var for idx, var in zip(self.index, self._)}
 
-    def args(self) -> dict:
-        """Arguments"""
-        return {
-            'itg': self.itg,
-            'nn': self.nn,
-            'bnr': self.bnr,
-        }
+    # def args(self) -> dict:
+    #     """Arguments"""
+    #     return {
+    #         'itg': self.itg,
+    #         'nn': self.nn,
+    #         'bnr': self.bnr,
+    #     }
 
     def fix(self, values: P | list[float]):
         """Fix the value of the variable"""
@@ -249,14 +251,15 @@ class V:
         if prod(key) == self.index:
             return self
 
-        var = V(**self.args(), tag=self.tag)
+        var = V(**self.args, tag=self.tag)
         var.n = self.n
         var.name = self.name
         # if a subset is called
         if isinstance(prod(key), I):
             var.index = prod(key)
             var._ = [
-                self.idx[idx] if not isinstance(idx, Skip) else None for idx in prod(key)
+                self.idx[idx] if not isinstance(idx, Skip) else None
+                for idx in prod(key)
             ]
             return var
 

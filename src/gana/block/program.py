@@ -118,14 +118,14 @@ class Prg:
         if isinstance(value, Cons):
             value.n = len(self.constraints)
             self.constraints.append(value)
-            if not value.name:
-                value.name = name
-            setattr(self, value.name + '_f', value.func)
+            # if not value.name:
+            #     value.name = name
+            # setattr(self, value.name + '_f', value.func)
 
         if isinstance(value, Obj):
             value.n = len(self.objectives)
             self.objectives.append(value)
-            setattr(self, value.name + '_f', value.func)
+            # setattr(self, value.name + '_f', value.func)
 
         super().__setattr__(name, value)
 
