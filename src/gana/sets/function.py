@@ -42,6 +42,17 @@ class F:
         self.one = one
         self.two = two
 
+        if mul:
+            self.rel = '×'
+        elif add:
+            self.rel = '+'
+        elif sub:
+            self.rel = '-'
+        elif div:
+            self.rel = '÷'
+        else:
+            raise ValueError('one of mul, add, sub or div must be True')
+
         # if the function is -1*v (negation)
         self.isnnvar = False
 
@@ -169,20 +180,6 @@ class F:
             # negative to indicate that two is greater than one
             return -int(ltwo / lone)
         return 1
-
-    @property
-    def rel(self):
-        """Relation between the two elements"""
-        if self.mul:
-            return '×'
-        elif self.add:
-            return '+'
-        elif self.sub:
-            return '-'
-        elif self.div:
-            return '÷'
-        else:
-            raise ValueError('one of mul, add, sub or div must be True')
 
     def matrix(self):
         """Variable and Parameter Vectors"""

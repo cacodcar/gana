@@ -163,6 +163,7 @@ class V:
     def matrix(self):
         """Matrix Representation"""
 
+
     def mps(self) -> str:
         """MPS representation"""
         return str(self).upper()
@@ -247,6 +248,7 @@ class V:
         return f
 
     def __call__(self, *key: tuple[X | Idx | I]) -> Self:
+
         # if the whole set is called
         if prod(key) == self.index:
             return self
@@ -254,6 +256,7 @@ class V:
         var = V(**self.args, tag=self.tag)
         var.n = self.n
         var.name = self.name
+
         # if a subset is called
         if isinstance(prod(key), I):
             var.index = prod(key)

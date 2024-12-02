@@ -17,7 +17,7 @@ class Cons:
 
     def __init__(
         self,
-        func: Func | Var,
+        func: Func,
         leq: bool = False,
         pos: int = None,
         parent: C = None,
@@ -36,15 +36,14 @@ class Cons:
 
         self.leq = leq
 
-        for v in func.vars():
+        for v in func.vars:
             if not self.nn and v:
                 v.features.append(self)
 
     @property
     def nn(self):
         """Non-negativity Constraint"""
-        if self.func.isnnvar() and self.leq:
-            return True
+        return self.func.isnnvar() and self.leq
 
     @property
     def eq(self):

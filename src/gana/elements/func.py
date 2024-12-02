@@ -63,6 +63,47 @@ class Func:
         self.pos = pos
         self.n = None
 
+        if mul:
+            self.rel = '×'
+        elif add:
+            self.rel = '+'
+        elif sub:
+            self.rel = '-'
+        elif div:
+            self.rel = '÷'
+        else:
+            raise ValueError('one of mul, add, sub or div must be True')
+
+        self.array = sum(
+            [i.array if isinstance(i, Func) else [i] for i in [self.one, self.two]],
+            [],
+        )
+
+        self.vars = [i for i in self.array if not isinstance(i, (int, float))]
+
+        self.rels = []
+        if isinstance(self.one, Func):
+            self.rels += self.one.rels
+
+        self.rels += [self.rel]
+
+        if isinstance(self.two, Func):
+            self.rels += self.two.rels
+
+        self.elms = []
+        for n, e in enumerate(self.array):
+            if n > 0:
+                self.elms.append(self.rels[n - 1])
+            self.elms.append(e)
+
+        if self.elms[0] is None:
+            self.elms = self.elms[1:]
+        else:
+            if isinstance(self.elms[0], (float, int)) and self.elms[0] < 0:
+                self.elms = ['-', -self.elms[0]] + self.elms[1:]
+            else:
+                self.elms = ['+'] + self.elms
+
         self.name = ''.join([str(i) for i in self.elms])
 
     @property
@@ -114,60 +155,6 @@ class Func:
                 two_ = 0
             return one_ - two_
 
-    @property
-    def rel(self):
-        """Relation between the two elements"""
-        if self.mul:
-            return '×'
-        elif self.add:
-            return '+'
-        elif self.sub:
-            return '-'
-        elif self.div:
-            return '÷'
-        else:
-            raise ValueError('one of mul, add, sub or div must be True')
-
-    def array(self):
-        """Elements (Variables and Parameters) of the function"""
-        return sum(
-            [i.array() if isinstance(i, Func) else [i] for i in [self.one, self.two]],
-            [],
-        )
-
-    def vars(self) -> list[Var]:
-        """Variables in the function"""
-        return [i for i in self.array() if not isinstance(i, (int, float))]
-
-    def rels(self):
-        """Relations between variables"""
-        rels = []
-        if isinstance(self.one, Func):
-            rels += self.one.rels()
-
-        rels += [self.rel]
-
-        if isinstance(self.two, Func):
-            rels += self.two.rels()
-        return rels
-
-    @property
-    def elms(self):
-        """The function as a list"""
-        x = []
-        for n, e in enumerate(self.array()):
-            if n > 0:
-                x.append(self.rels()[n - 1])
-            x.append(e)
-
-        if x[0] is None:
-            x = x[1:]
-        else:
-            if isinstance(x[0], (float, int)) and x[0] < 0:
-                x = ['-', -x[0]] + x[1:]
-            else:
-                x = ['+'] + x
-        return x
 
     def B(self, zero: bool = False) -> int | float | None:
         """Parameter

@@ -25,7 +25,7 @@ class Obj:
         # name given by user in program
         self.pname: str = None
 
-        for v in self.func.vars():
+        for v in self.func.vars:
             v.features.append(self)
 
     @property

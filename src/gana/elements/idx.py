@@ -269,7 +269,7 @@ class Idx:
         return iter(self._)
 
     def __str__(self):
-        return self.name
+        return rf'{self.name}'
 
     def __repr__(self):
         return str(self)
