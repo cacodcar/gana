@@ -14,7 +14,8 @@ maintainers = [
 description = "An Algebraic Modeling Language (AML) for multiscale modeling and optimization"
 requires-python = ">=3.12"
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICEN[CS]E.*"]
 keywords = ["modeling", "optimization", "mathematical programming", "aml"]
 classifiers = [
     "Programming Language :: Python :: 3.12",
