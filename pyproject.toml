@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gana"
+version = "0.0.1"
+authors = [
+  { name="Rahul Kakodkar", email="cacodcar@gmail.com" },
+]
+maintainers = [
+  { name="Rahul Kakodkar", email="cacodcar@gmail.com" },
+]
+description = "An Algebraic Modeling Language (AML) for multiscale modeling and optimization"
+requires-python = ">=3.12"
+readme = "README.md"
+license = { file = "LICENSE" }
+keywords = ["modeling", "optimization", "mathematical programming", "aml"]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = ["ppopt"]
+[project.optional-dependencies]
+all = ["gurobipy",  "pyomo", "sympy"]
+test = ["coverage", "pytest"]
+
+[project.urls]
+Homepage = "https://github.com/cacodcar/gana"
+Issues = "https://github.com/cacodcar/gana/issues"
