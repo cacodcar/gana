@@ -1,3 +1,5 @@
+[![PyPI](https://img.shields.io/pypi/v/gana.svg)](https://pypi.org/project/gana)
+
 Gana is an algebraic modeling language (AML) for multiscale modeling and optimization
 
 Modeling in Gana is done using four sets: 
