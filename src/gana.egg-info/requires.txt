@@ -1,0 +1,11 @@
+ppopt
+
+[all]
+gurobipy
+pyomo
+sympy
+IPython
+
+[test]
+coverage
+pytest

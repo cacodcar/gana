@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Diet Problem &#8212; gana 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Multiscale Model" href="multiscale.html" />
+    <link rel="prev" title="Parameteric Variable Sets" href="thetas.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="Diet-Problem">
+<h1>Diet Problem<a class="headerlink" href="#Diet-Problem" title="Link to this heading"></a></h1>
+<p>source: <a class="reference external" href="https://s2.smu.edu/~olinick/cse3360/lectures/l12.html">https://s2.smu.edu/~olinick/cse3360/lectures/l12.html</a></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;../../src&#39;</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gana</span><span class="w"> </span><span class="kn">import</span> <span class="n">Prg</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">inf</span>
+</pre></div>
+</div>
+</div>
+<section id="Declare-Program-Elements">
+<h2>Declare Program Elements<a class="headerlink" href="#Declare-Program-Elements" title="Link to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">Prg</span><span class="p">()</span>
+<span class="n">p</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">I</span><span class="p">(</span><span class="s1">&#39;milk&#39;</span><span class="p">,</span> <span class="s1">&#39;cheese&#39;</span><span class="p">,</span> <span class="s1">&#39;apples&#39;</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s1">&#39;food item&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">V</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s1">&#39;amount of food item to intake&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">protein</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="n">_</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">p</span><span class="o">.</span><span class="n">vitA</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="n">_</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">30</span><span class="p">])</span>
+<span class="n">p</span><span class="o">.</span><span class="n">vitB</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="n">_</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">])</span>
+<span class="n">p</span><span class="o">.</span><span class="n">vitC</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="n">_</span><span class="o">=</span><span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">60</span><span class="p">])</span>
+<span class="n">p</span><span class="o">.</span><span class="n">cost</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="n">_</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">4</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Declare-Constraints">
+<h2>Declare Constraints<a class="headerlink" href="#Declare-Constraints" title="Link to this heading"></a></h2>
+<p>Non-descriptive print will use the names as provided by the user</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">cons_protein</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">protein</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">item</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">80</span>
+<span class="n">p</span><span class="o">.</span><span class="n">cons_protein</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle [0] -Protein \cdot x_{\mathcal{milk}} - Protein \cdot x_{\mathcal{cheese}} - Protein \cdot x_{\mathcal{apples}} + 80 \leq 0$</div></div>
+</div>
+<p>Descriptive print will display the values</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">cons_vitA</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">vitA</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">item</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">60</span>
+<span class="n">p</span><span class="o">.</span><span class="n">cons_protein</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle [0]   -40.0 \cdot x_{milk} - 20.0 \cdot x_{cheese} - 10.0 \cdot x_{apples} + 80.0 \leq 0$</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">cons_vitB</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">vitB</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">item</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">50</span>
+<span class="n">p</span><span class="o">.</span><span class="n">cons_vitC</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">vitC</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">item</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">30</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Declare-Objective">
+<h2>Declare Objective<a class="headerlink" href="#Declare-Objective" title="Link to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">obj_cost</span> <span class="o">=</span> <span class="n">inf</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">cost</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">item</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Display-Program">
+<h2>Display Program<a class="headerlink" href="#Display-Program" title="Link to this heading"></a></h2>
+<p>The entire program can also be displayed descriptively and non-descriptively.</p>
+<p>The program is always in the canonical form</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Mathematical Program for prog
+
+---Index Sets---
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle \mathcal{item} = \{ milk, cheese, apples \}$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+---Objective(s)---
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle min \hspace{0.2cm} 1.0 \cdot x_{milk} + 2.5 \cdot x_{cheese} + 0.75 \cdot x_{apples}$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+---Such that---
+
+Inequality Constraints:
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle [0] -Protein \cdot x_{\mathcal{milk}} - Protein \cdot x_{\mathcal{cheese}} - Protein \cdot x_{\mathcal{apples}} + 80 \leq 0$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle [1] -Vita \cdot x_{\mathcal{milk}} - Vita \cdot x_{\mathcal{cheese}} - Vita \cdot x_{\mathcal{apples}} + 60 \leq 0$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle [2] -Vitb \cdot x_{\mathcal{milk}} - Vitb \cdot x_{\mathcal{cheese}} - Vitb \cdot x_{\mathcal{apples}} + 50 \leq 0$</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle [3] -Vitc \cdot x_{\mathcal{milk}} - Vitc \cdot x_{\mathcal{cheese}} - Vitc \cdot x_{\mathcal{apples}} + 30 \leq 0$</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Mathematical Program for prog
+
+---Index Sets---
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle \mathcal{item} = \{ milk, cheese, apples \}$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+---Objective(s)---
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle min \hspace{0.2cm} 1.0 \cdot x_{milk} + 2.5 \cdot x_{cheese} + 0.75 \cdot x_{apples}$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+---Such that---
+
+Inequality Constraints:
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle [0]   -40.0 \cdot x_{milk} - 20.0 \cdot x_{cheese} - 10.0 \cdot x_{apples} + 80.0 \leq 0$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle [1]   -5.0 \cdot x_{milk} - 40.0 \cdot x_{cheese} - 30.0 \cdot x_{apples} + 60.0 \leq 0$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle [2]   -20.0 \cdot x_{milk} - 30.0 \cdot x_{cheese} - 40.0 \cdot x_{apples} + 50.0 \leq 0$</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle [3]   -30.0 \cdot x_{milk} - 50.0 \cdot x_{cheese} - 60.0 \cdot x_{apples} + 30.0 \leq 0$</div></div>
+</div>
+</section>
+<section id="Exporting">
+<h2>Exporting<a class="headerlink" href="#Exporting" title="Link to this heading"></a></h2>
+<p>The program can be exported as a .mps file</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">mps</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Solving">
+<h2>Solving<a class="headerlink" href="#Solving" title="Link to this heading"></a></h2>
+<p>The solution can be obtained using <em>state-of-the-art</em> solvers.</p>
+<p>Note that the program is first exported in the .mps format and then sent to the solver</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">opt</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="s1">&#39;gurobi&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Set parameter Username
+Academic license - for non-commercial use only - expires 2025-12-10
+Read MPS format model from file prog.mps
+Reading time = 0.00 seconds
+PROG: 4 rows, 3 columns, 12 nonzeros
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (win64 - Windows 11.0 (26100.2))
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13700, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 24 logical processors, using up to 24 threads
+
+Optimize a model with 4 rows, 3 columns and 12 nonzeros
+Model fingerprint: 0x7c6539af
+Coefficient statistics:
+  Matrix range     [5e+00, 6e+01]
+  Objective range  [8e-01, 3e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [3e+01, 8e+01]
+Presolve time: 0.01s
+Presolved: 4 rows, 3 columns, 12 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   2.750000e+01   0.000000e+00      0s
+       2    2.8695652e+00   0.000000e+00   0.000000e+00      0s
+
+Solved in 2 iterations and 0.01 seconds (0.00 work units)
+Optimal objective  2.869565217e+00
+</pre></div></div>
+</div>
+</section>
+<section id="Display-Solution">
+<h2>Display Solution<a class="headerlink" href="#Display-Solution" title="Link to this heading"></a></h2>
+<p>The values of the variables as well as the constrain slacks are denoted for inequality constraints</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">sol</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Solution for prog
+
+---Objective Value(s)---
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle min \hspace{0.2cm} 1.0 \cdot x_{milk} + 2.5 \cdot x_{cheese} + 0.75 \cdot x_{apples}=5.369565217391305$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+---Variable Value---
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle x_{milk}=1.5652173913043477$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle x_{cheese}=0.0$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle x_{apples}=1.7391304347826089$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+---Constraint Slack---
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle -40.0 \cdot x_{milk} - 20.0 \cdot x_{cheese} - 10.0 \cdot x_{apples} + 80.0=-20.0$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle -5.0 \cdot x_{milk} - 40.0 \cdot x_{cheese} - 30.0 \cdot x_{apples} + 60.0=-40.0$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle -20.0 \cdot x_{milk} - 30.0 \cdot x_{cheese} - 40.0 \cdot x_{apples} + 50.0=-80.86956521739131$</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle -30.0 \cdot x_{milk} - 50.0 \cdot x_{cheese} - 60.0 \cdot x_{apples} + 30.0=-171.30434782608697$</div></div>
+</div>
+<p>The values attained by individual variables can also be displayed</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">sol</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle x_{milk}=1.5652173913043477$</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle x_{cheese}=0.0$</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle x_{apples}=1.7391304347826089$</div></div>
+</div>
+<p>even at an index</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">milk</span><span class="p">)</span><span class="o">.</span><span class="n">sol</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$\displaystyle x_{milk}=1.5652173913043477$</div></div>
+</div>
+<p>or accessed.</p>
+<p>I get that this is a little wierd (referring to the [0]), I will fix this.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">milk</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.5652173913043477
+</pre></div></div>
+</div>
+</section>
+<section id="Matrix-Form">
+<h2>Matrix Form<a class="headerlink" href="#Matrix-Form" title="Link to this heading"></a></h2>
+<p>Left Hand Side parameters</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">A</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[[-40.0, -20.0, -10.0],
+ [-5.0, -40.0, -30.0],
+ [-20.0, -30.0, -40.0],
+ [-30.0, -50.0, -60.0]]
+</pre></div></div>
+</div>
+<p>Right Hand Side paremeters</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">B</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[-80.0, -60.0, -50.0, -30.0]
+</pre></div></div>
+</div>
+<p>Objective cost vector</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">C</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[1.0, 2.5, 0.75]
+</pre></div></div>
+</div>
+<p>LHS parameters for less than equal constraints</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">G</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[[-40.0, -20.0, -10.0],
+ [-5.0, -40.0, -30.0],
+ [-20.0, -30.0, -40.0],
+ [-30.0, -50.0, -60.0]]
+</pre></div></div>
+</div>
+<p>LHS parameters for equality constraints. There are no equality constraints in this program</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">H</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[]
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gana-logo.png" alt="Logo of gana"/>
+            </a></p>
+<h1 class="logo"><a href="../index.html">gana</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Example Implementation:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="sets.html">Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="indices.html">Index Set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameter Set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="variables.html">Variable Set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thetas.html">Parameteric Variable Sets</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Diet Problem</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Declare-Program-Elements">Declare Program Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Declare-Constraints">Declare Constraints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Declare-Objective">Declare Objective</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Display-Program">Display Program</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Exporting">Exporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Solving">Solving</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Display-Solution">Display Solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Matrix-Form">Matrix Form</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="multiscale.html">Multiscale Model</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="thetas.html" title="previous chapter">Parameteric Variable Sets</a></li>
+      <li>Next: <a href="multiscale.html" title="next chapter">Multiscale Model</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Rahul Kakodkar.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/examples/diet.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
