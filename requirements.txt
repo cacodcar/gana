@@ -1,2 +1,8 @@
 sympy 
 pyomo
+
+sphinx
+sphinx-rtd-theme  # or another theme you prefer
+myst-parser  # if switching to myst-parser for markdown support
+nbsphinx
+sphinx-autodoc-typehints  # Optional for better type hint support
