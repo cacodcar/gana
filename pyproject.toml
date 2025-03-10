@@ -26,7 +26,12 @@ dependencies = ["ppopt"]
 [project.optional-dependencies]
 all = ["gurobipy",  "pyomo", "sympy", "IPython"]
 test = ["coverage", "pytest"]
-
+docs = ['sphinx.ext.autodoc',
+    'sphinx_mdinclude',
+    'sphinx.ext.napoleon',
+    'nbsphinx',
+    'sphinx.ext.mathjax',
+]
 [project.urls]
 Homepage = "https://github.com/cacodcar/gana"
 Issues = "https://github.com/cacodcar/gana/issues"
