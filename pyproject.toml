@@ -27,7 +27,7 @@ dependencies = ["ppopt"]
 all = ["gurobipy",  "pyomo", "sympy", "IPython"]
 test = ["coverage", "pytest"]
 docs = ['sphinx.ext.autodoc',
-    'sphinx_mdinclude',
+    'sphinx-mdinclude',
     'sphinx.ext.napoleon',
     'nbsphinx',
     'sphinx.ext.mathjax',
