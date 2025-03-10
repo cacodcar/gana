@@ -5,7 +5,6 @@
 
 import os
 import sys
-import sphinx_rtd_theme
 
 for x in os.walk("../src"):
     sys.path.insert(0, x[0])
@@ -32,7 +31,6 @@ release = '0.0.1'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx_mdinclude',
-    'sphinx_rtd_theme',
     'sphinx.ext.napoleon',
     'nbsphinx',
     'sphinx.ext.mathjax',
