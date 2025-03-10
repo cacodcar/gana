@@ -100,7 +100,7 @@ class Cons:
         else:
             rel = r'='
 
-        return rf'{self.func.latex()} {rel} 0'
+        return rf'[{self.n}]   {self.func.latex()} {rel} 0'
 
     def sol(self):
         """Solution"""

@@ -5,44 +5,46 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from IPython.display import Math, display
+from ..elements.var import Var
 
 if TYPE_CHECKING:
     from ..sets.function import F
+    from ..sets.variable import V
     from .func import Func
 
 
 class Obj:
     """Objective Function"""
 
-    def __init__(self, func: F):
+    def __init__(self, func: F | V):
 
-        self.func: Func = func._[0]
         # self.idx = func.idx
+        self.func: Var | Func = func._[0]
+
+        self.funcs = func
+
+        if isinstance(self.func, Var):
+            self.func.features.append(self)
+            self.isvar = True
+            self.A = [1]
+            self.X = [self.func.n]
+        else:
+            for v in self.func.variables:
+                v.features.append(self)
+            self.isvar = False
+            self.A = self.func.A
+            self.X = self.func.X
 
         # number in the program
         self.n = None
 
         # name given by user in program
         self.pname: str = None
-        self.funcs = func
-
-        for v in self.func.variables:
-            v.features.append(self)
 
     @property
     def name(self):
         """name of the element"""
         return f'min({self.func})'
-
-    @property
-    def A(self) -> list[float | None]:
-        """Parameter values"""
-        return self.func.A
-
-    @property
-    def X(self):
-        """Variable positions"""
-        return self.func.X
 
     def sol(self, asfloat: bool = False):
         """Solution"""

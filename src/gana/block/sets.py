@@ -95,10 +95,10 @@ class Sets:
 
         elif isinstance(value, C):
             value.n = self._nc
-            self._nc += 1
             if not name in self._cons_names:
                 self.constraint.append(value)
                 self._cons_names.append(name)
+                self._nc += 1
 
             super().__setattr__(name, value)
             return

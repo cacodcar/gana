@@ -19,13 +19,8 @@ if TYPE_CHECKING:
     from .parameter import P
 
 try:
-    from pyomo.environ import (
-        Binary,
-        Integers,
-        NonNegativeIntegers,
-        NonNegativeReals,
-        Reals,
-    )
+    from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
+                               NonNegativeReals, Reals)
     from pyomo.environ import Var as PyoVar
 
     has_pyomo = True
@@ -239,7 +234,6 @@ class V:
         from .parameter import P
 
         # doing this here saves some time
-
         # p = P(self.index, _=[None if isinstance(_, Skip) else -1.0 for _ in self.index ])
         p = P(_=[-1.0] * len(self))
         p.index = self.index
@@ -283,13 +277,26 @@ class V:
             return -self + other
 
     def __mul__(self, other: Self | F):
+
+        if isinstance(other, (int, float)):
+            if other in [1, 1.0]:
+                return self
+
+            elif other in [0, 0.0]:
+                return 0.0
+
+            other = float(other)
         return F(one=self, mul=True, two=other)
 
     def __rmul__(self, other: Self | F | int):
-        # if isinstance(other, (int, float)):
-        #     if other in [1, 1.0]:
-        #         return self
-        #     other = float(other)
+        if isinstance(other, (int, float)):
+            if other in [1, 1.0]:
+                return self
+
+            elif other in [0, 0.0]:
+                return 0.0
+
+            other = float(other)
         return F(one=other, mul=True, two=self)
 
     def __truediv__(self, other: Self | F):
@@ -338,19 +345,19 @@ class V:
         if not key:
             return self
 
+        prodkey = prod(key)
+
         # if the whole set is called
-        if prod(key) == self.index:
+        if prodkey == self.index:
             return self
 
         var = V(**self.args, tag=self.tag, mutable=self.mutable)
         var.name, var.n = self.name, self.n
-
         # if a subset is called
-        if isinstance(prod(key), I):
-            var.index = prod(key)
+        if isinstance(prodkey, I):
+            var.index = prodkey
             var._ = [
-                self.idx[idx] if not isinstance(idx, Skip) else None
-                for idx in prod(key)
+                self.idx[idx] if not isinstance(idx, Skip) else None for idx in prodkey
             ]
             return var
 

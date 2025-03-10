@@ -4,19 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gana"
-version = "0.0.1"
+version = "1.0.0"
 authors = [
   { name="Rahul Kakodkar", email="cacodcar@gmail.com" },
 ]
 maintainers = [
   { name="Rahul Kakodkar", email="cacodcar@gmail.com" },
 ]
-description = "An Algebraic Modeling Language (AML) for multiscale modeling and optimization"
+description = "A barebones mathematical programming package"
 requires-python = ">=3.12"
 readme = "README.md"
-license = "MIT"
-license-files = ["LICEN[CS]E.*"]
-keywords = ["modeling", "optimization", "mathematical programming", "aml"]
+license = { file = "LICENSE" }
+keywords = ["modeling", "optimization", "programming", "aml"]
 classifiers = [
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
@@ -25,7 +24,7 @@ classifiers = [
 
 dependencies = ["ppopt"]
 [project.optional-dependencies]
-all = ["gurobipy",  "pyomo", "sympy"]
+all = ["gurobipy",  "pyomo", "sympy", "IPython"]
 test = ["coverage", "pytest"]
 
 [project.urls]

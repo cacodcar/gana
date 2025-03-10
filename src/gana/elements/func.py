@@ -162,7 +162,7 @@ class Func:
             else:
                 one = self.one.latex()
         else:
-            one = ''
+            one = None
 
         if self.two is not None:
             if isinstance(self.two, (int, float)):
@@ -171,12 +171,21 @@ class Func:
             else:
                 two = self.two.latex()
         else:
-            two = ''
+            two = None
+
+        if two is None:
+            return rf'{one}'
+
+        if one is None:
+            return rf'{two}'
 
         if self.add:
             return rf'{one} + {two}'
 
         if self.sub:
+            if self.parent.funcs[0] and self.parent.funcs[1]:
+                if not self.one.mul and not self.two.mul:
+                    return rf'({one}) - ({two})'
             return rf'{one} - {two}'
 
         if self.mul:

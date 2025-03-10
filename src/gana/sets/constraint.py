@@ -3,13 +3,12 @@
 
 from __future__ import annotations
 
-from ..elements.idx import Skip
-
 from typing import TYPE_CHECKING
 
 from IPython.display import Math, display
 
 from ..elements.cons import Cons
+from ..elements.idx import Skip
 
 if TYPE_CHECKING:
     from .function import F
@@ -134,7 +133,7 @@ class C:
         else:
             rel = r'='
 
-        return rf'{self.funcs.latex()} {rel} 0'
+        return rf'[{self.n}] {self.funcs.latex()} {rel} 0'
 
     def pprint(self, descriptive: bool = False):
         """Display the function"""

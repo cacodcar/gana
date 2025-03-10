@@ -8,7 +8,7 @@ from typing import Self
 
 from IPython.display import Math, display
 
-from ..elements.idx import Idx, X, Skip
+from ..elements.idx import Idx, Skip, X
 from .constraint import C
 from .function import F
 from .index import I
@@ -436,16 +436,18 @@ class P:
         if not key:
             return self
 
+        prodkey = prod(key)
+
         # if the whole set is called
         if prod(key) == self.index:
             return self
 
-        par = P(tag=self.tag)
+        par = P(tag=self.tag, mutable=self.mutable)
         par.name, par.n = self.name, par.n
 
         # if a subset is called
-        if isinstance(prod(key), I):
-            par.index = prod(key)
+        if isinstance(prodkey, I):
+            par.index = prodkey
             par._ = [
                 self.idx[idx] if not isinstance(idx, Skip) else 0 for idx in prod(key)
             ]
@@ -456,6 +458,7 @@ class P:
             key = None & key[0]
         else:
             key = reduce(lambda a, b: a & b, key)
+        key = 1 * key
         par.index = key
         par._ = [self.idx[key]]
         return par

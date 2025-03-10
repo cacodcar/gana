@@ -6,13 +6,20 @@ from __future__ import annotations
 from functools import reduce
 from typing import TYPE_CHECKING, Self
 
-# from enum import Enum, auto
-from IPython.display import Math, display
+from collections import OrderedDict
+
 
 from ..elements.func import Func
+from ..elements.idx import Skip
 from .constraint import C
 from .index import I
-from ..elements.idx import Skip
+
+try:
+    from IPython.display import Math, display
+
+    has_ipython = True
+except ImportError:
+    has_ipython = False
 
 if TYPE_CHECKING:
     from ..elements.idx import Idx, X
@@ -79,6 +86,7 @@ class F:
 
         # if the function is -1*v (negation)
         self.isnegvar = False
+        self.issum: V = None
         self.istheta = False
         # self._variables = False
 
@@ -220,6 +228,7 @@ class F:
 
         self.matrix()
 
+        v_ = OrderedDict((i, []) for i in range(len(self)))
         v_ = {i: [] for i in range(len(self))}
         for i in range(len(self)):
             for n, e in enumerate(self.elems_):
@@ -240,23 +249,6 @@ class F:
     def two(self):
         """Element two"""
         return self._two(self.index.two)
-
-    # @property
-    # def variables(self) -> dict[int, list[V]]:
-    #     """Variables"""
-    #     if not self._variables:
-    #         v_ = {i: [] for i in range(len(self))}
-    #         for i in range(len(self)):
-    #             for n, e in enumerate(self.elems_):
-    #                 if self.vars[n]:
-    #                     if e[i]:
-    #                         v_[i].append(e[i])
-    #                 elif self.funcs[n]:
-    #                     if e[i]:
-    #                         v_[i].extend(e[i].variables)
-    #         self._variables = v_
-    #         return v_
-    #     return self._variables
 
     @property
     def elems(self):
@@ -491,7 +483,16 @@ class F:
             # if isinstance(self.one, (int, float)):
             #     one = self.one
             # else:
-            one = self.one(self.index.one).latex()
+            one_ = self.one(self.index.one)
+            # TODO issum phantom V
+            if self.funcs[0] and one_.issum:
+                v, hold, over = self.one.issum
+                oneissum = v.name
+                one = rf'\sum_{{i \in {over}}} {oneissum}_{{{str(hold).replace('[', '').replace(']','')}, i}}'
+
+            else:
+                one = one_.latex()
+
         else:
             one = None
 
@@ -499,15 +500,31 @@ class F:
             # if isinstance(self.two, (int, float)):
             #     two = self.two
             # else:
-            two = self.two(self.index.two).latex()
+            two_ = self.two(self.index.two)
+            if self.funcs[1] and two_.issum:
+                v, hold, over = self.two.issum
+                twoissum = v.name
+                two = rf'\sum_{{i \in {over}}} {twoissum}_{{{str(hold).replace('[', '').replace(']','')}, i}}'
+
+            else:
+                two = two_.latex()
         else:
             two = None
 
+        if not two:
+            return rf'{one}'
+
+        if not one:
+            return rf'{two}'
+
         if self.add:
-            return rf'{one or ""} + {two or ""}'
+            return rf'{one} + {two}'
 
         if self.sub:
-            return rf'{one or ""} - {two or ""}'
+            if self.funcs[0] and self.funcs[1]:
+                if not self.one.mul and not self.two.mul:
+                    return rf'({one}) - ({two})'
+            return rf'{one} - {two}'
 
         if self.mul:
             # handling special case where something is multiplied by -1
@@ -524,11 +541,16 @@ class F:
 
     def pprint(self, descriptive: bool = False):
         """Display the function"""
-        if descriptive:
-            for f in self._:
-                display(Math(f.latex()))
+        if has_ipython:
+            if descriptive:
+                for f in self._:
+                    display(Math(f.latex()))
+            else:
+                display(Math(self.latex()))
         else:
-            display(Math(self.latex()))
+            print(
+                'IPython is an optional dependency, pip install gana[all] to get optional dependencies'
+            )
 
     def __neg__(self):
 

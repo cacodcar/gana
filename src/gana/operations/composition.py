@@ -12,3 +12,7 @@ def inf(func: Func) -> Func:
 def sup(func: Func) -> Func:
     """Maximize the function"""
     return Obj(func=-func)
+
+
+
+

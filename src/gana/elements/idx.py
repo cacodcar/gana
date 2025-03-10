@@ -18,18 +18,19 @@ class Skip:
     """Skips the generation of model element at this index"""
 
     def __init__(self):
+        self.name = ''
         self.parent = None
         self.pos = None
 
-    def __add__(self, other: Self | Idx):
-        return Skip()
+    # def __add__(self, other: Self | Idx):
+    #     return other
 
     # multiplication of skip with anything is skip
-    def __mul__(self, other: Self):
-        return self
+    # def __mul__(self, other: Self):
+    #     return Skip()
 
-    def __rmul__(self, other: Self):
-        return self
+    # def __rmul__(self, other: Self):
+    #     return Skip()
 
     def __str__(self):
         return r'Skip'
@@ -153,6 +154,8 @@ class X:
     def __and__(self, other: Self):
         if isinstance(other, Skip):
             return Skip()
+        if other is None:
+            return Idx(self)
         return Idx(self, other)
 
     def __rand__(self, other: Self | int):
@@ -166,15 +169,18 @@ class X:
     # for function x(n) + y(m)
     def __add__(self, other: Self):
         if isinstance(other, Skip):
-            return Skip()
+            return self
         return Pair(self, other)
 
     def __radd__(self, other: Self):
         if isinstance(other, Skip):
-            return Skip()
+            return self
         return Pair(other, self)
 
     def __mul__(self, other: Self | Idx | I):
+        if isinstance(other, Skip):
+            return Skip()
+
         from ..sets.index import I
 
         if isinstance(other, I):
@@ -191,6 +197,7 @@ class X:
     def __rmul__(self, other: int):
         if isinstance(other, int) and other == 1:
             return Idx(self)
+        return self * other
 
     def __str__(self):
         return self.name
@@ -239,7 +246,8 @@ class Idx:
 
     def latex(self, dummy: bool = False):
         """Latex representation"""
-        return rf'{self.name}'.replace('(', '').replace(')', '')
+        return rf'{self.name}'
+        # return rf'{self.name}'.replace('(', '').replace(')', '')
 
     def __len__(self):
         return len(self._)
@@ -268,16 +276,19 @@ class Idx:
     # Idx + (Idx or X) creates a Mutli-Index(Pair)
     def __add__(self, other: Self | Pair):
         if isinstance(other, Skip):
-            return Skip()
+            return self
         return Pair(self, other)
 
     def __radd__(self, other: Self | Pair):
         if isinstance(other, Skip):
-            return Skip()
+            return self
         return Pair(other, self)
 
     def __mul__(self, other: X | Self | I):
         from ..sets.index import I
+
+        if isinstance(other, Skip):
+            return self
 
         if isinstance(other, I):
             i = I()
@@ -290,6 +301,9 @@ class Idx:
 
     # required only in the case of using math.prod
     def __rmul__(self, other: int):
+        if isinstance(other, Skip):
+            return self
+
         if isinstance(other, int) and other == 1:
             from ..sets.index import I
 

@@ -1,5 +1,3 @@
-[![PyPI](https://img.shields.io/pypi/v/gana.svg)](https://pypi.org/project/gana)
-
 Gana is an algebraic modeling language (AML) for multiscale modeling and optimization
 
 Modeling in Gana is done using four sets: 
@@ -37,5 +35,6 @@ Gana was developed to enable certain functionalities in [energia (py)](https://p
 Both were developed through my PhD and as such have a lot of room for improvement.
 
 So please reach out to me on cacodcar@gmail.com with suggestions and such. 
+
 
 

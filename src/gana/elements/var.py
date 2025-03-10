@@ -79,6 +79,16 @@ class Var:
         """Index of the variable set"""
         return self.parent.index
 
+    @property
+    def X(self):
+        """Variable positions"""
+        return [self.n]
+    
+    @property
+    def A(self):
+        """Parameter values"""
+        return [1.0]
+
     def latex(self):
         """Latex representation"""
 

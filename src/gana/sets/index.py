@@ -103,6 +103,7 @@ class I:
             self.ordered = False
 
         # set by program
+
         self.name = ''
         self.n = None
 
@@ -140,7 +141,7 @@ class I:
             return '-' + self.name[:-1], ''
         return self.name, ''
 
-    def latex(self, descriptive: bool = True, int_not: bool = False) -> str:
+    def latex(self, descriptive: bool = False, int_not: bool = False) -> str:
         """LaTeX representation
         Args:
             descriptive (bool): print members of the index set
@@ -167,6 +168,8 @@ class I:
             members = r', '.join(x.latex() for x in self._)
             return rf'{mathcal} = \{{ {members} \}}'
 
+        if self.tag:
+            return rf'{mathcal} - {self.tag.replace(" ", r"\ ")}'
         return mathcal
 
     def isarray(self):
@@ -188,7 +191,7 @@ class I:
 
         # return min(self.one, self.two, key=len)
 
-    def pprint(self, descriptive: bool = True):
+    def pprint(self, descriptive: bool = False):
         """Display the set
 
         Args:
@@ -342,7 +345,13 @@ class I:
         # this to allow using math.prod
         # in V and P for single Indices
         # makes X into Idx
+
         i = I()
+        if isinstance(other, Skip):
+            i._ = [Skip()] * len(self)
+            i.name = rf'({self.name.replace('(', '').replace(')', '')}, )'
+            return i
+
         if other == 1:
             i._ = [Idx(i) for i in self._ if not isinstance(i, Skip)]
             i.name = rf'{(self)}'
