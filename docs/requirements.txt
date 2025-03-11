@@ -2,7 +2,6 @@ sympy
 pyomo
 
 sphinx
-sphinx-rtd-theme 
 myst-parser
 nbsphinx
 sphinx-autodoc-typehints 
