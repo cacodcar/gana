@@ -27,11 +27,10 @@ dependencies = ["ppopt"]
 all = ["gurobipy",  "pyomo", "sympy", "IPython"]
 test = ["coverage", "pytest"]
 docs = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    'nbsphinx',
-    'sphinx.ext.mathjax',
-    'myst-parser'  # Replacing sphinx-mdinclude
+    "sphinx",            # Core documentation tool
+    "sphinx-rtd-theme",  # Optional: ReadTheDocs theme
+    "nbsphinx",          # Jupyter notebook integration
+    "myst-parser",       # Markdown support
 ]
 [project.urls]
 Homepage = "https://github.com/cacodcar/gana"
