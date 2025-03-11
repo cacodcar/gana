@@ -45,6 +45,6 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
-html_logo = "gana-logo.png"
+html_logo = "ganalogo.jpg"
 source_suffix = [".rst", ".md"]
 nbsphinx_execute = 'never'
