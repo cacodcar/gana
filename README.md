@@ -1,6 +1,5 @@
 
-![alt text](https://github.com/cacodcar/gana/main/docs/source/gana-logo.png?raw=true)
-
+![alt text](https://github.com/cacodcar/gana/blob/main/docs/source/gana-logo.png?raw=true)
 
 [![Documentation Status](https://readthedocs.org/projects/gana/badge/)](https://gana.readthedocs.io/en/latest/)
 
