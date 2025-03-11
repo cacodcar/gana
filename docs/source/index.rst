@@ -8,7 +8,7 @@
 Welcome to gana's documentation!
 ================================
 
-.. mdinclude:: ../../README.md
+.. mdinclude:: README.md
    
 Tutorial
 --------
