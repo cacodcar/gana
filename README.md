@@ -3,6 +3,7 @@
 
 [![Documentation Status](https://readthedocs.org/projects/gana/badge/)](https://gana.readthedocs.io/en/latest/)
 [![PyPI](https://img.shields.io/pypi/v/gana.svg)](https://pypi.org/project/gana)
+[![Downloads](https://static.pepy.tech/personalized-badge/gana?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads)](https://pepy.tech/project/gana)
 
 Gana is an algebraic modeling language (AML) for multiscale modeling and optimization
 
