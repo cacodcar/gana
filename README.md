@@ -1,3 +1,9 @@
+
+![alt text](https://github.com/cacodcar/gana/main/docs/gana-logo.png?raw=true)
+
+
+[![Documentation Status](https://readthedocs.org/projects/gana/badge/)](https://gana.readthedocs.io/en/latest/)
+
 Gana is an algebraic modeling language (AML) for multiscale modeling and optimization
 
 Modeling in Gana is done using four sets: 
