@@ -27,15 +27,13 @@ release = '0.0.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
-
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx_mdinclude',
+    'myst_parser', 
     'sphinx.ext.napoleon',
     'nbsphinx',
     'sphinx.ext.mathjax',
 ]
-
 myst_enable_extensions = ["amsmath"]
 
 templates_path = ['_templates']
