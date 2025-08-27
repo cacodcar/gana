@@ -779,6 +779,22 @@ class V:
             # variables can be passed as indices
             return self.name == other.name
 
+        # if something of the type v = p*v is given
+        # classify it as a calculation
+        if isinstance(other, V):
+            other = other.make_function()
+
+        if (
+            isinstance(other, F)
+            and other.one_type == Elem.P
+            and other.two_type == Elem.V
+            and other.mul
+        ):
+            other.case = FCase.CALC
+            other.calculation = self.copy()
+            other.index = self.index
+            return other
+
         return C(self - other)
 
     def __le__(

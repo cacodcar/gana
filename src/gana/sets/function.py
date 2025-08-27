@@ -109,6 +109,13 @@ class F:
         # evaluates the value of the function
         self.value: float = None
 
+        # calculated variable
+        self.calculation: V = None
+
+        # category of the constraint
+        # constraints can be printed by category
+        self.category: str = ''
+
         if one is not None or two is not None:
             # A basic Function is of the type
             # P*V, V + P, V - P
@@ -243,6 +250,12 @@ class F:
     # -----------------------------------------------------
     #                    Helpers
     # -----------------------------------------------------
+
+    def categorize(self, category: str):
+        """Categorizes the function"""
+        self.category = category
+        for c in self._:
+            c.category = category
 
     def make_consistent(
         self,
@@ -802,6 +815,17 @@ class F:
     def latex(self) -> str:
         """LaTeX Equation"""
 
+        if self.case == FCase.CALC:
+            # if this is a calculated variable
+            if self.one_type == Elem.P and self.parent:
+                # if this is a child function with a parameter
+                # one will int/float
+                one = self.one
+            else:
+                one = self.one.latex()
+
+            return rf'{self.calculation.latex()} = {one} \cdot {self.two.latex()}'
+
         if self.case == FCase.FVAR:
             # if this is a variable being treated as a function
             return self.two.latex()
@@ -909,9 +933,9 @@ class F:
         if has_ipython:
             if descriptive:
                 for f in self._:
-                    display(Math(f.latex()))
+                    display(Math(rf'[{f.n}]' + r'\text{   }' + f.latex()))
             else:
-                display(Math(self.latex()))
+                display(Math(rf'[{self.n}]' + r'\text{   }' + self.latex()))
         else:
             print(
                 'IPython is an optional dependency, pip install gana[all] to get optional dependencies'
