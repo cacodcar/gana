@@ -1,18 +1,14 @@
 """Function Compositions"""
 
-from ..elements.func import Func
-from ..elements.obj import Obj
+from ..sets.function import F
+from ..sets.objective import O
 
 
-def inf(func: Func) -> Func:
+def inf(function: F) -> F:
     """Minimize the function"""
-    return Obj(func=func)
+    return O(function=function)
 
 
-def sup(func: Func) -> Func:
+def sup(function: F) -> F:
     """Maximize the function"""
-    return Obj(func=-func)
-
-
-
-
+    return O(function=-function)
