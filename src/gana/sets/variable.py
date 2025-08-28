@@ -321,7 +321,7 @@ class V:
         """LaTeX representation"""
         index = (
             r'_{'
-            + rf'{self.index}'.replace('(', '')
+            + rf'{self.index}'.replace('), (', '|').replace('(', '')
             .replace(')', '')
             .replace('[', '{')
             .replace(']', '}')
