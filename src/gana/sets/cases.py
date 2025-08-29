@@ -38,6 +38,9 @@ class FCase(Enum):
     # prints differently (f_cal = p*v)
     CALC = 'calculation'
 
+    # when a variable is a function
+    VARF = 'function_as_variable'
+
 
 class PCase(Enum):
     """parameter cases"""

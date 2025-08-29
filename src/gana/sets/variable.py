@@ -795,8 +795,9 @@ class V:
                 other.case = FCase.CALC
 
                 for f, v in zip(other, other.calculation):
-                    f.case = FCase.CALC
                     f.calculation = v.copy()
+                    f.calculation.case = FCase.VARF
+                    f.case = FCase.CALC
 
                 other.index = self.index
                 return other
