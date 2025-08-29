@@ -110,6 +110,9 @@ class Prg:
         self.categories_sets: dict[str, list[C]] = {}  # categories of constraint sets
         self.categories: dict[str, list[C]] = {}  # categories of constraints
 
+        self.fcategories_sets: dict[str, list[F]] = {}  # categories of function sets
+        self.fcategories: dict[str, list[F]] = {}  # categories of functions
+
         # objective (O)
         self.objectives: list[O] = []
 
@@ -1400,6 +1403,7 @@ class Prg:
             if categorical:
                 # gather the categories if not already done
                 categories: dict[str, list[C]] = {}
+                fcategories: dict[str, list[F]] = {}
                 for c in self.cons():
                     if c.category not in categories:
                         categories[c.category] = []
@@ -1407,10 +1411,21 @@ class Prg:
                 sorted_categories = sorted(categories.keys())
                 self.categories = categories
 
+                for f in self.function_sets:
+                    if f.category not in fcategories:
+                        fcategories[f.category] = []
+                    fcategories[f.category].append(f)
+                sorted_fcategories = sorted(fcategories.keys())
+                self.fcategories = fcategories
+
                 for category in sorted_categories:
                     display(Markdown(rf'### {category} Constraints'))
                     for c in categories[category]:
                         c.show()
+                for category in sorted_fcategories:
+                    display(Markdown(rf'### {category} Functions'))
+                    for f in fcategories[category]:
+                        f.show()
 
             else:
 
@@ -1428,11 +1443,11 @@ class Prg:
                     for c in self.nncons():
                         c.show()
 
-            if self.function_sets:
-                print()
-                display(Markdown(r'## Functions'))
-                for f in self.function_sets:
-                    f.show()
+                if self.functions:
+                    print()
+                    display(Markdown(r'## Functions'))
+                    for f in self.functions:
+                        f.show()
 
         else:
 
@@ -1447,6 +1462,8 @@ class Prg:
             if categorical:
                 # gather the categories if not already done
                 categories_sets: dict[str, list[C]] = {}
+                fcategories_sets: dict[str, list[F]] = {}
+
                 for c in self.constraint_sets:
                     if c.category not in categories_sets:
                         categories_sets[c.category] = []
@@ -1455,10 +1472,23 @@ class Prg:
                 sorted_categories = sorted(categories_sets.keys())
                 self.categories_sets = categories_sets
 
+                for f in self.function_sets:
+                    if f.category not in fcategories_sets:
+                        fcategories_sets[f.category] = []
+                    fcategories_sets[f.category].append(f)
+
+                sorted_fcategories = sorted(fcategories_sets.keys())
+                self.fcategories_sets = fcategories_sets
+
                 for category in sorted_categories:
                     display(Markdown(rf'### {category} Constraint Sets'))
                     for c in categories_sets[category]:
                         c.show()
+
+                for category in sorted_fcategories:
+                    display(Markdown(rf'### {category} Function Sets'))
+                    for f in fcategories_sets[category]:
+                        f.show()
 
             else:
 
@@ -1473,11 +1503,11 @@ class Prg:
                     for c in self.eqcons_sets:
                         c.show()
 
-            if self.function_sets:
-                print()
-                display(Markdown(r'## Functions'))
-                for f in self.function_sets:
-                    f.show()
+                if self.function_sets:
+                    print()
+                    display(Markdown(r'## Functions'))
+                    for f in self.function_sets:
+                        f.show()
 
     def draw(self, variable: V):
         """Plots the solution for a variable"""

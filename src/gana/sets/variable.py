@@ -136,10 +136,10 @@ class V:
         self.index: tuple[I] | set[tuple[I]] = tuple(
             [i if not isinstance(i, V) else [i] for i in index]
         )
-
         if self.index:
             self.map: dict[I, V] = {
-                prod([ii for ii in i if ii is not None]): None
+                # prod([ii for ii in i if ii is not None]): None
+                i: None
                 for i in list(product(*self.index))
             }
             # self.map: dict[I, V] = {prod(i): None for i in list(product(*self.index))}
@@ -253,6 +253,7 @@ class V:
         v.name, v.n = self.name, self.n
         v.index = tuple(self.index)
         v.map = self.map.copy()
+        v.case = self.case
         v._ = list(self._)
         v.copyof = self
         return v
@@ -321,7 +322,8 @@ class V:
         """LaTeX representation"""
         index = (
             r'_{'
-            + rf'{self.index}'.replace('), (', '|').replace('(', '')
+            + rf'{self.index}'.replace('), (', '|')
+            .replace('(', '')
             .replace(')', '')
             .replace('[', '{')
             .replace(']', '}')
@@ -784,16 +786,20 @@ class V:
         if isinstance(other, V):
             other = other.make_function()
 
-        if (
-            isinstance(other, F)
-            and other.one_type == Elem.P
-            and other.two_type == Elem.V
-            and other.mul
-        ):
-            other.case = FCase.CALC
-            other.calculation = self.copy()
-            other.index = self.index
-            return other
+        if isinstance(other, F):
+            if (
+                other.one_type == Elem.P and other.two_type == Elem.V and other.mul
+            ) or other.case == FCase.SUM:
+                other.calculation = self.copy()
+                other.calculation.case = other.case
+                other.case = FCase.CALC
+
+                for f, v in zip(other, other.calculation):
+                    f.case = FCase.CALC
+                    f.calculation = v.copy()
+
+                other.index = self.index
+                return other
 
         return C(self - other)
 

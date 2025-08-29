@@ -817,6 +817,15 @@ class F:
 
         if self.case == FCase.CALC:
             # if this is a calculated variable
+            if self.calculation.case == FCase.SUM:
+                # self.case = FCase.SUM
+                # two_ = self.latex()
+                # self.case = FCase.CALC
+                self.case = FCase.SUM
+                two = self.latex()
+                self.case = FCase.CALC
+                return rf'{self.calculation.latex()} = {two}'
+
             if self.one_type == Elem.P and self.parent:
                 # if this is a child function with a parameter
                 # one will int/float
