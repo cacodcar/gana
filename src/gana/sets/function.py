@@ -1590,7 +1590,7 @@ class F:
 
         indices = list(product(*[list(product(*k)) for k in key]))
 
-        # create a new variable set to return
+        # create a new function set to return
         f = F(**self.args)
         f.name, f.pname, f.n = self.name, self.pname, self.n
         f.A = []

@@ -181,6 +181,8 @@ class V:
         # as variables can mutate in gana
         self.make_copy: bool = False
 
+        self.category: str = ''
+
     @property
     def matrix(self) -> dict:
         """Matrix Representation"""
@@ -793,11 +795,19 @@ class V:
                 other.calculation = self.copy()
                 other.calculation.case = other.case
                 other.case = FCase.CALC
-
+            
                 for f, v in zip(other, other.calculation):
-                    f.calculation = v.copy()
+                    v.calculation = f
+                    f.calculation = v
                     f.calculation.case = FCase.VARF
                     f.case = FCase.CALC
+
+                v_idx = list(self.map) 
+                f_values = list(self.map.values())
+                _map = {idx: f for f, idx in zip(f_values, v_idx)}
+                print()
+                self.map = _map
+                other.map = _map
 
                 other.index = self.index
                 return other
