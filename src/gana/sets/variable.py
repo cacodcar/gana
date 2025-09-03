@@ -680,7 +680,11 @@ class V:
     ) -> Self | F | float:
         # only called for non gana elements (tuple, list, int, float)
         # multiplication is commutative
-        return self * other
+        if isinstance(other, tuple):
+            return other + (self,)
+        
+        # list int and float handle by __mul__
+        return self * other 
 
     def __truediv__(
         self,
@@ -788,29 +792,29 @@ class V:
         if isinstance(other, V):
             other = other.make_function()
 
-        if isinstance(other, F):
-            if (
-                other.one_type == Elem.P and other.two_type == Elem.V and other.mul
-            ) or other.case == FCase.SUM:
-                other.calculation = self.copy()
-                other.calculation.case = other.case
-                other.case = FCase.CALC
+        # if isinstance(other, F):
+        #     if (
+        #         other.one_type == Elem.P and other.two_type == Elem.V and other.mul
+        #     ) or other.case == FCase.SUM:
+        #         other.calculation = self.copy()
+        #         other.calculation.case = other.case
+        #         other.case = FCase.CALC
             
-                for f, v in zip(other, other.calculation):
-                    v.calculation = f
-                    f.calculation = v
-                    f.calculation.case = FCase.VARF
-                    f.case = FCase.CALC
+        #         for f, v in zip(other, other.calculation):
+        #             v.calculation = f
+        #             f.calculation = v
+        #             f.calculation.case = FCase.VARF
+        #             f.case = FCase.CALC
 
-                v_idx = list(self.map) 
-                f_values = list(self.map.values())
-                _map = {idx: f for f, idx in zip(f_values, v_idx)}
-                print()
-                self.map = _map
-                other.map = _map
+        #         v_idx = list(self.map) 
+        #         f_values = list(self.map.values())
+        #         _map = {idx: f for f, idx in zip(f_values, v_idx)}
+        #         print()
+        #         self.map = _map
+        #         other.map = _map
 
-                other.index = self.index
-                return other
+        #         other.index = self.index
+        #         return other
 
         return C(self - other)
 
