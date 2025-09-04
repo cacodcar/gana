@@ -119,14 +119,14 @@ class Prg:
         # ------ names --------
         self.names: list[str] = []  # element names
 
-        self._names_index_sets: list[str] = []  # index sets
-        self._names_indices: list[str] = []  # elements
-        self._names_variable_sets: list[str] = []  # variable sets
-        self._names_parameter_sets: list[str] = []  # parameter sets
-        self._names_theta_sets: list[str] = []  # parametric variable sets
-        self._names_function_sets: list[str] = []  # function sets
-        self._names_constraint_sets: list[str] = []  # constraints
-        self._names_objectives: list[str] = []  # objectives
+        self.names_index_sets: list[str] = []  # index sets
+        self.names_indices: list[str] = []  # elements
+        self.names_variable_sets: list[str] = []  # variable sets
+        self.names_parameter_sets: list[str] = []  # parameter sets
+        self.names_theta_sets: list[str] = []  # parametric variable sets
+        self.names_function_sets: list[str] = []  # function sets
+        self.names_constraint_sets: list[str] = []  # constraints
+        self.names_objectives: list[str] = []  # objectives
 
         # ------ counts --------
 
@@ -157,7 +157,7 @@ class Prg:
         self.n_objectives: int = 0  # objectives
 
         # flag for is optimized
-        self._isopt = False
+        self.optimized = False
 
         # the solution object
         self.solution: Solution = None
@@ -170,7 +170,7 @@ class Prg:
             index (I): index set to be added
         """
         self.names.append(name)
-        self._names_index_sets.append(name)
+        self.names_index_sets.append(name)
         # give the index a name
         index.name = name
         # This is the nth index set (0 indexed)
@@ -195,7 +195,7 @@ class Prg:
         # for unordered sets, the elements are set on the program
         for n, member in enumerate(members):
 
-            if not member in self._names_indices:
+            if not member in self.names_indices:
                 # if this element has not been added to the program before
                 # create an element set
                 element = I()
@@ -206,7 +206,7 @@ class Prg:
                 # update the number of elements
                 self.n_index_elements += 1
                 # this is a new element, so set the new name
-                self._names_indices.append(member)
+                self.names_indices.append(member)
                 self.indices.append(element)
                 # if new element, it should be set on the program
                 _new_elm = True
@@ -246,7 +246,7 @@ class Prg:
             variable (V): variable set to be added
         """
         self.names.append(name)
-        self._names_variable_sets.append(name)
+        self.names_variable_sets.append(name)
         # give the variable a name
         variable.name = name
         # This is the nth variable set (0 indexed)
@@ -325,7 +325,7 @@ class Prg:
         parameter (P): parameter set to be added
         """
         self.names.append(name)
-        self._names_parameter_sets.append(name)
+        self.names_parameter_sets.append(name)
         # give the parameter a name
         if not parameter.name:
             parameter.name = name
@@ -373,7 +373,7 @@ class Prg:
             theta (V): theta set to be added
         """
         self.names.append(name)
-        self._names_theta_sets.append(name)
+        self.names_theta_sets.append(name)
         # give the theta a name
         theta.name = name
         # This is the nth theta set (0 indexed)
@@ -510,7 +510,7 @@ class Prg:
             function (F): function object
         """
         self.names.append(name)
-        self._names_function_sets.append(name)
+        self.names_function_sets.append(name)
         # give the function a name
         # but do not add it to name
         # we want the hash to the equation
@@ -581,7 +581,7 @@ class Prg:
             constraint (C): constraint object
         """
         self.names.append(name)
-        self._names_constraint_sets.append(name)
+        self.names_constraint_sets.append(name)
         # give the constraint a name
         # but do not add it to name
         # we want the hash to the equation
@@ -666,7 +666,7 @@ class Prg:
             objective (O): objective object
         """
         self.names.append(objective.pname)
-        self._names_objectives.append(objective.pname)
+        self.names_objectives.append(objective.pname)
         # This is the nth objective set (0 indexed)
         objective.n = self.n_objectives
         # update the number of objective sets
@@ -682,7 +682,7 @@ class Prg:
 
         if isinstance(value, I):
 
-            if not name in self._names_index_sets and not name in self._names_indices:
+            if not name in self.names_index_sets and not name in self.names_indices:
 
                 if len(value.members) == 1 and value.members[0] == name:
                     # There is a special case, where a self contained set is passed
@@ -707,7 +707,7 @@ class Prg:
                     else:
                         self.add_indices(value)
 
-            elif not name in self._names_indices:
+            elif not name in self.names_indices:
                 # the set could be already declared, and mutable
                 # is being declared as part of another index set
                 # in which case get the original set to update
@@ -735,8 +735,8 @@ class Prg:
 
         elif isinstance(value, V):
 
-            if not name in self._names_variable_sets:
-                if not value.name in self._names_variable_sets:
+            if not name in self.names_variable_sets:
+                if not value.name in self.names_variable_sets:
                     # if variable set is new, add it to the program
                     # another check we do, is if variable is being added to the program
                     # but the variable already exists
@@ -766,7 +766,7 @@ class Prg:
                 self.mutate_variable(variable_ex, value)
 
         elif isinstance(value, P):
-            if not name in self._names_parameter_sets:
+            if not name in self.names_parameter_sets:
                 # if parameter is new, add it to the program
 
                 if value.case in [PCase.NEGSET, PCase.SET]:
@@ -788,7 +788,7 @@ class Prg:
 
         elif isinstance(value, T):
 
-            if not name in self._names_theta_sets:
+            if not name in self.names_theta_sets:
                 self.add_theta(name, value)
 
             else:
@@ -801,7 +801,7 @@ class Prg:
                 self.mutate_theta(theta_ex, value)
 
         elif isinstance(value, F):
-            if not name in self._names_function_sets:
+            if not name in self.names_function_sets:
                 self.add_function(name, value)
             else:
                 # if function is being mutated
@@ -811,7 +811,7 @@ class Prg:
 
         elif isinstance(value, C):
 
-            if not name in self._names_constraint_sets:
+            if not name in self.names_constraint_sets:
                 self.add_constraint(name, value)
 
             else:
@@ -1298,7 +1298,7 @@ class Prg:
                 for c in self.constraint_sets:
                     c.function.eval()
                 self.objectives[0].value = m.ObjVal
-                self._isopt = True
+                self.optimized = True
 
                 print('--- Creating Solution object, check.solution')
                 self.solution = self.birth_solution()
@@ -1323,7 +1323,7 @@ class Prg:
     def sol(self, slack: bool = True):
         """Print sol"""
 
-        if not self._isopt:
+        if not self.optimized:
             return r'Use .opt() to generate solution'
 
         display(Markdown(rf'# Solution for {self.name}'))
