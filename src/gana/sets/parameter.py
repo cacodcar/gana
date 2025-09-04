@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import enum
 from itertools import product
 from math import prod
 from typing import TYPE_CHECKING, Self
@@ -13,10 +14,10 @@ from .birth import make_T
 from .cases import Elem, PCase
 from .function import F
 from .index import I
+from .variable import V
 
 if TYPE_CHECKING:
     from .theta import T
-    from .variable import V
 
 try:
     from pyomo.environ import Param as PyoParam
@@ -81,10 +82,54 @@ class P:
         # special case of the parameter
         self.case: PCase = PCase.SET
         # set the index
-        self.index: tuple[I] | set[tuple[I]] = index
+        # self.index: tuple[I] | set[tuple[I]] = index
+
+        if any([isinstance(i, tuple) for i in index]):
+            self.n_splices = len(index)
+            # if index is a set of indices,
+            # needs to be done for each index
+            _index = []
+            _map = {}
+            for idx in index:
+                _index.append(tuple([i if not isinstance(i, V) else [i] for i in idx]))
+
+            # iterates over each individual index
+            # and creates a mapping for it
+            for idx in _index:
+                for i in list(product(*idx)):
+                    _map[i] = None
+            _index = set(_index)
+
+        else:
+            # number of splices of the index set
+            self.n_splices = 1
+            # if not set
+            _index = tuple([i if not isinstance(i, V) else [i] for i in index])
+
+            if _index:
+                _map = {i: None for i in list(product(*_index))}
+
+            else:
+                _map = {}
+
+        self.index: tuple[I] | set[tuple[I]] = _index
+        self.map: dict[I, V] = _map
+
+        # self.index: tuple[I] | set[tuple[I]] = tuple(
+        #     [i if not isinstance(i, V) else [i] for i in index]
+        # )
+        # if self.index:
+        #     self.map: dict[I, V] = {
+        #         # prod([ii for ii in i if ii is not None]): None
+        #         i: None
+        #         for i in list(product(*self.index))
+        #     }
+        #     # self.map: dict[I, V] = {prod(i): None for i in list(product(*self.index))}
+        # else:
+        #     self.map: dict[I, V] = {}
 
         # contains the set of parameters
-        if not _:
+        if _ is None:
             self._ = []
         else:
             self._: list[float | int] = _  # always a list of parameters
@@ -114,7 +159,7 @@ class P:
             if self.index:
                 # if index is passed
                 # make length equal to index
-                self._ = [float(_)] * len(list(product(*index)))
+                self._ = [float(_)] * len(self.map)
             else:
                 self.index = (I(size=1, dummy=True),)
                 self._ = [float(_)]
@@ -131,17 +176,21 @@ class P:
 
             self._ = [float(p) for p in self._]
 
-        if self._:
-            self.create_map()
+        # fill in the values
+        for n, k in enumerate(self.map):
+            self.map[k] = self._[n]
 
-            # check if there is a mismatch between the length of data
-            # and the length of index passed
-            if len(self.map) != len(self._):
-                raise ValueError(
-                    f"Index mismatch: len(values) ({len(self._)}) ! = len(index) ({len(self.map)})"
-                )
-        else:
-            self.map = {}
+        # if self._:
+        #     self.create_map()
+
+        #     # check if there is a mismatch between the length of data
+        #     # and the length of index passed
+        #     if len(self.map) != len(self._):
+        #         raise ValueError(
+        #             f"Index mismatch: len(values) ({len(self._)}) ! = len(index) ({len(self.map)})"
+        #         )
+        # else:
+        #     self.map = {}
 
     @property
     def args(self) -> dict[str, str | bool]:
@@ -176,11 +225,11 @@ class P:
     #                    Helpers
     # -----------------------------------------------------
 
-    def create_map(self):
-        """Create a map of indices to parameters"""
-        self.map: dict[I, float | int] = {
-            prod(i): self._[n] for n, i in enumerate(list(product(*self.index)))
-        }
+    # def create_map(self):
+    #     """Create a map of indices to parameters"""
+    #     self.map: dict[I, float | int] = {
+    #         prod(i): self._[n] for n, i in enumerate(list(product(*self.index)))
+    #     }
 
     # -----------------------------------------------------
     #                    Printing
@@ -1574,10 +1623,22 @@ class P:
 
     def __call__(self, *key: I) -> Self:
 
-        if not key or (key == self.index):
+        # if a dependent variable is being passed in the key
+        # extract variable from the index (it will be in a list)
+        def delister(inp: tuple[I | list[V]]):
+            return tuple(i[0] if isinstance(i, list) else i for i in inp)
+
+        if not key or delister(key) == delister(self.index):
             # if the index is an exact match
             # or no key is passed
             return self
+
+        # the check helps to handle if a variable itself is an index
+        # we do not want to iterate over the entire variable set
+        # but treat the variable as a single index element
+        key: tuple[I] | set[tuple[I]] = [
+            i if not isinstance(i, V) else [i] for i in key
+        ]
 
         # if a subset is passed,
         # first create a product to match

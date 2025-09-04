@@ -37,6 +37,7 @@ def make_P(
         # if number is passed
         # give it the same index as self
         # the values will be stretched at initialization
+
         p = P(*index, _=inp)
         # set the special case
         p.case = case

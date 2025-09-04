@@ -169,13 +169,21 @@ def test_pnum_operations(a, b, x):
         assert all(math.isclose(v, a - b, rel_tol=1e-9, abs_tol=0.0) for v in p.sub._)
 
     p.mul = p.a * p.b
-    assert all(math.isclose(v, a * b, rel_tol=1e-9, abs_tol=0.0) for v in p.mul._)
+    if not isinstance(p.mul, (int, float)):
+        assert all(math.isclose(v, a * b, rel_tol=1e-9, abs_tol=0.0) for v in p.mul._)
+    else:
+        assert p.mul == 0
 
     p.div = p.a / p.b
     if a == b:
         assert p.div == 1
     else:
-        assert all(math.isclose(v, a / b, rel_tol=1e-9, abs_tol=0.0) for v in p.div._)
+        if not isinstance(p.mul, (int, float)):
+            assert all(
+                math.isclose(v, a / b, rel_tol=1e-9, abs_tol=0.0) for v in p.div._
+            )
+        else:
+            assert p.div == 0
 
 
 test_pnum_operations()

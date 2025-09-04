@@ -134,6 +134,7 @@ class F:
 
             # now that the function is consistent
             # set one and two
+
             self.one = one(*one.index)
             self.two = two(*two.index)
 
@@ -1279,10 +1280,15 @@ class F:
                         consistent=True,
                     )
 
+            if len(self.two) > len(self.one):
+                index = self.two.index
+            else:
+                index = self.one.index
+
             return F(
                 one=self,
                 sub=True,
-                two=make_P(other, index=self.index),
+                two=make_P(other, index=index),
                 one_type=Elem.F,
                 two_type=Elem.P,
                 consistent=True,
@@ -1562,6 +1568,7 @@ class F:
         return C(self - other)
 
     def __le__(self, other: Self | P | V | T):
+
         return C(self - other, leq=True)
 
     def __ge__(self, other: Self | P | V | T):

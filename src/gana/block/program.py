@@ -305,6 +305,7 @@ class Prg:
                 # update the iter counter
                 n += 1
         if n > 0:
+            variable_ex.n_splices += 1
             # update the existing variable index
             # only if something new has been added
             var_ex_idx = tuple(
@@ -313,7 +314,12 @@ class Prg:
             var_new_idx = tuple(
                 [i[0] if isinstance(i, list) else i for i in variable_new.index]
             )
-            variable_ex.index = {var_ex_idx, var_new_idx}
+
+            if variable_ex.n_splices > 2:
+                # if there are more than 2 splices
+                variable_ex.index = {*variable_ex.index, var_new_idx}
+            else:
+                variable_ex.index = {var_ex_idx, var_new_idx}
             self.n_variables += n
             self.variables.extend(var_add)
 
@@ -361,9 +367,13 @@ class Prg:
             n += 1
 
         if n > 0:
+            parameter_ex.n_splices += 1
             # update the existing parameter index
             # only if something new has been added
-            parameter_ex.index = {parameter_ex.index, parameter_new.index}
+            if parameter_ex.n_splices > 2:
+                parameter_ex.index = {*parameter_ex.index, parameter_new.index}
+            else:
+                parameter_ex.index = {parameter_ex.index, parameter_new.index}
 
     def add_theta(self, name: str, theta: T):
         """Adds new theta set to program

@@ -133,18 +133,52 @@ class V:
         # the check helps to handle if a variable itself is an index
         # we do not want to iterate over the entire variable set
         # but treat the variable as a single index element
-        self.index: tuple[I] | set[tuple[I]] = tuple(
-            [i if not isinstance(i, V) else [i] for i in index]
-        )
-        if self.index:
-            self.map: dict[I, V] = {
-                # prod([ii for ii in i if ii is not None]): None
-                i: None
-                for i in list(product(*self.index))
-            }
-            # self.map: dict[I, V] = {prod(i): None for i in list(product(*self.index))}
+
+        # this takes any variable in the indices and sets them as [V]
+        # and them creates an empty list for the rest of the indices
+        if any([isinstance(i, tuple) for i in index]):
+            # if index is a set of indices,
+            # needs to be done for each index
+            _index = []
+            _map = {}
+            for idx in index:
+                _index.append(tuple([i if not isinstance(i, V) else [i] for i in idx]))
+
+            # iterates over each individual index
+            # and creates a mapping for it
+            for idx in _index:
+                for i in list(product(*idx)):
+                    _map[i] = None
+            _index = set(_index)
+
         else:
-            self.map: dict[I, V] = {}
+            # if not set
+            _index = tuple([i if not isinstance(i, V) else [i] for i in index])
+
+            if _index:
+                _map = {i: None for i in list(product(*_index))}
+
+            else:
+                _map = {}
+
+        self.index: tuple[I] | set[tuple[I]] = _index
+        self.map: dict[I, V] = _map
+
+        # if self.index:
+
+        # # self.index: tuple[I] | set[tuple[I]] = tuple(
+        # #     [i if not isinstance(i, V) else [i] for i in index]
+        # # )
+
+        # if self.index:
+        #     self.map: dict[I, V] = {
+        #         # prod([ii for ii in i if ii is not None]): None
+        #         i: None
+        #         for i in list(product(*self.index))
+        #     }
+        #     # self.map: dict[I, V] = {prod(i): None for i in list(product(*self.index))}
+        # else:
+        #     self.map: dict[I, V] = {}
 
         # this is the nth parameter declared in the
         self.n: int = None
@@ -173,6 +207,9 @@ class V:
         self.X = [self.n]
 
         self.copyof: Self = None
+
+        # number of splices of the index set
+        self.n_splices = 1
 
         # this flag tells the function
         # that self in its entirety is being returned on call
@@ -682,9 +719,9 @@ class V:
         # multiplication is commutative
         if isinstance(other, tuple):
             return other + (self,)
-        
+
         # list int and float handle by __mul__
-        return self * other 
+        return self * other
 
     def __truediv__(
         self,
@@ -799,14 +836,14 @@ class V:
         #         other.calculation = self.copy()
         #         other.calculation.case = other.case
         #         other.case = FCase.CALC
-            
+
         #         for f, v in zip(other, other.calculation):
         #             v.calculation = f
         #             f.calculation = v
         #             f.calculation.case = FCase.VARF
         #             f.case = FCase.CALC
 
-        #         v_idx = list(self.map) 
+        #         v_idx = list(self.map)
         #         f_values = list(self.map.values())
         #         _map = {idx: f for f, idx in zip(f_values, v_idx)}
         #         print()
