@@ -1280,10 +1280,15 @@ class F:
                         consistent=True,
                     )
 
-            if len(self.two) > len(self.one):
+            if not self.two:
+                index = self.one.index
+            elif not self.one:
                 index = self.two.index
             else:
-                index = self.one.index
+                if self.two and self.one and len(self.two) > len(self.one):
+                    index = self.two.index
+                else:
+                    index = self.one.index
 
             return F(
                 one=self,

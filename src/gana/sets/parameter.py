@@ -172,8 +172,9 @@ class P:
                 # if index is not passed
                 # make a dummy index
                 self.index = (I(size=len(self._), dummy=True),)
+                # here the map needs to be remade
+                self.map = {i: None for i in list(product(*self.index))}
                 self.name = 'φ'  # set the name to phi
-
             self._ = [float(p) for p in self._]
 
         # fill in the values
