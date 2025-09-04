@@ -4,6 +4,7 @@ from src.gana.operations.composition import inf, sup
 from src.gana.sets.index import I
 from src.gana.sets.parameter import P
 from src.gana.sets.variable import V
+from src.gana.operations.operators import sigma
 
 
 @pytest.fixture
@@ -22,18 +23,24 @@ def psmall():
 
 
 def test_solsmall(psmall):
-    assert psmall.vars() == {psmall.x[0]: 4.0, psmall.x[1]: 8.0, psmall.y[0]: 10.0}
+    assert psmall.variables == [psmall.x[0], psmall.x[1], psmall.y[0]]
     assert psmall.obj() == -390.0
     assert psmall.A == [
-        [-1.0, 0, 0],
-        [0, -1.0, 0],
-        [0, 0, -1.0],
         [1.0, 1.0, 0],
         [2.0, 1.0, 0],
         [0, 0, 4.0],
     ]
+    assert psmall.A_with_NN == [
+        [1.0, 1.0, 0],
+        [2.0, 1.0, 0],
+        [0, 0, 4.0],
+        [-1.0, 0, 0],
+        [0, -1.0, 0],
+        [0, 0, -1.0],
+    ]
     assert psmall.G == [[1.0, 1.0, 0], [2.0, 1.0, 0]]
-    assert psmall.B == [0, 0, 0, 12.0, 16.0, 40.0]
+    assert psmall.B == [12.0, 16.0, 40.0]
+    assert psmall.B_with_NN == [12.0, 16.0, 40.0, 0, 0, 0]
     assert psmall.H == [[0, 0, 4.0]]
     # assert psmall._A == [
     #     [-1.0, 0, 0],
@@ -48,81 +55,86 @@ def test_solsmall(psmall):
 
 
 @pytest.fixture
-def p():
-    p_ = Prg()
-    p_.y = I(size=1)
-    p_.q = I(size=3)
-    p_.res_cons = I('solar')
-    p_.res_dem = I('power')
-    p_.res_stg = I('charge')
-    p_.res = p_.res_cons | p_.res_dem | p_.res_stg
-    p_.pro_var = I('pv')
-    p_.pro_cer = I('li', 'li_d')
-    p_.pro = p_.pro_var | p_.pro_cer
-    p_.dm_fac = P(p_.power, p_.q, _=[0.5, 1, 0.5])
-    p_.pv_fac = P(p_.pv, p_.q, _=[1, 0, 0.5])
-    p_.demand = P(p_.res_dem, p_.q, _=[100] * 3)
-    p_.capex = P(p_.pro, p_.y, _=[5000, 1000, 0])
-    p_.fopex = P(p_.pro, p_.y, _=[500, 100, 0])
-    p_.vopex = P(p_.pro, p_.y, _=[10, 50, 0])
-    p_.cap_p = V(p_.pro, p_.y)
-    p_.cap_s = V(p_.res_stg, p_.y)
-    p_.sell = V(p_.res_dem, p_.q)
-    p_.con = V(p_.res_cons, p_.q)
-    p_.inv = V(p_.res_stg, p_.q)
-    p_.prod = V(p_.pro, p_.q)
-    p_.ex_cap = V(p_.pro, p_.y)
-    p_.ex_fop = V(p_.pro, p_.y)
-    p_.ex_vop = V(p_.pro, p_.y)
-    p_.con_vopex = p_.ex_vop(p_.pro, p_.y) == p_.vopex(p_.pro, p_.y) * sum(
-        p_.prod(p_.pro, q) for q in p_.q
+def p_energy():
+    p = Prg()
+    p.y = I(size=1)
+    p.q = I(size=3)
+    p.res_cons = I('solar')
+    p.res_dem = I('power')
+    p.res_stg = I('charge')
+    p.res = p.res_cons | p.res_dem | p.res_stg
+    p.pro_var = I('pv')
+    p.pro_cer = I('li', 'li_d')
+    p.pro = p.pro_var | p.pro_cer
+    p.dm_fac = P(p.power, p.q, _=[0.5, 1, 0.5])
+    p.pv_fac = P(p.pv, p.q, _=[1, 0, 0.5])
+    p.demand = P(p.res_dem, p.q, _=[100] * 3)
+    p.capex = P(p.pro, p.y, _=[5000, 1000, 0])
+    p.fopex = P(p.pro, p.y, _=[500, 100, 0])
+    p.vopex = P(p.pro, p.y, _=[10, 50, 0])
+    p.capp = V(p.pro, p.y)
+    p.caps = V(p.res_stg, p.y)
+    p.sell = V(p.res_dem, p.q)
+    p.con = V(p.res_cons, p.q)
+    p.inv = V(p.res_stg, p.q)
+    p.prod = V(p.pro, p.q)
+    p.ex_cap = V(p.pro, p.y)
+    p.ex_fop = V(p.pro, p.y)
+    p.ex_vop = V(p.pro, p.y)
+
+    p.con_vopex = p.ex_vop(p.pro, p.y) == p.vopex(p.pro, p.y) * sigma(
+        p.prod(p.pro, p.q), p.q
     )
-    p_.con_capmax = p_.cap_p(p_.pro, p_.y) <= 200
-    p_.con_capstg = p_.cap_s(p_.charge, p_.y) <= 200
-    p_.con_consmax = p_.con(p_.res_cons, p_.q) <= 200
-    p_.con_sell = p_.sell(p_.power, p_.q) >= p_.dm_fac(p_.power, p_.q) * p_.demand(
-        p_.power, p_.q
-    )
-    p_.con_pv = p_.prod(p_.pv, p_.q) <= p_.pv_fac(p_.pv, p_.q) * p_.cap_p(p_.pv, p_.y)
-    p_.con_prod = p_.prod(p_.pro_cer, p_.q) <= p_.cap_p(p_.pro_cer, p_.y)
-    p_.con_inv = p_.inv(p_.charge, p_.q) <= p_.cap_s(p_.charge, p_.y)
-    p_.con_capex = p_.ex_cap(p_.pro, p_.y) == p_.capex(p_.pro, p_.y) * p_.cap_p(
-        p_.pro, p_.y
-    )
-    p_.con_fopex = p_.ex_fop(p_.pro, p_.y) == p_.fopex(p_.pro, p_.y) * p_.cap_p(
-        p_.pro, p_.y
-    )
-    p_.con_solar = p_.prod(p_.pv, p_.q) == p_.con(p_.solar, p_.q)
-    p_.con_power = (
-        sum(p_.prod(i, p_.q) for i in p_.pro_var)
-        - p_.prod(p_.li, p_.q)
-        + p_.prod(p_.li_d, p_.q)
-        - p_.sell(p_.power, p_.q)
+    p.con_capmax = p.capp(p.pro, p.y) <= 200
+    p.con_capstg = p.caps(p.charge, p.y) <= 200
+    p.con_consmax = p.con(p.res_cons, p.q) <= 200
+    p.con_sell = p.sell(p.power, p.q) >= p.dm_fac(p.power, p.q) * p.demand(p.power, p.q)
+    p.con_pv = p.prod(p.pv, p.q) <= p.pv_fac(p.pv, p.q) * p.capp(p.pv, p.y)
+    p.con_prod = p.prod(p.pro_cer, p.q) <= p.capp(p.pro_cer, p.y)
+    p.con_inv = p.inv(p.charge, p.q) <= p.caps(p.charge, p.y)
+    p.con_capex = p.ex_cap(p.pro, p.y) == p.capex(p.pro, p.y) * p.capp(p.pro, p.y)
+    p.con_fopex = p.ex_fop(p.pro, p.y) == p.fopex(p.pro, p.y) * p.capp(p.pro, p.y)
+    p.con_solar = p.prod(p.pv, p.q) == p.con(p.solar, p.q)
+    p.con_power = (
+        p.prod(p.pv, p.q)
+        - p.prod(p.li, p.q)
+        + p.prod(p.li_d, p.q)
+        - p.sell(p.power, p.q)
         == 0
     )
-    p_.con_charge = (
-        p_.prod(p_.li, p_.q)
-        - p_.prod(p_.li_d, p_.q)
-        + p_.inv(p_.charge, p_.q - 1)
-        - p_.inv(p_.charge, p_.q)
+    p.con_charge = (
+        p.prod(p.li, p.q)
+        - p.prod(p.li_d, p.q)
+        + p.inv(p.charge, p.q - 1)
+        - p.inv(p.charge, p.q)
         == 0
     )
-    p_.o = inf(sum(p_.ex_cap) + sum(p_.ex_vop) + sum(p_.ex_fop))
-    p_.opt()
-    return p_
+    p.o = inf(sigma(p.ex_cap) + sigma(p.ex_vop) + sigma(p.ex_fop))
+    p.opt()
+    return p
 
 
-def test_sol(p):
-    assert p.cap_p.sol(True) == [150.0, 100.0, 200.0]
-    assert p.cap_s.sol(True) == [200.0]
-    assert p.sell.sol(True) == [50.0, 100.0, 50.0]
-    assert p.con.sol(True) == [150.0, 0.0, 50.0]
-    assert p.inv.sol(True) == [100.0, 0.0, 0.0]
-    assert p.prod.sol(True) == [150.0, 0.0, 50.0, 100.0, 0.0, 0.0, 0.0, 100.0, 0.0]
-    assert p.ex_cap.sol(True) == [750000.0, 100000.0, 0.0]
-    assert p.ex_fop.sol(True) == [75000.0, 10000.0, 0.0]
-    assert p.ex_vop.sol(True) == [2000.0, 5000.0, 0.0]
-    assert p.o.sol(True) == 942000.0
+def test_sol(p_energy):
+    assert p_energy.capp.sol(True) == [150.0, 100.0, 200.0]
+    assert p_energy.caps.sol(True) == [200.0]
+    assert p_energy.sell.sol(True) == [50.0, 100.0, 50.0]
+    assert p_energy.con.sol(True) == [150.0, 0.0, 50.0]
+    assert p_energy.inv.sol(True) == [100.0, 0.0, 0.0]
+    assert p_energy.prod.sol(True) == [
+        150.0,
+        0.0,
+        50.0,
+        100.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0,
+        0.0,
+    ]
+    assert p_energy.ex_cap.sol(True) == [750000.0, 100000.0, 0.0]
+    assert p_energy.ex_fop.sol(True) == [75000.0, 10000.0, 0.0]
+    assert p_energy.ex_vop.sol(True) == [2000.0, 5000.0, 0.0]
+    assert p_energy.o.sol(True) == 942000.0
 
 
 @pytest.fixture
