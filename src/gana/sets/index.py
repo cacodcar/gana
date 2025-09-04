@@ -349,6 +349,8 @@ class I:
     def __sub__(self, other: int | Self):
         # other is an integer, step down the index set
         if isinstance(other, int):
+            if len(self) == 1:
+                return
             return self.step(-other)
 
         # members from other are removed from self

@@ -499,11 +499,13 @@ class F:
                 if self.one_type in [Elem.P, Elem.T]:
                     f.one = one
                 else:
-                    f.one = one(*one_idx)
+                    if one:
+                        f.one = one(*one_idx)
                 if self.two_type in [Elem.P, Elem.T]:
                     f.two = two
                 else:
-                    f.two = two(*two_idx)
+                    if two:
+                        f.two = two(*two_idx)
                 f.pos = n
                 f.one_type, f.two_type = self.one_type, self.two_type
                 f.mul, f.add, f.sub, f.div = self.mul, self.add, self.sub, self.div
