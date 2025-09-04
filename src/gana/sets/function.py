@@ -325,7 +325,7 @@ class F:
             # check the compatibility
             if not lone % ltwo == 0 and not ltwo % lone == 0:
                 raise ValueError(
-                    f'{self.one} with index {self.one.index} and {self.two} with {self.two.index} are not compatible'
+                    f'{self.one} with index {self.one.index} (length = {lone}) and {self.two} with {self.two.index} (length = {ltwo}) are not compatible'
                 )
             if lone > ltwo:
                 # one is longer, keep as is
