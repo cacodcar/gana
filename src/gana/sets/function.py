@@ -5,11 +5,13 @@ from __future__ import annotations
 from itertools import product
 from typing import TYPE_CHECKING, Self
 
+from numpy import isin
+
 from .birth import make_P, make_T
 from .cases import Elem, FCase, PCase
 from .constraint import C
 from .index import I
-from ..operations.operators import sigma
+from ..operators.sigma import sigma
 
 try:
     from IPython.display import Math, display
@@ -168,6 +170,7 @@ class F:
                 # needs the mismatch to generate matrices
                 self.generate_matrices()
                 # matrix is passed on to the birthed functions
+                print('mmmm', self, self.one, self.two)
                 self.birth_functions()
                 # make a matrix of positions
                 self.X = [f.X for f in self._]
@@ -464,7 +467,7 @@ class F:
         Accordingly sets n
         sets self._, self.n
         """
-
+        print('jjjjj', self._one_map, self._two_map)
         # _one and _two are used because
         # they are created post handling an length mismatches
         for n, (one, one_idx, two, two_idx) in enumerate(
@@ -513,6 +516,9 @@ class F:
                 f.consistent = self.consistent
                 f.case = self.case
                 f.issumhow = self.issumhow
+                if self.two_type == Elem.F:
+                    print(self.two.variables)
+                print('hhhh', self.one, self.two, type(self.two))
                 f.update_variables()
                 f.give_name()
                 f.map[one_idx, two_idx] = f
@@ -545,6 +551,9 @@ class F:
             self.variables.append(self.one)
 
         if self.two_type == Elem.F:
+            print('aaaaa', self.one, self.two, type(self.two))
+            print(self.variables)
+            print()
             self.variables.extend(self.two.variables)
 
         elif self.two_type == Elem.V:
@@ -555,15 +564,22 @@ class F:
 
     def give_name(self):
         """Gives a name to the function"""
-        _name = ''
-        if self.one is not None:
-            _name += str(self.one)
-        if self.two is not None:
-            _name += f'{self.rel}{self.two}'
 
-        self.name = _name
         # set by program
         self.pname: str = ''
+
+        if self.case == FCase.SUM:
+            self.name = '+'.join([str(v) for v in self.variables])
+        elif self.case == FCase.NEGSUM:
+            self.name = '-' + ' - '.join([str(v) for v in self.variables])
+        else:
+            _name = ''
+            if self.one is not None:
+                _name += str(self.one)
+            if self.two is not None:
+                _name += f'{self.rel}{self.two}'
+
+            self.name = _name
 
     def types(
         self,
@@ -609,6 +625,7 @@ class F:
             one_type = check_type(one)
 
         if not two_type:
+            print('gggg', two, type(two))
             two_type = check_type(two)
 
         self.one_type = one_type
@@ -842,7 +859,7 @@ class F:
             # if this is a variable being treated as a function
             return self.two.latex()
 
-        if self.case in [FCase.SUM, FCase.NEGSUM] and self.parent is None:
+        if self.case in [FCase.SUM, FCase.NEGSUM]:
             # if this is a summation
 
             v, over, pos = self.issumhow
@@ -861,6 +878,7 @@ class F:
                 oneissum = v.name
 
             ltx = rf'\sum_{{i \in {over}}} {oneissum}_{{{index}}}'
+
             if self.case == FCase.NEGSUM:
                 # if this is a summation
                 # return the summation

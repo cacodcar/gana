@@ -1,8 +1,8 @@
 """Gana Imports"""
 
 from .block.program import Prg
-from .operations.composition import inf, sup
-from .operations.operators import sigma
+from .operators.composition import inf, sup
+from .operators.sigma import sigma
 from .sets.index import I
 from .sets.parameter import P
 from .sets.theta import T
