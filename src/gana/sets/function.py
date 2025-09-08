@@ -550,8 +550,10 @@ class F:
         elif self.two_type == Elem.V:
             self.variables.append(self.two)
 
-        # make a matrix of positions of the variables
-        self.X = [v.n for v in self.variables]
+            # make a matrix of positions of the variables
+            print('aaaa', self, self.variables)
+
+            self.X = [v.n for v in self.variables if v is not None]
 
     def give_name(self):
         """Gives a name to the function"""
