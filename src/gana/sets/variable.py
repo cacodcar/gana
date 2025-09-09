@@ -974,7 +974,7 @@ class V:
         # first create a product to match
         # the indices
 
-        indices = list(product(*key))
+        indices = product(*key)
         # create a new variable set to return
         v = V(**self.args)
         v.name, v.n = self.name, self.n
