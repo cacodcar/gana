@@ -460,7 +460,7 @@ class I:
             return self._hash
 
         except AttributeError:
-            setattr(self, '_hash', hash(self.name))
+            self._hash = hash(self.name)
             # self._hash = hash(self.name)
             return self.__hash__()
 

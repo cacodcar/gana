@@ -118,7 +118,7 @@ class F:
         # constraints can be printed by category
         self.category: str = ''
 
-        if (one is not None or two is not None):
+        if one is not None or two is not None:
             # A basic Function is of the type
             # P*V, V + P, V - P
             # P can be a number (int or float), parameter set (P) or list[int | float]
@@ -467,6 +467,7 @@ class F:
         Accordingly sets n
         sets self._, self.n
         """
+
         # _one and _two are used because
         # they are created post handling an length mismatches
         for n, (one, one_idx, two, two_idx) in enumerate(
@@ -484,30 +485,39 @@ class F:
                 # if self.one_type == Elem.V:
                 index += (one_idx,)
 
-            if two is not None:
+            if two is None:
+                # you can have just a P or T masquerading as a function
+                # so check are unnecessary
+                # f = one(*one.index)
+                f = one()
+                f.map[tuple(index)] = f
+                index = tuple(index)
+
+            else:
                 # this is done to handle skipping
                 #  for shifted indices (.step)
                 if self.two_type == Elem.F:
                     index += two_idx
 
                 else:
-                    # if self.two_type == Elem.V:
                     index += (two_idx,)
                 index = tuple(index)
 
                 f = F()
                 f.parent = self
                 f.index = index
-                if self.one_type in [Elem.P, Elem.T]:
-                    f.one = one
-                else:
-                    if one:
+                if one:
+                    if self.one_type in [Elem.P, Elem.T]:
+                        f.one = one
+                    else:
+                        f.one = one()
                         f.one = one(*one_idx)
+
                 if self.two_type in [Elem.P, Elem.T]:
                     f.two = two
                 else:
-                    if two:
-                        f.two = two(*two_idx)
+                    f.two = two(*two_idx)
+
                 f.pos = n
                 f.one_type, f.two_type = self.one_type, self.two_type
                 f.mul, f.add, f.sub, f.div = self.mul, self.add, self.sub, self.div
@@ -519,11 +529,6 @@ class F:
                 f.update_variables()
                 f.give_name()
                 f.map[one_idx, two_idx] = f
-
-            else:
-                f = one(*one.index)
-                f.map[tuple(index)] = f
-                index = tuple(index)
 
             # f.variables = [v(i) for v, i in zip(self.variables, index)]
             # update the map
