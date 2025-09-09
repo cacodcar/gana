@@ -11,7 +11,6 @@ from .birth import make_P, make_T
 from .cases import Elem, FCase, PCase
 from .constraint import C
 from .index import I
-from ..operators.sigma import sigma
 
 try:
     from IPython.display import Math, display
@@ -47,7 +46,7 @@ class F:
         pos (int, optional): Position of the function in the parent. Defaults to None.
         index (tuple[I] | list[tuple[I]] | None, optional): Index of the function. Defaults to None.
         issumhow (tuple[V, I, int], optional): If the function is a summation, this is the variable, index and position of the summation. Defaults to None.
-
+        process (bool, optional): whether to make matrices. Defaults to True
     Attributes:
         one (P | V | F): First element
         two (P | V | F): Second element
@@ -68,6 +67,7 @@ class F:
         n (int): Number id, set by the program
         pname (str): Name, set by the program
         elmo (dict[int, list[P | V | T | str]]): Elements in the function with relation. Also a sesame street character
+
 
     Raises:
         ValueError: If one of mul, add, sub or div is not True
@@ -118,7 +118,8 @@ class F:
         # constraints can be printed by category
         self.category: str = ''
 
-        if one is not None or two is not None:
+
+        if (one is not None or two is not None) and not self.issumhow:
             # A basic Function is of the type
             # P*V, V + P, V - P
             # P can be a number (int or float), parameter set (P) or list[int | float]
@@ -192,8 +193,8 @@ class F:
             self.mis = 0
             self._one = []
             self._two = []
-            self.one = None
-            self.two = None
+            self.one = one
+            self.two = two
             self.index = None
 
             self.handle_rel(mul, add, sub, div, ignore=True)
@@ -205,6 +206,8 @@ class F:
             self.name, self.pname = '', ''
             self.A, self.X, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
             self.variables = []
+            if self.issumhow:
+                self.give_name()
 
     @property
     def matrix(self) -> dict:
@@ -1008,6 +1011,7 @@ class F:
 
         if self.add:
             if self.case == FCase.SUM:
+                from ..operators.sigma import sigma
 
                 # -(E1 + ... + En) = -E1 - ... - En
                 # create and return a negative summation
@@ -1206,7 +1210,7 @@ class F:
 
         # these are of the type
         # F + P where F can be P*V or V/P
-        return F(one=self, add=True, two=other, one_type=Elem.F)
+        return F(one=self, add=True, two=other, one_type=Elem.F, issumhow=self.issumhow)
 
     def __radd__(
         self,
@@ -1410,7 +1414,7 @@ class F:
                         consistent=True,
                     )
 
-        return F(one=self, sub=True, two=other, one_type=Elem.F)
+        return F(one=self, sub=True, two=other, one_type=Elem.F, issumhow=self.issumhow)
 
     def __rsub__(
         self,
