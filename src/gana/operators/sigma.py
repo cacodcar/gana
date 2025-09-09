@@ -71,7 +71,7 @@ def sigma(variable: V, over: I = None, position: int = None, neg: bool = False) 
             one=-_variables[0],
             sub=True,
             two=_variables[1],
-            issumhow=(variable.copy(), over, position),
+            issumhow=(variable(), over, position),
         )
         for v in _variables[2:]:
             f -= v
@@ -83,7 +83,7 @@ def sigma(variable: V, over: I = None, position: int = None, neg: bool = False) 
             one=_variables[0],
             add=True,
             two=_variables[1],
-            issumhow=(variable.copy(), over, position),
+            issumhow=(variable(), over, position),
         )
 
         for v in _variables[2:]:
@@ -99,23 +99,22 @@ def sigma(variable: V, over: I = None, position: int = None, neg: bool = False) 
 
     keys = list(zip(*[v.map for v in f.variables]))
 
+    f.A = [[a] * length] * length_var
+
     for n in range(length_var):
+        # make the child functions
         f_child = F()
-        for v in _variables:
-            f_child.variables.append(v[n])
-            f_child.A.append(a)
-            f_child.X.append(v[n].n)
+
+        f_child.variables = [v[n] for v in f.variables]
+        f_child.A = [a] * length
+        f_child.X = [v.n for v in f_child.variables]
 
         key = keys[n]
-
-        # _over = over
-        # _over[position] = key[position]
 
         f_child.issumhow = (variable[length * n], over, position)
 
         f_child.case = case
         f_child.rhs_thetas = []
-        f.A.append(f_child.A)
         f.X.append(f_child.X)
         f_child.give_name()
         f_child._ = [f_child]

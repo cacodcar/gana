@@ -147,6 +147,7 @@ class I:
             index.ordered = True
             # give the name
             index.name = rf'{self}[{n}]'
+            index._hash = hash(index.name)
             # the only element in element (index set of size one)
             # is itself
             index._ = [index]
