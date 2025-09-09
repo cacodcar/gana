@@ -118,7 +118,29 @@ class F:
         # constraints can be printed by category
         self.category: str = ''
 
-        if one is not None or two is not None:
+        if self.issumhow:
+
+            #     self.one =
+
+            self.mis = 0
+            self._one = one._
+            self._two = two._
+            self.one = one
+            self.two = two
+            self.index = one.index + (two.index,)
+
+            self.handle_rel(mul, add, sub, div, ignore=True)
+
+            self.one_type = Elem.F
+            self.two_type = Elem.V
+            self.make_args()
+            self._ = []
+            self.n = 0
+            self.name, self.pname = '', ''
+            self.A, self.X, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
+            self.variables = []
+
+        elif one is not None or two is not None:
             # A basic Function is of the type
             # P*V, V + P, V - P
             # P can be a number (int or float), parameter set (P) or list[int | float]
@@ -137,8 +159,8 @@ class F:
             # now that the function is consistent
             # set one and two
 
-            self.one = one(*one.index)
-            self.two = two(*two.index)
+            self.one = one()
+            self.two = two()
 
             # if the entirety of self is being returned on call
             # this prevents the entirety of self being an element of a function
@@ -163,7 +185,7 @@ class F:
 
             self.make_args()
 
-            self.give_name()
+            # self.give_name()
 
             # donot birth for birthed functions
             if self.parent is None:
@@ -204,7 +226,8 @@ class F:
             self.name, self.pname = '', ''
             self.A, self.X, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
             self.variables = []
-            self.give_name()
+
+        self.give_name()
 
     @property
     def matrix(self) -> dict:
@@ -568,9 +591,9 @@ class F:
         self.pname: str = ''
 
         if self.case == FCase.SUM:
-            self.name = '+'.join([str(v) for v in self.variables])
+            self.name = f'sigma({self.variables[0].parent}[{self.variables[0].pos}:{self.variables[-1].pos}])'
         elif self.case == FCase.NEGSUM:
-            self.name = '-' + ' - '.join([str(v) for v in self.variables])
+            self.name = f'-sigma({self.variables[0].parent}[{self.variables[0].pos}:{self.variables[-1].pos}])'
         else:
             _name = ''
             if self.one is not None:
@@ -1205,6 +1228,10 @@ class F:
 
         # these are of the type
         # F + P where F can be P*V or V/P
+
+        if isinstance(other, F):
+            return F(one=self, add=True, two=other, one_type=Elem.F, two_type=Elem.F)
+
         return F(one=self, add=True, two=other, one_type=Elem.F, issumhow=self.issumhow)
 
     def __radd__(
@@ -1408,6 +1435,8 @@ class F:
                         two_type=Elem.P,
                         consistent=True,
                     )
+        if isinstance(other, F):
+            return F(one=self, sub=True, two=other, one_type=Elem.F, two_type=Elem.F)
 
         return F(one=self, sub=True, two=other, one_type=Elem.F, issumhow=self.issumhow)
 
