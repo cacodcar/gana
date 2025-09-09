@@ -1,10 +1,10 @@
 import pytest
 from src.gana.block.program import Prg
-from src.gana.operations.composition import inf, sup
+from src.gana.operators.composition import inf, sup
 from src.gana.sets.index import I
 from src.gana.sets.parameter import P
 from src.gana.sets.variable import V
-from src.gana.operations.operators import sigma
+from src.gana.operators.sigma import sigma
 
 
 @pytest.fixture

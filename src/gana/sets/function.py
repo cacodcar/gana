@@ -5,11 +5,12 @@ from __future__ import annotations
 from itertools import product
 from typing import TYPE_CHECKING, Self
 
+from numpy import isin
+
 from .birth import make_P, make_T
 from .cases import Elem, FCase, PCase
 from .constraint import C
 from .index import I
-from ..operations.operators import sigma
 
 try:
     from IPython.display import Math, display
@@ -45,7 +46,7 @@ class F:
         pos (int, optional): Position of the function in the parent. Defaults to None.
         index (tuple[I] | list[tuple[I]] | None, optional): Index of the function. Defaults to None.
         issumhow (tuple[V, I, int], optional): If the function is a summation, this is the variable, index and position of the summation. Defaults to None.
-
+        process (bool, optional): whether to make matrices. Defaults to True
     Attributes:
         one (P | V | F): First element
         two (P | V | F): Second element
@@ -66,6 +67,7 @@ class F:
         n (int): Number id, set by the program
         pname (str): Name, set by the program
         elmo (dict[int, list[P | V | T | str]]): Elements in the function with relation. Also a sesame street character
+
 
     Raises:
         ValueError: If one of mul, add, sub or div is not True
@@ -189,8 +191,8 @@ class F:
             self.mis = 0
             self._one = []
             self._two = []
-            self.one = None
-            self.two = None
+            self.one = one
+            self.two = two
             self.index = None
 
             self.handle_rel(mul, add, sub, div, ignore=True)
@@ -202,6 +204,7 @@ class F:
             self.name, self.pname = '', ''
             self.A, self.X, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
             self.variables = []
+            self.give_name()
 
     @property
     def matrix(self) -> dict:
@@ -482,30 +485,39 @@ class F:
                 # if self.one_type == Elem.V:
                 index += (one_idx,)
 
-            if two is not None:
+            if two is None:
+                # you can have just a P or T masquerading as a function
+                # so check are unnecessary
+                # f = one(*one.index)
+                f = one()
+                f.map[tuple(index)] = f
+                index = tuple(index)
+
+            else:
                 # this is done to handle skipping
                 #  for shifted indices (.step)
                 if self.two_type == Elem.F:
                     index += two_idx
 
                 else:
-                    # if self.two_type == Elem.V:
                     index += (two_idx,)
                 index = tuple(index)
 
                 f = F()
                 f.parent = self
                 f.index = index
-                if self.one_type in [Elem.P, Elem.T]:
-                    f.one = one
-                else:
-                    if one:
+                if one:
+                    if self.one_type in [Elem.P, Elem.T]:
+                        f.one = one
+                    else:
+                        f.one = one()
                         f.one = one(*one_idx)
+
                 if self.two_type in [Elem.P, Elem.T]:
                     f.two = two
                 else:
-                    if two:
-                        f.two = two(*two_idx)
+                    f.two = two(*two_idx)
+
                 f.pos = n
                 f.one_type, f.two_type = self.one_type, self.two_type
                 f.mul, f.add, f.sub, f.div = self.mul, self.add, self.sub, self.div
@@ -513,14 +525,10 @@ class F:
                 f.consistent = self.consistent
                 f.case = self.case
                 f.issumhow = self.issumhow
+
                 f.update_variables()
                 f.give_name()
                 f.map[one_idx, two_idx] = f
-
-            else:
-                f = one(*one.index)
-                f.map[tuple(index)] = f
-                index = tuple(index)
 
             # f.variables = [v(i) for v, i in zip(self.variables, index)]
             # update the map
@@ -551,19 +559,26 @@ class F:
             self.variables.append(self.two)
 
         # make a matrix of positions of the variables
-        self.X = [v.n for v in self.variables]
+        self.X = [v.n for v in self.variables if v is not None]
 
     def give_name(self):
         """Gives a name to the function"""
-        _name = ''
-        if self.one is not None:
-            _name += str(self.one)
-        if self.two is not None:
-            _name += f'{self.rel}{self.two}'
 
-        self.name = _name
         # set by program
         self.pname: str = ''
+
+        if self.case == FCase.SUM:
+            self.name = '+'.join([str(v) for v in self.variables])
+        elif self.case == FCase.NEGSUM:
+            self.name = '-' + ' - '.join([str(v) for v in self.variables])
+        else:
+            _name = ''
+            if self.one is not None:
+                _name += str(self.one)
+            if self.two is not None:
+                _name += f'{self.rel}{self.two}'
+
+            self.name = _name
 
     def types(
         self,
@@ -842,7 +857,7 @@ class F:
             # if this is a variable being treated as a function
             return self.two.latex()
 
-        if self.case in [FCase.SUM, FCase.NEGSUM] and self.parent is None:
+        if self.case in [FCase.SUM, FCase.NEGSUM]:
             # if this is a summation
 
             v, over, pos = self.issumhow
@@ -861,6 +876,7 @@ class F:
                 oneissum = v.name
 
             ltx = rf'\sum_{{i \in {over}}} {oneissum}_{{{index}}}'
+
             if self.case == FCase.NEGSUM:
                 # if this is a summation
                 # return the summation
@@ -990,6 +1006,7 @@ class F:
 
         if self.add:
             if self.case == FCase.SUM:
+                from ..operators.sigma import sigma
 
                 # -(E1 + ... + En) = -E1 - ... - En
                 # create and return a negative summation
@@ -1188,7 +1205,7 @@ class F:
 
         # these are of the type
         # F + P where F can be P*V or V/P
-        return F(one=self, add=True, two=other, one_type=Elem.F)
+        return F(one=self, add=True, two=other, one_type=Elem.F, issumhow=self.issumhow)
 
     def __radd__(
         self,
@@ -1392,7 +1409,7 @@ class F:
                         consistent=True,
                     )
 
-        return F(one=self, sub=True, two=other, one_type=Elem.F)
+        return F(one=self, sub=True, two=other, one_type=Elem.F, issumhow=self.issumhow)
 
     def __rsub__(
         self,

@@ -164,22 +164,6 @@ class V:
         self.index: tuple[I] | set[tuple[I]] = _index
         self.map: dict[I, V] = _map
 
-        # if self.index:
-
-        # # self.index: tuple[I] | set[tuple[I]] = tuple(
-        # #     [i if not isinstance(i, V) else [i] for i in index]
-        # # )
-
-        # if self.index:
-        #     self.map: dict[I, V] = {
-        #         # prod([ii for ii in i if ii is not None]): None
-        #         i: None
-        #         for i in list(product(*self.index))
-        #     }
-        #     # self.map: dict[I, V] = {prod(i): None for i in list(product(*self.index))}
-        # else:
-        #     self.map: dict[I, V] = {}
-
         # this is the nth parameter declared in the
         self.n: int = None
 
@@ -603,7 +587,6 @@ class V:
                     two_type=Elem.P,
                     consistent=True,
                 )
-
         return F(one=self, sub=True, two=other, one_type=Elem.V)
 
     def __rsub__(
@@ -968,7 +951,10 @@ class V:
 
         # if a dependent variable is being passed in the key
         # extract variable from the index (it will be in a list)
+        # the problem with equating variables is that
+        # the __eq__ method is overloaded
         def delister(inp: tuple[I | list[V]]):
+
             return tuple(i[0] if isinstance(i, list) else i for i in inp)
 
         if not key or delister(key) == delister(self.index):

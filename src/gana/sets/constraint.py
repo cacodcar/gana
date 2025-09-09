@@ -144,10 +144,12 @@ class C:
         """Update variables in the constraint set"""
         for cons in self._:
             for v in cons.variables:
-                # the variable is constrained by this constraint
-                v.cons_by.append(cons)
+                if v is not None:
+                    # update cons_by for variables of children in constraint
+                    v.cons_by.append(cons)
         for v in self.variables:
-            v.cons_by.append(self)
+            if v is not None:
+                v.cons_by.append(self)
 
     def copy(self) -> Self:
         """Copy the constraint set"""
@@ -268,7 +270,6 @@ class C:
 
     def __radd__(self, other: V | P | T | F) -> Self:
         _ = self + other
-    
 
     def __sub__(self, other: V | P | T | F) -> Self:
 

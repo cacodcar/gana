@@ -5,11 +5,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ..sets.cases import Elem, FCase
+from itertools import product
+from ..sets.function import F
 
 if TYPE_CHECKING:
     from ..sets.index import I
     from ..sets.variable import V
-    from ..sets.function import F
 
 
 def sigma(variable: V, over: I = None, position: int = None, neg: bool = False) -> F:
@@ -48,7 +49,6 @@ def sigma(variable: V, over: I = None, position: int = None, neg: bool = False) 
     if position == len(variable.index) - 1:
         # if this is the last index
         _variables = [variable(*variable.index[:-1], _index) for _index in over]
-        
 
     else:
         # it is somewhere in the middle
