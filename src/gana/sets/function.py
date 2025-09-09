@@ -118,8 +118,7 @@ class F:
         # constraints can be printed by category
         self.category: str = ''
 
-
-        if (one is not None or two is not None) and not self.issumhow:
+        if one is not None or two is not None:
             # A basic Function is of the type
             # P*V, V + P, V - P
             # P can be a number (int or float), parameter set (P) or list[int | float]
@@ -171,7 +170,6 @@ class F:
                 # needs the mismatch to generate matrices
                 self.generate_matrices()
                 # matrix is passed on to the birthed functions
-                print('mmmm', self, self.one, self.two)
                 self.birth_functions()
                 # make a matrix of positions
                 self.X = [f.X for f in self._]
@@ -470,7 +468,6 @@ class F:
         Accordingly sets n
         sets self._, self.n
         """
-        print('jjjjj', self._one_map, self._two_map)
         # _one and _two are used because
         # they are created post handling an length mismatches
         for n, (one, one_idx, two, two_idx) in enumerate(
@@ -519,9 +516,7 @@ class F:
                 f.consistent = self.consistent
                 f.case = self.case
                 f.issumhow = self.issumhow
-                if self.two_type == Elem.F:
-                    print(self.two.variables)
-                print('hhhh', self.one, self.two, type(self.two))
+
                 f.update_variables()
                 f.give_name()
                 f.map[one_idx, two_idx] = f
@@ -554,9 +549,6 @@ class F:
             self.variables.append(self.one)
 
         if self.two_type == Elem.F:
-            print('aaaaa', self.one, self.two, type(self.two))
-            print(self.variables)
-            print()
             self.variables.extend(self.two.variables)
 
         elif self.two_type == Elem.V:
@@ -628,7 +620,6 @@ class F:
             one_type = check_type(one)
 
         if not two_type:
-            print('gggg', two, type(two))
             two_type = check_type(two)
 
         self.one_type = one_type

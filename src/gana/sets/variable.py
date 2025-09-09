@@ -603,7 +603,6 @@ class V:
                     two_type=Elem.P,
                     consistent=True,
                 )
-        print('ddddd', other, type(other))
         return F(one=self, sub=True, two=other, one_type=Elem.V)
 
     def __rsub__(
