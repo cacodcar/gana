@@ -118,7 +118,7 @@ class F:
         # constraints can be printed by category
         self.category: str = ''
 
-        if one is not None or two is not None:
+        if (one is not None or two is not None):
             # A basic Function is of the type
             # P*V, V + P, V - P
             # P can be a number (int or float), parameter set (P) or list[int | float]
@@ -204,8 +204,7 @@ class F:
             self.name, self.pname = '', ''
             self.A, self.X, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
             self.variables = []
-            if self.issumhow:
-                self.give_name()
+            self.give_name()
 
     @property
     def matrix(self) -> dict:

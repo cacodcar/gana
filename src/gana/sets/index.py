@@ -87,6 +87,9 @@ class I:
         # if it is a slice
         self.slice: slice = None
 
+        # hash passed on along with name
+        # self._hash = ''
+
         if size:
             if members:
                 raise ValueError(
@@ -440,18 +443,31 @@ class I:
     #                    Hashing
     # -----------------------------------------------------
 
-    __str__ = lambda self: self.name
-    __repr__ = __str__
-    __hash__ = lambda self: hash(self.name)
+    # __str__ = lambda self: self.name
+    # __repr__ = __str__
+    # __hash__ = lambda self: hash(self.name)
 
-    # def __str__(self):
-    #     return self.name
+    def __str__(self):
+        return self.name
 
-    # def __repr__(self):
-    #     return str(self)
+    def __repr__(self):
+        return str(self)
 
-    # def __hash__(self):
-    #     return hash(self.name)
+    def __hash__(self):
+        # this seems to work the fastest
+        # not sure how pythonic this is though
+        try:
+            return self._hash
+
+        except AttributeError:
+            setattr(self, '_hash', hash(self.name))
+            # self._hash = hash(self.name)
+            return self.__hash__()
+
+        # if not self._hash:
+        #     self._hash = hash(self.name)
+
+        # return self._hash
 
     # -----------------------------------------------------
     #                    Export

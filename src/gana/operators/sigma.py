@@ -94,12 +94,29 @@ def sigma(variable: V, over: I = None, position: int = None, neg: bool = False) 
     # f.case = case
     # f._ = []
 
-    # for f_child in f._:
-    #     f_child.parent = f
-    #     f_child.one_type = Elem.F
-    #     f_child.two_type = Elem.V
-    #     f_child.case = case
-    #     f_child.issumhow = (variable.copy(), variable.index, position)
+    # keys = [v.map.keys() for v in f.variables]
+    # values = [v.map.values() for v in f.variables]
+
+
+    # keys_ = []
+    # values_ = []
+    # for i in zip(*keys):
+    #     keys_.append(i)
+    # for i in zip(*values):
+    #     values_.append(sum(i))
+
+    # f.map = {k: v for k, v in zip(keys_, values_)}
+
+
+
+
+
+    # # for f_child in f._:
+    # #     f_child.parent = f
+    # #     f_child.one_type = Elem.F
+    # #     f_child.two_type = Elem.V
+    # #     f_child.case = case
+    # #     f_child.issumhow = (variable.copy(), variable.index, position)
 
     # return f
 

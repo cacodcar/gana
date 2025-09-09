@@ -970,6 +970,9 @@ class V:
         def delister(inp: tuple[I | list[V]]):
             return tuple(i[0] if isinstance(i, list) else i for i in inp)
 
+        # the problem with equating variables is that
+        # the __eq__ method is overloaded
+
         if not key or delister(key) == delister(self.index):
             # if the index is an exact match
             # or no key is passed
