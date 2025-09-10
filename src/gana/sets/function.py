@@ -124,6 +124,8 @@ class F:
         # constraints can be printed by category
         self.category: str = ''
 
+        self._matrix: dict = {}
+
         if self.issumhow:
 
             #     self.one =
@@ -242,9 +244,15 @@ class F:
             dict: Dictionary mapping of positions to values in A matrix
 
         """
+        if self._matrix:
+            return self._matrix
+
         if self.parent:
-            return {x: a for x, a in zip(self.X, self.A)}
-        return {f: f.matrix for f in self._}
+            self._matrix = dict(zip(self.X, self.A))
+        else:
+            self._matrix = {f: f.matrix for f in self._}
+
+        return self._matrix
 
     @property
     def struct(self) -> tuple[Elem, Elem]:

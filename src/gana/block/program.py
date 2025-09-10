@@ -1253,7 +1253,7 @@ class Prg:
                 # as they are added based on declaration
                 vs = len(v.mps())
                 # for constraints/functions/objectives that they feature in
-                for c in v.features_in:
+                for c in v.cons_by:
                     # this captures the length of the variable name
                     # variable names are just Vn where n is order of precedence
                     vfs = len(c.mps())
@@ -1264,11 +1264,29 @@ class Prg:
                     f.write(ws * (10 - vfs))
 
                     # C variable coefficients are a vector
-                    if isinstance(c, O):
-                        f.write(f'{c.function[0].matrix[v.n]}')
-                    else:
-                        f.write(f'{c.matrix[v.n]}')
+                    # if isinstance(c, O):
+                    #     f.write(f'{c.function[0].matrix[v.n]}')
+                    # else:
+                    #     f.write(f'{c.matrix[v.n]}')
+                    f.write(f'{c.matrix[v.n]}')
 
+                    # f.write(f'{c.A[c.X.index(v.n)]}')
+
+                    f.write('\n')
+
+                for o in v.min_by:
+                    # this captures the length of the variable name
+                    # variable names are just Vn where n is order of precedence
+                    vfs = len(o.mps())
+                    f.write(ws * 4)
+                    f.write(v.mps())
+                    f.write(ws * (10 - vs))
+                    f.write(o.mps())
+                    f.write(ws * (10 - vfs))
+
+                    f.write(f'{o.function[0].matrix[v.n]}')
+
+                    # f.write(f'{c.A[c.X.index(v.n)]}')
                     f.write('\n')
 
             # This gives the right-hand side of the constraints
