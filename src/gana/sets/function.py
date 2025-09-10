@@ -247,7 +247,7 @@ class F:
         if self._matrix:
             return self._matrix
 
-        if self.parent:
+        if self.parent is not None:
             self._matrix = dict(zip(self.X, self.A))
         else:
             self._matrix = {f: f.matrix for f in self._}
