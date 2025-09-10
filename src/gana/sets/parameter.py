@@ -96,7 +96,7 @@ class P:
             # iterates over each individual index
             # and creates a mapping for it
             for idx in _index:
-                for i in list(product(*idx)):
+                for i in product(*idx):
                     _map[i] = None
             _index = set(_index)
 
@@ -107,7 +107,7 @@ class P:
             _index = tuple([i if not isinstance(i, V) else [i] for i in index])
 
             if _index:
-                _map = {i: None for i in list(product(*_index))}
+                _map = {i: None for i in product(*_index)}
 
             else:
                 _map = {}

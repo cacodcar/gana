@@ -147,7 +147,7 @@ class V:
             # iterates over each individual index
             # and creates a mapping for it
             for idx in _index:
-                for i in list(product(*idx)):
+                for i in product(*idx):
                     _map[i] = None
             _index = set(_index)
 
@@ -156,7 +156,7 @@ class V:
             _index = tuple([i if not isinstance(i, V) else [i] for i in index])
 
             if _index:
-                _map = {i: None for i in list(product(*_index))}
+                _map = {i: None for i in product(*_index)}
 
             else:
                 _map = {}
@@ -947,7 +947,10 @@ class V:
     def __len__(self) -> int:
         return len(self._)
 
-    def __call__(self, *key: I) -> Self:
+    def __call__(self, *key: I, make_new: bool = False) -> Self:
+
+        def lister(inp: tuple[I]) -> tuple[I | list[V]]:
+            return tuple([i] if isinstance(i, V) else i for i in key)
 
         # if a dependent variable is being passed in the key
         # extract variable from the index (it will be in a list)
@@ -957,31 +960,31 @@ class V:
 
             return tuple(i[0] if isinstance(i, list) else i for i in inp)
 
-        if not key or delister(key) == delister(self.index):
-            # if the index is an exact match
-            # or no key is passed
-            self.make_copy = True
-            return self
+        if not make_new:
+
+            if not key or delister(key) == delister(self.index):
+                # if the index is an exact match
+                # or no key is passed
+                self.make_copy = True
+                return self
 
         # the check helps to handle if a variable itself is an index
         # we do not want to iterate over the entire variable set
         # but treat the variable as a single index element
-        key: tuple[I] | set[tuple[I]] = [
-            i if not isinstance(i, V) else [i] for i in key
-        ]
+        key: tuple[I] | set[tuple[I]] = lister(key)
 
         # if a subset is passed,
         # first create a product to match
         # the indices
 
-        indices = list(product(*key))
+        # indices = product(*key)
         # create a new variable set to return
         v = V(**self.args)
         v.name, v.n = self.name, self.n
-        v.index = tuple(key)
+        v.index = key
 
         # should be able to map these
-        for index in indices:
+        for index in product(*key):
             # this helps weed out any None indices
             # i.e. skips
             if any(i is None for i in index):

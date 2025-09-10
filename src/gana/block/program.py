@@ -173,6 +173,7 @@ class Prg:
         self.names_index_sets.append(name)
         # give the index a name
         index.name = name
+        index._hash = hash(name)
         # This is the nth index set (0 indexed)
         index.n = self.n_index_sets
         # update the number of index sets
@@ -201,6 +202,7 @@ class Prg:
                 element = I()
                 # set the name
                 element.name = member
+                element._hash = hash(member)
                 # this is the nth element (0 indexed)
                 element.n = self.n_index_elements
                 # update the number of elements
@@ -1247,7 +1249,7 @@ class Prg:
 
                     # C variable coefficients are a vector
                     if isinstance(c, O):
-                        f.write(f'{c.matrix[v.n]}')
+                        f.write(f'{c.function[0].matrix[v.n]}')
                     else:
                         f.write(f'{c.matrix[v.n]}')
 
