@@ -652,30 +652,40 @@ class Prg:
 
             cons_new.n = cons_ex.n
 
-        for variable in self.variable_sets:
+        for cons_ex, cons_new in zip(constraint_ex._, constraint_new._):
+            cons_new.cons_by_pos = cons_ex.cons_by_pos
+            for v in cons_ex.variables:
+                v.cons_by[cons_ex.cons_by_pos[v]] = cons_new
 
-            if constraint_ex in variable.cons_by:
-                # if variable is constrained by the old constraint
-                # remove the constraint from the variable
-                variable.cons_by[variable.cons_by.index(constraint_ex)] = constraint_new
+            for v in cons_new.variables:
+                if cons_new not in v.cons_by:
+                    cons_new.cons_by_pos[v] = len(v.cons_by)
+                    v.cons_by.append(cons_new)
 
-            for var in variable._:
+        # for variable in self.variable_sets:
 
-                for cons_new, cons_ex in zip(constraint_new._, constraint_ex._):
-                    # if variable is constrained by the old constraint
-                    # update the cons_by list
-                    if cons_ex in var.cons_by:
-                        var.cons_by[var.cons_by.index(cons_ex)] = cons_new
+        #     if constraint_ex in variable.cons_by:
+        #         # if variable is constrained by the old constraint
+        #         # remove the constraint from the variable
+        #         variable.cons_by[variable.cons_by.index(constraint_ex)] = constraint_new
 
-        for cons_new in constraint_new._:
-            # there could be new variables in the updated constraint
-            for var in cons_new.variables:
+        #     for var in variable._:
 
-                # if the variable is in the new constraint
-                if cons_new not in var.cons_by:
+        #         for cons_new, cons_ex in zip(constraint_new._, constraint_ex._):
+        #             # if variable is constrained by the old constraint
+        #             # update the cons_by list
+        #             if cons_ex in var.cons_by:
+        #                 var.cons_by[var.cons_by.index(cons_ex)] = cons_new
 
-                    # update the cons_by list
-                    var.cons_by.append(cons_new)
+        # for cons_new in constraint_new._:
+        #     # there could be new variables in the updated constraint
+        #     for var in cons_new.variables:
+
+        #         # if the variable is in the new constraint
+        #         if cons_new not in var.cons_by:
+
+        #             # update the cons_by list
+        #             var.cons_by.append(cons_new)
 
     def add_objective(self, objective: O):
         """Adds an objective set to the program

@@ -968,6 +968,8 @@ class V:
                 self.make_copy = True
                 return self
 
+        
+
         # the check helps to handle if a variable itself is an index
         # we do not want to iterate over the entire variable set
         # but treat the variable as a single index element

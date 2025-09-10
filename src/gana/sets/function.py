@@ -76,19 +76,24 @@ class F:
 
     def __init__(
         self,
+        # --------- Elements -----------
         one: int | float | list[int | float] | P | V | T | Self | None = None,
         two: int | float | list[int | float] | P | V | T | Self | None = None,
+        # --------- Types --------------
         one_type: Elem = None,
         two_type: Elem = None,
+        # ------- Relations -----------
         mul: bool = False,
         add: bool = False,
         sub: bool = False,
         div: bool = False,
-        case: FCase = None,
-        consistent: bool = False,
+        # ------ Vector ---------------
         parent: Self = None,
         pos: int = None,
         index: tuple[I] | list[tuple[I]] | None = None,
+        # ------- Other attributes -----
+        case: FCase = None,
+        consistent: bool = False,
         issumhow: tuple[V, I, int] = None,
     ):
         # set by program or birther function (parent)
