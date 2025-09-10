@@ -94,6 +94,9 @@ class C:
         # whether the constraint is binding
         self.binding = False
 
+        # position of the constraint in the cons_by of its variables
+        self.cons_by_pos = {}
+
         if not self.nn:
             if self.function.case == FCase.NEGVAR and self.leq:
                 self.nn = True
@@ -146,10 +149,11 @@ class C:
             for v in cons.variables:
                 if v is not None:
                     # update cons_by for variables of children in constraint
+                    cons.cons_by_pos[v] = len(v.cons_by)
                     v.cons_by.append(cons)
-        for v in self.variables:
-            if v is not None:
-                v.cons_by.append(self)
+        # for v in self.variables:
+        #     if v is not None:
+        #         v.cons_by.append(self)
 
     def copy(self) -> Self:
         """Copy the constraint set"""

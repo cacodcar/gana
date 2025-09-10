@@ -76,19 +76,24 @@ class F:
 
     def __init__(
         self,
+        # --------- Elements -----------
         one: int | float | list[int | float] | P | V | T | Self | None = None,
         two: int | float | list[int | float] | P | V | T | Self | None = None,
+        # --------- Types --------------
         one_type: Elem = None,
         two_type: Elem = None,
+        # ------- Relations -----------
         mul: bool = False,
         add: bool = False,
         sub: bool = False,
         div: bool = False,
-        case: FCase = None,
-        consistent: bool = False,
+        # ------ Vector ---------------
         parent: Self = None,
         pos: int = None,
         index: tuple[I] | list[tuple[I]] | None = None,
+        # ------- Other attributes -----
+        case: FCase = None,
+        consistent: bool = False,
         issumhow: tuple[V, I, int] = None,
     ):
         # set by program or birther function (parent)
@@ -118,6 +123,8 @@ class F:
         # category of the constraint
         # constraints can be printed by category
         self.category: str = ''
+
+        self._matrix: dict = {}
 
         if self.issumhow:
 
@@ -237,9 +244,15 @@ class F:
             dict: Dictionary mapping of positions to values in A matrix
 
         """
-        if self.parent:
-            return {x: a for x, a in zip(self.X, self.A)}
-        return {f: f.matrix for f in self._}
+        if self._matrix:
+            return self._matrix
+
+        if self.parent is not None:
+            self._matrix = dict(zip(self.X, self.A))
+        else:
+            self._matrix = {f: f.matrix for f in self._}
+
+        return self._matrix
 
     @property
     def struct(self) -> tuple[Elem, Elem]:

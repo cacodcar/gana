@@ -385,7 +385,7 @@ class V:
 
     def lp(self) -> str:
         """LP representation"""
-        return str(self)
+        return f'{self}_{self.pos}'
 
     @property
     def longname(self) -> str:
@@ -967,6 +967,8 @@ class V:
                 # or no key is passed
                 self.make_copy = True
                 return self
+
+        
 
         # the check helps to handle if a variable itself is an index
         # we do not want to iterate over the entire variable set

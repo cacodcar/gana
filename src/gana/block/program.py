@@ -14,6 +14,7 @@ from ..sets.theta import T
 from ..sets.variable import V
 from .solution import Solution
 
+
 from ppopt.mplp_program import MPLP_Program
 import numpy as np
 
@@ -551,6 +552,7 @@ class Prg:
             function_ex (F): existing function set to be mutated
             function_new (F): new function set to replace the existing one
         """
+
         # just replace the existing function set
         # take the old constraints number and pname
         function_new.n = function_ex.n
@@ -634,42 +636,56 @@ class Prg:
         constraint_new.n = constraint_ex.n
         constraint_new.pname = constraint_ex.pname
         if not constraint_ex.category == 'General':
+
             constraint_new.categorize(constraint_ex.category)
 
         # replace the constraint set in the program
-        self.constraint_sets[self.constraint_sets.index(constraint_ex)] = constraint_new
+        # self.constraint_sets[self.constraint_sets.index(constraint_ex)] = constraint_new
+        self.constraint_sets[constraint_ex.n] = constraint_new
 
         # replace the constraint in the program
         # let new constraint take n of the old constraint
         for cons_new, cons_ex in zip(constraint_new._, constraint_ex._):
 
-            self.constraints[self.constraints.index(cons_ex)] = cons_new
+            # self.constraints[self.constraints.index(cons_ex)] = cons_new
+            self.constraints[cons_ex.n] = cons_new
+
             cons_new.n = cons_ex.n
 
-        for variable in self.variable_sets:
+        for cons_ex, cons_new in zip(constraint_ex._, constraint_new._):
+            cons_new.cons_by_pos = cons_ex.cons_by_pos
+            for v in cons_ex.variables:
+                v.cons_by[cons_ex.cons_by_pos[v]] = cons_new
 
-            if constraint_ex in variable.cons_by:
-                # if variable is constrained by the old constraint
-                # remove the constraint from the variable
-                variable.cons_by[variable.cons_by.index(constraint_ex)] = constraint_new
+            for v in cons_new.variables:
+                if cons_new not in v.cons_by:
+                    cons_new.cons_by_pos[v] = len(v.cons_by)
+                    v.cons_by.append(cons_new)
 
-            for var in variable._:
+        # for variable in self.variable_sets:
 
-                for cons_new, cons_ex in zip(constraint_new._, constraint_ex._):
-                    # if variable is constrained by the old constraint
-                    # update the cons_by list
-                    if cons_ex in var.cons_by:
-                        var.cons_by[var.cons_by.index(cons_ex)] = cons_new
+        #     if constraint_ex in variable.cons_by:
+        #         # if variable is constrained by the old constraint
+        #         # remove the constraint from the variable
+        #         variable.cons_by[variable.cons_by.index(constraint_ex)] = constraint_new
 
-        for cons_new in constraint_new._:
-            # there could be new variables in the updated constraint
-            for var in cons_new.variables:
+        #     for var in variable._:
 
-                # if the variable is in the new constraint
-                if cons_new not in var.cons_by:
+        #         for cons_new, cons_ex in zip(constraint_new._, constraint_ex._):
+        #             # if variable is constrained by the old constraint
+        #             # update the cons_by list
+        #             if cons_ex in var.cons_by:
+        #                 var.cons_by[var.cons_by.index(cons_ex)] = cons_new
 
-                    # update the cons_by list
-                    var.cons_by.append(cons_new)
+        # for cons_new in constraint_new._:
+        #     # there could be new variables in the updated constraint
+        #     for var in cons_new.variables:
+
+        #         # if the variable is in the new constraint
+        #         if cons_new not in var.cons_by:
+
+        #             # update the cons_by list
+        #             var.cons_by.append(cons_new)
 
     def add_objective(self, objective: O):
         """Adds an objective set to the program
@@ -1237,7 +1253,7 @@ class Prg:
                 # as they are added based on declaration
                 vs = len(v.mps())
                 # for constraints/functions/objectives that they feature in
-                for c in v.features_in:
+                for c in v.cons_by:
                     # this captures the length of the variable name
                     # variable names are just Vn where n is order of precedence
                     vfs = len(c.mps())
@@ -1248,11 +1264,29 @@ class Prg:
                     f.write(ws * (10 - vfs))
 
                     # C variable coefficients are a vector
-                    if isinstance(c, O):
-                        f.write(f'{c.function[0].matrix[v.n]}')
-                    else:
-                        f.write(f'{c.matrix[v.n]}')
+                    # if isinstance(c, O):
+                    #     f.write(f'{c.function[0].matrix[v.n]}')
+                    # else:
+                    #     f.write(f'{c.matrix[v.n]}')
+                    f.write(f'{c.matrix[v.n]}')
 
+                    # f.write(f'{c.A[c.X.index(v.n)]}')
+
+                    f.write('\n')
+
+                for o in v.min_by:
+                    # this captures the length of the variable name
+                    # variable names are just Vn where n is order of precedence
+                    vfs = len(o.mps())
+                    f.write(ws * 4)
+                    f.write(v.mps())
+                    f.write(ws * (10 - vs))
+                    f.write(o.mps())
+                    f.write(ws * (10 - vfs))
+
+                    f.write(f'{o.function[0].matrix[v.n]}')
+
+                    # f.write(f'{c.A[c.X.index(v.n)]}')
                     f.write('\n')
 
             # This gives the right-hand side of the constraints
