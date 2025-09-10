@@ -492,14 +492,11 @@ class F:
         sets self._, self.n
         """
 
-        print(self._one_map, self._one)
-
         # _one and _two are used because
         # they are created post handling an length mismatches
         for n, (one, one_idx, two, two_idx) in enumerate(
             zip(self._one, self._one_map, self._two, self._two_map)
         ):
-
             # only update the indices for F and V for functions
             index: tuple[tuple[I]] = []
 
@@ -557,6 +554,7 @@ class F:
 
             # f.variables = [v(i) for v, i in zip(self.variables, index)]
             # update the map
+            self.map[index] = f
             f.A = self.A[n]
             f.B = self.B[n]
 
@@ -747,9 +745,12 @@ class F:
             if self.mul:
                 if self.two_type == Elem.F and self.two.case == FCase.SUM:
                     if self.two.parent is not None:
-                        self.A = [self.one._[0] * i for i in self.two.A]
+                        self.A = [self.one._[n] * i for n, i in enumerate(self.two.A)]
                     else:
-                        self.A = [[self.one._[0] * i for i in j] for j in self.two.A]
+                        self.A = [
+                            [self.one._[n] * i for i in j]
+                            for n, j in enumerate(self.two.A)
+                        ]
                 else:
                     # so you A is a the parameter matrix
                     # self.A = self.one.A
@@ -1039,7 +1040,7 @@ class F:
         if self.case == FCase.SUM:
             # -(E1 + ... + En) = -E1 - ... - En
             # create and return a negative summation
-            return 
+            return
 
         if self.add:
 
@@ -1495,15 +1496,19 @@ class F:
                 return self
 
             # make a numeric parameter
-            two = make_P(other, index=self.one.index)
             if self.case == FCase.SUM:
+                one = make_P([other] * len(self))
+                one.index = self.index
                 return F(
-                    one=two,
+                    one=one,
                     mul=True,
                     two=self,
                     one_type=Elem.P,
                     two_type=Elem.F,
                 )
+
+            two = make_P(other, index=self.one.index)
+
             if self.mul:
                 return F(one=two * self.one, mul=True, two=self.two)
 
