@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from ..sets.variable import V
 
 
-def sigma(variable: V, over: I = None, position: int = None, neg: bool = False) -> F:
+def sigma(variable: V, over: I = None, position: int = None) -> F:
     """Summation, allows better printing, avoids recurssion error
 
     Args:
@@ -49,78 +49,53 @@ def sigma(variable: V, over: I = None, position: int = None, neg: bool = False) 
 
     if length == 2:
         # this checks for v_0 + v_1
+        return _variables[0] + _variables[1]
 
-        if neg:
-            f = -_variables[0] - _variables[1]
+    # f = F(
+    #     one=_variables[0],
+    #     add=True,
+    #     two=_variables[1],
+    #     issumhow=issumhow,
+    # )
 
-        else:
-            f = _variables[0] + _variables[1]
+    # for v in islice(_variables, 2, None):
+    #     f = F(
+    #         one=f,
+    #         add=True,
+    #         two=v,
+    #         one_type=Elem.F,
+    #         two_type=Elem.V,
+    #         issumhow=issumhow,
+    #     )
+    # f += v
 
-        return f
+    # other options for looping,
+    # all avoid recurssion
 
-    issumhow = (variable(), over, position)
+    # for i in range(2, len(_variables)):
+    #     f += _variables[i]
 
-    if neg:
-        f = F(
-            one=-_variables[0],
-            sub=True,
-            two=_variables[1],
-            issumhow=issumhow,
-        )
-        for v in islice(_variables, 2, None):
-            f = F(
-                one=f,
-                sub=True,
-                two=v,
-                one_type=Elem.F,
-                two_type=Elem.V,
-                issumhow=issumhow,
-            )
+    # for v in _variables[2:]:
+    #     f += v
 
-        case = FCase.NEGSUM
-        a = -1
-    else:
+    f = F()
 
-        f = F(
-            one=_variables[0],
-            add=True,
-            two=_variables[1],
-            issumhow=issumhow,
-        )
+    f.case = FCase.SUM
 
-        for v in islice(_variables, 2, None):
-            f = F(
-                one=f,
-                add=True,
-                two=v,
-                one_type=Elem.F,
-                two_type=Elem.V,
-                issumhow=issumhow,
-            )
-            # f += v
-
-        # other options for looping,
-        # all avoid recurssion
-
-        # for i in range(2, len(_variables)):
-        #     f += _variables[i]
-
-        # for v in _variables[2:]:
-        #     f += v
-
-        case = FCase.SUM
-        a = 1
+    f.issumhow = (variable(), over, position)
 
     f.variables = _variables
-    # f.one_type = Elem.F
+    f.index = tuple(v.index for v in f.variables)
+    f.one = f
+    f.one_type = Elem.F
+    f.give_name()
     # f.two_type = Elem.V
-    f.case = case
     f.rhs_thetas = []
     length_var = len(_variables[0])
 
     keys = list(zip(*(v.map for v in f.variables)))
 
-    f.A = [[a] * length for _ in range(length_var)]
+    f.A = [[1] * length for _ in range(length_var)]
 
     for n in range(length_var):
         # make the child functions
@@ -128,13 +103,13 @@ def sigma(variable: V, over: I = None, position: int = None, neg: bool = False) 
 
         f_child.variables = [v[n] for v in f.variables]
         f_child.X = [v.n for v in f_child.variables]
-        f_child.A = [a] * length
+        f_child.A = [1] * length
 
         key = keys[n]
 
         f_child.issumhow = (variable[length * n], over, position)
-
-        f_child.case = case
+        f_child.parent = f
+        f_child.case = FCase.SUM
         f_child.rhs_thetas = []
         f.X.append(f_child.X)
         f_child.give_name()

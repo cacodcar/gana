@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from itertools import product
+from turtle import position
 from typing import TYPE_CHECKING, Self
 
 from numpy import isin
@@ -491,6 +492,8 @@ class F:
         sets self._, self.n
         """
 
+        print(self._one_map, self._one)
+
         # _one and _two are used because
         # they are created post handling an length mismatches
         for n, (one, one_idx, two, two_idx) in enumerate(
@@ -533,7 +536,6 @@ class F:
                     if self.one_type in [Elem.P, Elem.T]:
                         f.one = one
                     else:
-                        f.one = one()
                         f.one = one(*one_idx)
 
                 if self.two_type in [Elem.P, Elem.T]:
@@ -555,7 +557,6 @@ class F:
 
             # f.variables = [v(i) for v, i in zip(self.variables, index)]
             # update the map
-            self.map[index] = f
             f.A = self.A[n]
             f.B = self.B[n]
 
@@ -591,9 +592,11 @@ class F:
         self.pname: str = ''
 
         if self.case == FCase.SUM:
-            self.name = f'sigma({self.variables[0].parent}[{self.variables[0].pos}:{self.variables[-1].pos}])'
-        elif self.case == FCase.NEGSUM:
-            self.name = f'-sigma({self.variables[0].parent}[{self.variables[0].pos}:{self.variables[-1].pos}])'
+            variable, over, _ = self.issumhow
+
+            self.name = f'sigma({variable}({variable.index}),{over})'
+        # elif self.case == FCase.NEGSUM:
+        #     self.name = f'-sigma({self.variables[0].parent}[{self.variables[0].pos}:{self.variables[-1].pos}])'
         else:
             _name = ''
             if self.one is not None:
@@ -696,52 +699,58 @@ class F:
         # V*F (not implemented yet)
 
         # these (SUM, NEGSUM) are just boxes
-        if self.case == FCase.SUM:
-            # all positive
-            self.A = [[1] * len(self.index)] * len(self.index)
-            self.B = [0] * len(self.index)
+        # if self.case == FCase.SUM:
+        #     # all positive
+        #     self.A = [[1] * len(self.index)] * len(self.index)
+        #     self.B = [0] * len(self.index)
 
-        elif self.case == FCase.NEGSUM:
-            # all negative
-            self.A = [[-1] * len(self.index)] * len(self.index)
-            self.B = [0] * len(self.index)
+        # elif self.case == FCase.NEGSUM:
+        #     # all negative
+        #     self.A = [[-1] * len(self.index)] * len(self.index)
+        #     self.B = [0] * len(self.index)
 
-        else:
-            # update the elements in the function
-            if self.one_type == Elem.F:
-                # two can be F, V, P, or T
+        # else:
+        # update the elements in the function
+        if self.one_type == Elem.F:
+            # two can be F, V, P, or T
 
-                self.variables.extend(self.one.variables)
-                # irrespective, we only need to take A here
-                if self.mis > 0:
-                    # if there is a mismatch,
-                    # positive indicates that two is longer
-                    # so scale the A to match
-                    self.A = [row[:] for _ in range(self.mis) for row in self.one.A]
+            self.variables.extend(self.one.variables)
+            # irrespective, we only need to take A here
+            if self.mis > 0:
+                # if there is a mismatch,
+                # positive indicates that two is longer
+                # so scale the A to match
+                self.A = [row[:] for _ in range(self.mis) for row in self.one.A]
+            else:
+                self.A = self.one.A
+
+        elif self.one_type == Elem.V:
+            # two can be F, V, P, or T
+            self.variables.append(self.one)
+            # irrespective, we only need to take A here
+            if self.mis > 0:
+                # if there is a mismatch,
+                # positive indicates that two is longer
+                # so scale the A to match
+                self.A = [row[:] for _ in range(self.mis) for row in self.one.A]
+            else:
+                self.A = self.one.A
+
+        elif self.one_type == Elem.T:
+            # TODO Bilevel: this is only possible for multiplication of variable/function with theta
+            pass
+
+        elif self.one_type == Elem.P:
+            # this is only possible if mul is True
+            # and two is V
+            self.mul_parameters.append(self.one)
+            if self.mul:
+                if self.two_type == Elem.F and self.two.case == FCase.SUM:
+                    if self.two.parent is not None:
+                        self.A = [self.one._[0] * i for i in self.two.A]
+                    else:
+                        self.A = [[self.one._[0] * i for i in j] for j in self.two.A]
                 else:
-                    self.A = self.one.A
-
-            elif self.one_type == Elem.V:
-                # two can be F, V, P, or T
-                self.variables.append(self.one)
-                # irrespective, we only need to take A here
-                if self.mis > 0:
-                    # if there is a mismatch,
-                    # positive indicates that two is longer
-                    # so scale the A to match
-                    self.A = [row[:] for _ in range(self.mis) for row in self.one.A]
-                else:
-                    self.A = self.one.A
-
-            elif self.one_type == Elem.T:
-                # TODO Bilevel: this is only possible for multiplication of variable/function with theta
-                pass
-
-            elif self.one_type == Elem.P:
-                # this is only possible if mul is True
-                # and two is V
-                self.mul_parameters.append(self.one)
-                if self.mul:
                     # so you A is a the parameter matrix
                     # self.A = self.one.A
                     if self.mis > 0:
@@ -751,103 +760,103 @@ class F:
                     else:
                         self.A = self.one.A
 
-                    # at this point, it can be of the type P*(V|F)
-                    # if F = V +- P, we use the operation P*V +- P*P
-                    # so P always shows up at two
-                    # if this is just of the form (P*V) or (P*F) where F = P*V
-                    # B will not be set if self.two_type is not P
-                    # it is just safe to set a B here, if needed it will be overwritten
-                    if self.mis > 0:
-                        # if there is a mismatch,
-                        # positive indicates that two is longer
-                        # make a B of length of two
-                        self.B = [0] * len(self._two)
-                    else:
-                        # if one is longer
-                        # or there is no mismatch (either one or two will do)
-                        self.B = [0] * len(self._one)
+                # at this point, it can be of the type P*(V|F)
+                # if F = V +- P, we use the operation P*V +- P*P
+                # so P always shows up at two
+                # if this is just of the form (P*V) or (P*F) where F = P*V
+                # B will not be set if self.two_type is not P
+                # it is just safe to set a B here, if needed it will be overwritten
+                if self.mis > 0:
+                    # if there is a mismatch,
+                    # positive indicates that two is longer
+                    # make a B of length of two
+                    self.B = [0] * len(self._two)
+                else:
+                    # if one is longer
+                    # or there is no mismatch (either one or two will do)
+                    self.B = [0] * len(self._one)
 
-            # update the elements in the function
-            if self.two_type == Elem.F:
-                # one could have been a V, T, or F
-                self.variables.extend(self.two.variables)
-                if self.one_type in [Elem.F, Elem.V]:
-                    # if V or F, A definitely exists, so update A
-                    if self.mis < 0:
-                        # if there is a mismatch,
-                        # negative indicates that one is longer
-                        # scale two's A to correct mismatch
-                        _A = [row[:] for _ in range(-self.mis) for row in self.two.A]
+        # update the elements in the function
+        if self.two_type == Elem.F:
+            # one could have been a V, T, or F
+            self.variables.extend(self.two.variables)
+            if self.one_type in [Elem.F, Elem.V]:
+                # if V or F, A definitely exists, so update A
+                if self.mis < 0:
+                    # if there is a mismatch,
+                    # negative indicates that one is longer
+                    # scale two's A to correct mismatch
+                    _A = [row[:] for _ in range(-self.mis) for row in self.two.A]
 
-                    else:
-                        _A = self.two.A
-                    if self.add:
-                        self.A = [a + b for a, b in zip(self.A, _A)]
-                    if self.sub:
-                        self.A = [a + [-bb for bb in b] for a, b in zip(self.A, _A)]
-
-            elif self.two_type == Elem.V:
-                # one could have been a V, T, or F
-                self.variables.append(self.two)
-
-                if self.one_type in [Elem.F, Elem.V]:
-                    # if V or F, A definitely exists, so update A
-                    if self.mis < 0:
-                        # if there is a mismatch,
-                        # negative indicates that one is longer
-                        # scale two's A to correct mismatch
-                        _A = [row[:] for _ in range(-self.mis) for row in self.two.A]
-                    else:
-                        _A = self.two.A
-
-                    if self.add:
-
-                        self.A = [a + b for a, b in zip(self.A, _A)]
-
-                    if self.sub:
-                        self.A = [a + [-bb for bb in b] for a, b in zip(self.A, _A)]
-
-            elif self.two_type == Elem.T:
-                # if self.one_type == Elem.F and self.one.two_type == Elem.T:
-                #     if self.add:
-                #         self.F = [i + [-1] for i in self.one.F]
-                #     if self.sub:
-                #         self.F = [i + [1] for i in self.one.F]
-                # else:
-                #     if self.add:
-                #         self.F = [[-1]] * len(self._one)
-                #     if self.sub:
-                #         self.F = [[1]] * len(self._one)
-                self.rhs_thetas.append(self.two)
-
-            if self.two_type == Elem.P:
-
-                # this is only possible for addition and subtraction
+                else:
+                    _A = self.two.A
                 if self.add:
-                    self.rhs_parameters.append(self.two)
-                    # if addition, since B is rhs, negate
-                    if self.mis < 0:
-                        # if there is a mismatch,
-                        # negative indicates that one is longer
-                        # so scale the parameter to match
-                        self.B = [-b for b in self.two._] * (-self.mis)
-                    else:
-                        self.B = [-b for b in self.two._]
-                elif self.sub:
-                    self.rhs_parameters.append(self.two)
-                    # if subtraction, since B is rhs, keep as is
-                    if self.mis < 0:
-                        # if there is a mismatch,
-                        # negative indicates that one is longer
-                        # so scale the parameter to match
-                        self.B = self.two._ * (-self.mis)
-                    else:
-                        self.B = self.two._
+                    self.A = [a + b for a, b in zip(self.A, _A)]
+                if self.sub:
+                    self.A = [a + [-bb for bb in b] for a, b in zip(self.A, _A)]
 
-            else:
-                # if not caught by the parameter check
-                # set a B of zeros
-                self.B = [0] * len(self.A)
+        elif self.two_type == Elem.V:
+            # one could have been a V, T, or F
+            self.variables.append(self.two)
+
+            if self.one_type in [Elem.F, Elem.V]:
+                # if V or F, A definitely exists, so update A
+                if self.mis < 0:
+                    # if there is a mismatch,
+                    # negative indicates that one is longer
+                    # scale two's A to correct mismatch
+                    _A = [row[:] for _ in range(-self.mis) for row in self.two.A]
+                else:
+                    _A = self.two.A
+
+                if self.add:
+
+                    self.A = [a + b for a, b in zip(self.A, _A)]
+
+                if self.sub:
+                    self.A = [a + [-bb for bb in b] for a, b in zip(self.A, _A)]
+
+        elif self.two_type == Elem.T:
+            # if self.one_type == Elem.F and self.one.two_type == Elem.T:
+            #     if self.add:
+            #         self.F = [i + [-1] for i in self.one.F]
+            #     if self.sub:
+            #         self.F = [i + [1] for i in self.one.F]
+            # else:
+            #     if self.add:
+            #         self.F = [[-1]] * len(self._one)
+            #     if self.sub:
+            #         self.F = [[1]] * len(self._one)
+            self.rhs_thetas.append(self.two)
+
+        if self.two_type == Elem.P:
+
+            # this is only possible for addition and subtraction
+            if self.add:
+                self.rhs_parameters.append(self.two)
+                # if addition, since B is rhs, negate
+                if self.mis < 0:
+                    # if there is a mismatch,
+                    # negative indicates that one is longer
+                    # so scale the parameter to match
+                    self.B = [-b for b in self.two._] * (-self.mis)
+                else:
+                    self.B = [-b for b in self.two._]
+            elif self.sub:
+                self.rhs_parameters.append(self.two)
+                # if subtraction, since B is rhs, keep as is
+                if self.mis < 0:
+                    # if there is a mismatch,
+                    # negative indicates that one is longer
+                    # so scale the parameter to match
+                    self.B = self.two._ * (-self.mis)
+                else:
+                    self.B = self.two._
+
+        else:
+            # if not caught by the parameter check
+            # set a B of zeros
+            self.B = [0] * len(self.A)
 
     # -----------------------------------------------------
     #                    Printing
@@ -1027,13 +1036,12 @@ class F:
         else:
             one_type = self.one_type
 
-        if self.add:
-            if self.case == FCase.SUM:
-                from ..operators.sigma import sigma
+        if self.case == FCase.SUM:
+            # -(E1 + ... + En) = -E1 - ... - En
+            # create and return a negative summation
+            return 
 
-                # -(E1 + ... + En) = -E1 - ... - En
-                # create and return a negative summation
-                return sigma(*self.issumhow, neg=True)
+        if self.add:
 
             return F(
                 # -(E1 + E2) = -E1 - E2
@@ -1488,6 +1496,14 @@ class F:
 
             # make a numeric parameter
             two = make_P(other, index=self.one.index)
+            if self.case == FCase.SUM:
+                return F(
+                    one=two,
+                    mul=True,
+                    two=self,
+                    one_type=Elem.P,
+                    two_type=Elem.F,
+                )
             if self.mul:
                 return F(one=two * self.one, mul=True, two=self.two)
 
@@ -1522,6 +1538,15 @@ class F:
             # make a parameter from the list
             two = make_P(other)
             # this by default is a parameter set
+
+            if self.case == FCase.SUM:
+                return F(
+                    one=two,
+                    mul=True,
+                    two=self,
+                    one_type=Elem.P,
+                    two_type=Elem.F,
+                )
 
             if self.mul:
                 return F(one=two * self.one, mul=True, two=self.two)
@@ -1558,6 +1583,8 @@ class F:
             )
 
         # what remains is P
+        if self.case == FCase.SUM:
+            return F(one=other, mul=True, two=self, one_type=Elem.P, two_type=Elem.F)
 
         if self.mul:
             return F(one=other * self.one, mul=True, two=self.two)
@@ -1566,6 +1593,7 @@ class F:
             return F(one=other * self.one, div=True, two=self.two)
 
         if self.add:
+
             if other < 0:
                 # multiplying a negative number
                 return F(one=other * self.one, sub=True, two=-other * self.two)
