@@ -14,6 +14,7 @@ from ..sets.theta import T
 from ..sets.variable import V
 from .solution import Solution
 
+
 from ppopt.mplp_program import MPLP_Program
 import numpy as np
 
@@ -551,6 +552,7 @@ class Prg:
             function_ex (F): existing function set to be mutated
             function_new (F): new function set to replace the existing one
         """
+
         # just replace the existing function set
         # take the old constraints number and pname
         function_new.n = function_ex.n
@@ -634,16 +636,20 @@ class Prg:
         constraint_new.n = constraint_ex.n
         constraint_new.pname = constraint_ex.pname
         if not constraint_ex.category == 'General':
+
             constraint_new.categorize(constraint_ex.category)
 
         # replace the constraint set in the program
-        self.constraint_sets[self.constraint_sets.index(constraint_ex)] = constraint_new
+        # self.constraint_sets[self.constraint_sets.index(constraint_ex)] = constraint_new
+        self.constraint_sets[constraint_ex.n] = constraint_new
 
         # replace the constraint in the program
         # let new constraint take n of the old constraint
         for cons_new, cons_ex in zip(constraint_new._, constraint_ex._):
 
-            self.constraints[self.constraints.index(cons_ex)] = cons_new
+            # self.constraints[self.constraints.index(cons_ex)] = cons_new
+            self.constraints[cons_ex.n] = cons_new
+
             cons_new.n = cons_ex.n
 
         for variable in self.variable_sets:

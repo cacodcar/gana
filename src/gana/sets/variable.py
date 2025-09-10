@@ -385,7 +385,7 @@ class V:
 
     def lp(self) -> str:
         """LP representation"""
-        return str(self)
+        return f'{self}_{self.pos}'
 
     @property
     def longname(self) -> str:
