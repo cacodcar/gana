@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ..sets.cases import Elem, FCase
-from itertools import product
+from itertools import islice
 from ..sets.function import F
 
 if TYPE_CHECKING:
@@ -31,22 +31,14 @@ def sigma(variable: V, over: I = None, position: int = None, neg: bool = False) 
         if not position:
             position = variable.index.index(over)
 
-        if position == 0:
-            # if this is the first index
-            _variables = [variable(_index, *variable.index[1:]) for _index in over]
+        # Precompute slices
+        before = variable.index[:position]
+        after = variable.index[position + 1 :]
 
-        if position == len(variable.index) - 1:
-            # if this is the last index
-            _variables = [variable(*variable.index[:-1], _index) for _index in over]
-
-        else:
-            # it is somewhere in the middle
-            _variables = [
-                variable(
-                    *variable.index[:position], _index, *variable.index[position + 1 :]
-                )
-                for _index in over
-            ]
+        # Build variables
+        _variables = [
+            variable(*before, _index, *after, make_new=True) for _index in over
+        ]
 
     else:
         # sum over the entire set
@@ -66,30 +58,59 @@ def sigma(variable: V, over: I = None, position: int = None, neg: bool = False) 
 
         return f
 
+    issumhow = (variable(), over, position)
+
     if neg:
         f = F(
             one=-_variables[0],
             sub=True,
             two=_variables[1],
-            issumhow=(variable(), over, position),
+            issumhow=issumhow,
         )
-        for v in _variables[2:]:
-            f -= v
+        for v in islice(_variables, 2, None):
+            f = F(
+                one=f,
+                sub=True,
+                two=v,
+                one_type=Elem.F,
+                two_type=Elem.V,
+                issumhow=issumhow,
+            )
 
         case = FCase.NEGSUM
         a = -1
     else:
+
         f = F(
             one=_variables[0],
             add=True,
             two=_variables[1],
-            issumhow=(variable(), over, position),
+            issumhow=issumhow,
         )
 
-        for v in _variables[2:]:
-            f += v
+        for v in islice(_variables, 2, None):
+            f = F(
+                one=f,
+                add=True,
+                two=v,
+                one_type=Elem.F,
+                two_type=Elem.V,
+                issumhow=issumhow,
+            )
+            # f += v
+
+        # other options for looping,
+        # all avoid recurssion
+
+        # for i in range(2, len(_variables)):
+        #     f += _variables[i]
+
+        # for v in _variables[2:]:
+        #     f += v
+
         case = FCase.SUM
         a = 1
+
     f.variables = _variables
     # f.one_type = Elem.F
     # f.two_type = Elem.V
@@ -97,17 +118,17 @@ def sigma(variable: V, over: I = None, position: int = None, neg: bool = False) 
     f.rhs_thetas = []
     length_var = len(_variables[0])
 
-    keys = list(zip(*[v.map for v in f.variables]))
+    keys = list(zip(*(v.map for v in f.variables)))
 
-    f.A = [[a] * length] * length_var
+    f.A = [[a] * length for _ in range(length_var)]
 
     for n in range(length_var):
         # make the child functions
         f_child = F()
 
         f_child.variables = [v[n] for v in f.variables]
-        f_child.A = [a] * length
         f_child.X = [v.n for v in f_child.variables]
+        f_child.A = [a] * length
 
         key = keys[n]
 
@@ -126,106 +147,4 @@ def sigma(variable: V, over: I = None, position: int = None, neg: bool = False) 
         f_child.one = f_child
         f_child.one_type = Elem.F
 
-    # f.A = [[1] * length] * len(_variables[0])
-    # f._ = []
-
-    # for i in zip(*maps):
-    #     print(i)
-
-    # keys = [v.map.keys() for v in f.variables]
-    # values = [v.map.values() for v in f.variables]
-
-    # keys_ = []
-    # values_ = []
-    # for i in zip(*keys):
-    #     keys_.append(i)
-    # for i in zip(*values):
-    #     values_.append(sum(i))
-
-    # f.map = {k: v for k, v in zip(keys_, values_)}
-
-    # for f_child in f._:
-    #     f_child.parent = f
-    #     f_child.one_type = Elem.F
-    #     f_child.two_type = Elem.V
-    #     f_child.case = case
-    #     f_child.issumhow = (variable.copy(), variable.index, position)
-
     return f
-
-    # if over is None:
-    #     f_lhs = None
-    #     for v in variable[:-1]:
-    #         f_lhs += v
-    #     f = f_lhs + variable[-1]
-    #     f.one_type = Elem.F
-    #     f.two_type = Elem.V
-    #     f.case = FCase.SUM
-    #     f.issumhow = (variable.copy(), over, position)
-    #     for f_child in f._:
-    #         f_child.one_type = Elem.F
-    #         f_child.two_type = Elem.V
-    #         f_child.case = FCase.SUM
-    #     return f
-
-    # if not position:
-    #     position = variable.index.index(over)
-
-    # if position == 0:
-    #     # if this is the first index
-    #     _variables = [variable(_index, *variable.index[1:]) for _index in over]
-    # if position == len(variable.index) - 1:
-    #     # if this is the last index
-    #     _variables = [variable(*variable.index[:-1], _index) for _index in over]
-
-    # else:
-    #     # it is somewhere in the middle
-    #     _variables = [
-    #         variable(
-    #             *variable.index[:position], _index, *variable.index[position + 1 :]
-    #         )
-    #         for _index in over
-    #     ]
-
-    # if len(over) == 2:
-    #     # this is essentially just v_0 + v_1
-    #     f = _variables[0] + _variables[1]
-    #     f.one_type = Elem.V
-    #     f.two_type = Elem.V
-    #     f.case = FCase.SUM
-    #     f.issumhow = (variable.copy(), over, position)
-    #     for f_child in f._:
-    #         f_child.one_type = Elem.V
-    #         f_child.two_type = Elem.V
-    #         f_child.case = FCase.SUM
-    #     return f
-
-    # f_lhs = None
-
-    # if neg:
-    #     for v in _variables[:-1]:
-    #         f_lhs -= v
-
-    #     f = f_lhs - _variables[-1]
-    #     f.one_type = Elem.F
-    #     f.two_type = Elem.V
-    #     f.case = FCase.NEGSUM
-    #     f.issumhow = (variable.copy(), over, position)
-    #     for f_child in f._:
-    #         f_child.one_type = Elem.F
-    #         f_child.two_type = Elem.V
-    #         f_child.case = FCase.NEGSUM
-    #     return f
-
-    # for v in _variables[:-1]:
-    #     f_lhs += v
-    # f = f_lhs + _variables[-1]
-    # f.one_type = Elem.F
-    # f.two_type = Elem.V
-    # f.case = FCase.SUM
-    # f.issumhow = (variable.copy(), over, position)
-    # for f_child in f._:
-    #     f_child.one_type = Elem.F
-    #     f_child.two_type = Elem.V
-    #     f_child.case = FCase.SUM
-    # return f
