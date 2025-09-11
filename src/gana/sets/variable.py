@@ -3,14 +3,11 @@
 from __future__ import annotations
 
 from itertools import product
-from math import prod
 from typing import TYPE_CHECKING, Self
-
 
 from .birth import make_P, make_T
 
 from IPython.display import Math, display
-from copy import deepcopy
 
 from .cases import Elem, FCase
 from .constraint import C
@@ -175,7 +172,7 @@ class V:
         self.min_by: list[O] = []
 
         # value after optimization
-        self.value = None
+        self.value = {}
 
         # these keep variables consistent with functions for some operations
         # Take the example of a variable set - parameter set
@@ -327,15 +324,15 @@ class V:
     #                    Solution
     # -----------------------------------------------------
 
-    def sol(self, aslist: bool = False) -> list[float] | None:
+    def sol(self, n_sol: int = 0, aslist: bool = False) -> list[float] | None:
         """Solution
         Args:
             aslist (bool, optional): Returns values taken as list. Defaults to False.
         """
         if aslist:
-            return [v.value for v in self._]
+            return [v.value[n_sol] for v in self._]
         for v in self._:
-            display(Math(v.latex() + r'=' + rf'{v.value}'))
+            display(Math(v.latex() + r'=' + rf'{v.value[n_sol]}'))
 
     # -----------------------------------------------------
     #                    Printing
@@ -967,8 +964,6 @@ class V:
                 # or no key is passed
                 self.make_copy = True
                 return self
-
-        
 
         # the check helps to handle if a variable itself is an index
         # we do not want to iterate over the entire variable set
