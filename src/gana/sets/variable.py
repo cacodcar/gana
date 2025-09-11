@@ -172,7 +172,7 @@ class V:
         self.min_by: list[O] = []
 
         # value after optimization
-        self.value = None
+        self.value = {}
 
         # these keep variables consistent with functions for some operations
         # Take the example of a variable set - parameter set
@@ -231,7 +231,6 @@ class V:
         if self.name:
             return r'{' + self.name.replace('_', r'\_') + r'}'
         return self._ltx
-
 
     # -----------------------------------------------------
     #                   Matrix
@@ -325,15 +324,15 @@ class V:
     #                    Solution
     # -----------------------------------------------------
 
-    def sol(self, aslist: bool = False) -> list[float] | None:
+    def sol(self, n_sol: int = 0, aslist: bool = False) -> list[float] | None:
         """Solution
         Args:
             aslist (bool, optional): Returns values taken as list. Defaults to False.
         """
         if aslist:
-            return [v.value for v in self._]
+            return [v.value[n_sol] for v in self._]
         for v in self._:
-            display(Math(v.latex() + r'=' + rf'{v.value}'))
+            display(Math(v.latex() + r'=' + rf'{v.value[n_sol]}'))
 
     # -----------------------------------------------------
     #                    Printing

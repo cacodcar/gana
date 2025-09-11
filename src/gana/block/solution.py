@@ -25,7 +25,7 @@ class Solution:
 
         self._: dict[str, dict[str, list]] = {}
 
-    def update(self, variable_sets: list[V]):
+    def update(self, variable_sets: list[V], n_sol: int = 0):
         """Add variables to the solution"""
         for v in variable_sets:
             if v.parent.name not in self._:
@@ -41,7 +41,7 @@ class Solution:
             self._[v.parent.name]['index_latex'].append(r'$' + v.latex(True) + r'$')
             self._[v.parent.name]['positions'].append(v.pos)
             self._[v.parent.name]['n'].append(v.n)
-            self._[v.parent.name]['values'].append(v.value)
+            self._[v.parent.name]['values'].append(v.value[n_sol])
             self._[v.parent.name]['index'].append(
                 {
                     idx.name: {par.name: pos for par, pos in zip(idx.parent, idx.pos)}

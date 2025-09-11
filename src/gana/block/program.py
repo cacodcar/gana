@@ -1337,18 +1337,18 @@ class Prg:
                 print('--- Solution found. Use .sol() to display it')
 
                 vals = [v.X for v in m.getVars()]
-
+                n_sol = len(self.solution)
                 for v, val in zip(self.variables, vals):
-                    v.value = val
+                    v.value[n_sol] = val
 
                 for c in self.constraint_sets:
-                    c.function.eval()
-                self.objectives[0].value = m.ObjVal
+                    c.function.eval(n_sol=n_sol)
+                self.objectives[-1].value = m.ObjVal
                 self.optimized = True
 
                 print('--- Creating Solution object, check.solution')
 
-                self.solution[len(self.solution)] = self.birth_solution()
+                self.solution[n_sol] = self.birth_solution()
 
             except AttributeError:
                 print('!!! No solution found. Check the model.')
@@ -1375,7 +1375,7 @@ class Prg:
     #     """Slack in each constraint"""
     #     return {c: c._ for c in self.leqcons()}
 
-    def sol(self, slack: bool = True):
+    def sol(self, n_sol: int = 0, slack: bool = True):
         """Print sol"""
 
         if not self.optimized:
@@ -1392,18 +1392,19 @@ class Prg:
         display(Markdown(r'## Variables'))
 
         for v in self.variable_sets:
-            v.sol()
+            v.sol(n_sol=n_sol)
 
         if slack:
             print()
             display(Markdown(r'## Constraint Slack'))
             for c in self.leqcons():
-                c.sol()
+                c.sol(n_sol=n_sol)
 
     def birth_solution(self):
         """Makes a solution object for the program"""
-        solution = Solution(self.name + '_solution_' + str(len(self.solution)))
-        solution.update(self.variables)
+        n_sol = len(self.solution)
+        solution = Solution(self.name + '_solution_' + str(n_sol))
+        solution.update(self.variables, n_sol=n_sol)
         return solution
 
     # # Displaying the program

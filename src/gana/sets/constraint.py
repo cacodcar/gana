@@ -249,11 +249,11 @@ class C:
     #                    Solution
     # -----------------------------------------------------
 
-    def sol(self):
+    def sol(self, n_sol: int = 0):
         """Solution"""
         for c in self._:
             if self.leq:
-                display(Math(c.function.latex() + r'=' + rf'{c.function.value}'))
+                display(Math(c.function.latex() + r'=' + rf'{c.function.value[n_sol]}'))
 
     # -----------------------------------------------------
     #                    Operators

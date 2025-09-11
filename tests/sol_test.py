@@ -115,12 +115,12 @@ def p_energy():
 
 
 def test_sol(p_energy):
-    assert p_energy.capp.sol(True) == [150.0, 100.0, 200.0]
-    assert p_energy.caps.sol(True) == [200.0]
-    assert p_energy.sell.sol(True) == [50.0, 100.0, 50.0]
-    assert p_energy.con.sol(True) == [150.0, 0.0, 50.0]
-    assert p_energy.inv.sol(True) == [100.0, 0.0, 0.0]
-    assert p_energy.prod.sol(True) == [
+    assert p_energy.capp.sol(aslist=True) == [150.0, 100.0, 200.0]
+    assert p_energy.caps.sol(aslist=True) == [200.0]
+    assert p_energy.sell.sol(aslist=True) == [50.0, 100.0, 50.0]
+    assert p_energy.con.sol(aslist=True) == [150.0, 0.0, 50.0]
+    assert p_energy.inv.sol(aslist=True) == [100.0, 0.0, 0.0]
+    assert p_energy.prod.sol(aslist=True) == [
         150.0,
         0.0,
         50.0,
@@ -131,9 +131,9 @@ def test_sol(p_energy):
         100.0,
         0.0,
     ]
-    assert p_energy.ex_cap.sol(True) == [750000.0, 100000.0, 0.0]
-    assert p_energy.ex_fop.sol(True) == [75000.0, 10000.0, 0.0]
-    assert p_energy.ex_vop.sol(True) == [2000.0, 5000.0, 0.0]
+    assert p_energy.ex_cap.sol(aslist=True) == [750000.0, 100000.0, 0.0]
+    assert p_energy.ex_fop.sol(aslist=True) == [75000.0, 10000.0, 0.0]
+    assert p_energy.ex_vop.sol(aslist=True) == [2000.0, 5000.0, 0.0]
     assert p_energy.o.sol(True) == 942000.0
 
 
