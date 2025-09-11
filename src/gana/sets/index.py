@@ -235,7 +235,6 @@ class I:
         # mathcal = rf'\mathcal{{{name}{sup}}}'
 
         if self.parent:
-
             return ltx
 
         if self.case == ICase.SELF:
@@ -250,7 +249,7 @@ class I:
                         rf'{self._[0]} \leq i \leq {self._[-1]} \}}'
                     )
                 members = (
-                    r', '.join(str(x) for x in self._)
+                    r', '.join(x.latex() for x in self._)
                     if len(self) < 5
                     else rf'{self._[0].latex()},..,{self._[-1].latex()}'
                 )
