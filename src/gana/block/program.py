@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 
 from ..sets.cases import PCase, ICase, Elem
 from ..sets.constraint import C
-from ..sets.function import F
+from ..sets.function import F as Func
 from ..sets.index import I
 
 from ..sets.objective import O
@@ -13,7 +13,7 @@ from ..sets.parameter import P
 from ..sets.theta import T
 from ..sets.variable import V
 from .solution import Solution
-
+from ..operators.composition import sup, inf
 
 from ppopt.mplp_program import MPLP_Program
 import numpy as np
@@ -101,8 +101,8 @@ class Prg:
         self.thetas: list[T] = []
 
         # function (F)
-        self.function_sets: list[F] = []
-        self.functions: list[F] = []
+        self.function_sets: list[Func] = []
+        self.functions: list[Func] = []
 
         # constraint (C)
         self.constraint_sets: list[C] = []
@@ -111,8 +111,8 @@ class Prg:
         self.categories_sets: dict[str, list[C]] = {}  # categories of constraint sets
         self.categories: dict[str, list[C]] = {}  # categories of constraints
 
-        self.fcategories_sets: dict[str, list[F]] = {}  # categories of function sets
-        self.fcategories: dict[str, list[F]] = {}  # categories of functions
+        self.fcategories_sets: dict[str, list[Func]] = {}  # categories of function sets
+        self.fcategories: dict[str, list[Func]] = {}  # categories of functions
 
         # objective (O)
         self.objectives: list[O] = []
@@ -161,7 +161,7 @@ class Prg:
         self.optimized = False
 
         # the solution object
-        self.solution: Solution = None
+        self.solution: dict[int, Solution] = {}
 
     def add_index(self, name: str, index: I):
         """Adds new index to program
@@ -515,7 +515,7 @@ class Prg:
             self.n_thetas += n
             self.thetas.extend(tht_add)
 
-    def add_function(self, name: str, function: F):
+    def add_function(self, name: str, function: Func):
         """Add a function set to the program
 
         Args:
@@ -545,7 +545,7 @@ class Prg:
         # # update the number of functions
         self.n_functions += len(function._)
 
-    def replace_function(self, function_ex: F, function_new: F):
+    def replace_function(self, function_ex: Func, function_new: Func):
         """Replaces an existing function set in the program
 
         Args:
@@ -828,7 +828,7 @@ class Prg:
                 _mutation = True
                 self.mutate_theta(theta_ex, value)
 
-        elif isinstance(value, F):
+        elif isinstance(value, Func):
             if not name in self.names_function_sets:
                 self.add_function(name, value)
             else:
@@ -1232,7 +1232,7 @@ class Prg:
 
             if self.objectives:
                 # the objective is: N   OBJECTIVE_NAME
-                f.write(f'{ws}N{ws*3}{self.objectives[0].mps()}\n')
+                f.write(f'{ws}N{ws*3}{self.objectives[-1].mps()}\n')
 
             for c in leq_cons:
                 # less than or equal constraints are: L   CONSTRAINT_NAME
@@ -1347,14 +1347,23 @@ class Prg:
                 self.optimized = True
 
                 print('--- Creating Solution object, check.solution')
-                self.solution = self.birth_solution()
+
+                self.solution[len(self.solution)] = self.birth_solution()
 
             except AttributeError:
                 print('!!! No solution found. Check the model.')
 
-    # def vars(self):
-    #     """Optimal Variable Values"""
-    #     return {v: v._ for v in self.variables}
+    def lb(self, function: V | Func):
+        """Finds the lower bound of a variable or function"""
+        # set the objective to minimizing the variable
+        setattr(self, f'min({function})', inf(function))
+        self.opt()
+
+    def ub(self, function: V | Func):
+        """Finds the upper bound of a variable or function"""
+        # set the objective to maximizing the variable
+        setattr(self, f'max({function})', sup(function))
+        self.opt()
 
     def obj(self):
         """Objective Values"""
@@ -1393,7 +1402,7 @@ class Prg:
 
     def birth_solution(self):
         """Makes a solution object for the program"""
-        solution = Solution(self.name + '_solution')
+        solution = Solution(self.name + '_solution_' + str(len(self.solution)))
         solution.update(self.variables)
         return solution
 
@@ -1420,11 +1429,18 @@ class Prg:
     #                 display(c.latex())
 
     def show(
-        self, descriptive: bool = False, nncons: bool = False, categorical: bool = False
+        self,
+        descriptive: bool = False,
+        nncons: bool = False,
+        categorical: bool = False,
+        category: str = None,
     ):
         """Pretty Print"""
 
         display(Markdown(rf'# Mathematical Program for {self}'))
+
+        if category:
+            categorical = True
 
         if self.index_sets:
             print()
@@ -1449,19 +1465,25 @@ class Prg:
             if categorical:
                 # gather the categories if not already done
                 categories: dict[str, list[C]] = {}
-                fcategories: dict[str, list[F]] = {}
+                fcategories: dict[str, list[Func]] = {}
                 for c in self.cons():
                     if c.category not in categories:
                         categories[c.category] = []
                     categories[c.category].append(c)
-                sorted_categories = sorted(categories.keys())
+                if category and category in categories:
+                    sorted_categories = [category]
+                else:
+                    sorted_categories = sorted(categories.keys())
                 self.categories = categories
 
                 for f in self.function_sets:
                     if f.category not in fcategories:
                         fcategories[f.category] = []
                     fcategories[f.category].append(f)
-                sorted_fcategories = sorted(fcategories.keys())
+                if category and category in fcategories:
+                    sorted_fcategories = [category]
+                else:
+                    sorted_fcategories = sorted(fcategories.keys())
                 self.fcategories = fcategories
 
                 for category in sorted_categories:
@@ -1508,22 +1530,26 @@ class Prg:
             if categorical:
                 # gather the categories if not already done
                 categories_sets: dict[str, list[C]] = {}
-                fcategories_sets: dict[str, list[F]] = {}
+                fcategories_sets: dict[str, list[Func]] = {}
 
                 for c in self.constraint_sets:
                     if c.category not in categories_sets:
                         categories_sets[c.category] = []
                     categories_sets[c.category].append(c)
-
-                sorted_categories = sorted(categories_sets.keys())
+                if category and category in categories_sets:
+                    sorted_categories = [category]
+                else:
+                    sorted_categories = sorted(categories_sets.keys())
                 self.categories_sets = categories_sets
 
                 for f in self.function_sets:
                     if f.category not in fcategories_sets:
                         fcategories_sets[f.category] = []
                     fcategories_sets[f.category].append(f)
-
-                sorted_fcategories = sorted(fcategories_sets.keys())
+                if category and category in fcategories_sets:
+                    sorted_fcategories = [category]
+                else:
+                    sorted_fcategories = sorted(fcategories_sets.keys())
                 self.fcategories_sets = fcategories_sets
 
                 for category in sorted_categories:
@@ -1555,9 +1581,9 @@ class Prg:
                     for f in self.function_sets:
                         f.show()
 
-    def draw(self, variable: V):
+    def draw(self, variable: V, n_sol: int = 0):
         """Plots the solution for a variable"""
-        self.solution.draw(variable)
+        self.solution[n_sol].draw(variable)
 
     # -----------------------------------------------------
     #                    Hashing

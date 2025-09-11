@@ -3,14 +3,11 @@
 from __future__ import annotations
 
 from itertools import product
-from math import prod
 from typing import TYPE_CHECKING, Self
-
 
 from .birth import make_P, make_T
 
 from IPython.display import Math, display
-from copy import deepcopy
 
 from .cases import Elem, FCase
 from .constraint import C
@@ -234,6 +231,7 @@ class V:
         if self.name:
             return r'{' + self.name.replace('_', r'\_') + r'}'
         return self._ltx
+
 
     # -----------------------------------------------------
     #                   Matrix
@@ -967,8 +965,6 @@ class V:
                 # or no key is passed
                 self.make_copy = True
                 return self
-
-        
 
         # the check helps to handle if a variable itself is an index
         # we do not want to iterate over the entire variable set

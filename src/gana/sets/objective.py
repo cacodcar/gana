@@ -19,6 +19,8 @@ class O:
             # if the function is defined using a variable element
             self.function = function[0]
             # the A matrix becomes the C matrix
+
+
             self.C = self.function.A
 
         else:
