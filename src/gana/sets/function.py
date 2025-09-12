@@ -202,7 +202,7 @@ class F:
                 # matrix is passed on to the birthed functions
                 self.birth_functions()
                 # make a matrix of positions
-                self.X = [f.X for f in self._]
+                self.X = [f.X for f in self._ if f is not None]
 
             else:
                 self.update_variables()
@@ -525,9 +525,17 @@ class F:
                 # you can have just a P or T masquerading as a function
                 # so check are unnecessary
                 # f = one(*one.index)
-                f = one()
-                f.map[tuple(index)] = f
+
                 index = tuple(index)
+                
+                if isinstance(one, (int, float)):
+                    # this happens when there is a skipped index
+                    self.map[index] = None
+                    self._.append(None)
+                    continue
+                else:
+                    f = one()
+                    f.map[index] = f
 
             else:
                 # this is done to handle skipping
@@ -537,6 +545,7 @@ class F:
 
                 else:
                     index += (two_idx,)
+
                 index = tuple(index)
 
                 f = F()
@@ -564,12 +573,11 @@ class F:
                 f.update_variables()
                 f.give_name()
                 f.map[one_idx, two_idx] = f
+                f.A = self.A[n]
+                f.B = self.B[n]
 
-            # f.variables = [v(i) for v, i in zip(self.variables, index)]
             # update the map
             self.map[index] = f
-            f.A = self.A[n]
-            f.B = self.B[n]
 
             # only member of the birthed function is itself
             f._ = [f]
@@ -1805,7 +1813,7 @@ class F:
     #                    Solution
     # -----------------------------------------------------
 
-    def eval(self, n_sol:int = 0):
+    def eval(self, n_sol: int = 0):
         """Evaluates the value of the function"""
         one, two = None, None
         # if this is a function, set
