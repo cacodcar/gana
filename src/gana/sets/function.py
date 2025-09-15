@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 from itertools import product
-from turtle import position
 from typing import TYPE_CHECKING, Self
 
-from numpy import isin
 
 from .birth import make_P, make_T
 from .cases import Elem, FCase, PCase
@@ -527,7 +525,7 @@ class F:
                 # f = one(*one.index)
 
                 index = tuple(index)
-                
+
                 if isinstance(one, (int, float)):
                     # this happens when there is a skipped index
                     self.map[index] = None
@@ -551,10 +549,12 @@ class F:
                 f = F()
                 f.parent = self
                 f.index = index
+
                 if one:
                     if self.one_type in [Elem.P, Elem.T]:
                         f.one = one
                     else:
+
                         f.one = one(*one_idx)
 
                 if self.two_type in [Elem.P, Elem.T]:
@@ -937,7 +937,11 @@ class F:
                 return rf'-{ltx}'
             return rf'{ltx}'
 
-        if self.one is not None:
+        if self.one is None and self.mul:
+
+            one = '0'
+
+        elif self.one is not None:
             # _one = self.one(self.index.one)
             if self.one_type == Elem.P and self.parent:
                 # if this is a child function with a parameter
