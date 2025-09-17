@@ -172,7 +172,7 @@ class V:
         self.min_by: list[O] = []
 
         # value after optimization
-        self.value = {}
+        self.X = {}
 
         # these keep variables consistent with functions for some operations
         # Take the example of a variable set - parameter set
@@ -200,6 +200,7 @@ class V:
         self.make_copy: bool = False
 
         self.category: str = ''
+
 
     @property
     def matrix(self) -> dict:
@@ -330,9 +331,9 @@ class V:
             aslist (bool, optional): Returns values taken as list. Defaults to False.
         """
         if aslist:
-            return [v.value[n_sol] for v in self._]
+            return [v.X[n_sol] for v in self._]
         for v in self._:
-            display(Math(v.latex() + r'=' + rf'{v.value[n_sol]}'))
+            display(Math(v.latex() + r'=' + rf'{v.X[n_sol]}'))
 
     # -----------------------------------------------------
     #                    Printing

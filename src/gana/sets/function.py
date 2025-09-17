@@ -113,7 +113,7 @@ class F:
         self.issumhow = issumhow
 
         # evaluates the value of the function
-        self.value: {int, float} = {}
+        self.X: {int, float} = {}
 
         # calculated variable
         self.calculation: V = None
@@ -1830,33 +1830,33 @@ class F:
             if function.case == FCase.SUM:
                 # if this is a summation
                 # avoid recursion
-                return sum([v.value[n_sol] for v in function.variables])
+                return sum([v.X[n_sol] for v in function.variables])
             if function.case == FCase.NEGSUM:
                 # if this is a negation
                 # avoid recursion
-                return -sum([v.value[n_sol] for v in function.variables])
+                return -sum([v.X[n_sol] for v in function.variables])
             if function.case == FCase.NEGVAR:
                 # if this is a negated variable
                 # return the value of the variable
-                return -function.two.value[n_sol]
+                return -function.two.X[n_sol]
             if function.case == FCase.FVAR:
                 # if this is a variable being treated as a function
                 # return the value of the variable
-                return function.two.value[n_sol]
+                return function.two.X[n_sol]
 
             return function.eval(n_sol)
 
         if self.parent.one_type == Elem.P:
             one = self.one
         elif self.parent.one_type == Elem.V:
-            one = self.one.value[n_sol]
+            one = self.one.X[n_sol]
         elif self.parent.one_type == Elem.F:
             one = function_eval(self.one)
 
         if self.parent.two_type == Elem.P:
             two = self.two
         elif self.parent.two_type == Elem.V:
-            two = self.two.value[n_sol]
+            two = self.two.X[n_sol]
         elif self.parent.two_type == Elem.F:
             two = function_eval(self.two)
 
@@ -1865,23 +1865,23 @@ class F:
                 one = 1
             if not two:
                 two = 1
-            self.value[n_sol] = one * two
+            self.X[n_sol] = one * two
         if self.div:
-            self.value[n_sol] = one / two
+            self.X[n_sol] = one / two
         if self.add:
             if not one:
                 one = 0
             if not two:
                 two = 0
-            self.value[n_sol] = one + two
+            self.X[n_sol] = one + two
         if self.sub:
             if not one:
                 one = 0
             if not two:
                 two = 0
-            self.value[n_sol] = one - two
+            self.X[n_sol] = one - two
 
-        return self.value[n_sol]
+        return self.X[n_sol]
 
     # -----------------------------------------------------
     #                    Hashing

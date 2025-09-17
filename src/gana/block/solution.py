@@ -41,7 +41,7 @@ class Solution:
             self._[v.parent.name]['index_latex'].append(r'$' + v.latex(True) + r'$')
             self._[v.parent.name]['positions'].append(v.pos)
             self._[v.parent.name]['n'].append(v.n)
-            self._[v.parent.name]['values'].append(v.value[n_sol])
+            self._[v.parent.name]['values'].append(v.X[n_sol])
             self._[v.parent.name]['index'].append(
                 {
                     idx.name: {par.name: pos for par, pos in zip(idx.parent, idx.pos)}

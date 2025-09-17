@@ -163,6 +163,13 @@ class Prg:
         # the solution object
         self.solution: dict[int, Solution] = {}
 
+        # number of solutions
+        self.n_sol: int = 0
+
+        # solution matrix
+
+        self.X: dict[int, list[float | int]] = {}
+
     def add_index(self, name: str, index: I):
         """Adds new index to program
 
@@ -1336,24 +1343,23 @@ class Prg:
             try:
                 print('--- Solution found. Use .sol() to display it')
 
-                vals = [v.X for v in m.getVars()]
+                self.X[self.n_sol] = [v.X for v in m.getVars()]
 
-                # there could be multiple solutions
-                # based on different objectives
-                n_sol = len(self.solution)
+                for v, val in zip(self.variables, self.X[self.n_sol]):
 
-                for v, val in zip(self.variables, vals):
-                    v.value[n_sol] = val
+                    v.X[self.n_sol] = val
 
                 for c in self.constraint_sets:
-                    c.function.eval(n_sol=n_sol)
+                    c.function.eval(n_sol=self.n_sol)
 
-                self.objectives[-1].value = m.ObjVal
+                self.objectives[-1].X = m.ObjVal
                 self.optimized = True
 
                 print('--- Creating Solution object, check.solution')
 
-                self.solution[n_sol] = self.birth_solution()
+                self.solution[self.n_sol] = self.birth_solution()
+
+                self.n_sol += 1
 
             except AttributeError:
                 print('!!! No solution found. Check the model.')
@@ -1373,8 +1379,8 @@ class Prg:
     def obj(self):
         """Objective Values"""
         if len(self.objectives) == 1:
-            return self.objectives[0].value
-        return {o: o.value for o in self.objectives}
+            return self.objectives[0].X
+        return {o: o.X for o in self.objectives}
 
     # def slack(self):
     #     """Slack in each constraint"""
@@ -1407,9 +1413,10 @@ class Prg:
 
     def birth_solution(self):
         """Makes a solution object for the program"""
-        n_sol = len(self.solution)
-        solution = Solution(self.name + '_solution_' + str(n_sol))
-        solution.update(self.variables, n_sol=n_sol)
+
+        solution = Solution(self.name + '_solution_' + str(self.n_sol))
+        solution.update(self.variables, n_sol=self.n_sol)
+
         return solution
 
     # # Displaying the program

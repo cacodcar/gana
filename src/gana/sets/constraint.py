@@ -253,7 +253,7 @@ class C:
         """Solution"""
         for c in self._:
             if self.leq:
-                display(Math(c.function.latex() + r'=' + rf'{c.function.value[n_sol]}'))
+                display(Math(c.function.latex() + r'=' + rf'{c.function.X[n_sol]}'))
 
     # -----------------------------------------------------
     #                    Operators
