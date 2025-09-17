@@ -169,9 +169,9 @@ class C:
         return self.function.A
 
     @property
-    def X(self) -> list[None | int]:
+    def P(self) -> list[None | int]:
         """Variables"""
-        return self.function.X
+        return self.function.P
 
     @property
     def B(self) -> float | None:

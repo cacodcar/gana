@@ -143,7 +143,7 @@ class F:
             self._ = []
             self.n = 0
             self.name, self.pname = '', ''
-            self.A, self.X, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
+            self.A, self.P, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
             self.variables = []
 
         elif one is not None or two is not None:
@@ -200,7 +200,7 @@ class F:
                 # matrix is passed on to the birthed functions
                 self.birth_functions()
                 # make a matrix of positions
-                self.X = [f.X for f in self._ if f is not None]
+                self.P = [f.P for f in self._ if f is not None]
 
             else:
                 self.update_variables()
@@ -230,7 +230,7 @@ class F:
             self._ = []
             self.n = 0
             self.name, self.pname = '', ''
-            self.A, self.X, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
+            self.A, self.P, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
             self.variables = []
 
         self.give_name()
@@ -246,7 +246,7 @@ class F:
             return self._matrix
 
         if self.parent is not None:
-            self._matrix = dict(zip(self.X, self.A))
+            self._matrix = dict(zip(self.P, self.A))
         else:
             self._matrix = {f: f.matrix for f in self._}
 
@@ -602,7 +602,7 @@ class F:
             self.variables.append(self.two)
 
         # make a matrix of positions of the variables
-        self.X = [v.n for v in self.variables if v is not None]
+        self.P = [v.n for v in self.variables if v is not None]
 
     def give_name(self):
         """Gives a name to the function"""
@@ -689,7 +689,7 @@ class F:
         ..math::
             \\mathrm{A} \\cdot \\mathbf{V} = \\mathrm{B} + \\mathrm{F} \\cdot θ
 
-        sets self.A, self.X, self.Y, self.Z, self.B, self.F
+        sets self.A, self.P, self.Y, self.Z, self.B, self.F
 
         """
 
@@ -1713,7 +1713,7 @@ class F:
         f.name, f.pname, f.n = self.name, self.pname, self.n
         f.A = []
         f.B = []
-        f.X = []
+        f.P = []
         f.index = key
 
         # should be able to map these
@@ -1798,7 +1798,7 @@ class F:
                 f.rhs_thetas = [t(*i) for t, i in zip(self.rhs_thetas, theta_index)]
                 f.A.append(self.A[function.n])
                 f.B.append(self.B[function.n])
-                f.X.append(self.X[function.n])
+                f.P.append(self.P[function.n])
 
             f._.append(function)
 

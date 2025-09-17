@@ -75,7 +75,7 @@ def sigma(variable: V, over: I = None, position: int = None) -> F:
         f_child = F()
 
         f_child.variables = [v[n] for v in f.variables]
-        f_child.X = [v.n for v in f_child.variables]
+        f_child.P = [v.n for v in f_child.variables]
         f_child.A = [1] * length
 
         key = keys[n]
@@ -84,7 +84,7 @@ def sigma(variable: V, over: I = None, position: int = None) -> F:
         f_child.parent = f
         f_child.case = FCase.SUM
         f_child.rhs_thetas = []
-        f.X.append(f_child.X)
+        f.P.append(f_child.P)
         f_child.give_name()
         f_child._ = [f_child]
         f._.append(f_child)

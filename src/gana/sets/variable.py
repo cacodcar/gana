@@ -185,7 +185,7 @@ class V:
         self.struct = (Elem.V, None)
         self.case = FCase.VAR
         # TODO: check
-        self.X = [self.n]
+        self.P = [self.n]
 
         self.copyof: Self = None
 

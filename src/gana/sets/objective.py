@@ -20,7 +20,6 @@ class O:
             self.function = function[0]
             # the A matrix becomes the C matrix
 
-
             self.C = self.function.A
 
         else:
@@ -56,7 +55,7 @@ class O:
             v.min_by.append(self)
 
     @property
-    def X(self):
+    def P(self):
         """Variable positions"""
         return [v.n for v in self.variables]
 

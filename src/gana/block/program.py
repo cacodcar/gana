@@ -944,7 +944,7 @@ class Prg:
             _A.append(row)
 
         for n, c in enumerate(constraints):
-            for x, a in zip(c.X, c.A):
+            for x, a in zip(c.P, c.A):
                 _A[n][x] = a
         return _A
 
@@ -980,16 +980,16 @@ class Prg:
 
             _C = [0] * len(self.variables)  # initialize with zeros
             for n, v in enumerate(obj.variables):
-                _C[obj.X[n]] = obj.C[n]
+                _C[obj.P[n]] = obj.C[n]
 
         return _C
 
         # TODO multiple objective
 
     @property
-    def X(self) -> list[list[int]]:
+    def P(self) -> list[list[int]]:
         """Structure of the constraint matrix"""
-        return [c.X for c in self.cons()]
+        return [c.P for c in self.cons()]
 
     @property
     def Z(self) -> list[list[int]]:
@@ -1005,7 +1005,7 @@ class Prg:
         _G = [[0] * len(self.variables) for _ in range(len(self.leqcons()))]
 
         for n, c in enumerate(self.leqcons()):
-            for x, a in zip(c.X, c.A):
+            for x, a in zip(c.P, c.A):
                 if x is not None:
                     _G[n][x] = a
 
@@ -1019,7 +1019,7 @@ class Prg:
         """
         _H = [[0] * len(self.variables) for _ in range(len(self.eqcons()))]
         for n, c in enumerate(self.eqcons()):
-            for x, a in zip(c.X, c.A):
+            for x, a in zip(c.P, c.A):
                 if x is not None:
                     _H[n][x] = a
         return _H
@@ -1270,7 +1270,7 @@ class Prg:
                     #     f.write(f'{c.matrix[v.n]}')
                     f.write(f'{c.matrix[v.n]}')
 
-                    # f.write(f'{c.A[c.X.index(v.n)]}')
+                    # f.write(f'{c.A[c.P.index(v.n)]}')
 
                     f.write('\n')
 
@@ -1286,7 +1286,7 @@ class Prg:
 
                     f.write(f'{o.function[0].matrix[v.n]}')
 
-                    # f.write(f'{c.A[c.X.index(v.n)]}')
+                    # f.write(f'{c.A[c.P.index(v.n)]}')
                     f.write('\n')
 
             # This gives the right-hand side of the constraints
@@ -1344,8 +1344,6 @@ class Prg:
 
                 for v, val in zip(self.variables, vals):
                     v.value[n_sol] = val
-
-                
 
                 for c in self.constraint_sets:
                     c.function.eval(n_sol=n_sol)
