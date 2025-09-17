@@ -51,38 +51,11 @@ def sigma(variable: V, over: I = None, position: int = None) -> F:
         # this checks for v_0 + v_1
         return _variables[0] + _variables[1]
 
-    # f = F(
-    #     one=_variables[0],
-    #     add=True,
-    #     two=_variables[1],
-    #     issumhow=issumhow,
-    # )
-
-    # for v in islice(_variables, 2, None):
-    #     f = F(
-    #         one=f,
-    #         add=True,
-    #         two=v,
-    #         one_type=Elem.F,
-    #         two_type=Elem.V,
-    #         issumhow=issumhow,
-    #     )
-    # f += v
-
-    # other options for looping,
-    # all avoid recurssion
-
-    # for i in range(2, len(_variables)):
-    #     f += _variables[i]
-
-    # for v in _variables[2:]:
-    #     f += v
-
     f = F()
 
     f.case = FCase.SUM
 
-    f.issumhow = (variable(), over, position)
+    f.issumhow = (variable.copy(), over, position)
 
     f.variables = _variables
     f.index = tuple(v.index for v in f.variables)

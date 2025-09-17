@@ -180,3 +180,34 @@ def p2():
 #     assert p.C == [[-40.0, -40.0, -30.0, -30.0, -30.0, 0, 0], [0, 0, 0, 0, 0, 3.0, 3.0]]
 #     assert p.variables == [p.x[0], p.x[1], p.y[0], p.y[1], p.y[2], p.z[0], p.z[1]]
 #     assert p.objectives == [p.o1, p.o2]
+
+
+@pytest.fixture
+def diet_problem():
+    p = Prg()
+    p.item = I('milk', 'cheese', 'apples', tag='food item')
+    p.x = V(p.item, tag='amount of food item to intake')
+    p.protein = P(p.item, _=[40, 20, 10])
+    p.vitA = P(p.item, _=[5, 40, 30])
+    p.vitB = P(p.item, _=[20, 30, 40])
+    p.vitC = P(p.item, _=[30, 50, 60])
+    p.cost = P(p.item, _=[1, 2.5, 3 / 4])
+
+    p.cons_protein = sum(p.protein(i) * p.x(i) for i in p.item) >= 80
+    p.cons_vitA = sum(p.vitA(i) * p.x(i) for i in p.item) >= 60
+
+    p.cons_vitB = sum(p.vitB(i) * p.x(i) for i in p.item) >= 50
+    p.cons_vitC = sum(p.vitC(i) * p.x(i) for i in p.item) >= 30
+
+    p.obj_cost = inf(sum(p.cost(i) * p.x(i) for i in p.item))
+    p.opt(using='gurobi')
+    return p
+
+
+def test_diet_problem(diet_problem):
+    assert diet_problem.x.sol(aslist=True) == [
+        1.5652173913043477,
+        0.0,
+        1.7391304347826089,
+    ]
+    assert diet_problem.obj_cost.sol(True) == 2.869565217391304

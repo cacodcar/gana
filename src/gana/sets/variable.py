@@ -947,7 +947,7 @@ class V:
     def __call__(self, *key: I, make_new: bool = False) -> Self:
 
         def lister(inp: tuple[I]) -> tuple[I | list[V]]:
-            return tuple([i] if isinstance(i, V) else i for i in key)
+            return tuple([i] if isinstance(i, V) else i for i in inp)
 
         # if a dependent variable is being passed in the key
         # extract variable from the index (it will be in a list)

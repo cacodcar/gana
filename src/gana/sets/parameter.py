@@ -1624,6 +1624,9 @@ class P:
 
     def __call__(self, *key: I) -> Self:
 
+        def lister(inp: tuple[I]) -> tuple[I | list[V]]:
+            return tuple([i] if isinstance(i, V) else i for i in inp)
+
         # if a dependent variable is being passed in the key
         # extract variable from the index (it will be in a list)
         def delister(inp: tuple[I | list[V]]):
@@ -1637,9 +1640,7 @@ class P:
         # the check helps to handle if a variable itself is an index
         # we do not want to iterate over the entire variable set
         # but treat the variable as a single index element
-        key: tuple[I] | set[tuple[I]] = [
-            i if not isinstance(i, V) else [i] for i in key
-        ]
+        key: tuple[I] | set[tuple[I]] = lister(key)
 
         # if a subset is passed,
         # first create a product to match
@@ -1652,16 +1653,18 @@ class P:
         p.index = key
 
         # should be able to map these
-        for index in indices:
+        for index in product(*key):
             # this helps weed out any None indices
             # i.e. skips
-            index = prod(index)
+            if any(i is None for i in index):
+                index = None
+
             if index is None:
                 parameter = None
             else:
                 parameter = self.map[index]
-                p.map[index] = parameter
 
+            p.map[index] = parameter
             p._.append(parameter)
 
         return p
