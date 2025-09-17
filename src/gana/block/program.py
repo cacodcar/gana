@@ -1337,12 +1337,19 @@ class Prg:
                 print('--- Solution found. Use .sol() to display it')
 
                 vals = [v.X for v in m.getVars()]
+
+                # there could be multiple solutions
+                # based on different objectives
                 n_sol = len(self.solution)
+
                 for v, val in zip(self.variables, vals):
                     v.value[n_sol] = val
 
+                
+
                 for c in self.constraint_sets:
                     c.function.eval(n_sol=n_sol)
+
                 self.objectives[-1].value = m.ObjVal
                 self.optimized = True
 
