@@ -330,9 +330,10 @@ class V:
             aslist (bool, optional): Returns values taken as list. Defaults to False.
         """
         if aslist:
-            return [v.X[n_sol] for v in self._]
+            return [v.X[n_sol] for v in self._ if n_sol in v.X]
         for v in self._:
-            display(Math(v.latex() + r'=' + rf'{v.X[n_sol]}'))
+            if n_sol in v.X:
+                display(Math(v.latex() + r'=' + rf'{v.X[n_sol]}'))
 
     # -----------------------------------------------------
     #                    Printing
