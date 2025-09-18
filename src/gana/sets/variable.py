@@ -804,35 +804,6 @@ class V:
             # variables can be passed as indices
             return self.name == other.name
 
-        # if something of the type v = p*v is given
-        # classify it as a calculation
-        # if isinstance(other, V):
-        #     other = other.make_function()
-
-        # if isinstance(other, F):
-        #     if (
-        #         other.one_type == Elem.P and other.two_type == Elem.V and other.mul
-        #     ) or other.case == FCase.SUM:
-        #         other.calculation = self.copy()
-        #         other.calculation.case = other.case
-        #         other.case = FCase.CALC
-
-        #         for f, v in zip(other, other.calculation):
-        #             v.calculation = f
-        #             f.calculation = v
-        #             f.calculation.case = FCase.VARF
-        #             f.case = FCase.CALC
-
-        #         v_idx = list(self.map)
-        #         f_values = list(self.map.values())
-        #         _map = {idx: f for f, idx in zip(f_values, v_idx)}
-        #         print()
-        #         self.map = _map
-        #         other.map = _map
-
-        #         other.index = self.index
-        #         return other
-
         return C(self - other)
 
     def __le__(

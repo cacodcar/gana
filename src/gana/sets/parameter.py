@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import enum
 from itertools import product
-from math import prod
 from typing import TYPE_CHECKING, Self
 from warnings import warn
 
@@ -168,18 +166,6 @@ class P:
         for n, k in enumerate(self.map):
             self.map[k] = self._[n]
 
-        # if self._:
-        #     self.create_map()
-
-        #     # check if there is a mismatch between the length of data
-        #     # and the length of index passed
-        #     if len(self.map) != len(self._):
-        #         raise ValueError(
-        #             f"Index mismatch: len(values) ({len(self._)}) ! = len(index) ({len(self.map)})"
-        #         )
-        # else:
-        #     self.map = {}
-
     @property
     def args(self) -> dict[str, str | bool]:
         """Return the arguments of the parameter set"""
@@ -204,20 +190,6 @@ class P:
         """Generate a diagonal matrix representation of the variable set"""
         return [[self._[i]] for i in range(len(self))]
 
-    # [
-    #         [self._[i] if i == j else 0 for j in range(len(self))]
-    #         for i in range(len(self))
-    #     ]
-
-    # -----------------------------------------------------
-    #                    Helpers
-    # -----------------------------------------------------
-
-    # def create_map(self):
-    #     """Create a map of indices to parameters"""
-    #     self.map: dict[I, float | int] = {
-    #         prod(i): self._[n] for n, i in enumerate(list(product(*self.index)))
-    #     }
 
     # -----------------------------------------------------
     #                    Printing
