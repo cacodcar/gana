@@ -115,19 +115,6 @@ class P:
         self.index: tuple[I] | set[tuple[I]] = _index
         self.map: dict[I, V] = _map
 
-        # self.index: tuple[I] | set[tuple[I]] = tuple(
-        #     [i if not isinstance(i, V) else [i] for i in index]
-        # )
-        # if self.index:
-        #     self.map: dict[I, V] = {
-        #         # prod([ii for ii in i if ii is not None]): None
-        #         i: None
-        #         for i in list(product(*self.index))
-        #     }
-        #     # self.map: dict[I, V] = {prod(i): None for i in list(product(*self.index))}
-        # else:
-        #     self.map: dict[I, V] = {}
-
         # contains the set of parameters
         if _ is None:
             self._ = []
@@ -1645,7 +1632,6 @@ class P:
         # if a subset is passed,
         # first create a product to match
         # the indices
-        indices = list(product(*key))
 
         # create a new variable set to return
         p = P(**self.args)

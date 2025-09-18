@@ -19,8 +19,13 @@ if TYPE_CHECKING:
     from .theta import T
 
 try:
-    from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
-                               NonNegativeReals, Reals)
+    from pyomo.environ import (
+        Binary,
+        Integers,
+        NonNegativeIntegers,
+        NonNegativeReals,
+        Reals,
+    )
     from pyomo.environ import Var as PyoVar
 
     has_pyomo = True
@@ -140,6 +145,7 @@ class V:
             for idx in _index:
                 for i in product(*idx):
                     _map[i] = None
+            print('vvvvvvv', _index, _map)
             _index = set(_index)
 
         else:
@@ -194,7 +200,6 @@ class V:
         self.make_copy: bool = False
 
         self.category: str = ''
-
 
     @property
     def matrix(self) -> dict:
@@ -801,8 +806,8 @@ class V:
 
         # if something of the type v = p*v is given
         # classify it as a calculation
-        if isinstance(other, V):
-            other = other.make_function()
+        # if isinstance(other, V):
+        #     other = other.make_function()
 
         # if isinstance(other, F):
         #     if (
