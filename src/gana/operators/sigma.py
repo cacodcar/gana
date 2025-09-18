@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+from itertools import islice
 from typing import TYPE_CHECKING
 
 from ..sets.cases import Elem, FCase
-from itertools import islice
 from ..sets.function import F
 
 if TYPE_CHECKING:

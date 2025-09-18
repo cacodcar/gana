@@ -5,10 +5,9 @@ from __future__ import annotations
 from itertools import product
 from typing import TYPE_CHECKING, Self
 
-from .birth import make_P, make_T
-
 from IPython.display import Math, display
 
+from .birth import make_P, make_T
 from .cases import Elem, FCase
 from .constraint import C
 from .function import F
@@ -20,13 +19,8 @@ if TYPE_CHECKING:
     from .theta import T
 
 try:
-    from pyomo.environ import (
-        Binary,
-        Integers,
-        NonNegativeIntegers,
-        NonNegativeReals,
-        Reals,
-    )
+    from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
+                               NonNegativeReals, Reals)
     from pyomo.environ import Var as PyoVar
 
     has_pyomo = True

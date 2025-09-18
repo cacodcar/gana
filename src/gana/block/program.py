@@ -3,21 +3,19 @@
 import warnings
 from dataclasses import dataclass, field
 
-from ..sets.cases import PCase, ICase, Elem
+import numpy as np
+from ppopt.mplp_program import MPLP_Program
+
+from ..operators.composition import inf, sup
+from ..sets.cases import Elem, ICase, PCase
 from ..sets.constraint import C
 from ..sets.function import F as Func
 from ..sets.index import I
-
 from ..sets.objective import O
 from ..sets.parameter import P
 from ..sets.theta import T
 from ..sets.variable import V
 from .solution import Solution
-from ..operators.composition import sup, inf
-
-from ppopt.mplp_program import MPLP_Program
-import numpy as np
-
 
 # optional dependencies
 try:

@@ -2,19 +2,19 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math, display
 
 from .cases import FCase
-from copy import deepcopy
 
 if TYPE_CHECKING:
     from .function import F
+    from .index import I
     from .parameter import P
     from .theta import T
     from .variable import V
-    from .index import I
 
 
 class C:

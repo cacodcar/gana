@@ -5,7 +5,6 @@ from __future__ import annotations
 from itertools import product
 from typing import TYPE_CHECKING, Self
 
-
 from .birth import make_P, make_T
 from .cases import Elem, FCase, PCase
 from .constraint import C
@@ -1504,8 +1503,8 @@ class F:
             | None
         ),
     ) -> Self:
-        from .variable import V
         from .theta import T
+        from .variable import V
 
         if other is None:
             # multiplying by nothing

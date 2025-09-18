@@ -8,8 +8,8 @@ from IPython.display import Math, display
 from .cases import ICase
 
 try:
-    from pyomo.environ import Set as PyoSet
     from pyomo.environ import RangeSet as PyoRangeSet
+    from pyomo.environ import Set as PyoSet
 
     has_pyomo = True
 except ImportError:
