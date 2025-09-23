@@ -190,7 +190,6 @@ class P:
         """Generate a diagonal matrix representation of the variable set"""
         return [[self._[i]] for i in range(len(self))]
 
-
     # -----------------------------------------------------
     #                    Printing
     # -----------------------------------------------------

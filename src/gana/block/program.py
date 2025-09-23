@@ -1394,8 +1394,9 @@ class Prg:
 
         print()
         display(Markdown(r'## Objective'))
-        for o in self.objectives:
-            o.sol()
+
+        self.objectives[n_sol].sol()
+        
 
         print()
         display(Markdown(r'## Variables'))
