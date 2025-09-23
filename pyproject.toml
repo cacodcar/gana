@@ -22,7 +22,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-dependencies = ["ppopt"]
+dependencies = ["ppopt", "IPython"]
 [project.optional-dependencies]
 all = ["gurobipy",  "pyomo", "sympy", "IPython"]
 test = ["coverage", "pytest"]
