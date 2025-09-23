@@ -8,8 +8,8 @@ from IPython.display import Math, display
 from .cases import ICase
 
 try:
-    from pyomo.environ import Set as PyoSet
     from pyomo.environ import RangeSet as PyoRangeSet
+    from pyomo.environ import Set as PyoSet
 
     has_pyomo = True
 except ImportError:
@@ -70,6 +70,7 @@ class I:
         size: int = None,
         mutable: bool = False,
         tag: str = None,
+        ltx: str = None,
         dummy: bool = False,
     ):
         self.tag = tag
@@ -121,6 +122,9 @@ class I:
         self.functions = []
         self.constraints = []
 
+        # if latex name is given
+        self.ltx = ltx
+
         if dummy:
             self.case = ICase.DUMMY
             self.birth_elements()
@@ -132,7 +136,6 @@ class I:
         """Create elements for the index set"""
         # if self.ordered:
         self.size = int(self.size)
-
         for n in range(self.size):
             # this is called from outside
             # (once the name is set)
@@ -154,6 +157,7 @@ class I:
             index.size = 1
             index.members = [index.name]
             self._.append(index)
+            index.ltx = rf'{self.ltx}[{n}]'
 
     # -----------------------------------------------------
     #                    Modifiers
@@ -194,6 +198,8 @@ class I:
         index.size = self.size
         # only done for index set
         index.ordered = True
+        # latex representation
+        index.ltx = self.ltx
 
         return index
 
@@ -219,14 +225,17 @@ class I:
             descriptive (bool): print members of the index set
             int_not (bool): Whether to display the set in integer notation.
         """
+
         if not self.name:
             return ''
 
         # if the name has underscores, replace them with \_
         ltx = self.name.replace('_', r'\_')
+
         if self.parent and any(parent.ordered for parent in self.parent):
             ltx = ltx.replace('[', '_{').replace(']', '}')
             ltx = r'{' + ltx + r'}'
+
         else:
             ltx = ltx.replace('[', '{').replace(']', '}')
 

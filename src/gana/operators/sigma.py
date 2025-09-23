@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+from itertools import islice
 from typing import TYPE_CHECKING
 
 from ..sets.cases import Elem, FCase
-from itertools import islice
 from ..sets.function import F
 
 if TYPE_CHECKING:
@@ -51,38 +51,11 @@ def sigma(variable: V, over: I = None, position: int = None) -> F:
         # this checks for v_0 + v_1
         return _variables[0] + _variables[1]
 
-    # f = F(
-    #     one=_variables[0],
-    #     add=True,
-    #     two=_variables[1],
-    #     issumhow=issumhow,
-    # )
-
-    # for v in islice(_variables, 2, None):
-    #     f = F(
-    #         one=f,
-    #         add=True,
-    #         two=v,
-    #         one_type=Elem.F,
-    #         two_type=Elem.V,
-    #         issumhow=issumhow,
-    #     )
-    # f += v
-
-    # other options for looping,
-    # all avoid recurssion
-
-    # for i in range(2, len(_variables)):
-    #     f += _variables[i]
-
-    # for v in _variables[2:]:
-    #     f += v
-
     f = F()
 
     f.case = FCase.SUM
 
-    f.issumhow = (variable(), over, position)
+    f.issumhow = (variable.copy(), over, position)
 
     f.variables = _variables
     f.index = tuple(v.index for v in f.variables)
@@ -102,7 +75,7 @@ def sigma(variable: V, over: I = None, position: int = None) -> F:
         f_child = F()
 
         f_child.variables = [v[n] for v in f.variables]
-        f_child.X = [v.n for v in f_child.variables]
+        f_child.P = [v.n for v in f_child.variables]
         f_child.A = [1] * length
 
         key = keys[n]
@@ -111,7 +84,7 @@ def sigma(variable: V, over: I = None, position: int = None) -> F:
         f_child.parent = f
         f_child.case = FCase.SUM
         f_child.rhs_thetas = []
-        f.X.append(f_child.X)
+        f.P.append(f_child.P)
         f_child.give_name()
         f_child._ = [f_child]
         f._.append(f_child)

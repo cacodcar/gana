@@ -5,10 +5,9 @@ from __future__ import annotations
 from itertools import product
 from typing import TYPE_CHECKING, Self
 
-from .birth import make_P, make_T
-
 from IPython.display import Math, display
 
+from .birth import make_P, make_T
 from .cases import Elem, FCase
 from .constraint import C
 from .function import F
@@ -146,6 +145,7 @@ class V:
             for idx in _index:
                 for i in product(*idx):
                     _map[i] = None
+            print('vvvvvvv', _index, _map)
             _index = set(_index)
 
         else:
@@ -172,7 +172,7 @@ class V:
         self.min_by: list[O] = []
 
         # value after optimization
-        self.value = {}
+        self.X = {}
 
         # these keep variables consistent with functions for some operations
         # Take the example of a variable set - parameter set
@@ -185,7 +185,7 @@ class V:
         self.struct = (Elem.V, None)
         self.case = FCase.VAR
         # TODO: check
-        self.X = [self.n]
+        self.P = [self.n]
 
         self.copyof: Self = None
 
@@ -330,9 +330,10 @@ class V:
             aslist (bool, optional): Returns values taken as list. Defaults to False.
         """
         if aslist:
-            return [v.value[n_sol] for v in self._]
+            return [v.X[n_sol] for v in self._ if n_sol in v.X]
         for v in self._:
-            display(Math(v.latex() + r'=' + rf'{v.value[n_sol]}'))
+            if n_sol in v.X:
+                display(Math(v.latex() + r'=' + rf'{v.X[n_sol]}'))
 
     # -----------------------------------------------------
     #                    Printing
@@ -804,35 +805,6 @@ class V:
             # variables can be passed as indices
             return self.name == other.name
 
-        # if something of the type v = p*v is given
-        # classify it as a calculation
-        if isinstance(other, V):
-            other = other.make_function()
-
-        # if isinstance(other, F):
-        #     if (
-        #         other.one_type == Elem.P and other.two_type == Elem.V and other.mul
-        #     ) or other.case == FCase.SUM:
-        #         other.calculation = self.copy()
-        #         other.calculation.case = other.case
-        #         other.case = FCase.CALC
-
-        #         for f, v in zip(other, other.calculation):
-        #             v.calculation = f
-        #             f.calculation = v
-        #             f.calculation.case = FCase.VARF
-        #             f.case = FCase.CALC
-
-        #         v_idx = list(self.map)
-        #         f_values = list(self.map.values())
-        #         _map = {idx: f for f, idx in zip(f_values, v_idx)}
-        #         print()
-        #         self.map = _map
-        #         other.map = _map
-
-        #         other.index = self.index
-        #         return other
-
         return C(self - other)
 
     def __le__(
@@ -947,7 +919,7 @@ class V:
     def __call__(self, *key: I, make_new: bool = False) -> Self:
 
         def lister(inp: tuple[I]) -> tuple[I | list[V]]:
-            return tuple([i] if isinstance(i, V) else i for i in key)
+            return tuple([i] if isinstance(i, V) else i for i in inp)
 
         # if a dependent variable is being passed in the key
         # extract variable from the index (it will be in a list)

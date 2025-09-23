@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import enum
 from itertools import product
-from math import prod
 from typing import TYPE_CHECKING, Self
 from warnings import warn
 
@@ -115,19 +113,6 @@ class P:
         self.index: tuple[I] | set[tuple[I]] = _index
         self.map: dict[I, V] = _map
 
-        # self.index: tuple[I] | set[tuple[I]] = tuple(
-        #     [i if not isinstance(i, V) else [i] for i in index]
-        # )
-        # if self.index:
-        #     self.map: dict[I, V] = {
-        #         # prod([ii for ii in i if ii is not None]): None
-        #         i: None
-        #         for i in list(product(*self.index))
-        #     }
-        #     # self.map: dict[I, V] = {prod(i): None for i in list(product(*self.index))}
-        # else:
-        #     self.map: dict[I, V] = {}
-
         # contains the set of parameters
         if _ is None:
             self._ = []
@@ -181,18 +166,6 @@ class P:
         for n, k in enumerate(self.map):
             self.map[k] = self._[n]
 
-        # if self._:
-        #     self.create_map()
-
-        #     # check if there is a mismatch between the length of data
-        #     # and the length of index passed
-        #     if len(self.map) != len(self._):
-        #         raise ValueError(
-        #             f"Index mismatch: len(values) ({len(self._)}) ! = len(index) ({len(self.map)})"
-        #         )
-        # else:
-        #     self.map = {}
-
     @property
     def args(self) -> dict[str, str | bool]:
         """Return the arguments of the parameter set"""
@@ -216,21 +189,6 @@ class P:
     def A(self) -> list[list[float]]:
         """Generate a diagonal matrix representation of the variable set"""
         return [[self._[i]] for i in range(len(self))]
-
-    # [
-    #         [self._[i] if i == j else 0 for j in range(len(self))]
-    #         for i in range(len(self))
-    #     ]
-
-    # -----------------------------------------------------
-    #                    Helpers
-    # -----------------------------------------------------
-
-    # def create_map(self):
-    #     """Create a map of indices to parameters"""
-    #     self.map: dict[I, float | int] = {
-    #         prod(i): self._[n] for n, i in enumerate(list(product(*self.index)))
-    #     }
 
     # -----------------------------------------------------
     #                    Printing
@@ -1624,6 +1582,9 @@ class P:
 
     def __call__(self, *key: I) -> Self:
 
+        def lister(inp: tuple[I]) -> tuple[I | list[V]]:
+            return tuple([i] if isinstance(i, V) else i for i in inp)
+
         # if a dependent variable is being passed in the key
         # extract variable from the index (it will be in a list)
         def delister(inp: tuple[I | list[V]]):
@@ -1637,14 +1598,11 @@ class P:
         # the check helps to handle if a variable itself is an index
         # we do not want to iterate over the entire variable set
         # but treat the variable as a single index element
-        key: tuple[I] | set[tuple[I]] = [
-            i if not isinstance(i, V) else [i] for i in key
-        ]
+        key: tuple[I] | set[tuple[I]] = lister(key)
 
         # if a subset is passed,
         # first create a product to match
         # the indices
-        indices = list(product(*key))
 
         # create a new variable set to return
         p = P(**self.args)
@@ -1652,16 +1610,18 @@ class P:
         p.index = key
 
         # should be able to map these
-        for index in indices:
+        for index in product(*key):
             # this helps weed out any None indices
             # i.e. skips
-            index = prod(index)
+            if any(i is None for i in index):
+                index = None
+
             if index is None:
                 parameter = None
             else:
                 parameter = self.map[index]
-                p.map[index] = parameter
 
+            p.map[index] = parameter
             p._.append(parameter)
 
         return p

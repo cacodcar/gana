@@ -20,7 +20,6 @@ class O:
             self.function = function[0]
             # the A matrix becomes the C matrix
 
-
             self.C = self.function.A
 
         else:
@@ -42,7 +41,7 @@ class O:
         # whats contained in the set
 
         # value obtained after optimization
-        self.value: float = None
+        self.X: float = None
 
         # number in the program
         self.n = None
@@ -56,7 +55,7 @@ class O:
             v.min_by.append(self)
 
     @property
-    def X(self):
+    def P(self):
         """Variable positions"""
         return [v.n for v in self.variables]
 
@@ -68,9 +67,9 @@ class O:
     def sol(self, asfloat: bool = False):
         """Solution"""
         if asfloat:
-            return self.value
+            return self.X
 
-        display(Math(self.latex() + r'=' + rf'{self.value}'))
+        display(Math(self.latex() + r'=' + rf'{self.X}'))
 
     def latex(self):
         """Latex representation"""

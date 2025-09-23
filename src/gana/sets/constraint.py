@@ -2,19 +2,19 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math, display
 
 from .cases import FCase
-from copy import deepcopy
 
 if TYPE_CHECKING:
     from .function import F
+    from .index import I
     from .parameter import P
     from .theta import T
     from .variable import V
-    from .index import I
 
 
 class C:
@@ -169,9 +169,9 @@ class C:
         return self.function.A
 
     @property
-    def X(self) -> list[None | int]:
+    def P(self) -> list[None | int]:
         """Variables"""
-        return self.function.X
+        return self.function.P
 
     @property
     def B(self) -> float | None:
@@ -253,7 +253,7 @@ class C:
         """Solution"""
         for c in self._:
             if self.leq:
-                display(Math(c.function.latex() + r'=' + rf'{c.function.value[n_sol]}'))
+                display(Math(c.function.latex() + r'=' + rf'{c.function.X[n_sol]}'))
 
     # -----------------------------------------------------
     #                    Operators

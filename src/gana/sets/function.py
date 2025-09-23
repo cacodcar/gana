@@ -3,10 +3,7 @@
 from __future__ import annotations
 
 from itertools import product
-from turtle import position
 from typing import TYPE_CHECKING, Self
-
-from numpy import isin
 
 from .birth import make_P, make_T
 from .cases import Elem, FCase, PCase
@@ -115,7 +112,7 @@ class F:
         self.issumhow = issumhow
 
         # evaluates the value of the function
-        self.value: {int, float} = {}
+        self.X: {int, float} = {}
 
         # calculated variable
         self.calculation: V = None
@@ -145,7 +142,7 @@ class F:
             self._ = []
             self.n = 0
             self.name, self.pname = '', ''
-            self.A, self.X, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
+            self.A, self.P, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
             self.variables = []
 
         elif one is not None or two is not None:
@@ -202,7 +199,7 @@ class F:
                 # matrix is passed on to the birthed functions
                 self.birth_functions()
                 # make a matrix of positions
-                self.X = [f.X for f in self._]
+                self.P = [f.P for f in self._ if f is not None]
 
             else:
                 self.update_variables()
@@ -232,7 +229,7 @@ class F:
             self._ = []
             self.n = 0
             self.name, self.pname = '', ''
-            self.A, self.X, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
+            self.A, self.P, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
             self.variables = []
 
         self.give_name()
@@ -248,7 +245,7 @@ class F:
             return self._matrix
 
         if self.parent is not None:
-            self._matrix = dict(zip(self.X, self.A))
+            self._matrix = dict(zip(self.P, self.A))
         else:
             self._matrix = {f: f.matrix for f in self._}
 
@@ -525,9 +522,17 @@ class F:
                 # you can have just a P or T masquerading as a function
                 # so check are unnecessary
                 # f = one(*one.index)
-                f = one()
-                f.map[tuple(index)] = f
+
                 index = tuple(index)
+
+                if isinstance(one, (int, float)):
+                    # this happens when there is a skipped index
+                    self.map[index] = None
+                    self._.append(None)
+                    continue
+                else:
+                    f = one()
+                    f.map[index] = f
 
             else:
                 # this is done to handle skipping
@@ -537,15 +542,18 @@ class F:
 
                 else:
                     index += (two_idx,)
+
                 index = tuple(index)
 
                 f = F()
                 f.parent = self
                 f.index = index
+
                 if one:
                     if self.one_type in [Elem.P, Elem.T]:
                         f.one = one
                     else:
+
                         f.one = one(*one_idx)
 
                 if self.two_type in [Elem.P, Elem.T]:
@@ -564,12 +572,11 @@ class F:
                 f.update_variables()
                 f.give_name()
                 f.map[one_idx, two_idx] = f
+                f.A = self.A[n]
+                f.B = self.B[n]
 
-            # f.variables = [v(i) for v, i in zip(self.variables, index)]
             # update the map
             self.map[index] = f
-            f.A = self.A[n]
-            f.B = self.B[n]
 
             # only member of the birthed function is itself
             f._ = [f]
@@ -594,7 +601,7 @@ class F:
             self.variables.append(self.two)
 
         # make a matrix of positions of the variables
-        self.X = [v.n for v in self.variables if v is not None]
+        self.P = [v.n for v in self.variables if v is not None]
 
     def give_name(self):
         """Gives a name to the function"""
@@ -681,7 +688,7 @@ class F:
         ..math::
             \\mathrm{A} \\cdot \\mathbf{V} = \\mathrm{B} + \\mathrm{F} \\cdot θ
 
-        sets self.A, self.X, self.Y, self.Z, self.B, self.F
+        sets self.A, self.P, self.Y, self.Z, self.B, self.F
 
         """
 
@@ -929,7 +936,11 @@ class F:
                 return rf'-{ltx}'
             return rf'{ltx}'
 
-        if self.one is not None:
+        if self.one is None and self.mul:
+
+            one = '0'
+
+        elif self.one is not None:
             # _one = self.one(self.index.one)
             if self.one_type == Elem.P and self.parent:
                 # if this is a child function with a parameter
@@ -1492,8 +1503,8 @@ class F:
             | None
         ),
     ) -> Self:
-        from .variable import V
         from .theta import T
+        from .variable import V
 
         if other is None:
             # multiplying by nothing
@@ -1701,7 +1712,7 @@ class F:
         f.name, f.pname, f.n = self.name, self.pname, self.n
         f.A = []
         f.B = []
-        f.X = []
+        f.P = []
         f.index = key
 
         # should be able to map these
@@ -1786,7 +1797,7 @@ class F:
                 f.rhs_thetas = [t(*i) for t, i in zip(self.rhs_thetas, theta_index)]
                 f.A.append(self.A[function.n])
                 f.B.append(self.B[function.n])
-                f.X.append(self.X[function.n])
+                f.P.append(self.P[function.n])
 
             f._.append(function)
 
@@ -1805,7 +1816,7 @@ class F:
     #                    Solution
     # -----------------------------------------------------
 
-    def eval(self, n_sol:int = 0):
+    def eval(self, n_sol: int = 0):
         """Evaluates the value of the function"""
         one, two = None, None
         # if this is a function, set
@@ -1818,33 +1829,33 @@ class F:
             if function.case == FCase.SUM:
                 # if this is a summation
                 # avoid recursion
-                return sum([v.value[n_sol] for v in function.variables])
+                return sum([v.X[n_sol] for v in function.variables])
             if function.case == FCase.NEGSUM:
                 # if this is a negation
                 # avoid recursion
-                return -sum([v.value[n_sol] for v in function.variables])
+                return -sum([v.X[n_sol] for v in function.variables])
             if function.case == FCase.NEGVAR:
                 # if this is a negated variable
                 # return the value of the variable
-                return -function.two.value[n_sol]
+                return -function.two.X[n_sol]
             if function.case == FCase.FVAR:
                 # if this is a variable being treated as a function
                 # return the value of the variable
-                return function.two.value[n_sol]
+                return function.two.X[n_sol]
 
             return function.eval(n_sol)
 
         if self.parent.one_type == Elem.P:
             one = self.one
         elif self.parent.one_type == Elem.V:
-            one = self.one.value[n_sol]
+            one = self.one.X[n_sol]
         elif self.parent.one_type == Elem.F:
             one = function_eval(self.one)
 
         if self.parent.two_type == Elem.P:
             two = self.two
         elif self.parent.two_type == Elem.V:
-            two = self.two.value[n_sol]
+            two = self.two.X[n_sol]
         elif self.parent.two_type == Elem.F:
             two = function_eval(self.two)
 
@@ -1853,23 +1864,23 @@ class F:
                 one = 1
             if not two:
                 two = 1
-            self.value[n_sol] = one * two
+            self.X[n_sol] = one * two
         if self.div:
-            self.value[n_sol] = one / two
+            self.X[n_sol] = one / two
         if self.add:
             if not one:
                 one = 0
             if not two:
                 two = 0
-            self.value[n_sol] = one + two
+            self.X[n_sol] = one + two
         if self.sub:
             if not one:
                 one = 0
             if not two:
                 two = 0
-            self.value[n_sol] = one - two
+            self.X[n_sol] = one - two
 
-        return self.value[n_sol]
+        return self.X[n_sol]
 
     # -----------------------------------------------------
     #                    Hashing

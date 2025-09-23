@@ -3,21 +3,19 @@
 import warnings
 from dataclasses import dataclass, field
 
-from ..sets.cases import PCase, ICase, Elem
+import numpy as np
+from ppopt.mplp_program import MPLP_Program
+
+from ..operators.composition import inf, sup
+from ..sets.cases import Elem, ICase, PCase
 from ..sets.constraint import C
 from ..sets.function import F as Func
 from ..sets.index import I
-
 from ..sets.objective import O
 from ..sets.parameter import P
 from ..sets.theta import T
 from ..sets.variable import V
 from .solution import Solution
-from ..operators.composition import sup, inf
-
-from ppopt.mplp_program import MPLP_Program
-import numpy as np
-
 
 # optional dependencies
 try:
@@ -162,6 +160,13 @@ class Prg:
 
         # the solution object
         self.solution: dict[int, Solution] = {}
+
+        # number of solutions
+        self.n_sol: int = 0
+
+        # solution matrix
+
+        self.X: dict[int, list[float | int]] = {}
 
     def add_index(self, name: str, index: I):
         """Adds new index to program
@@ -944,7 +949,7 @@ class Prg:
             _A.append(row)
 
         for n, c in enumerate(constraints):
-            for x, a in zip(c.X, c.A):
+            for x, a in zip(c.P, c.A):
                 _A[n][x] = a
         return _A
 
@@ -980,16 +985,16 @@ class Prg:
 
             _C = [0] * len(self.variables)  # initialize with zeros
             for n, v in enumerate(obj.variables):
-                _C[obj.X[n]] = obj.C[n]
+                _C[obj.P[n]] = obj.C[n]
 
         return _C
 
         # TODO multiple objective
 
     @property
-    def X(self) -> list[list[int]]:
+    def P(self) -> list[list[int]]:
         """Structure of the constraint matrix"""
-        return [c.X for c in self.cons()]
+        return [c.P for c in self.cons()]
 
     @property
     def Z(self) -> list[list[int]]:
@@ -1005,7 +1010,7 @@ class Prg:
         _G = [[0] * len(self.variables) for _ in range(len(self.leqcons()))]
 
         for n, c in enumerate(self.leqcons()):
-            for x, a in zip(c.X, c.A):
+            for x, a in zip(c.P, c.A):
                 if x is not None:
                     _G[n][x] = a
 
@@ -1019,7 +1024,7 @@ class Prg:
         """
         _H = [[0] * len(self.variables) for _ in range(len(self.eqcons()))]
         for n, c in enumerate(self.eqcons()):
-            for x, a in zip(c.X, c.A):
+            for x, a in zip(c.P, c.A):
                 if x is not None:
                     _H[n][x] = a
         return _H
@@ -1270,7 +1275,7 @@ class Prg:
                     #     f.write(f'{c.matrix[v.n]}')
                     f.write(f'{c.matrix[v.n]}')
 
-                    # f.write(f'{c.A[c.X.index(v.n)]}')
+                    # f.write(f'{c.A[c.P.index(v.n)]}')
 
                     f.write('\n')
 
@@ -1286,7 +1291,7 @@ class Prg:
 
                     f.write(f'{o.function[0].matrix[v.n]}')
 
-                    # f.write(f'{c.A[c.X.index(v.n)]}')
+                    # f.write(f'{c.A[c.P.index(v.n)]}')
                     f.write('\n')
 
             # This gives the right-hand side of the constraints
@@ -1336,19 +1341,23 @@ class Prg:
             try:
                 print('--- Solution found. Use .sol() to display it')
 
-                vals = [v.X for v in m.getVars()]
-                n_sol = len(self.solution)
-                for v, val in zip(self.variables, vals):
-                    v.value[n_sol] = val
+                self.X[self.n_sol] = [v.X for v in m.getVars()]
+
+                for v, val in zip(self.variables, self.X[self.n_sol]):
+
+                    v.X[self.n_sol] = val
 
                 for c in self.constraint_sets:
-                    c.function.eval(n_sol=n_sol)
-                self.objectives[-1].value = m.ObjVal
+                    c.function.eval(n_sol=self.n_sol)
+
+                self.objectives[-1].X = m.ObjVal
                 self.optimized = True
 
                 print('--- Creating Solution object, check.solution')
 
-                self.solution[n_sol] = self.birth_solution()
+                self.solution[self.n_sol] = self.birth_solution()
+
+                self.n_sol += 1
 
             except AttributeError:
                 print('!!! No solution found. Check the model.')
@@ -1368,8 +1377,8 @@ class Prg:
     def obj(self):
         """Objective Values"""
         if len(self.objectives) == 1:
-            return self.objectives[0].value
-        return {o: o.value for o in self.objectives}
+            return self.objectives[0].X
+        return {o: o.X for o in self.objectives}
 
     # def slack(self):
     #     """Slack in each constraint"""
@@ -1385,8 +1394,9 @@ class Prg:
 
         print()
         display(Markdown(r'## Objective'))
-        for o in self.objectives:
-            o.sol()
+
+        self.objectives[n_sol].sol()
+        
 
         print()
         display(Markdown(r'## Variables'))
@@ -1402,9 +1412,10 @@ class Prg:
 
     def birth_solution(self):
         """Makes a solution object for the program"""
-        n_sol = len(self.solution)
-        solution = Solution(self.name + '_solution_' + str(n_sol))
-        solution.update(self.variables, n_sol=n_sol)
+
+        solution = Solution(self.name + '_solution_' + str(self.n_sol))
+        solution.update(self.variables, n_sol=self.n_sol)
+
         return solution
 
     # # Displaying the program
