@@ -1384,7 +1384,7 @@ class Prg:
     #     """Slack in each constraint"""
     #     return {c: c._ for c in self.leqcons()}
 
-    def sol(self, n_sol: int = 0, slack: bool = True):
+    def sol(self, n_sol: int = 0, slack: bool = True, compare=False):
         """Print sol"""
 
         if not self.optimized:
@@ -1396,19 +1396,18 @@ class Prg:
         display(Markdown(r'## Objective'))
 
         self.objectives[n_sol].sol()
-        
 
         print()
         display(Markdown(r'## Variables'))
 
         for v in self.variable_sets:
-            v.sol(n_sol=n_sol)
+            v.sol(n_sol=n_sol, compare=compare)
 
         if slack:
             print()
             display(Markdown(r'## Constraint Slack'))
             for c in self.leqcons():
-                c.sol(n_sol=n_sol)
+                c.sol(n_sol=n_sol, compare=compare)
 
     def birth_solution(self):
         """Makes a solution object for the program"""
