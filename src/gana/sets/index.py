@@ -24,44 +24,60 @@ except ImportError:
 
 
 class I:
-    """Set of index elements (X)
+    """
+    Set of index elements (X).
 
-    Args:
-        *members (str | int, optional): Members of the Index set. Defaults to None.
-        size (int, optional): Size of the Index set, creates and ordered set. Defaults to None.
-        mutable (bool, optional): If the Index set is mutable. Defaults to False.
-        tag (str, optional): Tag/details. Defaults to None.
-        dummy(bool, optional): If the Index set is a dummy set, elements are birthed immediately. Defaults to False.
+    :param members: Members of the Index set.
+    :type members: str | int, optional
+    :param size: Size of the Index set, creates an ordered set if given.
+    :type size: int, optional
+    :param mutable: If the Index set is mutable. Defaults to False.
+    :type mutable: bool, optional
+    :param tag: Tag/details. Defaults to None.
+    :type tag: str, optional
+    :param dummy: If the Index set is a dummy set, elements are created immediately. Defaults to False.
+    :type dummy: bool, optional
 
-    Attributes:
-        _ (list[X]): Elements of the index set.
-        tag (str): Tag/details.
-        ordered (bool): Ordered set, True if size is given.
-        name (str): Name, set by the program.
-        n (int): Number id, set by the program.
-        ltx (str): LaTeX representation.
+    :ivar _: Elements of the index set
+    :vartype _: list[X]
+    :ivar tag: Tag/details
+    :vartype tag: str
+    :ivar ordered: Ordered set, True if size is given
+    :vartype ordered: bool
+    :ivar name: Name, set by the program
+    :vartype name: str
+    :ivar n: Number id, set by the program
+    :vartype n: int
+    :ivar ltx: LaTeX representation
+    :vartype ltx: str
 
-    Raise:
-        ValueError: If both members and size are given.
-        ValueError: If indices of elements (P, V) are not compatible.
-        ValueError: If index set is not ordered and step is given.
+    :raises ValueError: If both members and size are given
+    :raises ValueError: If indices of elements (P, V) are not compatible
+    :raises ValueError: If index set is not ordered and step is given
 
-    Examples:
-        >>> p = Program()
-        >>> p.s1 = I('a', 'b', 'c')
-        >>> p.s2 = I('a', 'd', 'e', 'f')
-        >>> p.s1 & p.s2
-        I('a')
+    Examples
+    --------
+    .. code-block:: python
 
-        >>> p.s1 | p.s2
-        I('a', 'b', 'c', 'd', 'e', 'f')
-
-        >>> p.s1 ^ p.s2
-        I('b', 'c', 'd', 'e', 'f')
-
-        >>> p.s1 - p.s2
-        I('b', 'c')
-
+        p = Program()
+        p.s1 = I('a', 'b', 'c')
+        p.s2 = I('a', 'd', 'e', 'f')
+        
+        # Intersection
+        p.s1 & p.s2
+        # I('a')
+        
+        # Union
+        p.s1 | p.s2
+        # I('a', 'b', 'c', 'd', 'e', 'f')
+        
+        # Symmetric difference
+        p.s1 ^ p.s2
+        # I('b', 'c', 'd', 'e', 'f')
+        
+        # Difference
+        p.s1 - p.s2
+        # I('b', 'c')
     """
 
     def __init__(

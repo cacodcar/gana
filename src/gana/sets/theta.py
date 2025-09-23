@@ -22,23 +22,32 @@ if TYPE_CHECKING:
 
 
 class T:
-    """Ordered set of parameteric variables (theta)
+    """
+    Ordered set of parametric variables (theta).
 
-    Args:
-        *index (I): Index for the theta set.
-        _: list[tuple[float]] | tuple[float]: Values for the theta set.
-        mutable (bool, optional): If True, the theta set can be modified. Defaults to False.
-        tag (str, optional): Tag for the theta set. Defaults to None.
+    :param index: Index for the theta set.
+    :type index: I
+    :param _: Values for the theta set.
+    :type _: list[tuple[float]] | tuple[float]
+    :param mutable: If True, the theta set can be modified. Defaults to False.
+    :type mutable: bool, optional
+    :param tag: Tag for the theta set. Defaults to None.
+    :type tag: str, optional
 
-
-    Attributes:
-        index (I): Index of the parameteric variable set.
-        _ (list[int | float]): List of parameteric variables.
-        mutable (bool): If the parameter is mutable.
-        tag (str): Tag/details.
-        name (str): Name, set by the program
-        n (int): Number id, set by the program.
-        map (dict[X | Idx, Var]): Index to parameter mapping.
+    :ivar index: Index of the parametric variable set
+    :vartype index: I
+    :ivar _: List of parametric variables
+    :vartype _: list[int | float]
+    :ivar mutable: If the parametric variable set is mutable
+    :vartype mutable: bool
+    :ivar tag: Tag/details
+    :vartype tag: str
+    :ivar name: Name, set by the program
+    :vartype name: str
+    :ivar n: Number id, set by the program
+    :vartype n: int
+    :ivar map: Index to parameter mapping
+    :vartype map: dict[X | Idx, Var]
     """
 
     def __init__(

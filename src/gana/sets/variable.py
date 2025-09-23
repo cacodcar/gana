@@ -50,42 +50,55 @@ except ImportError:
 
 
 class V:
-    """Ordered set of variables (Var)
+    """
+    Ordered set of variables (Var).
 
-    Args:
-        *index (I, optional): Indices. Defaults to None.
-        itg (bool, optional): If the variable set is integer. Defaults to False.
-        nn (bool, optional): If the variable set is non-negative. Defaults to True.
-        bnr (bool, optional): If the variable set is binary. Defaults to False.
-        mutable (bool, optional): If the variable set is mutable. Defaults to False.
-        tag (str): Tag/details
-        ltx (str): LaTe representation of the variable set.
+    :param index: Indices. Defaults to None.
+    :type index: I or tuple[I], optional
+    :param itg: If the variable set is integer. Defaults to False.
+    :type itg: bool, optional
+    :param nn: If the variable set is non-negative. Defaults to True.
+    :type nn: bool, optional
+    :param bnr: If the variable set is binary. Defaults to False.
+    :type bnr: bool, optional
+    :param mutable: If the variable set is mutable. Defaults to False.
+    :type mutable: bool, optional
+    :param tag: Tag/details
+    :type tag: str
+    :param ltx: LaTeX representation of the variable set.
+    :type ltx: str
 
-    Attributes:
-        index (I): Index of the variable set. Product of all indices.
-        map (dict[I , V]): Index to variable mapping.
-        _ (list[V]): List of variables in the set.
-        itg (bool): Integer variable set.
-        nn (bool): Non-negative variable set.
-        bnr (bool): Binary variable set.
-        mutable (bool): Mutable variable set.
-        tag (str): Tag/details.
-        name (str): Name, set by the program.
-        n (int): Number id, set by the program.
-        args (dict[str, bool]): Arguments to pass when making similar variable sets. itg, nn, bnr.
-        ltx (str): LaTeX representation of the variable set.
+    :ivar index: Index of the variable set (product of all indices)
+    :vartype index: I
+    :ivar map: Index to variable mapping
+    :vartype map: dict[I, V]
+    :ivar _: List of variables in the set
+    :vartype _: list[V]
+    :ivar itg: Integer variable set flag
+    :vartype itg: bool
+    :ivar nn: Non-negative variable set flag
+    :vartype nn: bool
+    :ivar bnr: Binary variable set flag
+    :vartype bnr: bool
+    :ivar mutable: Mutable variable set flag
+    :vartype mutable: bool
+    :ivar tag: Tag/details
+    :vartype tag: str
+    :ivar name: Name, set by the program
+    :vartype name: str
+    :ivar n: Number id, set by the program
+    :vartype n: int
+    :ivar args: Arguments for making similar variable sets
+    :vartype args: dict[str, bool]
+    :ivar ltx: LaTeX representation of the variable set
+    :vartype ltx: str
 
-    Raises:
-        ValueError: If variable is binary and not non-negative
-        ValueError: multiplication by tuple
-        ValueError: multiplication by list of tuples tuple
-        ValueError: Division by None
-        ZeroDivisionError: Division by zero
-        ValueError: Division by tuple
-        ValueError: Division by list of tuples tuple
-        ValueError: Division of something by a variable
-        ValueError: Raising variable to a power, except 0 or 1
-
+    :raises ValueError: If variable is binary and not non-negative
+    :raises ValueError: Multiplication by tuple or list of tuples
+    :raises ValueError: Division by None, tuple, or list of tuples
+    :raises ZeroDivisionError: Division by zero
+    :raises ValueError: Division of something by a variable
+    :raises ValueError: Raising variable to a power, except 0 or 1
     """
 
     def __init__(

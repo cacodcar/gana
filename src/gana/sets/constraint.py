@@ -18,38 +18,54 @@ if TYPE_CHECKING:
 
 
 class C:
-    """Constraint gives the relationship between Parameters, Variables, or Expressions
-
-    Not to be used directly. Made based on relationship between parameter sets, variable sets, or function sets.
-
-    Args:
-        function (F): Function set
-        leq (bool, optional): If the constraint is less than or equal to. Defaults to False.
-        parent (C, optional): Parent constraint set. Defaults to None.
-        pos (int, optional): Position of the constraint in the set. Defaults to None.
-        nn (bool, optional): If the constraint is non-negative. Defaults to False.
-
-    Attributes:
-        _ (list[Cons]): List of constraints
-        function (F): Function set
-        leq (bool): If the constraint is less than or equal to
-        binding (bool): If the constraint is binding
-        nn (bool): If the constraint is non-negative
-        index (P): Index of the constraint set. Product of all indices.
-        eq (bool): If the constraint is an equality constraint
-        one (V | P): Element one in the function
-        two (V | P): Element two in the function
-        name (str): Name of the constraint. Shows the operation.
-        n (int): Number of the set in the program
-        pname (str): Name given by user in program
-
-    Raise:
-        ValueError: Add constraints of different types (leq and eq)
-        ValueError: Substract constraints of different types (leq and eq)
-        ValueError: Cannot multiply constraints
-        ValueError: Cannot divide constraints
     """
+    Represents a relationship between Parameters, Variables, or Expressions.
 
+    This class is not intended to be used directly. It is constructed based on 
+    relationships between parameter sets, variable sets, or function sets.
+
+    :param function: Function set
+    :type function: F
+    :param leq: If the constraint is less than or equal to. Defaults to False.
+    :type leq: bool, optional
+    :param parent: Parent constraint set. Defaults to None.
+    :type parent: C, optional
+    :param pos: Position of the constraint in the set. Defaults to None.
+    :type pos: int, optional
+    :param nn: If the constraint is non-negative. Defaults to False.
+    :type nn: bool, optional
+
+    :ivar _: List of constraints
+    :vartype _: list[Cons]
+    :ivar function: Function set
+    :vartype function: F
+    :ivar leq: If the constraint is less than or equal to
+    :vartype leq: bool
+    :ivar binding: If the constraint is binding
+    :vartype binding: bool
+    :ivar nn: If the constraint is non-negative
+    :vartype nn: bool
+    :ivar index: Index of the constraint set (product of all indices)
+    :vartype index: P
+    :ivar eq: If the constraint is an equality constraint
+    :vartype eq: bool
+    :ivar one: Element one in the function
+    :vartype one: V | P
+    :ivar two: Element two in the function
+    :vartype two: V | P
+    :ivar name: Name of the constraint (shows the operation)
+    :vartype name: str
+    :ivar n: Number of the set in the program
+    :vartype n: int
+    :ivar pname: Name given by user in program
+    :vartype pname: str
+
+    :raises ValueError: Adding constraints of different types (leq and eq)
+    :raises ValueError: Subtracting constraints of different types (leq and eq)
+    :raises ValueError: Cannot multiply constraints
+    :raises ValueError: Cannot divide constraints
+    """
+    
     def __init__(
         self,
         function: F | V,
