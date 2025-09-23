@@ -324,16 +324,25 @@ class V:
     #                    Solution
     # -----------------------------------------------------
 
-    def sol(self, n_sol: int = 0, aslist: bool = False) -> list[float] | None:
+    def sol(
+        self, n_sol: int = 0, aslist: bool = False, compare=False
+    ) -> list[float] | None:
         """Solution
         Args:
             aslist (bool, optional): Returns values taken as list. Defaults to False.
         """
-        if aslist:
-            return [v.X[n_sol] for v in self._ if n_sol in v.X]
-        for v in self._:
-            if n_sol in v.X:
-                display(Math(v.latex() + r'=' + rf'{v.X[n_sol]}'))
+        if compare:
+            # this writes out a comparison of the solutions across multiple objectives
+            for v in self._:
+                display(
+                    Math(v.latex() + r'=' + ", ".join(str(val) for val in v.X.values()))
+                )
+        else:
+            if aslist:
+                return [v.X[n_sol] for v in self._ if n_sol in v.X]
+            for v in self._:
+                if n_sol in v.X:
+                    display(Math(v.latex() + r'=' + rf'{v.X[n_sol]}'))
 
     # -----------------------------------------------------
     #                    Printing
