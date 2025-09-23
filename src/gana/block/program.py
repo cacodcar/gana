@@ -50,28 +50,40 @@ except ImportError:
 
 @dataclass
 class Prg:
-    """A mathematical program
-    Can be a linear (LP), integer (IP), or mixed-integer (MIP)
+    """
+    A mathematical program.
 
-    Args:
-        name (str, optional): Name of the program. Defaults to 'prog'.
-        tol (float, optional): Tolerance. Defaults to None.
-        canonical (bool, optional): Canonical form. Defaults to True.
-        tag (str, optional): Tag for the program. Defaults to ''.
+    Can be a linear (LP), integer (IP), or mixed-integer (MIP).
 
-    Attributes:
-        names (list[str]): Names of declared sets
-        sets (Sets): An object to hold set objects
-        names_idx (list[str]): Names of the index elements
-        indices (list[X]): Index sets
-        variables (list[Var]): Variable sets
-        thetas (list[PVar]): Parametric Variable sets
-        functions (list[Func]): Function sets
-        constraints (list[Cons]): Constraint sets
-        objectives (list[Obj]): Objectives
+    :param name: Name of the program. Defaults to 'prog'.
+    :type name: str, optional
+    :param tol: Tolerance. Defaults to None.
+    :type tol: float, optional
+    :param canonical: Whether to use canonical form. Defaults to True.
+    :type canonical: bool, optional
+    :param tag: Tag for the program. Defaults to ''.
+    :type tag: str, optional
 
-    Raises:
-        ValueError: if overwriting a set
+    :ivar names: Names of declared sets
+    :vartype names: list[str]
+    :ivar sets: Object to hold set objects
+    :vartype sets: Sets
+    :ivar names_idx: Names of the index elements
+    :vartype names_idx: list[str]
+    :ivar indices: Index sets
+    :vartype indices: list[X]
+    :ivar variables: Variable sets
+    :vartype variables: list[Var]
+    :ivar thetas: Parametric variable sets
+    :vartype thetas: list[PVar]
+    :ivar functions: Function sets
+    :vartype functions: list[Func]
+    :ivar constraints: Constraint sets
+    :vartype constraints: list[Cons]
+    :ivar objectives: Objective sets
+    :vartype objectives: list[Obj]
+
+    :raises ValueError: If overwriting a set
     """
 
     name: str = field(default='prog')

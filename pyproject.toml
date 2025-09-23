@@ -12,12 +12,12 @@ maintainers = [
   { name="Rahul Kakodkar", email="cacodcar@gmail.com" },
 ]
 description = "A barebones mathematical programming package"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 readme = "README.md"
 license = { file = "LICENSE" }
 keywords = ["modeling", "optimization", "programming", "aml"]
 classifiers = [
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
@@ -27,10 +27,10 @@ dependencies = ["ppopt"]
 all = ["gurobipy",  "pyomo", "sympy", "IPython"]
 test = ["coverage", "pytest"]
 docs = [
-    "sphinx",            # Core documentation tool
-    "sphinx-rtd-theme",  # Optional: ReadTheDocs theme
-    "nbsphinx",          # Jupyter notebook integration
-    "myst-parser",       # Markdown support
+    "sphinx",            
+    "sphinx_book_theme",  
+    "nbsphinx",          
+    'sphinx_mdinclude',     
 ]
 [project.urls]
 Homepage = "https://github.com/cacodcar/gana"

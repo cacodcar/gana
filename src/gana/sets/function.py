@@ -24,53 +24,86 @@ if TYPE_CHECKING:
 
 
 class F:
-    """Provides some relational operation between parameter sets and variable sets or function sets (F) themselves.
-
-    Not to be declared by the user directly.
-    Made based on the operation between parameter sets (P or list of numbers or number) or variable sets (V) or function sets (F).
-
-    Args:
-        one (int | float | list[int | float] | P | V | T | F, optional): First element.
-        two (int | float | list[int | float] | P | V | T | F, optional): Second element. Defaults to 0.
-        one_type (Elem, optional): one' type. Default to None
-        two_type (Elem, optional): two' type. Default to None
-        mul (bool, optional): Multiplication. Defaults to False.
-        add (bool, optional): Addition. Defaults to False.
-        sub (bool, optional): Subtraction. Defaults to False.
-        div (bool, optional): Division. Defaults to False.
-        consistent (bool, optional): If the function is already consistent. Saves some computation. Defaults to False.
-        case (FCase, optional): Special Function case. Defaults to None.
-        parent (Self, optional): Parent function. Defaults to None.
-        pos (int, optional): Position of the function in the parent. Defaults to None.
-        index (tuple[I] | list[tuple[I]] | None, optional): Index of the function. Defaults to None.
-        issumhow (tuple[V, I, int], optional): If the function is a summation, this is the variable, index and position of the summation. Defaults to None.
-        process (bool, optional): whether to make matrices. Defaults to True
-    Attributes:
-        one (P | V | F): First element
-        two (P | V | F): Second element
-        mul (bool): Multiplication
-        add (bool): Addition
-        sub (bool): Subtraction
-        div (bool): Division
-        rel (str): Relation symbol
-        name (str): Name of the function, reads out the operation
-        index (I): Index of the function set
-        array (list[P | T | V]): List of elements in the function
-        vars (list[V]): List of variables in the function
-        struct tuple[Elem, Elem]: Structure of the function
-        rels (list[str]): Relations in the function
-        elms (list[P | V]): Elements in the function
-        isnegvar (bool): If the function is -1*v (negation)
-        isconsistent (bool): If the function is consistent
-        n (int): Number id, set by the program
-        pname (str): Name, set by the program
-        elmo (dict[int, list[P | V | T | str]]): Elements in the function with relation. Also a sesame street character
-
-
-    Raises:
-        ValueError: If one of mul, add, sub or div is not True
     """
+    Provides relational operations between parameter sets, variable sets, or function sets (F).
 
+    This class is not intended to be declared by the user directly. 
+    It is constructed based on operations between parameter sets (P or list of numbers or number),
+    variable sets (V), or function sets (F).
+
+    :param one: First element.
+    :type one: int | float | list[int | float] | P | V | T | F, optional
+    :param two: Second element. Defaults to 0.
+    :type two: int | float | list[int | float] | P | V | T | F, optional
+    :param one_type: Type of `one`. Defaults to None.
+    :type one_type: Elem, optional
+    :param two_type: Type of `two`. Defaults to None.
+    :type two_type: Elem, optional
+    :param mul: Multiplication operation. Defaults to False.
+    :type mul: bool, optional
+    :param add: Addition operation. Defaults to False.
+    :type add: bool, optional
+    :param sub: Subtraction operation. Defaults to False.
+    :type sub: bool, optional
+    :param div: Division operation. Defaults to False.
+    :type div: bool, optional
+    :param consistent: If the function is already consistent, saves computation. Defaults to False.
+    :type consistent: bool, optional
+    :param case: Special function case. Defaults to None.
+    :type case: FCase, optional
+    :param parent: Parent function. Defaults to None.
+    :type parent: Self, optional
+    :param pos: Position of the function in the parent. Defaults to None.
+    :type pos: int, optional
+    :param index: Index of the function. Defaults to None.
+    :type index: tuple[I] | list[tuple[I]] | None, optional
+    :param issumhow: If the function is a summation, provides variable, index, and position. Defaults to None.
+    :type issumhow: tuple[V, I, int], optional
+    :param process: Whether to make matrices. Defaults to True.
+    :type process: bool, optional
+
+    :ivar one: First element
+    :vartype one: P | V | F
+    :ivar two: Second element
+    :vartype two: P | V | F
+    :ivar mul: Multiplication flag
+    :vartype mul: bool
+    :ivar add: Addition flag
+    :vartype add: bool
+    :ivar sub: Subtraction flag
+    :vartype sub: bool
+    :ivar div: Division flag
+    :vartype div: bool
+    :ivar rel: Relation symbol
+    :vartype rel: str
+    :ivar name: Name of the function, describing the operation
+    :vartype name: str
+    :ivar index: Index of the function set
+    :vartype index: I
+    :ivar array: List of elements in the function
+    :vartype array: list[P | T | V]
+    :ivar vars: List of variables in the function
+    :vartype vars: list[V]
+    :ivar struct: Structure of the function
+    :vartype struct: tuple[Elem, Elem]
+    :ivar rels: Relations in the function
+    :vartype rels: list[str]
+    :ivar elms: Elements in the function
+    :vartype elms: list[P | V]
+    :ivar isnegvar: If the function is -1*v (negation)
+    :vartype isnegvar: bool
+    :ivar isconsistent: If the function is consistent
+    :vartype isconsistent: bool
+    :ivar n: Number id, set by the program
+    :vartype n: int
+    :ivar pname: Name set by the program
+    :vartype pname: str
+    :ivar elmo: Elements with relation (also a sesame street character)
+    :vartype elmo: dict[int, list[P | V | T | str]]
+
+    :raises ValueError: If none of `mul`, `add`, `sub`, or `div` is True
+    """
+    
     def __init__(
         self,
         # --------- Elements -----------

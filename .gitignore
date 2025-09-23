@@ -200,6 +200,6 @@ pyrightconfig.json
 
 *.pkl 
 *.mps
-*.log
 *.lp 
+*.swp
 results/

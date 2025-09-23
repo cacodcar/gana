@@ -33,32 +33,43 @@ except ImportError:
 
 
 class P:
-    """Ordered set of parameters
+    """
+    Ordered set of parameters.
 
-    Does not support inf and nan values.
+    Does not support `inf` or `nan` values.
 
-    Args:
-        *index (tuple[I], optional): Indices. Defaults to None.
-        _ (list[int | float], optional): list of parameters. Defaults to None.
-        mutable (bool): If the parameter is mutable
-        tag (str): Tag/details
+    :param index: Indices of the parameter set.
+    :type index: tuple[I], optional
+    :param _: List of parameters. All values are converted to float.
+    :type _: list[int | float], optional
+    :param mutable: If the parameter set is mutable.
+    :type mutable: bool, optional
+    :param tag: Tag/details
+    :type tag: str, optional
 
-    Attributes:
-        index (I): Index of the parameter set.
-        _ (list[int | float]): List of parameters. All converted to float.
-        mutable (bool): If the parameter is mutable.
-        tag (str): Tag/details.
-        name (str): Name, set by the program
-        n (int): Number id, set by the program.
-        map (dict[X | Idx, Var]): Index to parameter mapping.
-        case (PCase): Special case of a parameter set
+    :ivar index: Index of the parameter set
+    :vartype index: I
+    :ivar _: List of parameters (converted to float)
+    :vartype _: list[int | float]
+    :ivar mutable: If the parameter set is mutable
+    :vartype mutable: bool
+    :ivar tag: Tag/details
+    :vartype tag: str
+    :ivar name: Name, set by the program
+    :vartype name: str
+    :ivar n: Number id, set by the program
+    :vartype n: int
+    :ivar map: Index to parameter mapping
+    :vartype map: dict[X | Idx, Var]
+    :ivar case: Special case of the parameter set
+    :vartype case: PCase
 
-    Raises:
-        ValueError: If != operator is used with any other type (not P)
-        ValueError: If the parameter values and length of indices do not match
+    :raises ValueError: If `!=` operator is used with any type other than `P`
+    :raises ValueError: If the parameter values and the length of indices do not match
     """
 
     # TODO update Errors in docstring
+    # TODO add examples
 
     def __init__(
         self,
