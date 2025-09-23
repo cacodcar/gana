@@ -25,6 +25,10 @@ class Solution:
 
         self._: dict[str, dict[str, list]] = {}
 
+    def asdict(self):
+        """Return the solution as a dictionary"""
+        return {v: values['values'] for v, values in self._.items()}
+
     def update(self, variable_sets: list[V], n_sol: int = 0):
         """Add variables to the solution"""
         for v in variable_sets:
