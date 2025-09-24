@@ -27,7 +27,7 @@ class F:
     """
     Provides relational operations between parameter sets, variable sets, or function sets (F).
 
-    This class is not intended to be declared by the user directly. 
+    This class is not intended to be declared by the user directly.
     It is constructed based on operations between parameter sets (P or list of numbers or number),
     variable sets (V), or function sets (F).
 
@@ -103,7 +103,7 @@ class F:
 
     :raises ValueError: If none of `mul`, `add`, `sub`, or `div` is True
     """
-    
+
     def __init__(
         self,
         # --------- Elements -----------
@@ -379,7 +379,7 @@ class F:
         Stretches the shorter index to match the longer one.
 
         This comes up in writing 'multiscale' constraints, e.g.:
-        ..math::
+        .. math::
             \\mathbf{production}_{operation, hour} - \\mathrm{Parameter}_{operation, time} \\cdot \\mathbf{capacity}_{operation, year} \\leq 0
 
         One of the indices needs to be divisible by the other if there is a mismatch
@@ -455,7 +455,7 @@ class F:
         i am just using the __add__ dunder for I to create
         a function index basically.
         This is of the form
-        ..math::
+        .. math::
             f(\\mathbf{x}, \\mathbf{y})_{i,j} = \\mathbf{x}_{i} + \\mathbf{y}_{j}
 
         sets self.index
@@ -718,11 +718,10 @@ class F:
         F - pvar (theta) parameters
 
         The general for is:
-        ..math::
+        .. math::
             \\mathrm{A} \\cdot \\mathbf{V} = \\mathrm{B} + \\mathrm{F} \\cdot θ
 
         sets self.A, self.P, self.Y, self.Z, self.B, self.F
-
         """
 
         # TODO, pass this on for birthed functions

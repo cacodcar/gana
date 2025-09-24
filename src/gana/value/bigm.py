@@ -1,9 +1,6 @@
-"""BigM 
-"""
+"""BigM"""
 
 from typing import Self
-
-from sympy import IndexedBase
 
 
 class M:
@@ -14,7 +11,12 @@ class M:
         # big value if needed
         self._ = _
         # if this is a negative big M
-        self.name = r'M'
+
+        self.neg = neg
+        if neg:
+            self.name = r'M_{-}'
+        else:
+            self.name = r'M'
 
     def __repr__(self):
         return self.name
@@ -67,6 +69,3 @@ class M:
 
     def __ne__(self, other: Self):
         return not self == other
-
-    def __call__(self) -> IndexedBase:
-        return IndexedBase('M')

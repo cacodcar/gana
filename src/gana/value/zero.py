@@ -1,11 +1,6 @@
-"""Zero
-"""
-
-from __future__ import annotations
+"""Zero"""
 
 from typing import Self
-
-from sympy import IndexedBase
 
 
 class Z:
@@ -119,6 +114,6 @@ class Z:
     def __ne__(self, other: Self | float):
         return not self == other
 
-    def __call__(self) -> IndexedBase:
-        """Symbol"""
-        return -IndexedBase('δ') if self.neg else IndexedBase('δ')
+    # def __call__(self) -> IndexedBase:
+    #     """Symbol"""
+    #     return -IndexedBase('δ') if self.neg else IndexedBase('δ')
