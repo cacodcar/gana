@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>61"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -16,6 +16,7 @@ requires-python = ">=3.13"
 readme = "README.md"
 license = { file = "LICENSE" }
 keywords = ["modeling", "optimization", "programming", "aml"]
+
 classifiers = [
     "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: MIT License",
