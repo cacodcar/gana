@@ -380,11 +380,11 @@ class F:
 
         This comes up in writing 'multiscale' constraints, e.g.:
         .. math::
-            \\mathbf{production}_{operation, hour} - \\mathrm{Parameter}_{operation, time} \\cdot \\mathbf{capacity}_{operation, year} \\leq 0
+            \mathbf{production}_{operation, hour} - \mathrm{Parameter}_{operation, time} \cdot \mathbf{capacity}_{operation, year} \leq 0
 
         One of the indices needs to be divisible by the other if there is a mismatch
 
-        Sets self.mis, self._one, self._two, self.one, self.two
+        Sets ``self.mis``, ``self._one``, ``self._two``, ``self.one``, ``self.two``
         """
 
         if self.parent is None and (self.one and self.two):
@@ -456,9 +456,10 @@ class F:
         a function index basically.
         This is of the form
         .. math::
-            f(\\mathbf{x}, \\mathbf{y})_{i,j} = \\mathbf{x}_{i} + \\mathbf{y}_{j}
 
-        sets self.index
+            f(\mathbf{x}, \mathbf{y})_{i,j} = \mathbf{x}_{i} + \mathbf{y}_{j}
+
+        sets ``self.index``
         """
 
         # index is a combination of one and two
@@ -717,11 +718,11 @@ class F:
         B - rhs parameters
         F - pvar (theta) parameters
 
-        The general for is:
+        The general form is:
         .. math::
-            \\mathrm{A} \\cdot \\mathbf{V} = \\mathrm{B} + \\mathrm{F} \\cdot θ
+            \mathrm{A} \cdot \mathbf{V} = \mathrm{B} + \mathrm{F} \cdot \theta
 
-        sets self.A, self.P, self.Y, self.Z, self.B, self.F
+        sets ``self.A``, ``self.P``, ``self.Y``, ``self.Z``, ``self.B``, ``self.F``
         """
 
         # TODO, pass this on for birthed functions

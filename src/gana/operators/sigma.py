@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from itertools import islice
+# from itertools import islice
 from typing import TYPE_CHECKING
 
 from ..sets.cases import Elem, FCase
