@@ -379,7 +379,9 @@ class F:
         Stretches the shorter index to match the longer one.
 
         This comes up in writing 'multiscale' constraints, e.g.:
+
         .. math::
+
             \mathbf{production}_{operation, hour} - \mathrm{Parameter}_{operation, time} \cdot \mathbf{capacity}_{operation, year} \leq \theta
 
         One of the indices needs to be divisible by the other if there is a mismatch
@@ -455,6 +457,7 @@ class F:
         i am just using the __add__ dunder for I to create
         a function index basically.
         This is of the form
+
         .. math::
 
             f(\mathbf{x}, \mathbf{y})_{i,j} = \mathbf{x}_{i} + \mathbf{y}_{j}
@@ -719,6 +722,7 @@ class F:
         F - pvar (theta) parameters
 
         The general form is:
+
         .. math::
 
             \mathrm{A} \cdot \mathbf{V} = \mathrm{B} + \mathrm{F} \cdot \theta
