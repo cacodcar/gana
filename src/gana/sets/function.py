@@ -720,6 +720,7 @@ class F:
 
         The general form is:
         .. math::
+        
             \mathrm{A} \cdot \mathbf{V} = \mathrm{B} + \mathrm{F} \cdot \theta
 
         sets ``self.A``, ``self.P``, ``self.Y``, ``self.Z``, ``self.B``, ``self.F``
