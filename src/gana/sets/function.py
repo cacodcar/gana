@@ -374,13 +374,13 @@ class F:
         return one, one_type, two, two_type, add, sub, mul, div
 
     def handle_mismatch(self):
-        """Determine mismatch between indices
+        r"""Determine mismatch between indices
 
         Stretches the shorter index to match the longer one.
 
         This comes up in writing 'multiscale' constraints, e.g.:
         .. math::
-            \mathbf{production}_{operation, hour} - \mathrm{Parameter}_{operation, time} \cdot \mathbf{capacity}_{operation, year} \leq 0
+            \mathbf{production}_{operation, hour} - \mathrm{Parameter}_{operation, time} \cdot \mathbf{capacity}_{operation, year} \leq \theta
 
         One of the indices needs to be divisible by the other if there is a mismatch
 
@@ -447,7 +447,7 @@ class F:
                 self._two_map = self.two.map
 
     def handle_index(self):
-        """Handles (compounds if needed) the index
+        r"""Handles (compounds if needed) the index
         Irrespective of the operation being done
 
         The index of a function is index.one + index.two
@@ -710,7 +710,7 @@ class F:
         return one, two
 
     def generate_matrices(self):
-        """Generates matrices
+        r"""Generates matrices
         A - variable coefficients
         X - position of continuous variables in program
         Y - position of discrete variables in program
@@ -720,7 +720,7 @@ class F:
 
         The general form is:
         .. math::
-        
+
             \mathrm{A} \cdot \mathbf{V} = \mathrm{B} + \mathrm{F} \cdot \theta
 
         sets ``self.A``, ``self.P``, ``self.Y``, ``self.Z``, ``self.B``, ``self.F``
