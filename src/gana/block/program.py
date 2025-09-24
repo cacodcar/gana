@@ -3,7 +3,8 @@
 import warnings
 from dataclasses import dataclass, field
 
-import numpy as np
+from numpy import array as nparray
+from numpy import zeros as npzeros
 from ppopt.mplp_program import MPLP_Program
 
 from ..operators.composition import inf, sup
@@ -16,6 +17,8 @@ from ..sets.parameter import P
 from ..sets.theta import T
 from ..sets.variable import V
 from .solution import Solution
+from pandas import DataFrame
+
 
 # optional dependencies
 try:
@@ -41,7 +44,6 @@ except ImportError:
 
 
 try:
-    from pandas import DataFrame
 
     has_pandas = True
 except ImportError:
@@ -1098,8 +1100,6 @@ class Prg:
         Returns:
             DataFrame: Columns are the variables, rows are the constraints.
         """
-        if not has_pandas:
-            raise ImportError("pip install gana[all] to get optional dependencies")
         if longname:
             return DataFrame(
                 self.A,
@@ -1139,8 +1139,6 @@ class Prg:
         Returns:
             DataFrame: Columns are the variables, Has a single row
         """
-        if not has_pandas:
-            raise ImportError("pip install gana[all] to get optional dependencies")
 
         if longname:
             columns = [v.longname for v in self.variables]
@@ -1157,8 +1155,7 @@ class Prg:
         Returns:
             DataFrame: A DataFrame with the A matrix, B vector, and C vector.
         """
-        if not has_pandas:
-            raise ImportError("pip install gana[all] to get optional dependencies")
+
         if longname:
             index = ['Minimize'] + [c.longname for c in self.cons()]
             columns = [v.longname for v in self.variables] + ['RHS']
@@ -1176,8 +1173,6 @@ class Prg:
 
     def make_CrA_df(self, longname: bool = False) -> DataFrame:
         """Creates a DataFrame from the Critical Region A matrix."""
-        if not has_pandas:
-            raise ImportError("pip install gana[all] to get optional dependencies")
 
         if longname:
             columns = [t.longname for t in self.thetas]
@@ -1190,8 +1185,6 @@ class Prg:
 
     def make_CrB_df(self, longname: bool = False) -> DataFrame:
         """Creates a DataFrame from the Critical Region RHS vector."""
-        if not has_pandas:
-            raise ImportError("pip install gana[all] to get optional dependencies")
 
         if longname:
             index = sum([[t.longname] * 2 for t in self.thetas], [])
@@ -1202,9 +1195,6 @@ class Prg:
 
     def make_F_df(self, longname: bool = False) -> DataFrame:
         """Creates a DataFrame from the Theta coefficients matrix."""
-        if not has_pandas:
-            raise ImportError("pip install gana[all] to get optional dependencies")
-
         if longname:
             columns = [t.longname for t in self.thetas]
             index = [c.longname for c in self.cons()]
@@ -1673,13 +1663,13 @@ class Prg:
         # H are the parameteric objective coefficients
 
         return MPLP_Program(
-            A=np.array(self.A + self.NN),
-            b=np.array([[i] for i in self.B] + [[0]] * self.n_variables),
-            c=np.array([[i] for i in self.C]),
-            A_t=np.array(self.CrA),
-            b_t=np.array([[i] for i in self.CrB]),
-            F=np.array(self.F + [[0] * self.n_thetas] * self.n_variables),
-            H=np.zeros((self.n_variables, self.n_thetas)),
+            A=nparray(self.A + self.NN),
+            b=nparray([[i] for i in self.B] + [[0]] * self.n_variables),
+            c=nparray([[i] for i in self.C]),
+            A_t=nparray(self.CrA),
+            b_t=nparray([[i] for i in self.CrB]),
+            F=nparray(self.F + [[0] * self.n_thetas] * self.n_variables),
+            H=npzeros((self.n_variables, self.n_thetas)),
             equality_indices=[c.n for c in self.cons() if c.eq],
         )
 
