@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 
 from numpy import array as nparray
 from numpy import zeros as npzeros
+from pandas import DataFrame
 from ppopt.mplp_program import MPLP_Program
 
 from ..operators.composition import inf, sup
@@ -17,8 +18,6 @@ from ..sets.parameter import P
 from ..sets.theta import T
 from ..sets.variable import V
 from .solution import Solution
-from pandas import DataFrame
-
 
 # optional dependencies
 try:
