@@ -1,7 +1,0 @@
-sympy 
-pyomo
-
-sphinx
-myst-parser
-nbsphinx
-sphinx-autodoc-typehints 
