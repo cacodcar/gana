@@ -1393,19 +1393,19 @@ class Prg:
 
         display(Markdown(rf'# Solution for {self.name}'))
 
-        display(Markdown('')) 
+        display(Markdown('<br><br>'))
         display(Markdown(r'## Objective'))
 
         self.objectives[n_sol].sol()
 
-        display(Markdown('')) 
+        display(Markdown('<br><br>'))
         display(Markdown(r'## Variables'))
 
         for v in self.variable_sets:
             v.sol(n_sol=n_sol, compare=compare)
 
         if slack:
-            display(Markdown('')) 
+            display(Markdown('<br><br>'))
             display(Markdown(r'## Constraint Slack'))
             for c in self.leqcons():
                 c.sol(n_sol=n_sol, compare=compare)
@@ -1455,7 +1455,7 @@ class Prg:
             categorical = True
 
         if self.index_sets:
-            display(Markdown('')) 
+            display(Markdown('<br><br>'))
             display(Markdown(r'## Index Sets'))
 
             for i in self.index_sets:
@@ -1463,7 +1463,7 @@ class Prg:
                     i.show(True)
 
         if self.objectives:
-            display(Markdown('')) 
+            display(Markdown('<br><br>'))
             display(Markdown(r'## Objective'))
 
             for o in self.objectives:
@@ -1471,7 +1471,7 @@ class Prg:
 
         if descriptive:
 
-            display(Markdown('')) 
+            display(Markdown('<br><br>'))
             display(Markdown(r'## s.t.'))
 
             if categorical:
@@ -1524,7 +1524,7 @@ class Prg:
                         c.show()
 
                 if self.functions:
-                    display(Markdown('')) 
+                    display(Markdown('<br><br>'))
                     display(Markdown(r'## Functions'))
                     for f in self.functions:
                         f.show()
@@ -1532,11 +1532,11 @@ class Prg:
         else:
 
             # if self.sets.nncons():
-            #     display(Markdown('')) 
+            #     display(Markdown('<br><br>'))
             #     display(Markdown(r'## Non-Negative Variables'))
             #     self.sets.I_nn.show()
 
-            display(Markdown('')) 
+            display(Markdown('<br><br>'))
             display(Markdown(r'## s.t.'))
 
             if categorical:
@@ -1577,18 +1577,18 @@ class Prg:
             else:
 
                 if self.leqcons_sets:
-                    display(Markdown('')) 
+                    display(Markdown('<br><br>'))
                     display(Markdown(r'### Inequality Constraint Sets'))
                     for c in self.leqcons_sets:
                         c.show()
                 if self.eqcons_sets:
-                    display(Markdown('')) 
+                    display(Markdown('<br><br>'))
                     display(Markdown(r'### Equality Constraint Sets'))
                     for c in self.eqcons_sets:
                         c.show()
 
                 if self.function_sets:
-                    display(Markdown('')) 
+                    display(Markdown('<br><br>'))
                     display(Markdown(r'## Functions'))
                     for f in self.function_sets:
                         f.show()
