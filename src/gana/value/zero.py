@@ -8,7 +8,7 @@ class Z:
 
     def __init__(self, _: float = 0, neg: bool = False):
         if _ and _ < 0:
-            raise ValueError('Zero value cant be negative, give neg = True')
+            raise ValueError("Zero value cant be negative, give neg = True")
         # a tolerance value if needed
         self._ = _
         self.neg = neg
@@ -17,9 +17,9 @@ class Z:
     def name(self):
         """name"""
         if self.neg:
-            return '-0'
+            return "-0"
         else:
-            return '0'
+            return "0"
 
     def __repr__(self):
         return self.name
@@ -64,7 +64,7 @@ class Z:
         return self
 
     def __rtruediv__(self, other: Self | float):
-        raise ValueError('Cant divide by zero')
+        raise ValueError("Cant divide by zero")
 
     def __gt__(self, other: Self | float):
 

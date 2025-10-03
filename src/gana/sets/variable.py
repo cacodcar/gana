@@ -28,7 +28,7 @@ except ImportError:
     has_pyomo = False
 
 try:
-    from sympy import Idx, IndexedBase, Symbol, symbols
+    from sympy import Idx, IndexedBase, symbols
 
     has_sympy = True
 except ImportError:
@@ -118,7 +118,7 @@ class V:
         if self.bnr:
             self.itg = bnr
             if not nn:
-                raise ValueError('Binary variables must be non-negative')
+                raise ValueError("Binary variables must be non-negative")
 
         self.nn = nn
         self.mutable = mutable
@@ -132,7 +132,7 @@ class V:
         self._: list[Self] = []
 
         # set by program
-        self.name: str = ''
+        self.name: str = ""
 
         # the check helps to handle if a variable itself is an index
         # we do not want to iterate over the entire variable set
@@ -153,7 +153,7 @@ class V:
             for idx in _index:
                 for i in product(*idx):
                     _map[i] = None
-            print('vvvvvvv', _index, _map)
+            print("vvvvvvv", _index, _map)
             _index = set(_index)
 
         else:
@@ -207,7 +207,7 @@ class V:
         # as variables can mutate in gana
         self.make_copy: bool = False
 
-        self.category: str = ''
+        self.category: str = ""
 
     @property
     def matrix(self) -> dict:
@@ -221,23 +221,23 @@ class V:
     def args(self) -> dict[str, str | bool]:
         """Return the arguments of the variable set"""
         return {
-            'itg': self.itg,
-            'nn': self.nn,
-            'bnr': self.bnr,
-            'mutable': self.mutable,
-            'tag': self.tag,
-            'ltx': self.ltx,
+            "itg": self.itg,
+            "nn": self.nn,
+            "bnr": self.bnr,
+            "mutable": self.mutable,
+            "tag": self.tag,
+            "ltx": self.ltx,
         }
 
     @property
     def ltx(self) -> str:
         """LaTeX representation of the variable set"""
         if self._ltx:
-            return r'{' + self._ltx + r'}'
+            return r"{" + self._ltx + r"}"
         # if user has not set the LaTeX representation
         # the name becomes the latex representation
         if self.name:
-            return r'{' + self.name.replace('_', r'\_') + r'}'
+            return r"{" + self.name.replace("_", r"\_") + r"}"
         return self._ltx
 
     # -----------------------------------------------------
@@ -308,7 +308,7 @@ class V:
 
             if not mutating:
                 # give the same name as self
-                variable.name = rf'{self}[{pos}]'
+                variable.name = rf"{self}[{pos}]"
 
                 # this is the position in the parent set
                 variable.pos = pos
@@ -343,14 +343,14 @@ class V:
             # this writes out a comparison of the solutions across multiple objectives
             for v in self._:
                 display(
-                    Math(v.latex() + r'=' + ", ".join(str(val) for val in v.X.values()))
+                    Math(v.latex() + r"=" + ", ".join(str(val) for val in v.X.values()))
                 )
         else:
             if aslist:
                 return [v.X[n_sol] for v in self._ if n_sol in v.X]
             for v in self._:
                 if n_sol in v.X:
-                    display(Math(v.latex() + r'=' + rf'{v.X[n_sol]}'))
+                    display(Math(v.latex() + r"=" + rf"{v.X[n_sol]}"))
 
     # -----------------------------------------------------
     #                    Printing
@@ -359,13 +359,13 @@ class V:
     def latex(self, index_only: bool = False) -> str:
         """LaTeX representation"""
         index = (
-            r'_{'
-            + rf'{self.index}'.replace('), (', '|')
-            .replace('(', '')
-            .replace(')', '')
-            .replace('[', '{')
-            .replace(']', '}')
-            + r'}'
+            r"_{"
+            + rf"{self.index}".replace("), (", "|")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("[", "{")
+            .replace("]", "}")
+            + r"}"
         )
 
         if index_only:
@@ -376,7 +376,7 @@ class V:
         if len(self.index) == 1:
             # if there is a single index element
             # then a comma will show up in the end, replace that
-            return self.ltx + index.replace(',', '')  # type: ignore
+            return self.ltx + index.replace(",", "")  # type: ignore
 
         return self.ltx + index
 
@@ -395,19 +395,19 @@ class V:
     def mps(self):
         """Name in MPS file"""
         if self.bnr:
-            return f'X{self.n}'
-        return f'V{self.n}'
+            return f"X{self.n}"
+        return f"V{self.n}"
 
     def lp(self) -> str:
         """LP representation"""
-        return f'{self}_{self.pos}'
+        return f"{self}_{self.pos}"
 
     @property
     def longname(self) -> str:
         """Long name"""
         if self.parent:
-            return f'{self.parent.name}(' + ",".join([i.name for i in self.index]) + ')'
-        return f'{self.name}(' + ",".join([i.name for i in self.index]) + ')'
+            return f"{self.parent.name}(" + ",".join([i.name for i in self.index]) + ")"
+        return f"{self.name}(" + ",".join([i.name for i in self.index]) + ")"
 
     # -----------------------------------------------------
     #                    Birthers
@@ -418,8 +418,8 @@ class V:
         return V(
             *self.index,
             bnr=True,
-            tag=f'Reporting binary for {self.tag}',
-            ltx=rf'x_{self.ltx}',
+            tag=f"Reporting binary for {self.tag}",
+            ltx=rf"x_{self.ltx}",
         )
 
     # -----------------------------------------------------
@@ -672,14 +672,14 @@ class V:
         if isinstance(other, tuple):
             # TODO multiplying by a tuple
             raise ValueError(
-                f'{self}*{other}: Multiplication with multiparameteric variable is not supported yet'
+                f"{self}*{other}: Multiplication with multiparameteric variable is not supported yet"
             )
 
         if isinstance(other, list):
             if isinstance(other[0], tuple):
                 # TODO multiplying by a list of tuples
                 raise ValueError(
-                    f'{self}*{other}: Multiplication with multiparameteric variable is not supported yet'
+                    f"{self}*{other}: Multiplication with multiparameteric variable is not supported yet"
                 )
             else:
                 return F(
@@ -760,13 +760,13 @@ class V:
 
         if isinstance(other, tuple):
             # TODO division by tuple
-            raise ValueError('Division by tuple is not supported yet, use T instead')
+            raise ValueError("Division by tuple is not supported yet, use T instead")
 
         if isinstance(other, list):
             # TODO division by list of tuples
             if isinstance(other[0], tuple):
                 raise ValueError(
-                    'Division by tuple is not supported yet, use T instead'
+                    "Division by tuple is not supported yet, use T instead"
                 )
             return F(
                 one=make_P([1 / o for o in other]),
@@ -993,7 +993,7 @@ class V:
     # -----------------------------------------------------
 
     def __str__(self):
-        return rf'{self.name}'
+        return rf"{self.name}"
 
     def __repr__(self):
         return str(self.name)
@@ -1009,7 +1009,7 @@ class V:
         """symbolic representation"""
         if has_sympy:
             return IndexedBase(str(self))[
-                symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
+                symbols(",".join([f"{d}" for d in self.index]), cls=Idx)
             ]
         print(
             "sympy is an optional dependency, pip install gana[all] to get optional dependencies"
@@ -1039,11 +1039,11 @@ class V:
 
     def draw(
         self,
-        kind: str = 'line',
+        kind: str = "line",
         font_size: float = 16,
         fig_size: tuple[float, float] = (12, 6),
         linewidth: float = 0.7,
-        color: str = 'blue',
+        color: str = "blue",
         grid_alpha: float = 0.3,
         usetex: bool = True,
     ):
@@ -1076,28 +1076,28 @@ class V:
 
         if usetex:
             rc(
-                'font',
-                **{'family': 'serif', 'serif': ['Computer Modern'], 'size': font_size},
+                "font",
+                **{"family": "serif", "serif": ["Computer Modern"], "size": font_size},
             )
-            rc('text', usetex=usetex)
+            rc("text", usetex=usetex)
         else:
-            rc('font', **{'size': font_size})
+            rc("font", **{"size": font_size})
 
-        if kind == 'line':
+        if kind == "line":
             ax.plot(x, y, linewidth=linewidth, color=color)
 
-        elif kind == 'bar':
+        elif kind == "bar":
             ax.bar(x, y, linewidth=linewidth, color=color)
 
-        ax.set_title(rf'${self.latex()}$')
-        ax.set_ylabel(r'Values')
-        ax.set_xlabel(r'Indices')
+        ax.set_title(rf"${self.latex()}$")
+        ax.set_ylabel(r"Values")
+        ax.set_xlabel(r"Indices")
         ax.grid(alpha=grid_alpha)
         ax.set_xticks(x)
         ax.set_xticklabels(
             [
-                rf'${tuple([idx.latex() for idx in index])}$'.replace("'", "").replace(
-                    '\\', ''
+                rf"${tuple([idx.latex() for idx in index])}$".replace("'", "").replace(
+                    "\\", ""
                 )
                 for index in self.map
             ]
@@ -1107,8 +1107,8 @@ class V:
 
     def draw_line(self, **kwargs):
         """Alias for plot with kind='line'"""
-        self.draw(kind='line', **kwargs)
+        self.draw(kind="line", **kwargs)
 
     def draw_bar(self, **kwargs):
         """Alias for plot with kind='bar'"""
-        self.draw(kind='bar', **kwargs)
+        self.draw(kind="bar", **kwargs)

@@ -62,19 +62,19 @@ class I:
         p = Program()
         p.s1 = I('a', 'b', 'c')
         p.s2 = I('a', 'd', 'e', 'f')
-        
+
         # Intersection
         p.s1 & p.s2
         # I('a')
-        
+
         # Union
         p.s1 | p.s2
         # I('a', 'b', 'c', 'd', 'e', 'f')
-        
+
         # Symmetric difference
         p.s1 ^ p.s2
         # I('b', 'c', 'd', 'e', 'f')
-        
+
         # Difference
         p.s1 - p.s2
         # I('b', 'c')
@@ -92,7 +92,7 @@ class I:
         self.tag = tag
         self.mutable = mutable
         # set by program
-        self.name = ''
+        self.name = ""
         self.n = None
 
         # this is when children single element sets are created
@@ -110,7 +110,7 @@ class I:
         if size:
             if members:
                 raise ValueError(
-                    'An index set can either be defined by members or size, not both'
+                    "An index set can either be defined by members or size, not both"
                 )
             self.size = size
             self.members = []
@@ -165,7 +165,7 @@ class I:
             # set that this is ordered
             index.ordered = True
             # give the name
-            index.name = rf'{self}[{n}]'
+            index.name = rf"{self}[{n}]"
             index._hash = hash(index.name)
             # the only element in element (index set of size one)
             # is itself
@@ -173,7 +173,7 @@ class I:
             index.size = 1
             index.members = [index.name]
             self._.append(index)
-            index.ltx = rf'{self.ltx}[{n}]'
+            index.ltx = rf"{self.ltx}[{n}]"
 
     # -----------------------------------------------------
     #                    Modifiers
@@ -186,7 +186,7 @@ class I:
         """
         if not self.ordered:
             raise ValueError(
-                'Index set is not ordered, cannot step up or down the index set'
+                "Index set is not ordered, cannot step up or down the index set"
             )
         if not n:
             # if no step (0)
@@ -199,12 +199,12 @@ class I:
             in_index = self._[:n]
             index._ = [None] * -n + in_index
             # the negative sign will come with n
-            index.name = f'{self.name}{n}'
+            index.name = f"{self.name}{n}"
         else:
             in_index = self._[n:]
             index._ = in_index + [None] * n
             # + needs to be provided
-            index.name = f'{self.name}+{n}'
+            index.name = f"{self.name}+{n}"
 
         # update the members
         index.members = [i.name for i in in_index]
@@ -243,20 +243,20 @@ class I:
         """
 
         if not self.name:
-            return ''
+            return ""
 
         # if the name has underscores, replace them with \_
-        ltx = self.name.replace('_', r'\_')
+        ltx = self.name.replace("_", r"\_")
 
         if self.parent and any(parent.ordered for parent in self.parent):
-            ltx = ltx.replace('[', '_{').replace(']', '}')
-            ltx = r'{' + ltx + r'}'
+            ltx = ltx.replace("[", "_{").replace("]", "}")
+            ltx = r"{" + ltx + r"}"
 
         else:
-            ltx = ltx.replace('[', '{').replace(']', '}')
+            ltx = ltx.replace("[", "{").replace("]", "}")
 
         # name, sup = self.nsplit()
-        ltx = ltx.replace('|', r'\cup')
+        ltx = ltx.replace("|", r"\cup")
         # mathcal = rf'\mathcal{{{name}{sup}}}'
 
         if self.parent:
@@ -264,24 +264,24 @@ class I:
 
         if self.case == ICase.SELF:
             # if this is a self contained index
-            return ''
+            return ""
 
         if descriptive:
             if self.ordered:
                 if int_not:
                     return (
-                        rf'\{{ i = \mathbb{{{ltx}}} \mid '
-                        rf'{self._[0]} \leq i \leq {self._[-1]} \}}'
+                        rf"\{{ i = \mathbb{{{ltx}}} \mid "
+                        rf"{self._[0]} \leq i \leq {self._[-1]} \}}"
                     )
                 members = (
-                    r', '.join(x.latex() for x in self._)
+                    r", ".join(x.latex() for x in self._)
                     if len(self) < 5
-                    else rf'{self._[0].latex()},..,{self._[-1].latex()}'
+                    else rf"{self._[0].latex()},..,{self._[-1].latex()}"
                 )
-                return rf'{ltx} = \{{ {members} \}}'
+                return rf"{ltx} = \{{ {members} \}}"
 
-            members = r', '.join(x.latex() for x in self._)
-            return rf'{ltx} = \{{ {members} \}}'
+            members = r", ".join(x.latex() for x in self._)
+            return rf"{ltx} = \{{ {members} \}}"
 
         return ltx
 
@@ -298,14 +298,14 @@ class I:
         Args:
             pos (int): Position of the member in the set
         """
-        return rf'_{self[pos]}'.upper()
+        return rf"_{self[pos]}".upper()
 
     def lp(self, pos: int) -> str:
         """LP representation
         Args:
             pos (int): Position of the member in the set
         """
-        return rf'_{self[pos]}'
+        return rf"_{self[pos]}"
 
     # -----------------------------------------------------
     #                    Birth
@@ -338,7 +338,7 @@ class I:
         # Members that exist in both Index sets
         _and = [i for i in self.members if i in other.members]
 
-        return self.birth_index(rf'{self.name} & {other.name}', _and)
+        return self.birth_index(rf"{self.name} & {other.name}", _and)
 
     def __or__(self, other: Self):
         # members that exist in either self or other
@@ -346,7 +346,7 @@ class I:
         _or = list(self.members)
         # if a member in other is not included
         for i in other.members:
-            if not i in _or:
+            if i not in _or:
                 # append it to the list
                 _or.append(i)
         # mutable sets will have the same name
@@ -358,7 +358,7 @@ class I:
             return self.birth_index(self.name, _or)
 
         # else create a new name that reflects the operation
-        return self.birth_index(rf'{self.name} | {other.name}', _or)
+        return self.birth_index(rf"{self.name} | {other.name}", _or)
 
     def __xor__(self, other: Self):
         # members that exist in either self or other, but not both
@@ -366,13 +366,13 @@ class I:
         _xor: list[Self] = []
         # if something is in self but not in other
         for i in self.members:
-            if not i in other.members:
+            if i not in other.members:
                 _xor.append(i)
         # if something is in other but not in self
         for i in other.members:
-            if not i in self.members:
+            if i not in self.members:
                 _xor.append(i)
-        return self.birth_index(rf'{self.name} ^ {other.name}', _xor)
+        return self.birth_index(rf"{self.name} ^ {other.name}", _xor)
 
     def __sub__(self, other: int | Self):
         # other is an integer, step down the index set
@@ -387,10 +387,10 @@ class I:
         _sub = []
         # if a member of self is in the other set
         for i in self.members:
-            if not i in other.members:
+            if i not in other.members:
                 # do not append
                 _sub.append(i)
-        return self.birth_index(rf'{self.name} - {other.name}', _sub)
+        return self.birth_index(rf"{self.name} - {other.name}", _sub)
 
     def __add__(self, other: int | Self):
         # if other is an integer, step up the index set
@@ -399,7 +399,7 @@ class I:
 
         raise NotImplementedError(
             'Addition of Index sets is not implemented. Use | or the "or" operator for union.\n'
-            '+  can be used to step up the index set by an integer.'
+            "+  can be used to step up the index set by an integer."
         )
 
     def __mul__(self, other: Self | tuple | None):
@@ -452,9 +452,9 @@ class I:
             index.slice = key
             # note the start and stops
             if key.start is None:
-                index.name = rf'{self.name}[0:{key.stop}]'
+                index.name = rf"{self.name}[0:{key.stop}]"
             else:
-                index.name = rf'{self.name}[{key.start}:{key.stop}]'
+                index.name = rf"{self.name}[{key.start}:{key.stop}]"
 
             index.ordered = self.ordered
             index._ = self._[key]

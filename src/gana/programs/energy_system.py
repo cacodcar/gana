@@ -1,4 +1,6 @@
-from gana import *
+"""Energy System Model Example."""
+
+from gana import I, P, Prg, V, inf, sigma
 
 
 def energy_system():
@@ -6,12 +8,12 @@ def energy_system():
     p = Prg()
     p.y = I(size=1)
     p.q = I(size=3)
-    p.res_cons = I('solar')
-    p.res_dem = I('power')
-    p.res_stg = I('charge')
+    p.res_cons = I("solar")
+    p.res_dem = I("power")
+    p.res_stg = I("charge")
     p.res = p.res_cons | p.res_dem | p.res_stg
-    p.pro_var = I('pv')
-    p.pro_cer = I('li', 'li_d')
+    p.pro_var = I("pv")
+    p.pro_cer = I("li", "li_d")
     p.pro = p.pro_var | p.pro_cer
     p.dm_fac = P(p.power, p.q, _=[0.5, 1, 0.5])
     p.pv_fac = P(p.pv, p.q, _=[1, 0, 0.5])
@@ -19,7 +21,7 @@ def energy_system():
     p.capex = P(p.pro, p.y, _=[5000, 1000, 0])
     p.fopex = P(p.pro, p.y, _=[500, 100, 0])
     p.vopex = P(p.pro, p.y, _=[10, 50, 0])
-    p.capp = V(p.pro, p.y, ltx=r'cap^{p}')
+    p.capp = V(p.pro, p.y, ltx=r"cap^{p}")
     p.caps = V(p.res_stg, p.y)
     p.sell = V(p.res_dem, p.q)
     p.con = V(p.res_cons, p.q)

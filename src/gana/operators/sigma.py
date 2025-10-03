@@ -64,7 +64,7 @@ def sigma(variable: V, over: I = None, position: int = None) -> F:
     f.give_name()
     # f.two_type = Elem.V
     f.rhs_thetas = []
-    
+
     length_var = len(_variables[0])
 
     keys = list(zip(*(v.map for v in f.variables)))

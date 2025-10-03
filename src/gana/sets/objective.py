@@ -37,7 +37,7 @@ class O:
 
         self.variables = self.function.variables
         # the name, always minimization in gana
-        self.name = rf'min({self.function})'
+        self.name = rf"min({self.function})"
         # whats contained in the set
 
         # value obtained after optimization
@@ -69,11 +69,11 @@ class O:
         if asfloat:
             return self.X
 
-        display(Math(self.latex() + r'=' + rf'{self.X}'))
+        display(Math(self.latex() + r"=" + rf"{self.X}"))
 
     def latex(self):
         """Latex representation"""
-        return rf'min \hspace{{0.2cm}} {self.function.latex()}'
+        return rf"min \hspace{{0.2cm}} {self.function.latex()}"
 
     def show(self):
         """Pretty Print"""
@@ -81,10 +81,10 @@ class O:
 
     def mps(self):
         """Name in MPS file"""
-        return f'O{self.n}'
+        return f"O{self.n}"
 
     def __str__(self):
-        return rf'{self.name}'
+        return rf"{self.name}"
 
     def __repr__(self):
         return str(self)

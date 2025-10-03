@@ -10,4 +10,4 @@ if TYPE_CHECKING:
 
 def multi_name(*index: I):
     """returns a name for tuple index with underscores"""
-    name = '_'.join([i.name for i in index])
+    return "_".join([i.name for i in index])

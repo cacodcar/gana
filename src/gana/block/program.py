@@ -34,12 +34,12 @@ try:
 except ImportError:
     has_ipython = False
 
-try:
-    from pyomo.environ import ConcreteModel as PyoModel
+# try:
+#     # from pyomo.environ import ConcreteModel as PyoModel
 
-    has_pyomo = True
-except ImportError:
-    has_pyomo = False
+#     has_pyomo = True
+# except ImportError:
+#     has_pyomo = False
 
 
 try:
@@ -87,10 +87,10 @@ class Prg:
     :raises ValueError: If overwriting a set
     """
 
-    name: str = field(default='prog')
+    name: str = field(default="prog")
     tol: float = field(default=None)
     canonical: bool = field(default=True)
-    tag: str = field(default='')
+    tag: str = field(default="")
 
     def __post_init__(self):
 
@@ -215,7 +215,7 @@ class Prg:
         # for unordered sets, the elements are set on the program
         for n, member in enumerate(members):
 
-            if not member in self.names_indices:
+            if member not in self.names_indices:
                 # if this element has not been added to the program before
                 # create an element set
                 element = I()
@@ -309,12 +309,12 @@ class Prg:
                 continue
             # only update exisitng variable
             # if not already in the existing variable set
-            if not idx in variable_ex.map:
+            if idx not in variable_ex.map:
                 # set the position of the new variable
                 _pos = pos_start + n
                 v.pos = _pos
                 # set the name based on position in existing variable set
-                v.name = f'{_name}[{_pos}]'  # give a name
+                v.name = f"{_name}[{_pos}]"  # give a name
                 # set the parent to the existing variable set
                 v.parent = variable_ex
                 # update the variable map
@@ -379,7 +379,7 @@ class Prg:
             if idx in parameter_ex.map:
                 # warn if number is being replaced
                 warnings.warn(
-                    f'The value{parameter_ex.map[idx]} is being overwritten by {p} at index {idx}'
+                    f"The value{parameter_ex.map[idx]} is being overwritten by {p} at index {idx}"
                 )
 
             # set the position of the new parameter
@@ -426,7 +426,7 @@ class Prg:
             constraint (C): constraint with thetas to be updated
         """
         for n, theta in enumerate(constraint.function.rhs_thetas):
-            self.add_theta(name=f'θ{self.n_theta_sets}', theta=theta)
+            self.add_theta(name=f"θ{self.n_theta_sets}", theta=theta)
             # the last theta added is the one just made
             theta = self.theta_sets[-1]
             # replace the theta in the constraint rhs list
@@ -504,12 +504,12 @@ class Prg:
                 continue
             # only update exisitng theta
             # if not already in the existing theta set
-            if not idx in theta_ex.map:
+            if idx not in theta_ex.map:
                 # set the position of the new theta
                 _pos = pos_start + n
                 t.pos = _pos
                 # set the name based on position in existing theta set
-                t.name = f'{_name}[{_pos}]'  # give a name
+                t.name = f"{_name}[{_pos}]"  # give a name
                 # set the parent to the existing theta set
                 t.parent = theta_ex
                 # update the theta map
@@ -653,7 +653,7 @@ class Prg:
         # take the old constraints number and pname
         constraint_new.n = constraint_ex.n
         constraint_new.pname = constraint_ex.pname
-        if not constraint_ex.category == 'General':
+        if not constraint_ex.category == "General":
 
             constraint_new.categorize(constraint_ex.category)
 
@@ -728,7 +728,7 @@ class Prg:
 
         if isinstance(value, I):
 
-            if not name in self.names_index_sets and not name in self.names_indices:
+            if name not in self.names_index_sets and name not in self.names_indices:
 
                 if len(value.members) == 1 and value.members[0] == name:
                     # There is a special case, where a self contained set is passed
@@ -753,7 +753,7 @@ class Prg:
                     else:
                         self.add_indices(value)
 
-            elif not name in self.names_indices:
+            elif name not in self.names_indices:
                 # the set could be already declared, and mutable
                 # is being declared as part of another index set
                 # in which case get the original set to update
@@ -762,7 +762,7 @@ class Prg:
                 # if not mutable, raise error
                 if not index_ex.mutable:
                     raise ValueError(
-                        f'{self.name}: Overwriting index {name}. Set mutable=True if index needs to be updated'
+                        f"{self.name}: Overwriting index {name}. Set mutable=True if index needs to be updated"
                     )
 
                 # if an index is being mutated, skip setting
@@ -781,8 +781,8 @@ class Prg:
 
         elif isinstance(value, V):
 
-            if not name in self.names_variable_sets:
-                if not value.name in self.names_variable_sets:
+            if name not in self.names_variable_sets:
+                if value.name not in self.names_variable_sets:
                     # if variable set is new, add it to the program
                     # another check we do, is if variable is being added to the program
                     # but the variable already exists
@@ -799,7 +799,7 @@ class Prg:
                 # if not mutable, raise error
                 if not variable_ex.mutable:
                     raise ValueError(
-                        f'{self.name}: Overwriting variable {name}. Set mutable=True if variable needs to be updated'
+                        f"{self.name}: Overwriting variable {name}. Set mutable=True if variable needs to be updated"
                     )
 
                 # if an index is being mutated, skip setting
@@ -812,7 +812,7 @@ class Prg:
                 self.mutate_variable(variable_ex, value)
 
         elif isinstance(value, P):
-            if not name in self.names_parameter_sets:
+            if name not in self.names_parameter_sets:
                 # if parameter is new, add it to the program
 
                 if value.case in [PCase.NEGSET, PCase.SET]:
@@ -824,7 +824,7 @@ class Prg:
                 # if not mutable, raise error
                 if not parameter_ex.mutable:
                     raise ValueError(
-                        f'{self.name}: Overwriting parameter {name}. Set mutable=True if parameter needs to be updated'
+                        f"{self.name}: Overwriting parameter {name}. Set mutable=True if parameter needs to be updated"
                     )
 
                 # if an index is being mutated, skip setting
@@ -834,20 +834,20 @@ class Prg:
 
         elif isinstance(value, T):
 
-            if not name in self.names_theta_sets:
+            if name not in self.names_theta_sets:
                 self.add_theta(name, value)
 
             else:
                 theta_ex: T = getattr(self, name)
                 if not theta_ex.mutable:
                     raise ValueError(
-                        f'{self.name}: Overwriting theta {name}. Set mutable=True if theta needs to be updated'
+                        f"{self.name}: Overwriting theta {name}. Set mutable=True if theta needs to be updated"
                     )
                 _mutation = True
                 self.mutate_theta(theta_ex, value)
 
         elif isinstance(value, Func):
-            if not name in self.names_function_sets:
+            if name not in self.names_function_sets:
                 self.add_function(name, value)
             else:
                 # if function is being mutated
@@ -857,7 +857,7 @@ class Prg:
 
         elif isinstance(value, C):
 
-            if not name in self.names_constraint_sets:
+            if name not in self.names_constraint_sets:
                 self.add_constraint(name, value)
 
             else:
@@ -1127,7 +1127,7 @@ class Prg:
         else:
             index = [c.name for c in self.cons()]
 
-        return DataFrame(self.B, columns=['RHS'], index=index)
+        return DataFrame(self.B, columns=["RHS"], index=index)
 
     def make_C_df(self, longname: bool = False) -> DataFrame:
         """Create a DataFrame from the C matrix.
@@ -1143,7 +1143,7 @@ class Prg:
             columns = [v.longname for v in self.variables]
         else:
             columns = [v.name for v in self.variables]
-        return DataFrame([self.C], columns=columns, index=['Minimize'])
+        return DataFrame([self.C], columns=columns, index=["Minimize"])
 
     def make_df(self, longname: bool = False) -> DataFrame:
         """Create a DataFrame from the model.
@@ -1156,11 +1156,11 @@ class Prg:
         """
 
         if longname:
-            index = ['Minimize'] + [c.longname for c in self.cons()]
-            columns = [v.longname for v in self.variables] + ['RHS']
+            index = ["Minimize"] + [c.longname for c in self.cons()]
+            columns = [v.longname for v in self.variables] + ["RHS"]
         else:
-            index = ['Minimize'] + [c.name for c in self.cons()]
-            columns = [v.name for v in self.variables] + ['RHS']
+            index = ["Minimize"] + [c.name for c in self.cons()]
+            columns = [v.name for v in self.variables] + ["RHS"]
         data = []
         for n, d in enumerate(self.A):
             d.append(self.B[n])
@@ -1190,7 +1190,7 @@ class Prg:
         else:
             index = sum([[t.name] * 2 for t in self.thetas], [])
 
-        return DataFrame(self.CrB, columns=['RHS'], index=index)
+        return DataFrame(self.CrB, columns=["RHS"], index=index)
 
     def make_F_df(self, longname: bool = False) -> DataFrame:
         """Creates a DataFrame from the Theta coefficients matrix."""
@@ -1210,10 +1210,10 @@ class Prg:
     def mps(self, name: str = None):
         """MPS File"""
 
-        print(f'--- Generating {name or self.name}.mps')
+        print(f"--- Generating {name or self.name}.mps")
 
         # 1 unit of whitespace
-        ws = ' '
+        ws = " "
         # renumber the constraints based on order in .cons()
         # as opposed to order of declaration
         self.renumber()
@@ -1228,30 +1228,30 @@ class Prg:
         # _A = self.A
 
         # write the MPS file
-        with open(f'{name or self.name}.mps', 'w', encoding='utf-8') as f:
+        with open(f"{name or self.name}.mps", "w", encoding="utf-8") as f:
 
             # header: NAME          MODEL_NAME
-            f.write(f'NAME{ws*10}{self.name.upper()}\n')
+            f.write(f"NAME{ws*10}{self.name.upper()}\n")
 
             # Here the constraint types are defined
-            f.write('ROWS\n')
+            f.write("ROWS\n")
 
             if self.objectives:
                 # the objective is: N   OBJECTIVE_NAME
-                f.write(f'{ws}N{ws*3}{self.objectives[-1].mps()}\n')
+                f.write(f"{ws}N{ws*3}{self.objectives[-1].mps()}\n")
 
             for c in leq_cons:
                 # less than or equal constraints are: L   CONSTRAINT_NAME
-                f.write(f'{ws}L{ws*3}{c.mps()}\n')
+                f.write(f"{ws}L{ws*3}{c.mps()}\n")
 
             for c in eq_cons:
                 # equality constraints are: E   CONSTRAINT_NAME
-                f.write(f'{ws}E{ws*3}{c.mps()}\n')
+                f.write(f"{ws}E{ws*3}{c.mps()}\n")
 
             # Here the variables are defined along with their coefficients
             # in each of the constraints that they feature in
 
-            f.write('COLUMNS\n')
+            f.write("COLUMNS\n")
             for v in self.variables:
                 # For each variable, we write:
                 # V_NAME    CONSTRAINT_NAME    COEFFICIENT
@@ -1274,11 +1274,11 @@ class Prg:
                     #     f.write(f'{c.function[0].matrix[v.n]}')
                     # else:
                     #     f.write(f'{c.matrix[v.n]}')
-                    f.write(f'{c.matrix[v.n]}')
+                    f.write(f"{c.matrix[v.n]}")
 
                     # f.write(f'{c.A[c.P.index(v.n)]}')
 
-                    f.write('\n')
+                    f.write("\n")
 
                 for o in v.min_by:
                     # this captures the length of the variable name
@@ -1290,57 +1290,57 @@ class Prg:
                     f.write(o.mps())
                     f.write(ws * (10 - vfs))
 
-                    f.write(f'{o.function[0].matrix[v.n]}')
+                    f.write(f"{o.function[0].matrix[v.n]}")
 
                     # f.write(f'{c.A[c.P.index(v.n)]}')
-                    f.write('\n')
+                    f.write("\n")
 
             # This gives the right-hand side of the constraints
-            f.write('RHS\n')
+            f.write("RHS\n")
             for n, c in enumerate(leq_cons + eq_cons):
                 # For each constraint, we write:
                 # RHSn    CONSTRAINT_NAME    RHS_VALUE
                 f.write(ws * 4)
-                f.write(f'RHS{n}')
-                f.write(ws * (10 - len(f'RHS{n+1}')))
+                f.write(f"RHS{n}")
+                f.write(ws * (10 - len(f"RHS{n+1}")))
                 f.write(c.mps())
                 f.write(ws * (10 - len(c.mps())))
-                f.write(f'{c.B}')
-                f.write('\n')
+                f.write(f"{c.B}")
+                f.write("\n")
 
-            f.write('BOUNDS\n')
+            f.write("BOUNDS\n")
             # for continuous variables that are nonnegative, we write:
             # LO BND1    VARIABLE_NAME    0
             for v in nn_vars:
                 if v in cont_vars:
-                    f.write(f'{ws}LO{ws}BND1{ws*4}{v.mps()}{ws*8}{0}\n')
+                    f.write(f"{ws}LO{ws}BND1{ws*4}{v.mps()}{ws*8}{0}\n")
 
             # for integer variables that are binary, we write:
             # BV BND1    VARIABLE_NAME
             for v in bnr_vars:
-                f.write(f'{ws}BV{ws}BND1{ws*5}{v.mps()}\n')
+                f.write(f"{ws}BV{ws}BND1{ws*5}{v.mps()}\n")
 
             # CLOSE the MPS file
-            f.write('ENDATA')
+            f.write("ENDATA")
 
     def lp(self):
         """LP File"""
         m = self.gurobi()
-        m.write(f'{self.name}.lp')
+        m.write(f"{self.name}.lp")
 
     # --------------------------------------------------
     #               Optimize
     # --------------------------------------------------
-    def opt(self, using: str = 'gurobi'):
+    def opt(self, using: str = "gurobi"):
         """Solve the program"""
 
-        if using == 'gurobi':
+        if using == "gurobi":
             m = self.gurobi()
 
-            print(f'--- Optimizing {self} using {using}')
+            print(f"--- Optimizing {self} using {using}")
             m.optimize()
             try:
-                print('--- Solution found. Use .sol() to display it')
+                print("--- Solution found. Use .sol() to display it")
 
                 self.X[self.n_sol] = [v.X for v in m.getVars()]
 
@@ -1354,25 +1354,25 @@ class Prg:
                 self.objectives[-1].X = m.ObjVal
                 self.optimized = True
 
-                print('--- Creating Solution object, check.solution')
+                print("--- Creating Solution object, check.solution")
 
                 self.solution[self.n_sol] = self.birth_solution()
 
                 self.n_sol += 1
 
             except AttributeError:
-                print('!!! No solution found. Check the model.')
+                print("!!! No solution found. Check the model.")
 
     def lb(self, function: V | Func):
         """Finds the lower bound of a variable or function"""
         # set the objective to minimizing the variable
-        setattr(self, f'min({function})', inf(function))
+        setattr(self, f"min({function})", inf(function))
         self.opt()
 
     def ub(self, function: V | Func):
         """Finds the upper bound of a variable or function"""
         # set the objective to maximizing the variable
-        setattr(self, f'max({function})', sup(function))
+        setattr(self, f"max({function})", sup(function))
         self.opt()
 
     def obj(self):
@@ -1389,31 +1389,31 @@ class Prg:
         """Print sol"""
 
         if not self.optimized:
-            return r'Use .opt() to generate solution'
+            return r"Use .opt() to generate solution"
 
-        display(Markdown(rf'# Solution for {self.name}'))
+        display(Markdown(rf"# Solution for {self.name}"))
 
-        display(Markdown('<br><br>'))
-        display(Markdown(r'## Objective'))
+        display(Markdown("<br><br>"))
+        display(Markdown(r"## Objective"))
 
         self.objectives[n_sol].sol()
 
-        display(Markdown('<br><br>'))
-        display(Markdown(r'## Variables'))
+        display(Markdown("<br><br>"))
+        display(Markdown(r"## Variables"))
 
         for v in self.variable_sets:
             v.sol(n_sol=n_sol, compare=compare)
 
         if slack:
-            display(Markdown('<br><br>'))
-            display(Markdown(r'## Constraint Slack'))
+            display(Markdown("<br><br>"))
+            display(Markdown(r"## Constraint Slack"))
             for c in self.leqcons():
                 c.sol(n_sol=n_sol, compare=compare)
 
     def birth_solution(self):
         """Makes a solution object for the program"""
 
-        solution = Solution(self.name + '_solution_' + str(self.n_sol))
+        solution = Solution(self.name + "_solution_" + str(self.n_sol))
         solution.update(self.variables, n_sol=self.n_sol)
 
         return solution
@@ -1449,30 +1449,30 @@ class Prg:
     ):
         """Pretty Print"""
 
-        display(Markdown(rf'# Mathematical Program for {self}'))
+        display(Markdown(rf"# Mathematical Program for {self}"))
 
         if category:
             categorical = True
 
         if self.index_sets:
-            display(Markdown('<br><br>'))
-            display(Markdown(r'## Index Sets'))
+            display(Markdown("<br><br>"))
+            display(Markdown(r"## Index Sets"))
 
             for i in self.index_sets:
                 if len(i) != 0 and i.case != ICase.SELF:
                     i.show(True)
 
         if self.objectives:
-            display(Markdown('<br><br>'))
-            display(Markdown(r'## Objective'))
+            display(Markdown("<br><br>"))
+            display(Markdown(r"## Objective"))
 
             for o in self.objectives:
                 o.show()
 
         if descriptive:
 
-            display(Markdown('<br><br>'))
-            display(Markdown(r'## s.t.'))
+            display(Markdown("<br><br>"))
+            display(Markdown(r"## s.t."))
 
             if categorical:
                 # gather the categories if not already done
@@ -1499,33 +1499,33 @@ class Prg:
                 self.fcategories = fcategories
 
                 for category in sorted_categories:
-                    display(Markdown(rf'### {category} Constraints'))
+                    display(Markdown(rf"### {category} Constraints"))
                     for c in categories[category]:
                         c.show()
                 for category in sorted_fcategories:
-                    display(Markdown(rf'### {category} Functions'))
+                    display(Markdown(rf"### {category} Functions"))
                     for f in fcategories[category]:
                         f.show()
 
             else:
 
                 if self.leqcons():
-                    display(Markdown(r'### Inequality Constraints'))
+                    display(Markdown(r"### Inequality Constraints"))
                     for c in self.leqcons():
                         c.show()
                 if self.eqcons():
-                    display(Markdown(r'### Equality Constraints'))
+                    display(Markdown(r"### Equality Constraints"))
                     for c in self.eqcons():
                         c.show()
 
                 if self.nncons() and nncons:
-                    display(Markdown(r'### Non-Negative Constraints'))
+                    display(Markdown(r"### Non-Negative Constraints"))
                     for c in self.nncons():
                         c.show()
 
                 if self.functions:
-                    display(Markdown('<br><br>'))
-                    display(Markdown(r'## Functions'))
+                    display(Markdown("<br><br>"))
+                    display(Markdown(r"## Functions"))
                     for f in self.functions:
                         f.show()
 
@@ -1536,8 +1536,8 @@ class Prg:
             #     display(Markdown(r'## Non-Negative Variables'))
             #     self.sets.I_nn.show()
 
-            display(Markdown('<br><br>'))
-            display(Markdown(r'## s.t.'))
+            display(Markdown("<br><br>"))
+            display(Markdown(r"## s.t."))
 
             if categorical:
                 # gather the categories if not already done
@@ -1565,31 +1565,31 @@ class Prg:
                 self.fcategories_sets = fcategories_sets
 
                 for category in sorted_categories:
-                    display(Markdown(rf'### {category} Constraint Sets'))
+                    display(Markdown(rf"### {category} Constraint Sets"))
                     for c in categories_sets[category]:
                         c.show()
 
                 for category in sorted_fcategories:
-                    display(Markdown(rf'### {category} Function Sets'))
+                    display(Markdown(rf"### {category} Function Sets"))
                     for f in fcategories_sets[category]:
                         f.show()
 
             else:
 
                 if self.leqcons_sets:
-                    display(Markdown('<br><br>'))
-                    display(Markdown(r'### Inequality Constraint Sets'))
+                    display(Markdown("<br><br>"))
+                    display(Markdown(r"### Inequality Constraint Sets"))
                     for c in self.leqcons_sets:
                         c.show()
                 if self.eqcons_sets:
-                    display(Markdown('<br><br>'))
-                    display(Markdown(r'### Equality Constraint Sets'))
+                    display(Markdown("<br><br>"))
+                    display(Markdown(r"### Equality Constraint Sets"))
                     for c in self.eqcons_sets:
                         c.show()
 
                 if self.function_sets:
-                    display(Markdown('<br><br>'))
-                    display(Markdown(r'## Functions'))
+                    display(Markdown("<br><br>"))
+                    display(Markdown(r"## Functions"))
                     for f in self.function_sets:
                         f.show()
 
@@ -1602,7 +1602,7 @@ class Prg:
     # -----------------------------------------------------
 
     def __str__(self):
-        return rf'{self.name}'
+        return rf"{self.name}"
 
     def __repr__(self):
         return self.name
@@ -1697,5 +1697,5 @@ class Prg:
         """Gurobi Model"""
 
         self.mps()
-        print(f'--- Creating gurobi model for {self}')
-        return gpread(f'{self}.mps')
+        print(f"--- Creating gurobi model for {self}")
+        return gpread(f"{self}.mps")

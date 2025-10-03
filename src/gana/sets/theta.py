@@ -67,7 +67,7 @@ class T:
 
         # name will be set by the program later
         # if dummy index, the name is set to 'φ' (phi)
-        self.name = 'θ'
+        self.name = "θ"
 
         # a Theta set of size 1 is a parameteric variable
         # these are created at each index in the set
@@ -135,7 +135,7 @@ class T:
     @property
     def args(self) -> dict[str, str | bool]:
         """Return the arguments of the parametric variable set"""
-        return {'tag': self.tag, 'ltx': self.ltx, 'mutable': self.mutable}
+        return {"tag": self.tag, "ltx": self.ltx, "mutable": self.mutable}
 
     def create_map(self):
         """Create a map of indices to parameters"""
@@ -167,7 +167,7 @@ class T:
 
             if not mutating:
                 # give self + pos as name
-                theta.name = f'{self.name}[{pos}]'
+                theta.name = f"{self.name}[{pos}]"
                 # give position
                 theta.pos = pos
 
@@ -228,36 +228,36 @@ class T:
     def ltx(self) -> str:
         """LaTeX representation of the parametric variable set"""
         if self._ltx:
-            return r'{' + self._ltx + r'}'
+            return r"{" + self._ltx + r"}"
         # if user has not set the LaTeX representation
         # the name becomes the latex representation
         if self.name:
-            return r'{' + self.name.replace('_', r'\_') + r'}'
+            return r"{" + self.name.replace("_", r"\_") + r"}"
         return self._ltx
 
     @property
     def longname(self) -> str:
         """Long name representation"""
         if self.parent:
-            return f'{self.parent.name}(' + ",".join([i.name for i in self.index]) + ')'
-        return f'{self.name}(' + ",".join([i.name for i in self.index]) + ')'
+            return f"{self.parent.name}(" + ",".join([i.name for i in self.index]) + ")"
+        return f"{self.name}(" + ",".join([i.name for i in self.index]) + ")"
 
     def latex(self) -> str:
         """LaTeX representation"""
 
         index = (
-            r'_{'
-            + rf'{self.index}'.replace('(', '')
-            .replace(')', '')
-            .replace('[', '{')
-            .replace(']', '}')
-            + r'}'
+            r"_{"
+            + rf"{self.index}".replace("(", "")
+            .replace(")", "")
+            .replace("[", "{")
+            .replace("]", "}")
+            + r"}"
         )
 
         if len(self.index) == 1:
             # if there is a single index element
             # then a comma will show up in the end, replace that
-            return self.ltx + index.replace(',', '')  # type: ignore
+            return self.ltx + index.replace(",", "")  # type: ignore
 
         return self.ltx + index
 
@@ -371,7 +371,7 @@ class T:
                 _=[tuple([other * j for j in i]) for i in self._],
                 **self.args,
             )
-            t.name = f'{other}*{self}'
+            t.name = f"{other}*{self}"
             return t
 
         if isinstance(other, tuple):
@@ -381,7 +381,7 @@ class T:
                 _=[(other[0] * i[0], other[1] * i[1]) for i in self._],
                 **self.args,
             )
-            t.name = f'{self}*θ'
+            t.name = f"{self}*θ"
 
         if isinstance(other, list):
             # if list..
@@ -389,7 +389,7 @@ class T:
             # check length match
             if len(self) != len(other):
                 warn(
-                    f'Index mismatch for {self} * {other}: ({len(self)} != {len(other)})'
+                    f"Index mismatch for {self} * {other}: ({len(self)} != {len(other)})"
                 )
             # check first element type
             if isinstance(other[0], tuple):
@@ -400,7 +400,7 @@ class T:
                     _=[(i[0] * j[0], i[1] * j[1]) for i, j in zip(self, other)],
                     **self.args,
                 )
-                t.name = f'{self}*θ'
+                t.name = f"{self}*θ"
                 return t
             # otherwise assume numeric
 
@@ -430,13 +430,13 @@ class T:
                 _=[tuple([i / other for i in j]) for j in self._],
                 **self.args,
             )
-            t.name = f'{self}/{other}'
+            t.name = f"{self}/{other}"
             return t
 
         if isinstance(other, tuple):
             # theta\theta not allowed
             raise NotImplementedError(
-                'Division by tuple is not implemented for theta sets.'
+                "Division by tuple is not implemented for theta sets."
             )
 
         if isinstance(other, list):
@@ -445,13 +445,13 @@ class T:
             # check length match
             if len(self) != len(other):
                 warn(
-                    f'Index mismatch for {self} / {other}: ({len(self)} != {len(other)})'
+                    f"Index mismatch for {self} / {other}: ({len(self)} != {len(other)})"
                 )
             # check first element type
             if isinstance(other[0], tuple):
                 # if tuple
                 raise NotImplementedError(
-                    'Division by list of tuples is not implemented for theta sets.'
+                    "Division by list of tuples is not implemented for theta sets."
                 )
 
             # otherwise assume numeric
@@ -462,7 +462,7 @@ class T:
             )
 
         raise NotImplementedError(
-            'Division by anything other than numeric is not implemented for theta sets.'
+            "Division by anything other than numeric is not implemented for theta sets."
         )
 
     # -----------------------------------------------------

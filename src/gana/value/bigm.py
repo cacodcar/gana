@@ -14,9 +14,9 @@ class M:
 
         self.neg = neg
         if neg:
-            self.name = r'M_{-}'
+            self.name = r"M_{-}"
         else:
-            self.name = r'M'
+            self.name = r"M"
 
     def __repr__(self):
         return self.name

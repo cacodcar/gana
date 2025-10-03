@@ -73,7 +73,7 @@ class C:
         parent: C = None,
         pos: int = None,
         nn: bool = False,
-        category: str = 'General',
+        category: str = "General",
     ):
         if function.case == FCase.VAR:
             # if the function is a variable, the index needs to be made consistent
@@ -103,7 +103,7 @@ class C:
         self.nn = nn
 
         # arguments to pass
-        self.args = {'leq': self.leq, 'nn': self.nn}
+        self.args = {"leq": self.leq, "nn": self.nn}
 
         # since indices should match, take any
 
@@ -144,10 +144,10 @@ class C:
     def name(self) -> str:
 
         if self.leq:
-            return self.function.name + r'<=0'
+            return self.function.name + r"<=0"
 
         else:
-            return self.function.name + r'=0'
+            return self.function.name + r"=0"
 
     # -----------------------------------------------------
     #                    Helpers
@@ -232,18 +232,18 @@ class C:
 
     def mps(self):
         """Name in MPS file"""
-        return f'C{self.n}'
+        return f"C{self.n}"
 
     def latex(self) -> str:
         """Latex representation"""
 
         if self.leq:
-            rel = r'\leq'
+            rel = r"\leq"
 
         else:
-            rel = r'='
+            rel = r"="
 
-        return rf'[{self.n}]' + r'\text{   }' + rf'{self.function.latex()} {rel} 0'
+        return rf"[{self.n}]" + r"\text{   }" + rf"{self.function.latex()} {rel} 0"
 
     def show(self, descriptive: bool = False):
         """Display the function"""
@@ -258,8 +258,8 @@ class C:
     def longname(self) -> str:
         """Long name"""
         if self.leq:
-            return f'{self.function.longname} <= 0'
-        return f'{self.function.longname} == 0'
+            return f"{self.function.longname} <= 0"
+        return f"{self.function.longname} == 0"
 
     # -----------------------------------------------------
     #                    Solution
@@ -273,14 +273,14 @@ class C:
                     display(
                         Math(
                             c.function.latex()
-                            + r'='
+                            + r"="
                             + ", ".join(str(val) for val in c.function.X.values())
                         )
                     )
 
             else:
                 for c in self._:
-                    display(Math(c.function.latex() + r'=' + rf'{c.function.X[n_sol]}'))
+                    display(Math(c.function.latex() + r"=" + rf"{c.function.X[n_sol]}"))
 
     # -----------------------------------------------------
     #                    Operators
@@ -290,7 +290,7 @@ class C:
         if isinstance(other, C):
             if self.leq != other.leq:
                 raise ValueError(
-                    f'Cannot add constraints with different types: {self.leq} and {other.leq}'
+                    f"Cannot add constraints with different types: {self.leq} and {other.leq}"
                 )
             return C(
                 function=self.function + other.function,
@@ -307,7 +307,7 @@ class C:
         if isinstance(other, C):
             if self.leq != other.leq:
                 raise ValueError(
-                    f'Cannot subtract constraints with different types: {self.leq} and {other.leq}'
+                    f"Cannot subtract constraints with different types: {self.leq} and {other.leq}"
                 )
             return C(
                 function=self.function - other.function,
@@ -322,7 +322,7 @@ class C:
 
     def __mul__(self, other: V | P | T | F) -> Self:
         if isinstance(other, C):
-            raise ValueError('Cannot multiply constraints')
+            raise ValueError("Cannot multiply constraints")
         return C(function=self.function * other, leq=self.leq)
 
     def __rmul__(self, other: V | P | T | F) -> Self:
@@ -330,7 +330,7 @@ class C:
 
     def __truediv__(self, other: V | P | T | F) -> Self:
         if isinstance(other, C):
-            raise ValueError('Cannot divide constraints')
+            raise ValueError("Cannot divide constraints")
         return C(function=self.function / other, leq=self.leq)
 
     # -----------------------------------------------------

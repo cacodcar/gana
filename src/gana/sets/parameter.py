@@ -86,7 +86,7 @@ class P:
 
         # name will be set by the program later
         # if dummy index, the name is set to 'φ' (phi)
-        self.name = ''
+        self.name = ""
 
         # special case of the parameter
         self.case: PCase = PCase.SET
@@ -170,7 +170,7 @@ class P:
                 self.index = (I(size=len(self._), dummy=True),)
                 # here the map needs to be remade
                 self.map = {i: None for i in list(product(*self.index))}
-                self.name = 'φ'  # set the name to phi
+                self.name = "φ"  # set the name to phi
             self._ = [float(p) for p in self._]
 
         # fill in the values
@@ -180,17 +180,17 @@ class P:
     @property
     def args(self) -> dict[str, str | bool]:
         """Return the arguments of the parameter set"""
-        return {'tag': self.tag, 'ltx': self.ltx, 'mutable': self.mutable}
+        return {"tag": self.tag, "ltx": self.ltx, "mutable": self.mutable}
 
     @property
     def ltx(self) -> str:
         """LaTeX representation of the variable set"""
         if self._ltx:
-            return r'{' + self._ltx + r'}'
+            return r"{" + self._ltx + r"}"
         # if user has not set the LaTeX representation
         # the name becomes the latex representation
         if self.name:
-            return r'{' + self.name.replace('_', r'\_') + r'}'
+            return r"{" + self.name.replace("_", r"\_") + r"}"
         return self._ltx
 
     # -----------------------------------------------------
@@ -212,18 +212,18 @@ class P:
             return str(self)
 
         index = (
-            r'_{'
-            + rf'{self.index}'.replace('(', '')
-            .replace(')', '')
-            .replace('[', '{')
-            .replace(']', '}')
-            + r'}'
+            r"_{"
+            + rf"{self.index}".replace("(", "")
+            .replace(")", "")
+            .replace("[", "{")
+            .replace("]", "}")
+            + r"}"
         )
 
         if len(self.index) == 1:
             # if there is a single index element
             # then a comma will show up in the end, replace that
-            return self.ltx + index.replace(',', '')  # type: ignore
+            return self.ltx + index.replace(",", "")  # type: ignore
 
         return self.ltx + index
 
@@ -258,13 +258,13 @@ class P:
         if self.case == PCase.NEGSET:
             # if this is already a negated set
             # make it a normal set now
-            p.name = f'{self.name[1:]}'  # remove the negative sign
+            p.name = f"{self.name[1:]}"  # remove the negative sign
             p.case = PCase.SET
         else:
             # if this is a normal set
             # make it a negated set
             p.case = PCase.NEGSET
-            p.name = f'-{self}'  # add the negative sign
+            p.name = f"-{self}"  # add the negative sign
         # return the new parameter set
         return p
 
@@ -293,7 +293,7 @@ class P:
         if self.case == PCase.SET:
             # if it is a set return a normal set
             p = P(*self.index, _=[abs(i) for i in self._], **self.args)
-            p.name = f'|{self.name}|'
+            p.name = f"|{self.name}|"
             return p
 
         if self.case in [PCase.NEGNUM, PCase.NEGSET]:
@@ -364,7 +364,7 @@ class P:
             # just add the number to each value
             # and return new parameter set
             p = P(*self.index, _=[i + other for i in self._], **self.args)
-            p.name = f'({self}+{other})'
+            p.name = f"({self}+{other})"
             return p
 
         if isinstance(other, list):
@@ -382,7 +382,7 @@ class P:
                     *self.index, _=[i + j for i, j in zip(self._, other)], **self.args
                 )
             # change the name to add that something from a list has been added
-            p.name = f'({self}+φ)'
+            p.name = f"({self}+φ)"
             return p
 
         if isinstance(other, tuple):
@@ -416,13 +416,13 @@ class P:
                 # else make a new parameter set
 
                 p = P(*self.index, _=[self._[-1] + i for i in other._], **self.args)
-                p.name = f'({self}+{other})'
+                p.name = f"({self}+{other})"
                 return p
 
             if other.case in [PCase.NUM, PCase.NEGNUM]:
                 # if other is a number, add other to every value in the set
                 p = P(*self.index, _=[i + other._[-1] for i in self._], **self.args)
-                p.name = f'({self}+{other})'
+                p.name = f"({self}+{other})"
                 return p
 
             if len(self) != len(other):
@@ -431,7 +431,7 @@ class P:
                 )
             # if either one of them is general parameter
             p = P(*self.index, _=[i + j for i, j in zip(self._, other._)], **self.args)
-            p.name = f'({self}+{other})'
+            p.name = f"({self}+{other})"
             return p
 
         # if not parameter, let the other handle elements operator handle the addition
@@ -500,7 +500,7 @@ class P:
                 return P(*self.index, _=self._[-1] - other, **self.args)
 
             p = P(*self.index, _=[i - other for i in self._], **self.args)
-            p.name = f'({self}-{other})'
+            p.name = f"({self}-{other})"
             return p
 
         if isinstance(other, list):
@@ -517,7 +517,7 @@ class P:
                     *self.index, _=[i - j for i, j in zip(self._, other)], **self.args
                 )
                 # change the name to add that something from a list has been added
-            p.name = f'({self}-φ)'
+            p.name = f"({self}-φ)"
             return p
 
         if isinstance(other, tuple):
@@ -549,13 +549,13 @@ class P:
                     return P(*self.index, _=self._[-1] - other._[-1], **self.args)
 
                 p = P(*self.index, _=[self._[-1] - i for i in other._], **self.args)
-                p.name = f'({self}-{other.name})'
+                p.name = f"({self}-{other.name})"
                 return p
 
             if other.case in [PCase.NUM, PCase.NEGNUM]:
                 # if other is a number subtract every value in self with the number
                 p = P(*self.index, _=[i - other._[-1] for i in self._], **self.args)
-                p.name = f'({self}-{other})'
+                p.name = f"({self}-{other})"
                 return p
 
             if len(self) != len(other):
@@ -566,7 +566,7 @@ class P:
             # if both are just general parameters
             # zip through the values and subtract
             p = P(*self.index, _=[i - j for i, j in zip(self._, other._)], **self.args)
-            p.name = f'({self}-{other})'
+            p.name = f"({self}-{other})"
             return p
 
         # if not parameter, let the other handle elements operator handle the addition
@@ -635,7 +635,7 @@ class P:
 
             # else multiply the number to each value
             p = P(*self.index, _=[i * other for i in self._], **self.args)
-            p.name = f'{self}*{other}'
+            p.name = f"{self}*{other}"
             return p
 
         if isinstance(other, list):
@@ -650,7 +650,7 @@ class P:
                 p = P(
                     *self.index, _=[i * j for i, j in zip(self._, other)], **self.args
                 )
-            p.name = f'{self}*φ'
+            p.name = f"{self}*φ"
             return p
 
         if isinstance(other, tuple):
@@ -667,7 +667,7 @@ class P:
                 t = make_T(
                     tuple([other[0] * self._[-1], other[1] * self._[-1]]), self.index
                 )
-                t.name = f'{self}*θ'
+                t.name = f"{self}*θ"
                 return t
 
             # otherwise self is a set
@@ -675,7 +675,7 @@ class P:
             t = make_T(
                 [tuple([i * other[0], i * other[1]]) for i in self._], self.index
             )
-            t.name = f'{self}*θ'
+            t.name = f"{self}*θ"
             return t
 
         if isinstance(other, P):
@@ -696,13 +696,13 @@ class P:
                     return P(*self.index, _=self._[-1] * other._[-1], **self.args)
 
                 p = P(*self.index, _=[self._[-1] * i for i in other._], **self.args)
-                p.name = f'{self}*{other}'
+                p.name = f"{self}*{other}"
                 return p
 
             if other.case in [PCase.NUM, PCase.NEGNUM]:
                 # if other is a number, find the product of every value in self with the number
                 p = P(*self.index, _=[i * other._[-1] for i in self._], **self.args)
-                p.name = f'{self}*{other}'
+                p.name = f"{self}*{other}"
                 return p
 
             if len(self) != len(other):
@@ -781,7 +781,7 @@ class P:
                 # if dividing by a number
                 if other in [0, 0.0]:
                     # if dividing by zero, raise an error
-                    raise ZeroDivisionError(f'{self} cannot be divided by zero.')
+                    raise ZeroDivisionError(f"{self} cannot be divided by zero.")
 
                 if other in [1, 1.0]:
                     return self
@@ -792,7 +792,7 @@ class P:
                     return P(*self.index, _=self._[-1] / other, **self.args)
 
                 p = P(*self.index, _=[i / other for i in self._], **self.args)
-                p.name = f'{self}/{other}'
+                p.name = f"{self}/{other}"
                 return p
 
             if isinstance(other, list):
@@ -817,7 +817,7 @@ class P:
                         **self.args,
                     )
                     # change the name to add that something from a list has been added
-                    p.name = f'{self}/φ'
+                    p.name = f"{self}/φ"
                     return p
 
             if isinstance(other, tuple):
@@ -829,7 +829,7 @@ class P:
             if isinstance(other, P):
 
                 if other.case == PCase.ZERO:
-                    raise ZeroDivisionError(f'{self} cannot be divided by zero.')
+                    raise ZeroDivisionError(f"{self} cannot be divided by zero.")
 
                 if self.case in [PCase.NEGNUM, PCase.NUM]:
                     if other.case in [PCase.NUM, PCase.NEGNUM]:
@@ -838,13 +838,13 @@ class P:
                         return P(*self.index, _=self._[-1] / other._[-1], **self.args)
 
                     p = P(*self.index, _=[self._[-1] / i for i in other._], **self.args)
-                    p.name = f'{self}/{other}'
+                    p.name = f"{self}/{other}"
                     return p
 
                 if other.case in [PCase.NUM, PCase.NEGNUM]:
                     # if other is a number, divide every value in self by the number
                     p = P(*self.index, _=[i / other._[-1] for i in self._], **self.args)
-                    p.name = f'{self}/{other}'
+                    p.name = f"{self}/{other}"
                     return p
 
                 if len(self) != len(other):
@@ -854,7 +854,7 @@ class P:
                 # if both are just general parameters
                 # zip through the values and divide
                 p = P(*self.index, _=[i / j for i, j in zip(self._, other._)])
-                p.name = f'{self}/{other}'
+                p.name = f"{self}/{other}"
                 return p
 
             # P / E: not handled yet
@@ -864,7 +864,7 @@ class P:
 
         except ZeroDivisionError as e:
             # handle division by zero
-            raise ZeroDivisionError(f'{self} cannot be divided by zero.') from e
+            raise ZeroDivisionError(f"{self} cannot be divided by zero.") from e
 
     def __rtruediv__(
         self,
@@ -911,7 +911,7 @@ class P:
             # if dividing by a number
             if other in [0, 0.0]:
                 # if dividing by zero, raise an error
-                raise ZeroDivisionError(f'{self} cannot be divided by zero.')
+                raise ZeroDivisionError(f"{self} cannot be divided by zero.")
 
             if other in [1, 1.0]:
                 return self
@@ -922,7 +922,7 @@ class P:
                 return P(*self.index, _=self._[-1] // other, **self.args)
 
             p = P(*self.index, _=[i // other for i in self._], **self.args)
-            p.name = f'{self}//{other}'
+            p.name = f"{self}//{other}"
             return p
 
         if isinstance(other, list):
@@ -943,7 +943,7 @@ class P:
                     *self.index, _=[i // j for i, j in zip(self._, other)], **self.args
                 )
             # change the name to add that something from a list has been added
-            p.name = f'{self}//φ'
+            p.name = f"{self}//φ"
             return p
 
         if isinstance(other, tuple):
@@ -955,7 +955,7 @@ class P:
         if isinstance(other, P):
 
             if other.case == PCase.ZERO:
-                raise ZeroDivisionError(f'{self} cannot be divided by zero.')
+                raise ZeroDivisionError(f"{self} cannot be divided by zero.")
 
             if self.case in [PCase.NEGNUM, PCase.NUM]:
                 if other.case in [PCase.NUM, PCase.NEGNUM]:
@@ -964,12 +964,12 @@ class P:
                     return P(*self.index, _=self._[-1] // other._[-1], **self.args)
 
                 p = P(*self.index, _=[self._[-1] // i for i in other._], **self.args)
-                p.name = f'{self}//{other}'
+                p.name = f"{self}//{other}"
                 return p
             if other.case in [PCase.NUM, PCase.NEGNUM]:
                 # if other is a number, divide every value in self by the number
                 p = P(*self.index, _=[i // other._[-1] for i in self._], **self.args)
-                p.name = f'{self}//{other}'
+                p.name = f"{self}//{other}"
                 return p
             if len(self) != len(other):
                 raise ValueError(
@@ -978,7 +978,7 @@ class P:
             # if both are just general parameters
             # zip through the values and divide
             p = P(*self.index, _=[i // j for i, j in zip(self._, other._)], **self.args)
-            p.name = f'{self}//{other}'
+            p.name = f"{self}//{other}"
             return p
 
         # else let the other handle the division
@@ -1011,7 +1011,7 @@ class P:
             # if dividing by a number
             if other in [0, 0.0]:
                 # if dividing by zero, raise an error
-                raise ZeroDivisionError(f'{self} cannot be divided by zero.')
+                raise ZeroDivisionError(f"{self} cannot be divided by zero.")
 
             if other in [1, 1.0]:
                 # if dividing by 1, return self
@@ -1021,11 +1021,11 @@ class P:
                 # if self is a number, just find the modulus
                 # let P handle the rest
                 p = P(*self.index, _=self._[-1] % other, **self.args)
-                p.name = f'{self} % {other}'
+                p.name = f"{self} % {other}"
                 return p
 
             p = P(*self.index, _=[i % other for i in self._], **self.args)
-            p.name = f'{self} % {other}'
+            p.name = f"{self} % {other}"
             return p
 
         if isinstance(other, list):
@@ -1048,7 +1048,7 @@ class P:
                     *self.index, _=[i % j for i, j in zip(self._, other)], **self.args
                 )
                 # change the name to add that something from a list has been added
-            p.name = f'{self} % φ'
+            p.name = f"{self} % φ"
             return p
 
         if isinstance(other, tuple):
@@ -1064,7 +1064,7 @@ class P:
                 return 0
 
             if other.case == PCase.ZERO:
-                raise ZeroDivisionError(f'{self} cannot be divided by zero.')
+                raise ZeroDivisionError(f"{self} cannot be divided by zero.")
 
             if self.case in [PCase.NEGNUM, PCase.NUM]:
                 if other.case in [PCase.NUM, PCase.NEGNUM]:
@@ -1073,12 +1073,12 @@ class P:
                     return P(*self.index, _=self._[-1] % other._[-1], **self.args)
 
                 p = P(*self.index, _=[self._[-1] % i for i in other._], **self.args)
-                p.name = f'{self} % {other}'
+                p.name = f"{self} % {other}"
                 return p
             if other.case in [PCase.NUM, PCase.NEGNUM]:
                 # if other is a number, find the modulus of every value in self with the number
                 p = P(*self.index, _=[i % other._[-1] for i in self._], **self.args)
-                p.name = f'{self} % {other}'
+                p.name = f"{self} % {other}"
                 return p
             if len(self) != len(other):
                 raise ValueError(
@@ -1087,7 +1087,7 @@ class P:
             # if both are just general parameters
             # zip through the values and find the modulus
             p = P(*self.index, _=[i % j for i, j in zip(self._, other._)], **self.args)
-            p.name = f'{self} % {other}'
+            p.name = f"{self} % {other}"
             return p
 
         # else let the other handle the modulus
@@ -1132,7 +1132,7 @@ class P:
 
             # else find the power of each element in set raised to other
             p = P(*self.index, _=[i**other for i in self._], **self.args)
-            p.name = f'{self}^({other})'
+            p.name = f"{self}^({other})"
             return p
 
         if isinstance(other, list):
@@ -1151,7 +1151,7 @@ class P:
                 # if list, just zip through the values and raise to power
                 p = P(*self.index, _=[i**j for i, j in zip(self._, other)], **self.args)
             # change the name to add that something from a list has been added
-            p.name = f'{self}^φ'
+            p.name = f"{self}^φ"
             return p
 
         if isinstance(other, tuple):
@@ -1173,13 +1173,13 @@ class P:
                     return P(*self.index, _=self._[-1] ** other._[-1], **self.args)
 
                 p = P(*self.index, _=[self._[-1] ** i for i in other._], **self.args)
-                p.name = f'{self}^{other}'
+                p.name = f"{self}^{other}"
                 return p
 
             if other.case in [PCase.NUM, PCase.NEGNUM]:
                 # if other is a number, raise every value in self to the power of the number
                 p = P(*self.index, _=[i ** other._[-1] for i in self._], **self.args)
-                p.name = f'{self}^{other}'
+                p.name = f"{self}^{other}"
                 return p
 
             if len(self) != len(other):
@@ -1189,7 +1189,7 @@ class P:
             # if both are just general parameters
             # zip through the values and raise to power
             p = P(*self.index, _=[i**j for i, j in zip(self._, other._)], **self.args)
-            p.name = f'{self}^{other}'
+            p.name = f"{self}^{other}"
             return p
 
         # else let the other handle the power
@@ -1227,13 +1227,13 @@ class P:
                 return self._[-1] == other
             # if not numeric, False
             raise NotImplementedError(
-                f'{self} == {other}: cannot compare a parameter set with a number'
+                f"{self} == {other}: cannot compare a parameter set with a number"
             )
 
         if isinstance(other, list):
             if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
                 raise NotImplementedError(
-                    f'{self} == {other}: cannot compare a number with a list.'
+                    f"{self} == {other}: cannot compare a number with a list."
                 )
             # if self is a set, compare it with the list
             if len(self) != len(other):
@@ -1250,7 +1250,7 @@ class P:
                     return self._[-1] == other._[-1]
 
                 raise NotImplementedError(
-                    f'{self} == {other}: cannot compare a number with a parameter set.'
+                    f"{self} == {other}: cannot compare a number with a parameter set."
                 )
 
             if len(self) != len(other):
@@ -1293,13 +1293,13 @@ class P:
                 return self._[-1] <= other
             # if not numeric, False
             raise NotImplementedError(
-                f'{self} <= {other}: cannot compare a parameter set with a number'
+                f"{self} <= {other}: cannot compare a parameter set with a number"
             )
 
         if isinstance(other, list):
             if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
                 raise NotImplementedError(
-                    f'{self} <= {other}: cannot compare a number with a list.'
+                    f"{self} <= {other}: cannot compare a number with a list."
                 )
             # if self is a set, compare it with the list
             if len(self) != len(other):
@@ -1316,7 +1316,7 @@ class P:
                     return self._[-1] <= other._[-1]
 
                 raise NotImplementedError(
-                    f'{self} <= {other}: cannot compare a number with a parameter set.'
+                    f"{self} <= {other}: cannot compare a number with a parameter set."
                 )
 
             if len(self) != len(other):
@@ -1358,13 +1358,13 @@ class P:
                 return self._[-1] >= other
             # if not numeric, False
             raise NotImplementedError(
-                f'{self} >= {other}: cannot compare a parameter set with a number'
+                f"{self} >= {other}: cannot compare a parameter set with a number"
             )
 
         if isinstance(other, list):
             if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
                 raise NotImplementedError(
-                    f'{self} >= {other}: cannot compare a number with a list.'
+                    f"{self} >= {other}: cannot compare a number with a list."
                 )
             # if self is a set, compare it with the list
             if len(self) != len(other):
@@ -1381,7 +1381,7 @@ class P:
                     return self._[-1] >= other._[-1]
 
                 raise NotImplementedError(
-                    f'{self} >= {other}: cannot compare a number with a parameter set.'
+                    f"{self} >= {other}: cannot compare a number with a parameter set."
                 )
 
             if len(self) != len(other):
@@ -1424,13 +1424,13 @@ class P:
                 return self._[-1] < other
             # if not numeric, False
             raise NotImplementedError(
-                f'{self} < {other}: cannot compare a parameter set with a number'
+                f"{self} < {other}: cannot compare a parameter set with a number"
             )
 
         if isinstance(other, list):
             if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
                 raise NotImplementedError(
-                    f'{self} < {other}: cannot compare a number with a list.'
+                    f"{self} < {other}: cannot compare a number with a list."
                 )
             # if self is a set, compare it with the list
             if len(self) != len(other):
@@ -1447,7 +1447,7 @@ class P:
                     return self._[-1] < other._[-1]
 
                 raise NotImplementedError(
-                    f'{self} < {other}: cannot compare a number with a parameter set.'
+                    f"{self} < {other}: cannot compare a number with a parameter set."
                 )
 
             if len(self) != len(other):
@@ -1480,13 +1480,13 @@ class P:
                 return self._[-1] != other
             # if not numeric, False
             raise NotImplementedError(
-                f'{self} != {other}: cannot compare a parameter set with a number'
+                f"{self} != {other}: cannot compare a parameter set with a number"
             )
 
         if isinstance(other, list):
             if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
                 raise NotImplementedError(
-                    f'{self} != {other}: cannot compare a number with a list.'
+                    f"{self} != {other}: cannot compare a number with a list."
                 )
             # if self is a set, compare it with the list
             if len(self) != len(other):
@@ -1503,7 +1503,7 @@ class P:
                     return self._[-1] != other._[-1]
 
                 raise NotImplementedError(
-                    f'{self} != {other}: cannot compare a number with a parameter set.'
+                    f"{self} != {other}: cannot compare a number with a parameter set."
                 )
 
             if len(self) != len(other):
@@ -1546,13 +1546,13 @@ class P:
                 return self._[-1] > other
             # if not numeric, False
             raise NotImplementedError(
-                f'{self} > {other}: cannot compare a parameter set with a number'
+                f"{self} > {other}: cannot compare a parameter set with a number"
             )
 
         if isinstance(other, list):
             if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
                 raise NotImplementedError(
-                    f'{self} > {other}: cannot compare a number with a list.'
+                    f"{self} > {other}: cannot compare a number with a list."
                 )
             # if self is a set, compare it with the list
             if len(self) != len(other):
@@ -1569,7 +1569,7 @@ class P:
                     return self._[-1] > other._[-1]
 
                 raise NotImplementedError(
-                    f'{self} > {other}: cannot compare a number with a parameter set.'
+                    f"{self} > {other}: cannot compare a number with a parameter set."
                 )
 
             if len(self) != len(other):
@@ -1645,7 +1645,7 @@ class P:
     # -----------------------------------------------------
 
     def __str__(self):
-        return rf'{self.name}'
+        return rf"{self.name}"
 
     def __repr__(self):
         return str(self.name)
@@ -1661,7 +1661,7 @@ class P:
         """symbolic representation"""
         if has_sympy:
             return IndexedBase(str(self))[
-                symbols(",".join([f'{d}' for d in self.index]), cls=Idx)
+                symbols(",".join([f"{d}" for d in self.index]), cls=Idx)
             ]
         print(
             "sympy is an optional dependency, pip install gana[all] to get optional dependencies"

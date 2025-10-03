@@ -152,7 +152,7 @@ class F:
 
         # category of the constraint
         # constraints can be printed by category
-        self.category: str = ''
+        self.category: str = ""
 
         self._matrix: dict = {}
 
@@ -174,7 +174,7 @@ class F:
             self.make_args()
             self._ = []
             self.n = 0
-            self.name, self.pname = '', ''
+            self.name, self.pname = "", ""
             self.A, self.P, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
             self.variables = []
 
@@ -261,7 +261,7 @@ class F:
             self.make_args()
             self._ = []
             self.n = 0
-            self.name, self.pname = '', ''
+            self.name, self.pname = "", ""
             self.A, self.P, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
             self.variables = []
 
@@ -398,7 +398,7 @@ class F:
             # check the compatibility
             if not lone % ltwo == 0 and not ltwo % lone == 0:
                 raise ValueError(
-                    f'{self.one} with index {self.one.index} (length = {lone}) and {self.two} with {self.two.index} (length = {ltwo}) are not compatible'
+                    f"{self.one} with index {self.one.index} (length = {lone}) and {self.two} with {self.two.index} (length = {ltwo}) are not compatible"
                 )
             if lone > ltwo:
                 # one is longer, keep as is
@@ -501,19 +501,19 @@ class F:
         # rel looks good for printing
         # one rel two
         if self.mul:
-            self.rel = '×'
+            self.rel = "×"
         elif self.add:
-            self.rel = '+'
+            self.rel = "+"
         elif self.sub:
-            self.rel = '-'
+            self.rel = "-"
         elif self.div:
-            self.rel = '÷'
+            self.rel = "÷"
         else:
             if not ignore:
                 # if no operation is specified, raise an error
                 # this is to avoid confusion
                 # if you want to create a function without an operation, use F()
-                raise ValueError('one of mul, add, sub or div must be True')
+                raise ValueError("one of mul, add, sub or div must be True")
 
     def make_args(self):
         """Makes the arguments for the function
@@ -523,14 +523,14 @@ class F:
         """
         # these are passed on for mutation or birthing
         self.args = {
-            'one_type': self.one_type,
-            'two_type': self.two_type,
-            'mul': self.mul,
-            'add': self.add,
-            'sub': self.sub,
-            'div': self.div,
-            'consistent': self.consistent,
-            'case': self.case,
+            "one_type": self.one_type,
+            "two_type": self.two_type,
+            "mul": self.mul,
+            "add": self.add,
+            "sub": self.sub,
+            "div": self.div,
+            "consistent": self.consistent,
+            "case": self.case,
         }
 
     def birth_functions(self):
@@ -644,20 +644,20 @@ class F:
         """Gives a name to the function"""
 
         # set by program
-        self.pname: str = ''
+        self.pname: str = ""
 
         if self.case == FCase.SUM:
             variable, over, _ = self.issumhow
 
-            self.name = f'sigma({variable}({variable.index}),{over})'
+            self.name = f"sigma({variable}({variable.index}),{over})"
         # elif self.case == FCase.NEGSUM:
         #     self.name = f'-sigma({self.variables[0].parent}[{self.variables[0].pos}:{self.variables[-1].pos}])'
         else:
-            _name = ''
+            _name = ""
             if self.one is not None:
                 _name += str(self.one)
             if self.two is not None:
-                _name += f'{self.rel}{self.two}'
+                _name += f"{self.rel}{self.two}"
 
             self.name = _name
 
@@ -933,7 +933,7 @@ class F:
                 self.case = FCase.SUM
                 two = self.latex()
                 self.case = FCase.CALC
-                return rf'{self.calculation.latex()} = {two}'
+                return rf"{self.calculation.latex()} = {two}"
 
             if self.one_type == Elem.P and self.parent:
                 # if this is a child function with a parameter
@@ -942,7 +942,7 @@ class F:
             else:
                 one = self.one.latex()
 
-            return rf'{self.calculation.latex()} = {one} \cdot {self.two.latex()}'
+            return rf"{self.calculation.latex()} = {one} \cdot {self.two.latex()}"
 
         if self.case == FCase.FVAR:
             # if this is a variable being treated as a function
@@ -956,27 +956,27 @@ class F:
 
             # use i for summed index
             index = [
-                'i' if n == pos else str(i).replace('[', '').replace(']', '')
+                "i" if n == pos else str(i).replace("[", "").replace("]", "")
                 for n, i in enumerate(v.index)
             ]
-            index = ', '.join(index)
+            index = ", ".join(index)
 
             if v.ltx:
                 oneissum = v.ltx
             else:
                 oneissum = v.name
 
-            ltx = rf'\sum_{{i \in {over}}} {oneissum}_{{{index}}}'
+            ltx = rf"\sum_{{i \in {over}}} {oneissum}_{{{index}}}"
 
             if self.case == FCase.NEGSUM:
                 # if this is a summation
                 # return the summation
-                return rf'-{ltx}'
-            return rf'{ltx}'
+                return rf"-{ltx}"
+            return rf"{ltx}"
 
         if self.one is None and self.mul:
 
-            one = '0'
+            one = "0"
 
         elif self.one is not None:
             # _one = self.one(self.index.one)
@@ -988,7 +988,7 @@ class F:
                 one = self.one.latex()
 
         else:
-            one = ''
+            one = ""
 
         if self.two is not None:
             # _two = self.two(self.index.two)
@@ -1002,13 +1002,13 @@ class F:
             two = None
 
         if two is None:
-            return rf'{one}'
+            return rf"{one}"
 
         if one is None:
-            return rf'{two}'
+            return rf"{two}"
 
         if self.add:
-            return rf'{one} + {two}'
+            return rf"{one} + {two}"
 
         if self.sub:
             if (
@@ -1020,54 +1020,54 @@ class F:
             ):
                 # bracket are important for function minuses
                 # alternatively, the entire function can be negated
-                return rf'({one}) - ({two})'
+                return rf"({one}) - ({two})"
             if (
                 self.two_type == Elem.F
                 and self.two.struct != (Elem.P, Elem.V)
                 and not self.two.case == FCase.SUM
             ):
 
-                return rf'{one} - ({two})'
-            return rf'{one} - {two}'
+                return rf"{one} - ({two})"
+            return rf"{one} - {two}"
 
         if self.mul:
             # handling special case where something is multiplied by -1
             if self.case == FCase.NEGVAR:
                 # if self.one and self.one.isnum and self.one[0] in [-1, -1.0]:
-                return rf'-{two}'
+                return rf"-{two}"
             if self.one_type == Elem.F:
                 # if one is a function, it should be bracketed
-                return rf'({one}) \cdot {two}'
+                return rf"({one}) \cdot {two}"
             if self.two_type == Elem.F:
                 # if two is a function, it should be bracketed
-                return rf'{one} \cdot ({two})'
+                return rf"{one} \cdot ({two})"
             if self.one_type == Elem.F and self.two_type == Elem.F:
                 # if both are functions, they should be bracketed
-                return rf'({one}) \cdot ({two})'
+                return rf"({one}) \cdot ({two})"
 
-            return rf'{one} \cdot {two}'
+            return rf"{one} \cdot {two}"
 
         if self.div:
             # not the most developed gana operation, yet
-            return rf'\frac{{{one}}}{{{two}}}'
+            return rf"\frac{{{one}}}{{{two}}}"
 
     def show(self, descriptive: bool = False):
         """Display the function"""
         if has_ipython:
             if descriptive:
                 for f in self._:
-                    display(Math(rf'[{f.n}]' + r'\text{   }' + f.latex()))
+                    display(Math(rf"[{f.n}]" + r"\text{   }" + f.latex()))
             else:
-                display(Math(rf'[{self.n}]' + r'\text{   }' + self.latex()))
+                display(Math(rf"[{self.n}]" + r"\text{   }" + self.latex()))
         else:
             print(
-                'IPython is an optional dependency, pip install gana[all] to get optional dependencies'
+                "IPython is an optional dependency, pip install gana[all] to get optional dependencies"
             )
 
     @property
     def longname(self):
         """Gives a longer more descriptive name for the function"""
-        _name = ''
+        _name = ""
         if self.one is not None:
             if isinstance(self.one, (int, float)):
                 _name += str(self.one)
@@ -1075,9 +1075,9 @@ class F:
                 _name += self.one.longname
         if self.two is not None:
             if isinstance(self.two, (int, float)):
-                _name += f'{self.rel}{self.two}'
+                _name += f"{self.rel}{self.two}"
             else:
-                _name += f'{self.rel}{self.two.longname}'
+                _name += f"{self.rel}{self.two.longname}"
         return _name
 
     # -----------------------------------------------------
@@ -1599,7 +1599,7 @@ class F:
                 # if multiplying with a list of tuples
                 # this is a theta
                 raise NotImplementedError(
-                    f'{self}*{other}: Multiplication with a parametric variable is not implemented yet.'
+                    f"{self}*{other}: Multiplication with a parametric variable is not implemented yet."
                 )
 
             # make a parameter from the list
@@ -1631,22 +1631,22 @@ class F:
             # if multiplying with a tuple
             # this is a theta
             raise NotImplementedError(
-                f'{self}*{other}: Multiplication of function and parametric variable is not implemented yet.'
+                f"{self}*{other}: Multiplication of function and parametric variable is not implemented yet."
             )
 
         if isinstance(other, F):
             raise NotImplementedError(
-                f'{self}*{other}: Multiplication of two functions is not implemented yet.'
+                f"{self}*{other}: Multiplication of two functions is not implemented yet."
             )
 
         if isinstance(other, V):
             raise NotImplementedError(
-                f'{self}*{other}: Multiplication of variable and function is not implemented yet.'
+                f"{self}*{other}: Multiplication of variable and function is not implemented yet."
             )
 
         if isinstance(other, T):
             raise NotImplementedError(
-                f'{self}*{other}: Multiplication of function and parametric variable is not implemented yet.'
+                f"{self}*{other}: Multiplication of function and parametric variable is not implemented yet."
             )
 
         # what remains is P
