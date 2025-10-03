@@ -21,7 +21,7 @@ class C:
     """
     Represents a relationship between Parameters, Variables, or Expressions.
 
-    This class is not intended to be used directly. It is constructed based on 
+    This class is not intended to be used directly. It is constructed based on
     relationships between parameter sets, variable sets, or function sets.
 
     :param function: Function set
@@ -65,7 +65,7 @@ class C:
     :raises ValueError: Cannot multiply constraints
     :raises ValueError: Cannot divide constraints
     """
-    
+
     def __init__(
         self,
         function: F | V,

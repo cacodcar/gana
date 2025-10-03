@@ -29,9 +29,9 @@ all = ["gurobipy",  "pyomo", "sympy"]
 test = ["coverage", "pytest"]
 docs = [
     "sphinx",            
-    "sphinx_book_theme",  
+    "sphinx-book-theme",  
     "nbsphinx",          
-    'sphinx_mdinclude',     
+    "sphinx_mdinclude",     
 ]
 [project.urls]
 Homepage = "https://github.com/cacodcar/gana"
