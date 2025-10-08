@@ -1,4 +1,4 @@
-gana.block.program module
+Program
 =========================
 
 .. automodule:: gana.block.program

@@ -19,8 +19,13 @@ if TYPE_CHECKING:
     from .theta import T
 
 try:
-    from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
-                               NonNegativeReals, Reals)
+    from pyomo.environ import (
+        Binary,
+        Integers,
+        NonNegativeIntegers,
+        NonNegativeReals,
+        Reals,
+    )
     from pyomo.environ import Var as PyoVar
 
     has_pyomo = True

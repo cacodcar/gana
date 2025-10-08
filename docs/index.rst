@@ -24,14 +24,27 @@ API
 
 .. toctree::
    :maxdepth: 5
-   :caption: API
+   :caption: Documentation
 
    gana
 
-Indices and tables
-==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+
+Indices and tables
+------------------
+
+   :maxdepth: 1
+   :caption: Indices
+   
+   genindex
+   modindex
+   search
+
+
+.. Indices and tables
+.. ==================
+
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`
 

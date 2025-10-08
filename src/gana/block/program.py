@@ -88,6 +88,7 @@ class Prg:
     """
 
     name: str = field(default="prog")
+    name: str = field(default="prog")
     tol: float = field(default=None)
     canonical: bool = field(default=True)
     tag: str = field(default="")
@@ -1128,6 +1129,7 @@ class Prg:
             index = [c.name for c in self.cons()]
 
         return DataFrame(self.B, columns=["RHS"], index=index)
+        return DataFrame(self.B, columns=["RHS"], index=index)
 
     def make_C_df(self, longname: bool = False) -> DataFrame:
         """Create a DataFrame from the C matrix.
@@ -1144,6 +1146,7 @@ class Prg:
         else:
             columns = [v.name for v in self.variables]
         return DataFrame([self.C], columns=columns, index=["Minimize"])
+        return DataFrame([self.C], columns=columns, index=["Minimize"])
 
     def make_df(self, longname: bool = False) -> DataFrame:
         """Create a DataFrame from the model.
@@ -1158,7 +1161,11 @@ class Prg:
         if longname:
             index = ["Minimize"] + [c.longname for c in self.cons()]
             columns = [v.longname for v in self.variables] + ["RHS"]
+            index = ["Minimize"] + [c.longname for c in self.cons()]
+            columns = [v.longname for v in self.variables] + ["RHS"]
         else:
+            index = ["Minimize"] + [c.name for c in self.cons()]
+            columns = [v.name for v in self.variables] + ["RHS"]
             index = ["Minimize"] + [c.name for c in self.cons()]
             columns = [v.name for v in self.variables] + ["RHS"]
         data = []
@@ -1511,20 +1518,23 @@ class Prg:
 
                 if self.leqcons():
                     display(Markdown(r"### Inequality Constraints"))
+                    display(Markdown(r"### Inequality Constraints"))
                     for c in self.leqcons():
                         c.show()
                 if self.eqcons():
+                    display(Markdown(r"### Equality Constraints"))
                     display(Markdown(r"### Equality Constraints"))
                     for c in self.eqcons():
                         c.show()
 
                 if self.nncons() and nncons:
                     display(Markdown(r"### Non-Negative Constraints"))
+                    display(Markdown(r"### Non-Negative Constraints"))
                     for c in self.nncons():
                         c.show()
 
                 if self.functions:
-                    display(Markdown("<br><br>"))
+                    print()
                     display(Markdown(r"## Functions"))
                     for f in self.functions:
                         f.show()
@@ -1602,6 +1612,7 @@ class Prg:
     # -----------------------------------------------------
 
     def __str__(self):
+        return rf"{self.name}"
         return rf"{self.name}"
 
     def __repr__(self):

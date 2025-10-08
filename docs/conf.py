@@ -46,5 +46,9 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'sphinx_book_theme'
 html_static_path = ['_static']
 html_logo = "ganalogo.jpg"
+html_theme_options = {
+    "toc_title": "On this page",  # right-hand ToC title
+    "show_navbar_depth": 2,  # how deep the sidebar nav goes
+}
 source_suffix = {".rst": 'restructuredtext', ".md": 'markdown'}
 nbsphinx_execute = 'never'
