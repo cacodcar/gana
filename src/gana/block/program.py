@@ -1353,13 +1353,28 @@ class Prg:
         print(f"--- Solving {self} using PPOPT {using} algorithm")
 
         sol = solve_mpqp(m, getattr(mpqp_algorithm, using))
-        for cr in sol.critical_regions:
-            for mat in ["A", "d", "E"]:
-                getattr(cr, mat)[npabs(getattr(cr, mat)) < tol_mat] = 0
-                setattr(cr, mat, npround(getattr(cr, mat), decimals=round_off))
+        if sol.critical_regions:
 
-        self.solution[self.n_sol] = sol
-        self.n_sol += 1
+            _p = Prg(f"{self}_var_eval")
+            _p.i = I(size=self.n_thetas)
+            _p.t = V(_p.i)
+
+            for n, cr in enumerate(sol.critical_regions):
+                for mat in ["A", "d", "E"]:
+                    getattr(cr, mat)[npabs(getattr(cr, mat)) < tol_mat] = 0
+                    setattr(cr, mat, npround(getattr(cr, mat), decimals=round_off))
+                A = cr.A.T
+                f = sum(list(a) * t for a, t in zip(A, _p.t._)) + list(cr.b)
+
+                setattr(_p, f"v_cr{n}", f)
+                # this add the equations determining variable values
+                # as a function of parametric variables
+                # in a dictionary for each variable to hold them
+                for _v, _f in zip(self.variables, f):
+                    _v.eval_funcs.setdefault(self.n_sol, {})[n] = _f
+
+            self.solution[self.n_sol] = sol
+            self.n_sol += 1
 
     def lb(self, function: V | Func):
         """Finds the lower bound of a variable or function"""

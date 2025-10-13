@@ -213,6 +213,9 @@ class V:
 
         self.category: str = ""
 
+        # functions to evaluate within critical regions
+        self.eval_funcs: dict[int, dict[int, F]] = {}
+
     @property
     def matrix(self) -> dict:
         """Matrix Representation"""
@@ -355,6 +358,18 @@ class V:
             for v in self._:
                 if n_sol in v.X:
                     display(Math(v.latex() + r"=" + rf"{v.X[n_sol]}"))
+
+    def eval(self, *values: float | int, n_sol: int = 0, n_cr: int = 0) -> float:
+        """Evaluates the variable value as a function of parametric variables
+
+        Args:
+            n_sol (int, optional): solution number. Defaults to 0.
+            n_cr (int, optional): critical region number. Defaults to 0.
+
+        Returns:
+            float: evaluated value
+        """
+        return self.eval_funcs[n_sol][n_cr].eval(*values)
 
     # -----------------------------------------------------
     #                    Printing
