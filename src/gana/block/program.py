@@ -7,7 +7,9 @@ from typing import Literal
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
+from numpy import abs as npabs
 from numpy import array as nparray
+from numpy import round as npround
 from numpy import zeros as npzeros
 from pandas import DataFrame
 from ppopt.mp_solvers.solve_mpqp import mpqp_algorithm, solve_mpqp
@@ -1365,6 +1367,8 @@ class Prg:
             "geometric_parallel",
             "geometric_parallel_exp",
         ] = "combinatorial",
+        tol_mat: float = 1e-9,
+        round_off: int = 4,
     ):
         """Solve the multiparametric program"""
 
@@ -1374,6 +1378,10 @@ class Prg:
         print(f"--- Solving {self} using PPOPT {using} algorithm")
 
         sol = solve_mpqp(m, getattr(mpqp_algorithm, using))
+        for cr in sol.critical_regions:
+            for mat in ["A", "d", "E"]:
+                getattr(cr, mat)[npabs(getattr(cr, mat)) < tol_mat] = 0
+                setattr(cr, mat, npround(getattr(cr, mat), decimals=round_off))
 
         self.solution[self.n_sol] = sol
         self.n_sol += 1
