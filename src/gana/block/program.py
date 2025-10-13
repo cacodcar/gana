@@ -2,11 +2,17 @@
 
 import warnings
 from dataclasses import dataclass, field
+from typing import Literal
 
+from gurobipy import Model as GPModel
+from gurobipy import read as gpread
+from IPython.display import Markdown, display
 from numpy import array as nparray
 from numpy import zeros as npzeros
 from pandas import DataFrame
+from ppopt.mp_solvers.solve_mpqp import mpqp_algorithm, solve_mpqp
 from ppopt.mplp_program import MPLP_Program
+from ppopt.solution import Solution as MPSolution
 
 from ..operators.composition import inf, sup
 from ..sets.cases import Elem, ICase, PCase
@@ -18,35 +24,6 @@ from ..sets.parameter import P
 from ..sets.theta import T
 from ..sets.variable import V
 from .solution import Solution
-
-# optional dependencies
-try:
-    from gurobipy import read as gpread
-
-    has_gurobi = True
-except ImportError:
-    has_gurobi = False
-
-try:
-    from IPython.display import Markdown, display
-
-    has_ipython = True
-except ImportError:
-    has_ipython = False
-
-# try:
-#     # from pyomo.environ import ConcreteModel as PyoModel
-
-#     has_pyomo = True
-# except ImportError:
-#     has_pyomo = False
-
-
-try:
-
-    has_pandas = True
-except ImportError:
-    has_pandas = False
 
 
 @dataclass
@@ -173,10 +150,16 @@ class Prg:
         self.optimized = False
 
         # the solution object
-        self.solution: dict[int, Solution] = {}
+        self.solution: dict[int, Solution | MPSolution] = {}
 
         # number of solutions
         self.n_sol: int = 0
+
+        # formulations available
+        self.formulation: dict[int, GPModel | MPLP_Program] = {}
+
+        # number of formulations
+        self.n_for: int = 0
 
         # solution matrix
 
@@ -979,15 +962,6 @@ class Prg:
         for n, c in enumerate(constraints):
             for z, f in zip(c.Z, c.F):
                 _F[n][z] = f
-
-        # n = 0
-        # for c in constraints:
-        #     m = 0
-        #     for z, f in zip(c.Z, c.F):
-        #         if z and z[m] is not None:
-        #             _F[n][z[m]] = f[m]
-        #         m += 1
-        #         n += 1
         return _F
 
     @property
@@ -1125,14 +1099,12 @@ class Prg:
         Returns:
             DataFrame: Has a single column, rows are the constraints.
         """
-        if not has_pandas:
-            raise ImportError("pip install gana[all] to get optional dependencies")
+
         if longname:
             index = [c.longname for c in self.cons()]
         else:
             index = [c.name for c in self.cons()]
 
-        return DataFrame(self.B, columns=["RHS"], index=index)
         return DataFrame(self.B, columns=["RHS"], index=index)
 
     def make_C_df(self, longname: bool = False) -> DataFrame:
@@ -1343,10 +1315,13 @@ class Prg:
     #               Optimize
     # --------------------------------------------------
     def opt(self, using: str = "gurobi"):
-        """Solve the program"""
+        """Determine the optimal solution to the program"""
 
         if using == "gurobi":
             m = self.gurobi()
+
+            self.formulation[self.n_for] = m
+            self.n_for += 1
 
             print(f"--- Optimizing {self} using {using}")
             m.optimize()
@@ -1374,6 +1349,34 @@ class Prg:
 
             except AttributeError:
                 print("!!! No solution found. Check the model.")
+
+    def solve(
+        self,
+        using: Literal[
+            "combinatorial",
+            "combinatorial_parallel",
+            "combinatorial_parallel_exp",
+            "graph",
+            "graph_exp",
+            "graph_parallel",
+            "graph_parallel_exp",
+            "combinatorial_graph",
+            "geometric",
+            "geometric_parallel",
+            "geometric_parallel_exp",
+        ] = "combinatorial",
+    ):
+        """Solve the multiparametric program"""
+
+        m = self.ppopt()
+        self.formulation[self.n_for] = m
+        self.n_for += 1
+        print(f"--- Solving {self} using PPOPT {using} algorithm")
+
+        sol = solve_mpqp(m, getattr(mpqp_algorithm, using))
+
+        self.solution[self.n_sol] = sol
+        self.n_sol += 1
 
     def lb(self, function: V | Func):
         """Finds the lower bound of a variable or function"""
@@ -1617,8 +1620,8 @@ class Prg:
     # -----------------------------------------------------
 
     def __str__(self):
-        return rf"{self.name}"
-        return rf"{self.name}"
+        # return rf"{self.name}"
+        return self.name
 
     def __repr__(self):
         return self.name
@@ -1685,16 +1688,25 @@ class Prg:
         _CrB = self.CrB
         _F = self.F
 
+        print(f"--- Creating PPOPT MPLP_Program for {self}")
+
         return MPLP_Program(
             A=nparray(_A + _NN),
             b=nparray([[i] for i in _B] + [[0]] * self.n_variables),
             c=nparray([[i] for i in _C]),
             A_t=nparray(_CrA),
-            b_t=nparray([[i] for i in self.CrB]),
+            b_t=nparray([[i] for i in _CrB]),
             F=nparray(_F + [[0] * self.n_thetas] * self.n_variables),
             H=npzeros((self.n_variables, self.n_thetas)),
             equality_indices=[c.n for c in self.cons() if c.eq],
         )
+
+    def gurobi(self) -> GPModel:
+        """Gurobi Model"""
+
+        self.mps()
+        print(f"--- Creating gurobi model for {self}")
+        return gpread(f"{self}.mps")
 
     # def pyomo(self):
     #     """Pyomo Model"""
@@ -1716,10 +1728,3 @@ class Prg:
     #     print(
     #         'pyomo is an optional dependency, pip install gana[all] to get optional dependencies'
     #     )
-
-    def gurobi(self):
-        """Gurobi Model"""
-
-        self.mps()
-        print(f"--- Creating gurobi model for {self}")
-        return gpread(f"{self}.mps")
