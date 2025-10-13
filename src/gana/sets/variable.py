@@ -216,6 +216,9 @@ class V:
         # functions to evaluate within critical regions
         self.eval_funcs: dict[int, dict[int, F]] = {}
 
+        # evaluations using parametric solutions
+        self.evaluation: dict[int, dict[tuple[float, ...], float]] = {}
+
     @property
     def matrix(self) -> dict:
         """Matrix Representation"""
@@ -359,7 +362,7 @@ class V:
                 if n_sol in v.X:
                     display(Math(v.latex() + r"=" + rf"{v.X[n_sol]}"))
 
-    def eval(self, *values: float | int, n_sol: int = 0, n_cr: int = 0) -> float:
+    def f_eval(self, *values: float | int, n_sol: int = 0, n_cr: int = 0) -> float:
         """Evaluates the variable value as a function of parametric variables
 
         Args:
@@ -370,6 +373,23 @@ class V:
             float: evaluated value
         """
         return self.eval_funcs[n_sol][n_cr].eval(*values)
+
+    def eval(self, *theta_vals: float, n_sol: int = 0) -> float:
+        """Evaluates the variable value as a function of parametric variables
+        Args:
+            theta_vals (float): values of the parametric variables
+            n_sol (int, optional): solution number. Defaults to 0.
+            roundoff (int, optional): round off the evaluated value. Defaults to 4.
+        Returns:
+            float: evaluated value
+        """
+
+        try:
+            return self.evaluation[n_sol][theta_vals]
+        except KeyError:
+            print(
+                f"Run program.eval({theta_vals}) for appropriate solution number first"
+            )
 
     # -----------------------------------------------------
     #                    Printing
@@ -1090,8 +1110,10 @@ class V:
 
         # the indices are the x-axis
         x = [str(idx) for idx in self.map]
+        print("aaaa", x)
         # the values are the y-axis
-        y = self.sol(True)
+        y = self.sol(aslist=True)
+        print("bbbb", y)
 
         if usetex:
             rc(
@@ -1114,6 +1136,14 @@ class V:
         ax.grid(alpha=grid_alpha)
         ax.set_xticks(x)
         ax.set_xticklabels(
+            [
+                rf"${tuple([idx.latex() for idx in index])}$".replace("'", "").replace(
+                    "\\", ""
+                )
+                for index in self.map
+            ]
+        )
+        print(
             [
                 rf"${tuple([idx.latex() for idx in index])}$".replace("'", "").replace(
                     "\\", ""

@@ -14,6 +14,7 @@ from numpy import zeros as npzeros
 from pandas import DataFrame
 from ppopt.mp_solvers.solve_mpqp import mpqp_algorithm, solve_mpqp
 from ppopt.mplp_program import MPLP_Program
+from ppopt.plot import parametric_plot
 from ppopt.solution import Solution as MPSolution
 
 from ..operators.composition import inf, sup
@@ -157,15 +158,23 @@ class Prg:
         # number of solutions
         self.n_sol: int = 0
 
+        # solution matrix
+        self.X: dict[int, list[float | int]] = {}
+
         # formulations available
         self.formulation: dict[int, GPModel | MPLP_Program] = {}
 
         # number of formulations
         self.n_for: int = 0
 
-        # solution matrix
+        # evaluations using parametric solutions
+        self.evaluation: dict[int, dict[tuple[float, ...], list[float]]] = {}
 
-        self.X: dict[int, list[float | int]] = {}
+        # number of evaluations by solution number
+        self.n_eval: dict[int, int] = {}
+
+        # solution types
+        self.sol_types: dict[str, list[int]] = {"MIP": [], "mp": []}
 
     def add_index(self, name: str, index: I):
         """Adds new index to program
@@ -1099,7 +1108,6 @@ class Prg:
         else:
             columns = [v.name for v in self.variables]
         return DataFrame([self.C], columns=columns, index=["Minimize"])
-        return DataFrame([self.C], columns=columns, index=["Minimize"])
 
     def make_df(self, longname: bool = False) -> DataFrame:
         """Create a DataFrame from the model.
@@ -1321,9 +1329,8 @@ class Prg:
                 print("--- Creating Solution object, check.solution")
 
                 self.solution[self.n_sol] = self.birth_solution()
-
+                self.sol_types["MIP"].append(self.n_sol)
                 self.n_sol += 1
-
             except AttributeError:
                 print("!!! No solution found. Check the model.")
 
@@ -1378,7 +1385,42 @@ class Prg:
                     _v.eval_funcs.setdefault(self.n_sol, {})[n] = _f
 
             self.solution[self.n_sol] = sol
+            self.sol_types["mp"].append(self.n_sol)
             self.n_sol += 1
+
+    def eval(
+        self, *theta_vals: float, n_sol: int = 0, roundoff: int = 4
+    ) -> list[float]:
+        """Evaluates the variable value as a function of parametric variables
+        Args:
+            theta_vals (float): values of the parametric variables
+            n_sol (int, optional): solution number. Defaults to 0.
+            roundoff (int, optional): round off the evaluated value. Defaults to 4.
+        Returns:
+            list[float]: list of values
+        """
+        if len(theta_vals) != self.n_thetas:
+            raise ValueError(
+                f"Problem has {self.n_thetas} thetas, provided {len(theta_vals)} values",
+            )
+
+        _theta_vals = nparray([[v] for v in theta_vals])
+        sol = self.solution[n_sol].evaluate(_theta_vals)
+        sol = [round(float(val[0]), roundoff) for val in sol]
+
+        self.evaluation.setdefault(n_sol, {})
+        self.n_eval.setdefault(n_sol, 0)
+
+        self.evaluation[n_sol][theta_vals] = sol
+
+        self.n_eval[n_sol] += 1
+
+        for n, v in enumerate(self.variables):
+            v.evaluation.setdefault(n_sol, {})
+
+            v.evaluation[n_sol][theta_vals] = sol[n]
+
+        return {v: sol[i] for i, v in enumerate(self.variables)}
 
     def lb(self, function: V | Func):
         """Finds the lower bound of a variable or function"""
@@ -1613,9 +1655,14 @@ class Prg:
                     for f in self.function_sets:
                         f.show()
 
-    def draw(self, variable: V, n_sol: int = 0):
+    def draw(self, variable: V = None, n_sol: int = 0):
         """Plots the solution for a variable"""
-        self.solution[n_sol].draw(variable)
+        if n_sol in self.sol_types["MIP"]:
+            self.solution[n_sol].draw(variable)
+        elif n_sol in self.sol_types["mp"]:
+            parametric_plot(self.solution[n_sol])
+        else:
+            raise ValueError(f"Solution {n_sol} not found")
 
     # -----------------------------------------------------
     #                    Hashing
