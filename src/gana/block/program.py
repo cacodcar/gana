@@ -976,14 +976,18 @@ class Prg:
             row = [0] * len(self.theta_sets)
             _F.append(row)
 
-        n = 0
-        for c in constraints:
-            m = 0
+        for n, c in enumerate(constraints):
             for z, f in zip(c.Z, c.F):
-                if z and z[m] is not None:
-                    _F[n][z[m]] = f[m]
-                m += 1
-                n += 1
+                _F[n][z] = f
+
+        # n = 0
+        # for c in constraints:
+        #     m = 0
+        #     for z, f in zip(c.Z, c.F):
+        #         if z and z[m] is not None:
+        #             _F[n][z[m]] = f[m]
+        #         m += 1
+        #         n += 1
         return _F
 
     @property
@@ -1351,7 +1355,8 @@ class Prg:
 
                 self.X[self.n_sol] = [v.X for v in m.getVars()]
 
-                for v, val in zip(self.variables, self.X[self.n_sol]):
+                _variables = [v for v in self.variables if v.cons_by]
+                for v, val in zip(_variables, self.X[self.n_sol]):
 
                     v.X[self.n_sol] = val
 
@@ -1672,13 +1677,21 @@ class Prg:
         # F is the matrix of theta coefficients (including nn constraints)
         # H are the parameteric objective coefficients
 
+        _A = self.A
+        _NN = self.NN
+        _B = self.B
+        _C = self.C
+        _CrA = self.CrA
+        _CrB = self.CrB
+        _F = self.F
+
         return MPLP_Program(
-            A=nparray(self.A + self.NN),
-            b=nparray([[i] for i in self.B] + [[0]] * self.n_variables),
-            c=nparray([[i] for i in self.C]),
-            A_t=nparray(self.CrA),
+            A=nparray(_A + _NN),
+            b=nparray([[i] for i in _B] + [[0]] * self.n_variables),
+            c=nparray([[i] for i in _C]),
+            A_t=nparray(_CrA),
             b_t=nparray([[i] for i in self.CrB]),
-            F=nparray(self.F + [[0] * self.n_thetas] * self.n_variables),
+            F=nparray(_F + [[0] * self.n_thetas] * self.n_variables),
             H=npzeros((self.n_variables, self.n_thetas)),
             equality_indices=[c.n for c in self.cons() if c.eq],
         )

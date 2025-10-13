@@ -158,7 +158,6 @@ class V:
             for idx in _index:
                 for i in product(*idx):
                     _map[i] = None
-            print("vvvvvvv", _index, _map)
             _index = set(_index)
 
         else:
