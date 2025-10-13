@@ -421,13 +421,15 @@ class Prg:
             constraint (C): constraint with thetas to be updated
         """
         for n, theta in enumerate(constraint.function.rhs_thetas):
-            self.add_theta(name=f"θ{self.n_theta_sets}", theta=theta)
-            # the last theta added is the one just made
-            theta = self.theta_sets[-1]
-            # replace the theta in the constraint rhs list
-            constraint.function.rhs_thetas[n] = theta
-            # Create the F and Z matrices for the constraint
-            # this only handles addition or subtraction with T
+            if theta.parent is None:
+                self.add_theta(name=f"θ{self.n_theta_sets}", theta=theta)
+                # the last theta added is the one just made
+                theta = self.theta_sets[-1]
+                # replace the theta in the constraint rhs list
+                constraint.function.rhs_thetas[n] = theta
+                # Create the F and Z matrices for the constraint
+                # this only handles addition or subtraction with T
+
             if (
                 constraint.function.one_type == Elem.F
                 and constraint.function.one.two_type == Elem.T
@@ -942,7 +944,7 @@ class Prg:
         constraints = self.cons()
         _F = []
         for _ in constraints:
-            row = [0] * len(self.theta_sets)
+            row = [0] * len(self.thetas)
             _F.append(row)
 
         for n, c in enumerate(constraints):
@@ -967,7 +969,6 @@ class Prg:
 
         return _C
 
-        # TODO multiple objective
 
     @property
     def P(self) -> list[list[int]]:
@@ -1050,8 +1051,8 @@ class Prg:
         """Critical Region RHS vector"""
         CrB_ = []
         for t in self.thetas:
-            CrB_.append(t._[1])
-            CrB_.append(-t._[0])
+            CrB_.append(t.ub)
+            CrB_.append(-t.lb)
 
         return CrB_
 

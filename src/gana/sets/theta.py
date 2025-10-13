@@ -15,10 +15,10 @@ from .birth import make_P
 from .cases import Elem
 from .function import F
 from .index import I
+from .variable import V
 
 if TYPE_CHECKING:
     from .parameter import P
-    from .variable import V
 
 
 class T:
@@ -102,26 +102,57 @@ class T:
                 if self._:
                     self.index = (I(size=len(self._), dummy=True),)
 
-        if self.index:
-            # only do this if index is passed
-            self.create_map()
+        if any([isinstance(i, tuple) for i in index]):
+            # if index is a set of indices,
+            # needs to be done for each index
+            _index = []
+            _map = {}
+            for idx in index:
+                _index.append(tuple([i if not isinstance(i, V) else [i] for i in idx]))
 
-            # check if there is a mismatch between the length of data
-            # and the length of index passed
-            if len(self.map) != len(self._):
-                raise ValueError(
-                    f"Index mismatch: len(values) ({len(self._)}) ! = len(index) ({len(self.map)})"
-                )
+            # iterates over each individual index
+            # and creates a mapping for it
+            for idx in _index:
+                for i in product(*idx):
+                    _map[i] = None
+            _index = set(_index)
 
         else:
-            # empty Ts are created in __call__()
-            # they are populated from the outside
-            # which is more efficient
-            # because it avoids birthing the same theta elements again
-            # moreover, the same element objects are used in called sets
+            # if not set
+            _index = tuple([i if not isinstance(i, V) else [i] for i in index])
 
-            self.map = {}
-            self._ = []
+            if _index:
+                _map = {i: None for i in product(*_index)}
+
+            else:
+                _map = {}
+
+        self.index: tuple[I] | set[tuple[I]] = _index
+        self.map: dict[I, V] = _map
+
+        self.lb: float | int = None
+        self.ub: float | int = None
+
+        # if self.index:
+        #     # only do this if index is passed
+        #     self.create_map()
+
+        #     # check if there is a mismatch between the length of data
+        #     # and the length of index passed
+        #     if len(self.map) != len(self._):
+        #         raise ValueError(
+        #             f"Index mismatch: len(values) ({len(self._)}) ! = len(index) ({len(self.map)})"
+        #         )
+
+        # else:
+        #     # empty Ts are created in __call__()
+        #     # they are populated from the outside
+        #     # which is more efficient
+        #     # because it avoids birthing the same theta elements again
+        #     # moreover, the same element objects are used in called sets
+
+        #     self.map = {}
+        #     self._ = []
 
         # this helps in the index check when calling functions
         self.elements = [self]
@@ -177,7 +208,11 @@ class T:
 
             # kind of recursive, but for elemental sets
             # the element set only contains a tuple
-            theta._ = self._[pos]
+            theta.lb = self._[pos][0]
+            theta.ub = self._[pos][1]
+            theta._ = [theta]
+
+            # theta._ = self._[pos]
 
             # append the new parametric variable to the set
             self._[pos] = theta

@@ -18,6 +18,7 @@ Tutorial
    examples/thetas
    examples/diet 
    examples/multiscale
+   examples/mplp
 
 API
 ---

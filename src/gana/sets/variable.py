@@ -1110,10 +1110,8 @@ class V:
 
         # the indices are the x-axis
         x = [str(idx) for idx in self.map]
-        print("aaaa", x)
         # the values are the y-axis
         y = self.sol(aslist=True)
-        print("bbbb", y)
 
         if usetex:
             rc(
