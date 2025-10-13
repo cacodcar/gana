@@ -1361,9 +1361,13 @@ class Prg:
 
             for n, cr in enumerate(sol.critical_regions):
                 for mat in ["A", "d", "E"]:
+                    # clean up small values
+                    # set below tolerance to zero
+                    # round off to specified decimal places
                     getattr(cr, mat)[npabs(getattr(cr, mat)) < tol_mat] = 0
                     setattr(cr, mat, npround(getattr(cr, mat), decimals=round_off))
                 A = cr.A.T
+                # write the evaluation function
                 f = sum(list(a) * t for a, t in zip(A, _p.t._)) + list(cr.b)
 
                 setattr(_p, f"v_cr{n}", f)
