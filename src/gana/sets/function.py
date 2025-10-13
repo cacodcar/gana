@@ -1854,71 +1854,68 @@ class F:
     #                    Solution
     # -----------------------------------------------------
 
-    def eval(self, n_sol: int = 0):
-        """Evaluates the value of the function"""
-        one, two = None, None
-        # if this is a function, set
-        # do evaluations for all the children and return
+    def solution(self, n_sol: int = 0):
+        """Evaluate the value of the function."""
+
+        # if this is a function container, evaluate all its children
         if self.parent is None:
-            return [f.eval(n_sol) for f in self._]
+            # if this is a function, set
+            # do evaluations for all the children and return
+            return [f.solution(n_sol) for f in self._]
 
-        def function_eval(function: Self):
-            """Evaluates special cases of functions"""
-            if function.case == FCase.SUM:
-                # if this is a summation
-                # avoid recursion
-                return sum([v.X[n_sol] for v in function.variables])
-            if function.case == FCase.NEGSUM:
-                # if this is a negation
-                # avoid recursion
-                return -sum([v.X[n_sol] for v in function.variables])
-            if function.case == FCase.NEGVAR:
-                # if this is a negated variable
-                # return the value of the variable
-                return -function.two.X[n_sol]
-            if function.case == FCase.FVAR:
-                # if this is a variable being treated as a function
-                # return the value of the variable
-                return function.two.X[n_sol]
+        def function_eval(f: Self):
+            """Handle special function cases without recursion."""
+            match f.case:
+                case FCase.SUM:
+                    return sum(v.X[n_sol] for v in f.variables)
+                case FCase.NEGSUM:
+                    return -sum(v.X[n_sol] for v in f.variables)
+                case FCase.NEGVAR:
+                    return -f.two.X[n_sol]
+                case FCase.FVAR:
+                    return f.two.X[n_sol]
+                case _:
+                    return f.solution(n_sol)
 
-            return function.eval(n_sol)
+        def resolve(elem, elem_type):
+            """Return evaluated value based on element type."""
+            match elem_type:
+                case Elem.P:
+                    return elem
+                case Elem.V:
+                    return elem.X[n_sol]
+                case Elem.F:
+                    return function_eval(elem)
+                case _:
+                    return None
 
-        if self.parent.one_type == Elem.P:
-            one = self.one
-        elif self.parent.one_type == Elem.V:
-            one = self.one.X[n_sol]
-        elif self.parent.one_type == Elem.F:
-            one = function_eval(self.one)
+        one = resolve(self.one, self.parent.one_type)
+        two = resolve(self.two, self.parent.two_type)
 
-        if self.parent.two_type == Elem.P:
-            two = self.two
-        elif self.parent.two_type == Elem.V:
-            two = self.two.X[n_sol]
-        elif self.parent.two_type == Elem.F:
-            two = function_eval(self.two)
-
+        # arithmetic evaluation
         if self.mul:
-            if not one:
-                one = 1
-            if not two:
-                two = 1
-            self.X[n_sol] = one * two
-        if self.div:
+            self.X[n_sol] = (one or 1) * (two or 1)
+        elif self.div:
             self.X[n_sol] = one / two
-        if self.add:
-            if not one:
-                one = 0
-            if not two:
-                two = 0
-            self.X[n_sol] = one + two
-        if self.sub:
-            if not one:
-                one = 0
-            if not two:
-                two = 0
-            self.X[n_sol] = one - two
+        elif self.add:
+            self.X[n_sol] = (one or 0) + (two or 0)
+        elif self.sub:
+            self.X[n_sol] = (one or 0) - (two or 0)
 
         return self.X[n_sol]
+
+    def eval(self, *values: float | int | list[float | int]):
+        """Evaluate the function for given parameter values.
+
+        Args:
+            *values: Values for variables in the order they feature in the function
+        """
+        if self.parent:
+            return sum(a * v for a, v in zip(self.A, values))
+        _sol = []
+        for f, v in zip(self._, *values):
+            _sol.append(f.eval(*v))
+        return _sol
 
     # -----------------------------------------------------
     #                    Hashing

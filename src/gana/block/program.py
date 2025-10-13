@@ -666,31 +666,6 @@ class Prg:
                     cons_new.cons_by_pos[v] = len(v.cons_by)
                     v.cons_by.append(cons_new)
 
-        # for variable in self.variable_sets:
-
-        #     if constraint_ex in variable.cons_by:
-        #         # if variable is constrained by the old constraint
-        #         # remove the constraint from the variable
-        #         variable.cons_by[variable.cons_by.index(constraint_ex)] = constraint_new
-
-        #     for var in variable._:
-
-        #         for cons_new, cons_ex in zip(constraint_new._, constraint_ex._):
-        #             # if variable is constrained by the old constraint
-        #             # update the cons_by list
-        #             if cons_ex in var.cons_by:
-        #                 var.cons_by[var.cons_by.index(cons_ex)] = cons_new
-
-        # for cons_new in constraint_new._:
-        #     # there could be new variables in the updated constraint
-        #     for var in cons_new.variables:
-
-        #         # if the variable is in the new constraint
-        #         if cons_new not in var.cons_by:
-
-        #             # update the cons_by list
-        #             var.cons_by.append(cons_new)
-
     def add_objective(self, objective: O):
         """Adds an objective set to the program
 
@@ -1338,7 +1313,7 @@ class Prg:
                     v.X[self.n_sol] = val
 
                 for c in self.constraint_sets:
-                    c.function.eval(n_sol=self.n_sol)
+                    c.function.solution(n_sol=self.n_sol)
 
                 self.objectives[-1].X = m.ObjVal
                 self.optimized = True
