@@ -12,7 +12,7 @@ maintainers = [
   { name="Rahul Kakodkar", email="cacodcar@gmail.com" },
 ]
 description = "A barebones mathematical programming package"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 readme = "README.md"
 license = { file = "LICENSE" }
 keywords = ["modeling", "optimization", "programming", "aml"]
