@@ -4,7 +4,9 @@ from src.gana.operators.composition import inf, sup
 from src.gana.sets.index import I
 from src.gana.sets.parameter import P
 from src.gana.sets.variable import V
+from src.gana.sets.theta import T
 from src.gana.operators.sigma import sigma
+from numpy import allclose, array
 
 
 @pytest.fixture
@@ -211,3 +213,4 @@ def test_diet_problem(diet_problem):
         1.7391304347826089,
     ]
     assert diet_problem.obj_cost.sol(True) == 2.869565217391304
+

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gana"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
   { name="Rahul Kakodkar", email="cacodcar@gmail.com" },
 ]
@@ -26,13 +26,21 @@ classifiers = [
 dependencies = ["ppopt", "gurobipy", "IPython", "numpy", "pandas"]
 [project.optional-dependencies]
 all = ["pyomo", "sympy"]
-test = ["coverage", "pytest"]
+test = ["coverage", "pytest", "hypothesis", "flake8"]
 docs = [
     "sphinx",            
     "sphinx-book-theme",  
     "nbsphinx",          
     "sphinx_mdinclude",     
+    "myst-nb", 
+    "sphinxcontrib-bibtex",
+    "sphinx-copybutton",
+    "sphinx-togglebutton",
+    "numpydoc",
+    "linkify"
 ]
+
 [project.urls]
 Homepage = "https://github.com/cacodcar/gana"
 Issues = "https://github.com/cacodcar/gana/issues"
+

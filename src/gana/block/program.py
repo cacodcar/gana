@@ -894,13 +894,27 @@ class Prg:
             return [x.n for x in self.variables if x.bnr]
         return [x for x in self.variables if x.bnr]
 
-    def intvars(self, n: bool = False) -> list[int | V]:
+    def itgvars(self, n: bool = False) -> list[int | V]:
         """integer variables"""
         if n:
             return [x.n for x in self.variables if x.itg]
         return [x for x in self.variables if x.itg]
 
-    def contvars(self, n: bool = False) -> list[int | V]:
+    def nonbnritgvars(self, n: bool = False) -> list[int | V]:
+        """non-binary and integer variables"""
+        if n:
+            return [x.n for x in self.variables if x.itg and not x.bnr]
+        return [x for x in self.variables if x.itg and not x.bnr]
+
+    def cntbnrvars(self, n: bool = False) -> list[int | V]:
+        """continuous and binary variables
+        integer variables are excluded
+        """
+        if n:
+            return [x.n for x in self.variables if not x.itg or x.bnr]
+        return [x for x in self.variables if not x.itg or x.bnr]
+
+    def cntvars(self, n: bool = False) -> list[int | V]:
         """continuous variables"""
         if n:
             return [x.n for x in self.variables if not x.bnr and not x.itg]
@@ -968,7 +982,6 @@ class Prg:
                 _C[obj.P[n]] = obj.C[n]
 
         return _C
-
 
     @property
     def P(self) -> list[list[int]]:
@@ -1187,11 +1200,13 @@ class Prg:
         # as opposed to order of declaration
         self.renumber()
 
-        leq_cons = self.leqcons()
-        eq_cons = self.eqcons()
-        cont_vars = self.contvars()
-        nn_vars = self.nnvars()
-        bnr_vars = self.bnrvars()
+        leqcons = self.leqcons()
+        eqcons = self.eqcons()
+        cntvars = self.cntvars()
+        nnvars = self.nnvars()
+        bnrvars = self.bnrvars()
+        cntbnrvars = self.cntbnrvars()
+        nonbnritgvars = self.nonbnritgvars()
 
         # _C = self.C
         # _A = self.A
@@ -1209,11 +1224,11 @@ class Prg:
                 # the objective is: N   OBJECTIVE_NAME
                 f.write(f"{ws}N{ws*3}{self.objectives[-1].mps()}\n")
 
-            for c in leq_cons:
+            for c in leqcons:
                 # less than or equal constraints are: L   CONSTRAINT_NAME
                 f.write(f"{ws}L{ws*3}{c.mps()}\n")
 
-            for c in eq_cons:
+            for c in eqcons:
                 # equality constraints are: E   CONSTRAINT_NAME
                 f.write(f"{ws}E{ws*3}{c.mps()}\n")
 
@@ -1221,7 +1236,7 @@ class Prg:
             # in each of the constraints that they feature in
 
             f.write("COLUMNS\n")
-            for v in self.variables:
+            for v in cntbnrvars:
                 # For each variable, we write:
                 # V_NAME    CONSTRAINT_NAME    COEFFICIENT
                 # for all variables, these are ordered
@@ -1237,16 +1252,8 @@ class Prg:
                     f.write(ws * (10 - vs))
                     f.write(c.mps())
                     f.write(ws * (10 - vfs))
-
                     # C variable coefficients are a vector
-                    # if isinstance(c, O):
-                    #     f.write(f'{c.function[0].matrix[v.n]}')
-                    # else:
-                    #     f.write(f'{c.matrix[v.n]}')
                     f.write(f"{c.matrix[v.n]}")
-
-                    # f.write(f'{c.A[c.P.index(v.n)]}')
-
                     f.write("\n")
 
                 for o in v.min_by:
@@ -1258,15 +1265,45 @@ class Prg:
                     f.write(ws * (10 - vs))
                     f.write(o.mps())
                     f.write(ws * (10 - vfs))
-
                     f.write(f"{o.function[0].matrix[v.n]}")
-
-                    # f.write(f'{c.A[c.P.index(v.n)]}')
                     f.write("\n")
+
+            if nonbnritgvars:
+                f.write(f"{ws*4}MARK0000{ws*2}'MARKER'{ws*17}'INTORG'\n")
+                for v in nonbnritgvars:
+                    vs = len(v.mps())
+                    # for constraints/functions/objectives that they feature in
+                    for c in v.cons_by:
+                        # this captures the length of the variable name
+                        # variable names are just Vn where n is order of precedence
+                        vfs = len(c.mps())
+                        f.write(ws * 4)
+                        f.write(v.mps())
+                        f.write(ws * (10 - vs))
+                        f.write(c.mps())
+                        f.write(ws * (10 - vfs))
+                        # C variable coefficients are a vector
+                        f.write(f"{c.matrix[v.n]}")
+                        f.write("\n")
+
+                    for o in v.min_by:
+                        # this captures the length of the variable name
+                        # variable names are just Vn where n is order of precedence
+                        vfs = len(o.mps())
+                        f.write(ws * 4)
+                        f.write(v.mps())
+                        f.write(ws * (10 - vs))
+                        f.write(o.mps())
+                        f.write(ws * (10 - vfs))
+
+                        f.write(f"{o.function[0].matrix[v.n]}")
+                        f.write("\n")
+
+                f.write(f"{ws*4}MARK0000{ws*2}'MARKER'{ws*17}'INTEND'\n")
 
             # This gives the right-hand side of the constraints
             f.write("RHS\n")
-            for n, c in enumerate(leq_cons + eq_cons):
+            for n, c in enumerate(leqcons + eqcons):
                 # For each constraint, we write:
                 # RHSn    CONSTRAINT_NAME    RHS_VALUE
                 f.write(ws * 4)
@@ -1280,14 +1317,26 @@ class Prg:
             f.write("BOUNDS\n")
             # for continuous variables that are nonnegative, we write:
             # LO BND1    VARIABLE_NAME    0
-            for v in nn_vars:
-                if v in cont_vars:
+            for v in nnvars:
+                if v in cntvars:
                     f.write(f"{ws}LO{ws}BND1{ws*4}{v.mps()}{ws*8}{0}\n")
 
             # for integer variables that are binary, we write:
             # BV BND1    VARIABLE_NAME
-            for v in bnr_vars:
+            for v in bnrvars:
                 f.write(f"{ws}BV{ws}BND1{ws*5}{v.mps()}\n")
+
+            for v in nonbnritgvars:
+                vs = len(v.mps())
+                if v.nn:
+                    f.write(f"{ws}LI{ws}BOUND{ws*4}{v.mps()}{ws*(10 - vs)}{0}\n")
+                else:
+                    print(
+                        "!!! Some solvers need bounds for integer variables provided explicitly"
+                    )
+                    print(
+                        f"!!! This can cause issues when providing unbounded integer variables such as {v}"
+                    )
 
             # CLOSE the MPS file
             f.write("ENDATA")
@@ -1363,27 +1412,29 @@ class Prg:
         sol = solve_mpqp(m, getattr(mpqp_algorithm, using))
         if sol.critical_regions:
 
-            _p = Prg(f"{self}_var_eval")
-            _p.i = I(size=self.n_thetas)
-            _p.t = V(_p.i)
+            # TODO: do not delete
+            # this creates actual programs for each critical region
+            # _p = Prg(f"{self}_var_eval")
+            # _p.i = I(size=self.n_thetas)
+            # _p.t = V(_p.i)
 
-            for n, cr in enumerate(sol.critical_regions):
-                for mat in ["A", "d", "E"]:
-                    # clean up small values
-                    # set below tolerance to zero
-                    # round off to specified decimal places
-                    getattr(cr, mat)[npabs(getattr(cr, mat)) < tol_mat] = 0
-                    setattr(cr, mat, npround(getattr(cr, mat), decimals=round_off))
-                A = cr.A.T
-                # write the evaluation function
-                f = sum(list(a) * t for a, t in zip(A, _p.t._)) + list(cr.b)
+            # for n, cr in enumerate(sol.critical_regions):
+            #     for mat in ["A", "d", "E"]:
+            #         # clean up small values
+            #         # set below tolerance to zero
+            #         # round off to specified decimal places
+            #         getattr(cr, mat)[npabs(getattr(cr, mat)) < tol_mat] = 0
+            #         setattr(cr, mat, npround(getattr(cr, mat), decimals=round_off))
+            #     A = cr.A.T
+            #     # write the evaluation function
+            #     f = sum(list(a) * t for a, t in zip(A, _p.t._)) + list(cr.b)
 
-                setattr(_p, f"v_cr{n}", f)
-                # this add the equations determining variable values
-                # as a function of parametric variables
-                # in a dictionary for each variable to hold them
-                for _v, _f in zip(self.variables, f):
-                    _v.eval_funcs.setdefault(self.n_sol, {})[n] = _f
+            #     setattr(_p, f"v_cr{n}", f)
+            #     # this add the equations determining variable values
+            #     # as a function of parametric variables
+            #     # in a dictionary for each variable to hold them
+            #     for _v, _f in zip(self.variables, f):
+            #         _v.eval_funcs.setdefault(self.n_sol, {})[n] = _f
 
             self.solution[self.n_sol] = sol
             self.sol_types["mp"].append(self.n_sol)
@@ -1571,17 +1622,14 @@ class Prg:
 
                 if self.leqcons():
                     display(Markdown(r"### Inequality Constraints"))
-                    display(Markdown(r"### Inequality Constraints"))
                     for c in self.leqcons():
                         c.show()
                 if self.eqcons():
-                    display(Markdown(r"### Equality Constraints"))
                     display(Markdown(r"### Equality Constraints"))
                     for c in self.eqcons():
                         c.show()
 
                 if self.nncons() and nncons:
-                    display(Markdown(r"### Non-Negative Constraints"))
                     display(Markdown(r"### Non-Negative Constraints"))
                     for c in self.nncons():
                         c.show()
