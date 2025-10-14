@@ -147,6 +147,13 @@ html_theme_options = {
             "type": "url",
         },
     ],
+    "launch_buttons": {
+        "binderhub_url": "https://mybinder.org",
+        "colab_url": "https://colab.research.google.com/",
+        "notebook_interface": "jupyterlab",  # or "classic"
+        "binder_branch": "main",
+        "path_to_docs": "docs/",
+    },
 }
 nb_execution_mode = "off"
 
