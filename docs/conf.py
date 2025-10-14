@@ -25,7 +25,7 @@ sys.setrecursionlimit(10000)
 project = 'gana'
 copyright = str(datetime.now().year)
 author = 'Rahul Kakodkar'
-release = '1.0.1'
+release = '1.0.2'
 
 
 master_doc = 'index'
