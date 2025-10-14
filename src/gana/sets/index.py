@@ -510,7 +510,7 @@ class I:
         """Pyomo representation"""
         if has_pyomo:
             if self.ordered:
-                return PyoRangeSet(i, len(self), doc=self.tag)
+                return PyoRangeSet(len(self), doc=self.tag)
 
             return PyoSet(initialize=[i.name for i in self._], doc=self.tag)
         print(
