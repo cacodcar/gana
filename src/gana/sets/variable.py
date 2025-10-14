@@ -170,8 +170,8 @@ class V:
             else:
                 _map = {}
 
-        self.index: tuple[I] | set[tuple[I]] = _index
-        self.map: dict[I, V] = _map
+        self.index: tuple[I, ...] | set[tuple[I, ...]] = _index
+        self.map: dict[tuple[I, ...], V] = _map
 
         # this is the nth parameter declared in the
         self.n: int = None
@@ -184,7 +184,7 @@ class V:
         self.min_by: list[O] = []
 
         # value after optimization
-        self.X = {}
+        self.X: dict[tuple[I, ...], float] = {}
 
         # these keep variables consistent with functions for some operations
         # Take the example of a variable set - parameter set
@@ -343,8 +343,8 @@ class V:
     # -----------------------------------------------------
 
     def sol(
-        self, n_sol: int = 0, aslist: bool = False, compare=False
-    ) -> list[float] | None:
+        self, n_sol: int = 0, aslist: bool = False, asdict: bool = False, compare=False
+    ) -> list[float] | dict[tuple[I, ...], float] | None:
         """Solution
         Args:
             aslist (bool, optional): Returns values taken as list. Defaults to False.
@@ -358,6 +358,10 @@ class V:
         else:
             if aslist:
                 return [v.X[n_sol] for v in self._ if n_sol in v.X]
+
+            elif asdict:
+                return {idx: v.X[n_sol] for idx, v in self.map.items() if n_sol in v.X}
+
             for v in self._:
                 if n_sol in v.X:
                     display(Math(v.latex() + r"=" + rf"{v.X[n_sol]}"))
