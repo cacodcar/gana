@@ -1,4 +1,4 @@
-gana.block.program
+﻿gana.block.program
 ==================
 
 .. automodule:: gana.block.program
@@ -14,7 +14,6 @@ gana.block.program
       gpread
       inf
       nparray
-      npround
       npzeros
       parametric_plot
       solve_mpqp
