@@ -181,8 +181,9 @@ class I:
 
     def step(self, n: int) -> list[Self]:
         """Step up or down the index set
+
         Args:
-            i (int): Step size
+            n (int): Step size
         """
         if not self.ordered:
             raise ValueError(
@@ -237,6 +238,7 @@ class I:
 
     def latex(self, descriptive: bool = True, int_not: bool = False) -> str:
         """LaTeX representation
+
         Args:
             descriptive (bool): print members of the index set
             int_not (bool): Whether to display the set in integer notation.
@@ -295,6 +297,7 @@ class I:
 
     def mps(self, pos: int) -> str:
         """MPS representation
+
         Args:
             pos (int): Position of the member in the set
         """
@@ -302,6 +305,7 @@ class I:
 
     def lp(self, pos: int) -> str:
         """LP representation
+
         Args:
             pos (int): Position of the member in the set
         """

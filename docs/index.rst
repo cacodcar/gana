@@ -1,8 +1,3 @@
-.. Gana documentation master file, created by
-   sphinx-quickstart on Tue Oct 14 10:42:49 2025.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Gana Algebraic Modeling Language
 ================================
 
@@ -15,6 +10,7 @@ Gana Algebraic Modeling Language
    :caption: Tutorial:
    :hidden:
 
+   tutorials/installation
    tutorials/elements
    tutorials/indices 
    tutorials/parameters

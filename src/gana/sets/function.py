@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 
 
 class F:
-    """
+    r"""
     Provides relational operations between parameter sets, variable sets, or function sets (F).
 
     This class is not intended to be declared by the user directly.
@@ -90,7 +90,7 @@ class F:
     :vartype rels: list[str]
     :ivar elms: Elements in the function
     :vartype elms: list[P | V]
-    :ivar isnegvar: If the function is -1*v (negation)
+    :ivar isnegvar: If the function is :math:`-1 \cdot v` (negation)
     :vartype isnegvar: bool
     :ivar isconsistent: If the function is consistent
     :vartype isconsistent: bool
@@ -270,9 +270,9 @@ class F:
     @property
     def matrix(self) -> dict:
         """Matrix as dict
+
         Returns:
             dict: Dictionary mapping of positions to values in A matrix
-
         """
         if self._matrix:
             return self._matrix
@@ -1908,7 +1908,7 @@ class F:
         """Evaluate the function for given parameter values.
 
         Args:
-            *values: Values for variables in the order they feature in the function
+            values: Values for variables in the order they feature in the function
         """
         if self.parent:
             return sum(a * v for a, v in zip(self.A, values))

@@ -229,6 +229,7 @@ class P:
 
     def show(self, descriptive: bool = False):
         """Display the variables
+        
         Args:
             descriptive (bool, optional): If True, shows all parameters. Defaults to False.
         """

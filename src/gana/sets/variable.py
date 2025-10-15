@@ -346,8 +346,12 @@ class V:
         self, n_sol: int = 0, aslist: bool = False, asdict: bool = False, compare=False
     ) -> list[float] | dict[tuple[I, ...], float] | None:
         """Solution
+
         Args:
+            n_sol (int, optional): Solution number. Defaults to 0.
             aslist (bool, optional): Returns values taken as list. Defaults to False.
+            asdict (bool, optional): Returns values taken as dictionary. Defaults to False.
+            compare (bool, optional): Displays a comparison of the solutions across multiple objectives. Defaults to False.
         """
         if compare:
             # this writes out a comparison of the solutions across multiple objectives
@@ -380,10 +384,12 @@ class V:
 
     def eval(self, *theta_vals: float, n_sol: int = 0) -> float:
         """Evaluates the variable value as a function of parametric variables
+
         Args:
             theta_vals (float): values of the parametric variables
             n_sol (int, optional): solution number. Defaults to 0.
             roundoff (int, optional): round off the evaluated value. Defaults to 4.
+
         Returns:
             float: evaluated value
         """
@@ -425,6 +431,7 @@ class V:
 
     def show(self, descriptive: bool = False):
         """Display the variables
+
         Args:
             descriptive (bool, optional): Displays all variables in the ordered set. Defaults to False.
         """

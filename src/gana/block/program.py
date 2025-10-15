@@ -280,6 +280,7 @@ class Prg:
 
     def mutate_variable(self, variable_ex: V, variable_new: V):
         """Mutates an existing variable set in the program
+
         Args:
             variable_ex (V): exisiting variable set to be mutated
             variable (V): incoming variable set to be added
@@ -345,7 +346,7 @@ class Prg:
 
         Args:
             name (str): name of parameter set
-        parameter (P): parameter set to be added
+            parameter (P): parameter set to be added
         """
         self.names.append(name)
         self.names_parameter_sets.append(name)
@@ -361,6 +362,7 @@ class Prg:
 
     def mutate_parameter(self, parameter_ex: P, parameter_new: P):
         """Mutates an existing parameter set in the program
+
         Args:
             parameter_ex (P): exisiting parameter set to be mutated
             parameter_new (P): incoming parameter set to be added
@@ -477,6 +479,7 @@ class Prg:
 
     def mutate_theta(self, theta_ex: T, theta_new: T):
         """Mutates an existing theta set in the program
+
         Args:
             theta_ex (T): exisiting theta set to be mutated
             theta (T): incoming theta set to be added
@@ -1445,10 +1448,12 @@ class Prg:
         self, *theta_vals: float, n_sol: int = 0, roundoff: int = 4
     ) -> list[float]:
         """Evaluates the variable value as a function of parametric variables
+
         Args:
             theta_vals (float): values of the parametric variables
             n_sol (int, optional): solution number. Defaults to 0.
             roundoff (int, optional): round off the evaluated value. Defaults to 4.
+
         Returns:
             list[float]: list of values
         """

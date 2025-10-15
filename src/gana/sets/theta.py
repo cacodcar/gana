@@ -299,6 +299,7 @@ class T:
 
     def show(self, descriptive: bool = False):
         """Display the variables
+
         Args:
             descriptive (bool, optional): Displays all variables in the ordered set. Defaults to False.
         """
