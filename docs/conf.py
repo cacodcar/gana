@@ -76,6 +76,7 @@ html_theme_options = {
     },
 }
 
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 # These settings can be be copy pasted and are not package specific
@@ -207,7 +208,10 @@ html_css_files = ['custom.css']
 html_copy_source = True
 html_last_updated_fmt = ""
 source_suffix = {".rst": 'restructuredtext', ".md": 'markdown', ".ipynb": 'myst-nb'}
-
+html_context = {
+    # ...
+    "default_mode": "light"
+}
 
 suppress_warnings = [
     "ref.python",  # suppress all ambiguous cross-reference warnings in Python domain

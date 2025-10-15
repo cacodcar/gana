@@ -51,7 +51,7 @@ Additionally, matrices can be exported.
 
 # Purpose
 
-Gana was developed to enable certain functionalities in [energia (py)](https://github.com/TAMUparametric/energiapy). Both were developed as PhD projects and have ample room for improvement. So please reach out to me on cacodcar@gmail.com with suggestions and such. 
+Gana was developed to enable certain functionalities in [energia (py)](https://energiapy.readthedocs.io/en/latest/). Both were developed as PhD projects and have ample room for improvement. So please reach out to me on cacodcar@gmail.com with suggestions and such. 
 
 <!-- 
 or 
