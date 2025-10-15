@@ -36,8 +36,10 @@ docs = [
     "sphinxcontrib-bibtex",
     "sphinx-copybutton",
     "sphinx-togglebutton",
-    "numpydoc",
-    "linkify"
+    "sphinx-thebe",
+    "sphinx-design",
+    "sphinx-examples",          
+    "sphinx-tabs",
 ]
 
 [project.urls]

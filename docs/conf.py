@@ -35,35 +35,92 @@ master_doc = 'index'
 
 
 extensions = [
-    # "myst_parser",
+    # Allows executing and rendering Jupyter notebooks using MyST-NB
+    # Example:
+    # .. jupyter-execute::
+    #    print("Hello from a notebook cell")
     "myst_nb",
-    # "numpydoc",
+    # Automatically documents Python modules from docstrings
+    # Example: .. automodule:: my_package.mymodule
     "sphinx.ext.autodoc",
+    # Allows cross-referencing objects in other projects
+    # Example: :ref:`python:os.path` (links to Python stdlib docs)
     "sphinx.ext.intersphinx",
+    # Adds links to highlighted source code for documented Python objects
+    # Example: [source] links next to classes/functions
     "sphinx.ext.viewcode",
+    # Generates summary tables for modules/classes/functions
+    # Often used with autosummary_generate=True in conf.py
     "sphinx.ext.autosummary",
+    # Adds a "copy" button to code blocks for easy copy-paste
     "sphinx_copybutton",
-    # "sphinx_design",
-    # "sphinx_examples",
-    # "sphinx_tabs.tabs",
-    # "sphinx_thebe",
+    # Enables Thebe live code cells in the docs
+    # Example: .. jupyter-execute:: (cells become live in HTML)
+    "sphinx_thebe",
+    # Adds collapsible toggle buttons for content (like details/summary)
+    # Example:
+    # .. toggle::
+    #    Hidden content here
     "sphinx_togglebutton",
+    # Add support for bibliographies and citations using .bib files
+    # Example usage: :cite:`doe2020`
     # "sphinxcontrib.bibtex",
-    # "sphinxext.opengraph",
-    # "sphinx.ext.todo",
+    # Include TODO notes in your docs without breaking the build
+    # Example: .. todo:: Add more examples for the API
+    "sphinx.ext.todo",
+    # Provides design components like cards, grids, buttons, alerts
+    # Example: .. card:: This is a card with some text.
+    "sphinx_design",
+    # Automatically include and display example scripts or notebooks
+    # Example: .. example-code:: examples/example_script.py
+    "sphinx_examples",
+    # Adds tabbed content for side-by-side examples
+    # Example:
+    # .. tabs::
+    #    .. tab:: Python
+    #       print("Hello World")
+    #    .. tab:: Bash
+    #       echo "Hello World"
+    "sphinx_tabs.tabs",
+    # Adds Open Graph metadata for social sharing (Twitter, LinkedIn, etc.)
+    # Example config:
+    # ogp_site_url = "https://mydocs.example.com/"
+    # ogp_image = "https://mydocs.example.com/logo.png"
+    "sphinxext.opengraph",
 ]
+
 myst_enable_extensions = [
+    # Support for LaTeX math environments like \begin{equation}...\end{equation}
     "amsmath",
+    # Enable definition lists (key : value syntax)
+    # Example:
+    # Term
+    #   Definition
     "deflist",
+    # Render admonitions (notes, warnings, tips) in HTML
+    # Example: !!! note "Tip"
     "html_admonition",
+    # Enable images in HTML output with extended Markdown syntax
+    # Example: ![alt text](image.png)
     "html_image",
+    # Automatically convert URLs into links
     # "linkify",
+    # Support $...$ inline math and $$...$$ display math
     "dollarmath",
+    # Support colon-fenced code blocks
+    # Example:
+    # :::python
+    # print("Hello")
     "colon_fence",
+    # Improve quotation marks in rendered HTML (smart quotes)
     "smartquotes",
+    # Enable text replacements, like (C) → ©
     "replacements",
+    # Enable substitution syntax for custom placeholders
+    # Example: {substitution_name}
     "substitution",
 ]
+
 add_module_names = False
 
 autosummary_context = {
@@ -72,7 +129,6 @@ autosummary_context = {
 
 
 templates_path = ['_templates']
-# exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 exclude_patterns = [
     '_build',
@@ -148,11 +204,13 @@ html_theme_options = {
         },
     ],
     "launch_buttons": {
+        "thebe": True,
         "binderhub_url": "https://mybinder.org",
-        "colab_url": "https://colab.research.google.com/",
-        "notebook_interface": "jupyterlab",  # or "classic"
+        "notebook_interface": "classic",  # or "jupyterlab"
         "binder_branch": "main",
         "path_to_docs": "docs/",
+        # "colab_url": "https://colab.research.google.com/",
+        # "deepnote_url": "https://deepnote.com",
     },
 }
 nb_execution_mode = "off"
