@@ -212,6 +212,7 @@ html_theme_options = {
         # "colab_url": "https://colab.research.google.com/",
         # "deepnote_url": "https://deepnote.com",
     },
+    "use_thebe_styling": True,
 }
 nb_execution_mode = "off"
 
