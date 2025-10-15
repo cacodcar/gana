@@ -21,17 +21,64 @@ sys.setrecursionlimit(10000)
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+# These setting are specific to the package
 
-project = 'gana'
+project = 'Gana'
 copyright = str(datetime.now().year)
 author = 'Rahul Kakodkar'
 release = '1.0.2'
 
 
-master_doc = 'index'
+html_logo = "_static/ganalogo.jpg"
+html_title = "Gana"
+html_theme_options = {
+    "path_to_docs": "docs",
+    "repository_url": "https://github.com/cacodcar/gana",
+    "repository_branch": "main",
+    "use_edit_page_button": True,
+    "use_source_button": True,
+    "use_issues_button": True,
+    "use_repository_button": True,
+    "use_download_button": True,
+    # sidenotes are put using the format [^sn1]
+    # [^sn1]: text for sidenote 1
+    "use_sidenotes": True,
+    # "announcement": (
+    #     "Put Announcement Here. "
+    # ),
+    "logo": {
+        "image_dark": "_static/ganalogo.jpg",
+        # "text": html_title,  # Uncomment to try text with logo
+    },
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/cacodcar/gana",
+            "icon": "fa-brands fa-github",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/gana/",
+            "icon": "https://img.shields.io/pypi/dw/gana",
+            "type": "url",
+        },
+    ],
+    "launch_buttons": {
+        "thebe": True,
+        "binderhub_url": "https://mybinder.org",
+        "notebook_interface": "classic",  # or "jupyterlab"
+        "binder_branch": "main",
+        "path_to_docs": "docs/",
+        # "colab_url": "https://colab.research.google.com/",
+        # "deepnote_url": "https://deepnote.com",
+    },
+}
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+# These settings can be be copy pasted and are not package specific
+
+master_doc = 'index'
 
 
 extensions = [
@@ -147,75 +194,27 @@ autodoc_default_options = {
     'show-inheritance': True,
     'inherited-members': True,
 }
+autodoc_member_order = 'bysource'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'sphinx_book_theme'
 html_static_path = ['_static']
-html_logo = "_static/ganalogo.jpg"
-
-html_title = "Gana"
-source_suffix = {".rst": 'restructuredtext', ".md": 'markdown', ".ipynb": 'myst-nb'}
+html_css_files = ['custom.css']
 html_copy_source = True
 html_last_updated_fmt = ""
-# html_sidebars = {
-#     "reference/blog/*": [
-#         "navbar-logo.html",
-#         "search-field.html",
-#         "sbt-sidebar-nav.html",
-#     ]
-# }
-# toc_object_entries_show_parents = "hide"
+source_suffix = {".rst": 'restructuredtext', ".md": 'markdown', ".ipynb": 'myst-nb'}
 
 
 suppress_warnings = [
     "ref.python",  # suppress all ambiguous cross-reference warnings in Python domain
 ]
-html_theme_options = {
-    "path_to_docs": "docs",
-    "repository_url": "https://github.com/cacodcar/gana",
-    "repository_branch": "main",
-    "use_edit_page_button": True,
-    "use_source_button": True,
-    "use_issues_button": True,
-    "use_repository_button": True,
-    "use_download_button": True,
-    # "use_sidenotes": True,
-    # "show_toc_level": 4,
-    # "announcement": (
-    #     "Put Announcement Here. "
-    # ),
-    "logo": {
-        "image_dark": "_static/ganalogo.jpg",
-        # "text": html_title,  # Uncomment to try text with logo
-    },
-    "icon_links": [
-        {
-            "name": "GitHub",
-            "url": "https://github.com/cacodcar/gana",
-            "icon": "fa-brands fa-github",
-        },
-        {
-            "name": "PyPI",
-            "url": "https://pypi.org/project/gana/",
-            "icon": "https://img.shields.io/pypi/dw/gana",
-            "type": "url",
-        },
-    ],
-    "launch_buttons": {
-        "thebe": True,
-        "binderhub_url": "https://mybinder.org",
-        "notebook_interface": "classic",  # or "jupyterlab"
-        "binder_branch": "main",
-        "path_to_docs": "docs/",
-        # "colab_url": "https://colab.research.google.com/",
-        # "deepnote_url": "https://deepnote.com",
-    },
-    "use_thebe_styling": True,
-}
+
+# thebe_config = {"codemirror-theme": "ayu-dark"} # does not work
 nb_execution_mode = "off"
 
+
+# -----# Bibtex configuration-------------------------------------------------------
 # bibtex_bibfiles = ["refs.bib", "frameworks.bib"]
 # bibtex_default_style = "unsrt"
-autodoc_member_order = 'bysource'
