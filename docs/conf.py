@@ -32,20 +32,8 @@ release = '1.0.2'
 html_logo = "_static/ganalogo.jpg"
 html_title = "Gana"
 html_theme_options = {
-    "path_to_docs": "docs",
+    # These are specific to the package
     "repository_url": "https://github.com/cacodcar/gana",
-    "repository_branch": "main",
-    "use_edit_page_button": True,
-    "use_source_button": True,
-    "use_issues_button": True,
-    "use_repository_button": True,
-    "use_download_button": True,
-    # sidenotes are put using the format [^sn1]
-    # [^sn1]: text for sidenote 1
-    "use_sidenotes": True,
-    # "announcement": (
-    #     "Put Announcement Here. "
-    # ),
     "logo": {
         "image_dark": "_static/ganalogo.jpg",
         # "text": html_title,  # Uncomment to try text with logo
@@ -63,6 +51,20 @@ html_theme_options = {
             "type": "url",
         },
     ],
+    # "announcement": (
+    #     "Put Announcement Here. "
+    # ),
+    # These are general
+    "path_to_docs": "docs",
+    "repository_branch": "main",
+    "use_edit_page_button": True,
+    "use_source_button": True,
+    "use_issues_button": True,
+    "use_repository_button": True,
+    "use_download_button": True,
+    # sidenotes are put using the format [^sn1]
+    # [^sn1]: text for sidenote 1
+    "use_sidenotes": True,
     "launch_buttons": {
         "thebe": True,
         "binderhub_url": "https://mybinder.org",
