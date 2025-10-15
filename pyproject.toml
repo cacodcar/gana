@@ -40,6 +40,7 @@ docs = [
     "sphinx-design",
     "sphinx-examples",          
     "sphinx-tabs",
+    "sphinxext-opengraph",
 ]
 
 [project.urls]
