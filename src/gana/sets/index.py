@@ -55,29 +55,30 @@ class I:
     :raises ValueError: If indices of elements (P, V) are not compatible
     :raises ValueError: If index set is not ordered and step is given
 
-    Examples
-    --------
-    .. code-block:: python
 
-        p = Program()
-        p.s1 = I('a', 'b', 'c')
-        p.s2 = I('a', 'd', 'e', 'f')
+    .. admonition:: Example
 
-        # Intersection
-        p.s1 & p.s2
-        # I('a')
+        .. code-block:: python
 
-        # Union
-        p.s1 | p.s2
-        # I('a', 'b', 'c', 'd', 'e', 'f')
+            p = Program()
+            p.s1 = I('a', 'b', 'c')
+            p.s2 = I('a', 'd', 'e', 'f')
 
-        # Symmetric difference
-        p.s1 ^ p.s2
-        # I('b', 'c', 'd', 'e', 'f')
+            # Intersection
+            p.s1 & p.s2
+            # I('a')
 
-        # Difference
-        p.s1 - p.s2
-        # I('b', 'c')
+            # Union
+            p.s1 | p.s2
+            # I('a', 'b', 'c', 'd', 'e', 'f')
+
+            # Symmetric difference
+            p.s1 ^ p.s2
+            # I('b', 'c', 'd', 'e', 'f')
+
+            # Difference
+            p.s1 - p.s2
+            # I('b', 'c')
     """
 
     def __init__(
@@ -180,10 +181,14 @@ class I:
     # -----------------------------------------------------
 
     def step(self, n: int) -> list[Self]:
-        """Step up or down the index set
+        """
+        Step up or down the index set
 
-        Args:
-            n (int): Step size
+        :param n: Step size
+        :type n: int
+
+        :returns: New index set stepped up or down
+        :rtype: I
         """
         if not self.ordered:
             raise ValueError(
@@ -237,11 +242,15 @@ class I:
     #     return r'{' + self.name + r'}'
 
     def latex(self, descriptive: bool = True, int_not: bool = False) -> str:
-        """LaTeX representation
+        """
+        LaTeX representation
 
-        Args:
-            descriptive (bool): print members of the index set
-            int_not (bool): Whether to display the set in integer notation.
+        :param descriptive: print members of the index set
+        :type descriptive: bool, optional
+        :param int_not: Whether to display the set in integer notation.
+        :type int_not: bool, optional
+        :returns: LaTeX representation of the index set
+        :rtype: str
         """
 
         if not self.name:
@@ -288,26 +297,32 @@ class I:
         return ltx
 
     def show(self, descriptive: bool = True):
-        """Display the set
+        """
+        Display the set
 
-        Args:
-            descriptive (bool, optional): Displays all members in the index set. Defaults to False.
+        :param descriptive: Print members of the index set
+        :type descriptive: bool, optional
         """
         display(Math(self.latex(descriptive)))
 
     def mps(self, pos: int) -> str:
-        """MPS representation
+        """
+        MPS representation
 
-        Args:
-            pos (int): Position of the member in the set
+        :param pos: Position of the member in the set
+        :type pos: int
+
+        :returns: MPS representation of the member at position pos
+        :rtype: str
         """
         return rf"_{self[pos]}".upper()
 
     def lp(self, pos: int) -> str:
-        """LP representation
+        """
+        LP representation
 
-        Args:
-            pos (int): Position of the member in the set
+        :param pos: Position of the member in the set
+        :type pos: int
         """
         return rf"_{self[pos]}"
 
@@ -316,7 +331,17 @@ class I:
     # -----------------------------------------------------
 
     def birth_index(self, name: str, members: list[Self]) -> Self:
-        """Updates the parent, sets new positions and mutable/ordered attributes"""
+        """
+        Updates the parent, sets new positions and mutable/ordered attributes
+
+        :param name: Name of the new index set
+        :type name: str
+        :param members: Members of the new index set
+        :type members: list[I]
+
+        :returns: New index set
+        :rtype: I
+        """
         # set new members for the index
         index = I()
         # set a name for the new index

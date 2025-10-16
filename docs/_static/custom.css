@@ -64,3 +64,12 @@ code, pre {
 :root {
   --sb-width: 320px;  /* or whatever width you like */
 }
+
+/* Force light mode only */
+html[data-theme="dark"],
+html[data-theme="auto"],
+html {
+  color-scheme: light !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}

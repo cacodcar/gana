@@ -154,7 +154,11 @@ class C:
     # -----------------------------------------------------
 
     def categorize(self, category: str):
-        """Categorizes the constraint"""
+        """Categorizes the constraint
+        
+        :param category: Category name
+        :type category: str
+        """
         self.category = category
         for c in self._:
             c.category = category

@@ -8,6 +8,14 @@ if TYPE_CHECKING:
     from ..sets.index import I
 
 
-def multi_name(*index: I):
-    """returns a name for tuple index with underscores"""
+def multi_name(*index: I) -> str:
+    """
+    Returns a name for tuple index with underscores
+
+    :param index: index set
+    :type index: I
+
+    :returns: name with underscores
+    :rtype: str
+    """
     return "_".join([i.name for i in index])

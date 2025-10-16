@@ -69,7 +69,6 @@ class Prg:
     """
 
     name: str = field(default="prog")
-    name: str = field(default="prog")
     tol: float = field(default=None)
     canonical: bool = field(default=True)
     tag: str = field(default="")
@@ -178,11 +177,13 @@ class Prg:
         self.sol_types: dict[str, list[int]] = {"MIP": [], "mp": []}
 
     def add_index(self, name: str, index: I):
-        """Adds new index to program
+        """
+        Adds new index to program
 
-        Args:
-            name (str): name of index
-            index (I): index set to be added
+        :param name: name of index
+        :type name: str
+        :param index: index set to be added
+        :type index: I
         """
         self.names.append(name)
         self.names_index_sets.append(name)
@@ -197,10 +198,13 @@ class Prg:
         self.index_sets.append(index)
 
     def add_indices(self, index: I, members: list[str] = None):
-        """Adds indices from an index set to the program
+        """
+        Adds indices from an index set to the program
 
-        index (I): Index set who elements are to be added to the program.
-        members (list[str]): List of members to be added to the index set.
+        :param index: Index set who elements are to be added to the program.
+        :type index: I
+        :param members: List of members to be added to the index set.
+        :type members: list[str], optional
         """
 
         if not members:
@@ -256,11 +260,13 @@ class Prg:
                 setattr(self, member, element)
 
     def add_variable(self, name: str, variable: V):
-        """Adds new variable set to program
+        """
+        Adds new variable set to program
 
-        Args:
-            name (str): name of variable set
-            variable (V): variable set to be added
+        :param name: name of variable set
+        :type name: str
+        :param variable: variable set to be added
+        :type variable: V
         """
         self.names.append(name)
         self.names_variable_sets.append(name)
@@ -279,11 +285,13 @@ class Prg:
         self.n_variables += len(variable._)
 
     def mutate_variable(self, variable_ex: V, variable_new: V):
-        """Mutates an existing variable set in the program
+        """
+        Mutates an existing variable set in the program
 
-        Args:
-            variable_ex (V): exisiting variable set to be mutated
-            variable (V): incoming variable set to be added
+        :param variable_ex: existing variable set to be mutated
+        :type variable_ex: V
+        :param variable_new: incoming variable set to be added
+        :type variable_new: V
         """
         # birth the new variables
         # inform that this is a mutation
@@ -342,11 +350,13 @@ class Prg:
             self.variables.extend(var_add)
 
     def add_parameter(self, name: str, parameter: P):
-        """Adds new parameter set to program
+        """
+        Adds new parameter set to program
 
-        Args:
-            name (str): name of parameter set
-            parameter (P): parameter set to be added
+        :param name: name of parameter set
+        :type name: str
+        :param parameter: parameter set to be added
+        :type parameter: P
         """
         self.names.append(name)
         self.names_parameter_sets.append(name)
@@ -361,11 +371,13 @@ class Prg:
         self.parameter_sets.append(parameter)
 
     def mutate_parameter(self, parameter_ex: P, parameter_new: P):
-        """Mutates an existing parameter set in the program
+        """
+        Mutates an existing parameter set in the program
 
-        Args:
-            parameter_ex (P): exisiting parameter set to be mutated
-            parameter_new (P): incoming parameter set to be added
+        :param parameter_ex: existing parameter set to be mutated
+        :type parameter_ex: P
+        :param parameter_new: incoming parameter set to be added
+        :type parameter_new: P
         """
         n = 0  # count of parameters added to set
         for idx, p in parameter_new.map.items():
@@ -395,11 +407,13 @@ class Prg:
                 parameter_ex.index = {parameter_ex.index, parameter_new.index}
 
     def add_theta(self, name: str, theta: T):
-        """Adds new theta set to program
+        """
+        Adds new theta set to program
 
-        Args:
-            name (str): name of theta set
-            theta (V): theta set to be added
+        :param name: name of theta set
+        :type name: str
+        :param theta: theta set to be added
+        :type theta: T
         """
         self.names.append(name)
         self.names_theta_sets.append(name)
@@ -418,10 +432,11 @@ class Prg:
         self.n_thetas += len(theta._)
 
     def update_theta(self, constraint: C):
-        """Updates the theta set and thetas in a constraint
+        """
+        Updates the theta set and thetas in a constraint
 
-        Args:
-            constraint (C): constraint with thetas to be updated
+        :param constraint: constraint with thetas to be updated
+        :type constraint: C
         """
         for n, theta in enumerate(constraint.function.rhs_thetas):
             if theta.parent is None:
@@ -478,12 +493,15 @@ class Prg:
                 cons.function.give_name()
 
     def mutate_theta(self, theta_ex: T, theta_new: T):
-        """Mutates an existing theta set in the program
-
-        Args:
-            theta_ex (T): exisiting theta set to be mutated
-            theta (T): incoming theta set to be added
         """
+        Mutates an existing theta set in the program
+
+        :param theta_ex: existing theta set to be mutated
+        :type theta_ex: T
+        :param theta_new: incoming theta set to be added
+        :type theta_new: T
+        """
+
         # birth the new thetas
         # inform that this is a mutation
         theta_new.birth_thetas(mutating=True, n_start=self.n_thetas)
@@ -535,11 +553,13 @@ class Prg:
             self.thetas.extend(tht_add)
 
     def add_function(self, name: str, function: Func):
-        """Add a function set to the program
+        """
+        Add a function set to the program
 
-        Args:
-            name (str): name of function
-            function (F): function object
+        :param name: name of function
+        :type name: str
+        :param function: function object
+        :type function: F
         """
         self.names.append(name)
         self.names_function_sets.append(name)
@@ -565,11 +585,13 @@ class Prg:
         self.n_functions += len(function._)
 
     def replace_function(self, function_ex: Func, function_new: Func):
-        """Replaces an existing function set in the program
+        """
+        Replaces an existing function set in the program
 
-        Args:
-            function_ex (F): existing function set to be mutated
-            function_new (F): new function set to replace the existing one
+        :param function_ex: existing function set to be mutated
+        :type function_ex: F
+        :param function_new: new function set to replace the existing one
+        :type function_new: F
         """
 
         # just replace the existing function set
@@ -607,11 +629,13 @@ class Prg:
                         var.min_by = _min_by
 
     def add_constraint(self, name: str, constraint: C):
-        """Adds a constraint set to the program
+        """
+        Adds a constraint set to the program
 
-        Args:
-            name (str): name of constraint
-            constraint (C): constraint object
+        :param name: name of constraint
+        :type name: str
+        :param constraint: constraint object
+        :type constraint: C
         """
         self.names.append(name)
         self.names_constraint_sets.append(name)
@@ -644,11 +668,13 @@ class Prg:
             self.update_theta(constraint)
 
     def replace_constraint(self, constraint_ex: C, constraint_new: C):
-        """Replaces an existing constraint set in the program
+        """
+        Replaces an existing constraint set in the program
 
-        Args:
-            constraint_ex (C): existing constraint set to be mutated
-            constraint_new (C): new constraint set to replace the existing one
+        :param constraint_ex: existing constraint set to be mutated
+        :type constraint_ex: C
+        :param constraint_new: new constraint set to replace the existing one
+        :type constraint_new: C
         """
         # just replace the existing constraint set
         # take the old constraints number and pname
@@ -682,10 +708,11 @@ class Prg:
                     v.cons_by.append(cons_new)
 
     def add_objective(self, objective: O):
-        """Adds an objective set to the program
+        """
+        Adds an objective set to the program
 
-        Args:
-            objective (O): objective object
+        :param objective: objective object
+        :type objective: O
         """
         self.names.append(objective.pname)
         self.names_objectives.append(objective.pname)
@@ -1014,7 +1041,8 @@ class Prg:
 
     @property
     def H(self) -> list[list[float]]:
-        """Matrix of Variable coefficients for type:
+        """
+        Matrix of Variable coefficients for type:
 
         h = 0
         """
@@ -1074,13 +1102,14 @@ class Prg:
         return CrB_
 
     def make_A_df(self, longname: bool = False) -> DataFrame:
-        """Create a DataFrame from the A matrix.
+        """
+        Create a DataFrame from the A matrix.
 
-        Args:
-            longname (bool, optional): Whether to use long names for variables. Defaults to False.
+        :param longname: Whether to use long names for variables. Defaults to False.
+        :type longname: bool
 
-        Returns:
-            DataFrame: Columns are the variables, rows are the constraints.
+        :return: Columns are the variables, rows are the constraints.
+        :rtype: DataFrame
         """
         if longname:
             return DataFrame(
@@ -1095,13 +1124,14 @@ class Prg:
         )
 
     def make_B_df(self, longname: bool = False) -> DataFrame:
-        """Create a DataFrame from the B vector.
+        """
+        Create a DataFrame from the B vector.
 
-        Args:
-            longname (bool, optional): Whether to use long names for variables. Defaults to False.
+        :param longname: Whether to use long names for variables. Defaults to False.
+        :type longname: bool
 
-        Returns:
-            DataFrame: Has a single column, rows are the constraints.
+        :return: Single column DataFrame with the RHS values.
+        :rtype: DataFrame
         """
 
         if longname:
@@ -1112,13 +1142,14 @@ class Prg:
         return DataFrame(self.B, columns=["RHS"], index=index)
 
     def make_C_df(self, longname: bool = False) -> DataFrame:
-        """Create a DataFrame from the C matrix.
+        """
+        Create a DataFrame from the C matrix.
 
-        Args:
-            longname (bool, optional): Whether to use long names for variables. Defaults to False.
+        :param longname: Whether to use long names for variables. Defaults to False.
+        :type longname: bool
 
-        Returns:
-            DataFrame: Columns are the variables, Has a single row
+        :return: Single row DataFrame with the objective coefficients.
+        :rtype: DataFrame
         """
 
         if longname:
@@ -1128,13 +1159,14 @@ class Prg:
         return DataFrame([self.C], columns=columns, index=["Minimize"])
 
     def make_df(self, longname: bool = False) -> DataFrame:
-        """Create a DataFrame from the model.
+        """
+        Create a DataFrame from the model.
 
-        Args:
-            longname (bool, optional): Whether to use long names for variables. Defaults to False.
+        :param longname: Whether to use long names for variables. Defaults to False.
+        :type longname: bool
 
-        Returns:
-            DataFrame: A DataFrame with the A matrix, B vector, and C vector.
+        :return: A DataFrame with the A matrix, B vector, and C vector.
+        :rtype: DataFrame
         """
 
         if longname:
@@ -1447,15 +1479,20 @@ class Prg:
     def eval(
         self, *theta_vals: float, n_sol: int = 0, roundoff: int = 4
     ) -> list[float]:
-        """Evaluates the variable value as a function of parametric variables
+        """
+        Evaluates the variable value as a function of parametric variables
 
-        Args:
-            theta_vals (float): values of the parametric variables
-            n_sol (int, optional): solution number. Defaults to 0.
-            roundoff (int, optional): round off the evaluated value. Defaults to 4.
+        :param theta_vals: values of the parametric variables
+        :type theta_vals: float
+        :param n_sol: solution number, defaults to 0
+        :type n_sol: int, optional
+        :param roundoff: round off the evaluated value, defaults to 4
+        :type roundoff: int, optional
 
-        Returns:
-            list[float]: list of values
+        :returns: list of values
+        :rtype: list[float]
+
+        :raises ValueError: if number of theta values provided does not match number of thetas in the problem
         """
         if len(theta_vals) != self.n_thetas:
             raise ValueError(

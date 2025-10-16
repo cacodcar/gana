@@ -206,7 +206,12 @@ class P:
     # -----------------------------------------------------
 
     def latex(self) -> str:
-        """LaTeX representation"""
+        """
+        LaTeX representation
+
+        :returns: LaTeX representation of the parameter set
+        :rtype: str
+        """
 
         if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
             return str(self)
@@ -228,10 +233,11 @@ class P:
         return self.ltx + index
 
     def show(self, descriptive: bool = False):
-        """Display the variables
-        
-        Args:
-            descriptive (bool, optional): If True, shows all parameters. Defaults to False.
+        """
+        Display the variables
+
+        :param descriptive: If True, shows all parameters. Defaults to False.
+        :type descriptive: bool, optional
         """
         if descriptive:
             # just print out the parameters

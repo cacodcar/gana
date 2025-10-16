@@ -166,7 +166,11 @@ class T:
 
     @property
     def args(self) -> dict[str, str | bool]:
-        """Return the arguments of the parametric variable set"""
+        """Return the arguments of the parametric variable set
+
+        :returns: Dictionary of arguments
+        :rtype: dict
+        """
         return {"tag": self.tag, "ltx": self.ltx, "mutable": self.mutable}
 
     def create_map(self):
@@ -182,9 +186,10 @@ class T:
     def birth_thetas(self, mutating: bool = False, n_start=0):
         """Births a parametric variable (Theta) at every index in the index set
 
-        Args:
-            mutating (bool, optional): If the variable set is being mutated. Defaults to False.
-            n_start (int, optional): The starting number for positioning the variables. Defaults to 0.
+        :param mutating: If the variable set is being mutated. Defaults to False.
+        :type mutating: bool, optional
+        :param n_start: The starting number for positioning the variables. Defaults to 0.
+        :type n_start: int, optional
         """
         for pos, idx in enumerate(self.map):
             # create a theta at every index
@@ -300,8 +305,8 @@ class T:
     def show(self, descriptive: bool = False):
         """Display the variables
 
-        Args:
-            descriptive (bool, optional): Displays all variables in the ordered set. Defaults to False.
+        :param descriptive: Print members of the index set
+        :type descriptive: bool, optional
         """
         if descriptive:
             for pv in self._:

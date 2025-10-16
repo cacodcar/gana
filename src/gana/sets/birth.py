@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from .cases import PCase
 from .index import I
@@ -14,13 +14,18 @@ if TYPE_CHECKING:
 
 def make_P(
     inp: list[float | int] | float | int,
-    index: I = None,
+    index: Optional[I] = None,
 ) -> P:
-    """Make input into a parameter set (P)
+    """
+    Make input into a parameter set (P)
 
-    Args:
-        inp (list[float | int] | float | int): Input to be converted to P
-        index (I, optional): Index for the parameter set. Defaults to None.
+    :param inp: Input to be converted to P
+    :type inp: list[float | int] | float | int
+    :param index: Index for the parameter set. Defaults to None.
+    :type index: I, optional
+
+    :returns: Parameter set (P)
+    :rtype: P
     """
     from .parameter import P
 
@@ -51,13 +56,18 @@ def make_P(
 
 def make_T(
     inp: tuple[int | float] | list[tuple[int | float]],
-    index: I = None,
+    index: Optional[I] = None,
 ) -> T:
-    """Make input into a theta
+    """
+    Make input into a theta set (T)
 
-    Args:
-        inp (tuple[int | float] | list[tuple[int | float]]): Input to be converted to T
-        index (I, optional): Index for the theta set. Defaults to None.
+    :param inp: Input to be converted to T
+    :type inp: tuple[int | float] | list[tuple[int | float]]
+    :param index: Index for the theta set. Defaults to None.
+    :type index: I, optional
+
+    :returns: Theta set (T)
+    :rtype: T
     """
 
     from .theta import T

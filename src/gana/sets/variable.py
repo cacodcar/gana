@@ -275,7 +275,12 @@ class V:
     # -----------------------------------------------------
 
     def make_function(self) -> F:
-        """Make a function"""
+        """
+        Make a function
+
+        :returns: Function representing the variable set
+        :rtype: F
+        """
         return F(
             one=make_P(1, self.index),
             mul=True,
@@ -286,7 +291,12 @@ class V:
         )
 
     def copy(self) -> V:
-        """Returns a copy of the variable set"""
+        """
+        Returns a copy of the variable set
+
+        :returns: Copy of the variable set
+        :rtype: V
+        """
         v = V(**self.args)
         v.name, v.n = self.name, self.n
         v.index = tuple(self.index)
@@ -297,11 +307,13 @@ class V:
         return v
 
     def birth_variables(self, mutating: bool = False, n_start: int = 0):
-        """Births a variable at every index in the index set
+        """
+        Births a variable at every index in the index set
 
-        Args:
-            mutating (bool, optional): If the variable set is being mutated. Defaults to False.
-            n_start (int, optional): The starting number for positioning the variables. Defaults to 0.
+        :param mutating: If the variable set is being mutated. Defaults to False.
+        :type mutating: bool, optional
+        :param n_start: The starting number for positioning the variables. Defaults to 0.
+        :type n_start: int, optional
         """
         for pos, idx in enumerate(self.map):
             # create a variable at each index
@@ -345,13 +357,21 @@ class V:
     def sol(
         self, n_sol: int = 0, aslist: bool = False, asdict: bool = False, compare=False
     ) -> list[float] | dict[tuple[I, ...], float] | None:
-        """Solution
+        """
+        Solution
 
-        Args:
-            n_sol (int, optional): Solution number. Defaults to 0.
-            aslist (bool, optional): Returns values taken as list. Defaults to False.
-            asdict (bool, optional): Returns values taken as dictionary. Defaults to False.
-            compare (bool, optional): Displays a comparison of the solutions across multiple objectives. Defaults to False.
+        :param n_sol: Solution number. Defaults to 0.
+        :type n_sol: int, optional
+        :param aslist: Returns values taken as list. Defaults to False.
+        :type aslist: bool, optional
+        :param asdict: Returns values taken as dictionary. Defaults to False.
+        :type asdict: bool, optional
+        :param compare: Displays a comparison of the solutions across multiple objectives. Defaults to False.
+        :type compare: bool, optional
+
+
+        :returns: Solution values
+        :rtype: list[float] | dict[tuple[I, ...], float] | None
         """
         if compare:
             # this writes out a comparison of the solutions across multiple objectives
@@ -371,27 +391,35 @@ class V:
                     display(Math(v.latex() + r"=" + rf"{v.X[n_sol]}"))
 
     def f_eval(self, *values: float | int, n_sol: int = 0, n_cr: int = 0) -> float:
-        """Evaluates the variable value as a function of parametric variables
+        """
+        Evaluates the variable value as a function of parametric variables
 
-        Args:
-            n_sol (int, optional): solution number. Defaults to 0.
-            n_cr (int, optional): critical region number. Defaults to 0.
+        :param values: values of the parametric variables
+        :type values: float | int
+        :param n_sol: Solution number. Defaults to 0.
+        :type n_sol: int, optional
+        :param n_cr: Critical region number. Defaults to 0.
+        :type n_cr: int, optional
 
-        Returns:
-            float: evaluated value
+        :returns: evaluated value
+        :rtype: float
         """
         return self.eval_funcs[n_sol][n_cr].eval(*values)
 
-    def eval(self, *theta_vals: float, n_sol: int = 0) -> float:
-        """Evaluates the variable value as a function of parametric variables
+    def eval(self, *theta_vals: float, n_sol: int = 0) -> float | None:
+        """
+        Evaluates the variable value as a function of parametric variables
 
-        Args:
-            theta_vals (float): values of the parametric variables
-            n_sol (int, optional): solution number. Defaults to 0.
-            roundoff (int, optional): round off the evaluated value. Defaults to 4.
 
-        Returns:
-            float: evaluated value
+        :param theta_vals: values of the parametric variables
+        :type theta_vals: float
+        :param n_sol: solution number. Defaults to 0.
+        :type n_sol: int, optional
+        :param roundoff: round off the evaluated value. Defaults to 4.
+        :type roundoff: int, optional
+
+        :returns: evaluated value
+        :rtype: float | None
         """
 
         try:
@@ -406,7 +434,15 @@ class V:
     # -----------------------------------------------------
 
     def latex(self, index_only: bool = False) -> str:
-        """LaTeX representation"""
+        """
+        LaTeX representation
+
+        :param index_only: If only the index representation is needed. Defaults to False.
+        :type index_only: bool, optional
+
+        :returns: LaTeX representation of the variable set
+        :rtype: str
+        """
         index = (
             r"_{"
             + rf"{self.index}".replace("), (", "|")
@@ -430,10 +466,11 @@ class V:
         return self.ltx + index
 
     def show(self, descriptive: bool = False):
-        """Display the variables
+        """
+        Display the variables
 
-        Args:
-            descriptive (bool, optional): Displays all variables in the ordered set. Defaults to False.
+        :param descriptive: Print members of the index set
+        :type descriptive: bool, optional
         """
         if descriptive:
             for v in self._:
@@ -442,14 +479,22 @@ class V:
         else:
             display(Math(self.latex()))
 
-    def mps(self):
-        """Name in MPS file"""
+    def mps(self) -> str:
+        """Name in MPS file
+
+        :returns: Name in MPS file
+        :rtype: str
+        """
         if self.bnr:
             return f"X{self.n}"
         return f"V{self.n}"
 
     def lp(self) -> str:
-        """LP representation"""
+        """LP representation
+
+        :returns: LP representation
+        :rtype: str
+        """
         return f"{self}_{self.pos}"
 
     @property
@@ -464,7 +509,11 @@ class V:
     # -----------------------------------------------------
 
     def report(self) -> V:
-        """Return a reporting binary variable"""
+        """Return a reporting binary variable
+
+        :returns: Reporting binary variable
+        :rtype: V
+        """
         return V(
             *self.index,
             bnr=True,
@@ -1097,18 +1146,23 @@ class V:
         grid_alpha: float = 0.3,
         usetex: bool = True,
     ):
-        """Plot the variable set
+        """
+        Plot the variable set
 
-        Args:
-            kind (str, optional): Type of plot ['line', 'bar']. Defaults to 'line'.
-            font_size (float, optional): Font size for the plot. Defaults to 16.
-            fig_size (tuple[float, float], optional): Size of the figure. Defaults to (12, 6).
-            linewidth (float, optional): Width of the line in the plot. Defaults to 0.7.
-            color (str, optional): Color of the line in the plot. Defaults to 'blue'.
-            grid_alpha (float, optional): Transparency of the grid lines. Defaults to 0.3.
-            usetex (bool, optional): Use LaTeX for text rendering. Defaults to True.
-
-
+        :param kind: Type of plot ['line', 'bar']. Defaults to 'line'.
+        :type kind: str, optional
+        :param font_size: Font size for the plot. Defaults to 16.
+        :type font_size: float, optional
+        :param fig_size: Size of the figure. Defaults to (12, 6).
+        :type fig_size: tuple[float, float], optional
+        :param linewidth: Width of the line in the plot. Defaults to 0.7.
+        :type linewidth: float, optional
+        :param color: Color of the line in the plot. Defaults to 'blue'.
+        :type color: str, optional
+        :param grid_alpha: Transparency of the grid lines. Defaults to 0.3.
+        :type grid_alpha: float, optional
+        :param usetex: Use LaTeX for text rendering. Defaults to True.
+        :type usetex: bool, optional
         """
 
         if not has_matplotlib:

@@ -8,12 +8,18 @@ from IPython.display import Math, display
 
 if TYPE_CHECKING:
     from .function import F
+    from .variable import V
 
 
 class O:
-    """Objective Function"""
+    """
+    Objective Function
 
-    def __init__(self, function: F):
+    :param function: function to minimize
+    :type function: F | V
+    """
+
+    def __init__(self, function: F | V):
 
         if all([v.parent is None for v in function.variables]):
             # if the function is defined using a variable element

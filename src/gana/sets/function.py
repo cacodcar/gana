@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from itertools import product
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, Optional
 
 from .birth import make_P, make_T
 from .cases import Elem, FCase, PCase
@@ -110,21 +110,21 @@ class F:
         one: int | float | list[int | float] | P | V | T | Self | None = None,
         two: int | float | list[int | float] | P | V | T | Self | None = None,
         # --------- Types --------------
-        one_type: Elem = None,
-        two_type: Elem = None,
+        one_type: Optional[Elem] = None,
+        two_type: Optional[Elem] = None,
         # ------- Relations -----------
         mul: bool = False,
         add: bool = False,
         sub: bool = False,
         div: bool = False,
         # ------ Vector ---------------
-        parent: Self = None,
-        pos: int = None,
+        parent: Optional[Self] | None = None,
+        pos: Optional[int] = None,
         index: tuple[I] | list[tuple[I]] | None = None,
         # ------- Other attributes -----
-        case: FCase = None,
-        consistent: bool = False,
-        issumhow: tuple[V, I, int] = None,
+        case: Optional[FCase] = None,
+        consistent: Optional[bool] = False,
+        issumhow: Optional[tuple[V, I, int]] = None,
     ):
         # set by program or birther function (parent)
         self.parent: Self = parent
@@ -286,31 +286,19 @@ class F:
 
     @property
     def struct(self) -> tuple[Elem, Elem]:
-        """Structure of the function
-
-        Returns:
-            tuple[Elem, Elem]: Structure of the function
-        """
+        """Structure of the function"""
         return (self.one_type, self.two_type)
 
     @property
-    def elements(self) -> list[P | V | T | Self]:
-        """Elements in the function
-
-        Returns:
-            list[P | V | T | Self]: Elements in the function
-        """
+    def elements(self) -> list[T | P | V]:
+        """Elements in the function"""
         return (
             self.variables + self.mul_parameters + self.rhs_parameters + self.rhs_thetas
         )
 
     @property
-    def index_flat(self) -> list[int]:
-        """Flattens the index of the function
-
-        Returns:
-            list[int]: Flattened index of the function
-        """
+    def index_flat(self) -> list[tuple[I, ...] | set[tuple[I, ...]]]:
+        """Flattens the index of the function"""
         return (
             [v.index for v in self.variables]
             + [p.index for p in self.mul_parameters]
@@ -323,7 +311,11 @@ class F:
     # -----------------------------------------------------
 
     def categorize(self, category: str):
-        """Categorizes the function"""
+        """Categorizes the function
+
+        :param category: Category name
+        :type category: str
+        """
         self.category = category
         for c in self._:
             c.category = category
@@ -340,10 +332,28 @@ class F:
         div: bool,
     ) -> tuple[V | P | T | Self, Elem, V | P | T | Self, Elem, bool, bool, bool | bool]:
         """Sets the function in a consistent form
-
         Also makes parameters from int, float, or list[int|float] if needed
-
         sets self.isconsistent to True
+
+        :param one: First element
+        :type one: V | P | T | F
+        :param one_type: Type of `one`
+        :type one_type: Elem | None
+        :param two: Second element
+        :type two: V | P | T | F
+        :param two_type: Type of `two`
+        :type two_type: Elem | None
+        :param add: Addition operation
+        :type add: bool
+        :param sub: Subtraction operation
+        :type sub: bool
+        :param mul: Multiplication operation
+        :type mul: bool
+        :param div: Division operation
+        :type div: bool
+
+        :returns: Consistent elements and their types along with relation flags
+        :rtype: tuple[V | P | T | F, Elem, V | P | T | F, Elem, bool, bool, bool | bool]
         """
         # make consistent
         self.isconsistent = True
@@ -449,7 +459,8 @@ class F:
                 self._two_map = self.two.map
 
     def handle_index(self):
-        r"""Handles (compounds if needed) the index
+        r"""
+        Handles (compounds if needed) the index
         Irrespective of the operation being done
 
         The index of a function is index.one + index.two
@@ -487,7 +498,8 @@ class F:
     def handle_rel(
         self, mul: bool, add: bool, sub: bool, div: bool, ignore: bool = False
     ):
-        """Handles the relation of the function
+        """
+        Handles the relation of the function
         sets self.args, self.mul, self.add, self.sub, self.div, self.rel
         """
         # rel is used for printing
@@ -516,7 +528,8 @@ class F:
                 raise ValueError("one of mul, add, sub or div must be True")
 
     def make_args(self):
-        """Makes the arguments for the function
+        """
+        Makes the arguments for the function
         This is convenient for passing to the birther functions
         and while making calls to the function.
         Also sets self.args
@@ -534,7 +547,8 @@ class F:
         }
 
     def birth_functions(self):
-        """Creates a vector of functions
+        """
+        Creates a vector of functions
         Accordingly sets n
         sets self._, self.n
         """
@@ -668,14 +682,16 @@ class F:
         two: V | P | T | Self,
         two_type: Elem | None,
     ) -> tuple[V | P | T | Self, V | P | T | Self]:
-        """Sets whether there is an element of a particular type
-        in one and two
+        """
+        Sets whether there is an element of a particular type in one and two
 
-        Args:
-            one_type (Elem | None): Type of the first element
-            two_type (Elem | None): Type of the second element
+        :param one: First element
+        :param one_type: Type of V | P | T | F
+        :param two: Second element
+        :param two_type: Type of V | P | T | F
 
-        sets self.one_type, self.two_type
+        :return: Updated elements
+        :rtype: tuple[V | P | T | F, V | P | T | F]
         """
         # this is meant to be avoided as far as possible
         # look at how the operations for each element is defined
@@ -713,7 +729,8 @@ class F:
         return one, two
 
     def generate_matrices(self):
-        r"""Generates matrices
+        r"""
+        Generates matrices
         A - variable coefficients
         X - position of continuous variables in program
         Y - position of discrete variables in program
@@ -1052,7 +1069,12 @@ class F:
             return rf"\frac{{{one}}}{{{two}}}"
 
     def show(self, descriptive: bool = False):
-        """Display the function"""
+        """
+        Display the function
+
+        :param descriptive: Whether to show all birthed functions, defaults to False
+        :type descriptive: bool, optional
+        """
         if has_ipython:
             if descriptive:
                 for f in self._:
@@ -1854,8 +1876,15 @@ class F:
     #                    Solution
     # -----------------------------------------------------
 
-    def solution(self, n_sol: int = 0):
-        """Evaluate the value of the function."""
+    def solution(self, n_sol: int = 0) -> float | int | list[float | int]:
+        """Evaluate the value of the function.
+
+        :param n_sol: The solution number to evaluate, defaults to 0
+        :type n_sol: int, optional
+
+        :returns: Evaluated function value(s)
+        :rtype: float | int | list[float | int]
+        """
 
         # if this is a function container, evaluate all its children
         if self.parent is None:
@@ -1904,11 +1933,16 @@ class F:
 
         return self.X[n_sol]
 
-    def eval(self, *values: float | int | list[float | int]):
+    def eval(
+        self, *values: float | int | list[float | int]
+    ) -> float | int | list[float | int]:
         """Evaluate the function for given parameter values.
 
-        Args:
-            values: Values for variables in the order they feature in the function
+        :param values: Values for variables in the order they feature in the function
+        :type values: float | int | list[float | int]
+
+        :returns: Evaluated function value(s)
+        :rtype: float | int | list[float | int]
         """
         if self.parent:
             return sum(a * v for a, v in zip(self.A, values))

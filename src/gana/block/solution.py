@@ -17,7 +17,11 @@ except ImportError:
 
 @dataclass
 class Solution:
-    """A State with its variables filled in"""
+    """A State with its variables filled in
+
+    :param name: Name of the solution
+    :type name: str
+    """
 
     name: str = " "
 
@@ -104,16 +108,24 @@ class Solution:
     ):
         """Plot the variable set
 
-        Args:
-            kind (str, optional): Type of plot ['line', 'bar']. Defaults to 'line'.
-            font_size (float, optional): Font size for the plot. Defaults to 16.
-            fig_size (tuple[float, float], optional): Size of the figure. Defaults to (12, 6).
-            linewidth (float, optional): Width of the line in the plot. Defaults to 0.7.
-            color (str, optional): Color of the line in the plot. Defaults to 'blue'.
-            grid_alpha (float, optional): Transparency of the grid lines. Defaults to 0.3.
-            usetex (bool, optional): Use LaTeX for text rendering. Defaults to True.
-
-
+        :param variable: The variable to plot
+        :type variable: V
+        :param kind: Type of plot ['line', 'bar'], defaults to 'line'
+        :type kind: str, optional
+        :param font_size: Font size for the plot, defaults to 16
+        :type font_size: float, optional
+        :param fig_size: Size of the figure, defaults to (12, 6)
+        :type fig_size: tuple[float, float], optional
+        :param linewidth: Width of the line in the plot, defaults to 0.7
+        :type linewidth: float, optional
+        :param color: Color of the line in the plot, defaults to 'blue'
+        :type color: str, optional
+        :param grid_alpha: Transparency of the grid lines, defaults to 0.3
+        :type grid_alpha: float, optional
+        :param usetex: Use LaTeX for text rendering, defaults to True
+        :type usetex: bool, optional
+        :param x_ticks_lim: Maximum number of x-ticks to display, defaults to 20
+        :type x_ticks_lim: int, optional
         """
 
         if not has_matplotlib:

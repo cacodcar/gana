@@ -7,7 +7,7 @@ Gana Algebraic Modeling Language
 
 .. toctree::
    :maxdepth: 1
-   :caption: Tutorial:
+   :caption: Tutorials:
    :hidden:
 
    tutorials/installation

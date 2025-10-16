@@ -14,15 +14,18 @@ if TYPE_CHECKING:
 
 
 def sigma(variable: V, over: I = None, position: int = None) -> F:
-    """Summation, allows better printing, avoids recurssion error
+    """
+    Summation, allows better printing, avoids recurssion error
 
-    Args:
-        variable (V): variable set
-        over (I): over what index
-        position (int, optional): position of the index in the variable indices. Defaults to None.
-        neg (bool, optional): if this is a negative sum. Defaults to False.
-    Returns:
-        F: summed up function
+    :param variable: variable set
+    :type variable: V
+    :param over: over what index
+    :type over: I | None
+    :param position: position of the index in the variable indices. Defaults to None.
+    :type position: int | None
+
+    :returns: summed up function
+    :rtype: F
     """
 
     if over:
