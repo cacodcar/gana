@@ -2,16 +2,22 @@
 
 from __future__ import annotations
 
+import logging
 from itertools import product
 from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math, display
+from matplotlib import pyplot as plt
+from matplotlib import rc
 
 from .birth import make_P, make_T
 from .cases import Elem, FCase
 from .constraint import C
 from .function import F
 from .index import I
+
+logger = logging.getLogger("gana")
+
 
 if TYPE_CHECKING:
     from .objective import O
@@ -33,15 +39,6 @@ try:
     has_sympy = True
 except ImportError:
     has_sympy = False
-
-try:
-    from matplotlib import pyplot as plt
-    from matplotlib import rc
-
-    has_matplotlib = True
-
-except ImportError:
-    has_matplotlib = False
 
 
 class V:
@@ -392,8 +389,8 @@ class V:
         try:
             return self.evaluation[n_sol][theta_vals]
         except KeyError:
-            print(
-                f"Run program.eval({theta_vals}) for appropriate solution number first"
+            logger.warning(
+                f"Run program.eval{theta_vals} for appropriate solution number first"
             )
 
     # -----------------------------------------------------
@@ -1060,7 +1057,7 @@ class V:
             return IndexedBase(str(self))[
                 symbols(",".join([f"{d}" for d in self.index]), cls=Idx)
             ]
-        print(
+        logger.warning(
             "sympy is an optional dependency, pip install gana[all] to get optional dependencies"
         )
 
@@ -1082,7 +1079,7 @@ class V:
                     return PyoVar(*idx, domain=NonNegativeReals, doc=str(self))
                 else:
                     return PyoVar(*idx, domain=Reals, doc=str(self))
-        print(
+        logger.warning(
             "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
         )
 
@@ -1109,12 +1106,6 @@ class V:
 
 
         """
-
-        if not has_matplotlib:
-            print(
-                "matplotlib is an optional dependency, pip install gana[all] to get optional dependencies"
-            )
-            return
 
         ax = plt.subplots(figsize=fig_size)[1]
 
@@ -1144,14 +1135,6 @@ class V:
         ax.grid(alpha=grid_alpha)
         ax.set_xticks(x)
         ax.set_xticklabels(
-            [
-                rf"${tuple([idx.latex() for idx in index])}$".replace("'", "").replace(
-                    "\\", ""
-                )
-                for index in self.map
-            ]
-        )
-        print(
             [
                 rf"${tuple([idx.latex() for idx in index])}$".replace("'", "").replace(
                     "\\", ""

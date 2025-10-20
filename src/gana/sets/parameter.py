@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from itertools import product
 from typing import TYPE_CHECKING, Self
 from warnings import warn
@@ -13,6 +14,8 @@ from .cases import Elem, PCase
 from .function import F
 from .index import I
 from .variable import V
+
+logger = logging.getLogger("gana")
 
 if TYPE_CHECKING:
     from .theta import T
@@ -1664,7 +1667,7 @@ class P:
             return IndexedBase(str(self))[
                 symbols(",".join([f"{d}" for d in self.index]), cls=Idx)
             ]
-        print(
+        logger.warning(
             "sympy is an optional dependency, pip install gana[all] to get optional dependencies"
         )
 
@@ -1677,6 +1680,6 @@ class P:
                 initialize=self._,
                 doc=str(self),
             )
-        print(
+        logger.warning(
             "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
         )

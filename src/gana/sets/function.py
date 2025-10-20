@@ -5,17 +5,12 @@ from __future__ import annotations
 from itertools import product
 from typing import TYPE_CHECKING, Self
 
+from IPython.display import Math, display
+
 from .birth import make_P, make_T
 from .cases import Elem, FCase, PCase
 from .constraint import C
 from .index import I
-
-try:
-    from IPython.display import Math, display
-
-    has_ipython = True
-except ImportError:
-    has_ipython = False
 
 if TYPE_CHECKING:
     from .parameter import P
@@ -1053,16 +1048,11 @@ class F:
 
     def show(self, descriptive: bool = False):
         """Display the function"""
-        if has_ipython:
-            if descriptive:
-                for f in self._:
-                    display(Math(rf"[{f.n}]" + r"\text{   }" + f.latex()))
-            else:
-                display(Math(rf"[{self.n}]" + r"\text{   }" + self.latex()))
+        if descriptive:
+            for f in self._:
+                display(Math(rf"[{f.n}]" + r"\text{   }" + f.latex()))
         else:
-            print(
-                "IPython is an optional dependency, pip install gana[all] to get optional dependencies"
-            )
+            display(Math(rf"[{self.n}]" + r"\text{   }" + self.latex()))
 
     @property
     def longname(self):
