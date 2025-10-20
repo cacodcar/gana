@@ -28,6 +28,16 @@ Gana Algebraic Modeling Language
    examples/energy
    examples/transport
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Information
+   :hidden:
+
+   license
+   changelog
+   
+
+
 API Reference
 =============
 
