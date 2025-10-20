@@ -5,7 +5,7 @@ from __future__ import annotations
 from itertools import product
 from typing import TYPE_CHECKING, Self
 
-from IPython.display import display, Math
+from IPython.display import Math, display
 
 from .birth import make_P, make_T
 from .cases import Elem, FCase, PCase
