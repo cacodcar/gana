@@ -2,17 +2,11 @@
 
 from dataclasses import dataclass
 
+from matplotlib import pyplot as plt
+from matplotlib import rc
+
 from ..sets.index import I
 from ..sets.variable import V
-
-try:
-    from matplotlib import pyplot as plt
-    from matplotlib import rc
-
-    has_matplotlib = True
-
-except ImportError:
-    has_matplotlib = False
 
 
 @dataclass
@@ -127,12 +121,6 @@ class Solution:
         :param x_ticks_lim: Maximum number of x-ticks to display, defaults to 20
         :type x_ticks_lim: int, optional
         """
-
-        if not has_matplotlib:
-            print(
-                "matplotlib is an optional dependency, pip install gana[all] to get optional dependencies"
-            )
-            return
 
         data = self(variable)
 

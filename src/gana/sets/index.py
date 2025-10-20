@@ -1,11 +1,14 @@
 """A set of index elements (X)"""
 
+import logging
 from operator import is_
 from typing import Self
 
 from IPython.display import Math, display
 
 from .cases import ICase
+
+logger = logging.getLogger("gana")
 
 try:
     from pyomo.environ import RangeSet as PyoRangeSet
@@ -531,7 +534,7 @@ class I:
         """Sympy representation"""
         if has_sympy:
             return FiniteSet(*[str(s) for s in self._])
-        print(
+        logger.warning(
             "sympy is an optional dependency, pip install gana[all] to get optional dependencies"
         )
 
@@ -542,6 +545,6 @@ class I:
                 return PyoRangeSet(len(self), doc=self.tag)
 
             return PyoSet(initialize=[i.name for i in self._], doc=self.tag)
-        print(
+        logger.warning(
             "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
         )

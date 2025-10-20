@@ -22,7 +22,11 @@ class M:
         return self.name
 
     def __hash__(self):
-        return hash(self.name)
+        try:
+            return hash(self.name)
+        except AttributeError:
+            # Fallback for uninitialized state during unpickling
+            return id(self)
 
     def __len__(self):
         return 1

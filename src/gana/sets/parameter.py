@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from itertools import product
 from typing import TYPE_CHECKING, Self
 from warnings import warn
@@ -13,6 +14,8 @@ from .cases import Elem, PCase
 from .function import F
 from .index import I
 from .variable import V
+
+logger = logging.getLogger("gana")
 
 if TYPE_CHECKING:
     from .theta import T
@@ -233,11 +236,10 @@ class P:
         return self.ltx + index
 
     def show(self, descriptive: bool = False):
-        """
-        Display the variables
+        """Display the variables
 
-        :param descriptive: If True, shows all parameters. Defaults to False.
-        :type descriptive: bool, optional
+        Args:
+            descriptive (bool, optional): If True, shows all parameters. Defaults to False.
         """
         if descriptive:
             # just print out the parameters
@@ -318,7 +320,7 @@ class P:
     # -----------------------------------------------------
     #                    Operators
     # -----------------------------------------------------
-    # --- Handling basic operations----
+    # Handling basic operations----
     # if there is a zero on the left, just return P
     # if the other is a parameter, add the values
     # if the other is a function/variable, return a function
@@ -1670,7 +1672,7 @@ class P:
             return IndexedBase(str(self))[
                 symbols(",".join([f"{d}" for d in self.index]), cls=Idx)
             ]
-        print(
+        logger.warning(
             "sympy is an optional dependency, pip install gana[all] to get optional dependencies"
         )
 
@@ -1683,6 +1685,6 @@ class P:
                 initialize=self._,
                 doc=str(self),
             )
-        print(
+        logger.warning(
             "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
         )

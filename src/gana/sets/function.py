@@ -3,19 +3,14 @@
 from __future__ import annotations
 
 from itertools import product
-from typing import TYPE_CHECKING, Optional, Self
+from typing import TYPE_CHECKING, Self
+
+from IPython.display import display, Math
 
 from .birth import make_P, make_T
 from .cases import Elem, FCase, PCase
 from .constraint import C
 from .index import I
-
-try:
-    from IPython.display import Math, display
-
-    has_ipython = True
-except ImportError:
-    has_ipython = False
 
 if TYPE_CHECKING:
     from .parameter import P
@@ -106,32 +101,32 @@ class F:
 
     def __init__(
         self,
-        # --------- Elements -----------
+        # ------Elements -----------
         one: int | float | list[int | float] | P | V | T | Self | None = None,
         two: int | float | list[int | float] | P | V | T | Self | None = None,
         # --------- Types --------------
-        one_type: Optional[Elem] = None,
-        two_type: Optional[Elem] = None,
+        one_type: Elem | None = None,
+        two_type: Elem | None = None,
         # ------- Relations -----------
         mul: bool = False,
         add: bool = False,
         sub: bool = False,
         div: bool = False,
         # ------ Vector ---------------
-        parent: Optional[Self] | None = None,
-        pos: Optional[int] = None,
+        parent: Self = None,
+        pos: int = None,
         index: tuple[I] | list[tuple[I]] | None = None,
         # ------- Other attributes -----
-        case: Optional[FCase] = None,
-        consistent: Optional[bool] = False,
-        issumhow: Optional[tuple[V, I, int]] = None,
+        case: FCase = None,
+        consistent: bool = False,
+        issumhow: tuple[V, I, int] = None,
     ):
         # set by program or birther function (parent)
-        self.parent: Self = parent
+        self.parent = parent
         # position of the function in the parent
-        self.pos: int = pos
+        self.pos = pos
         # number id, set by the program based on order of declaration
-        self.n: int = None
+        self.n = None
         # members of the function set
         self._: list[F] = []
         # maps indices to functions in the set
@@ -1075,16 +1070,11 @@ class F:
         :param descriptive: Whether to show all birthed functions, defaults to False
         :type descriptive: bool, optional
         """
-        if has_ipython:
-            if descriptive:
-                for f in self._:
-                    display(Math(rf"[{f.n}]" + r"\text{   }" + f.latex()))
-            else:
-                display(Math(rf"[{self.n}]" + r"\text{   }" + self.latex()))
+        if descriptive:
+            for f in self._:
+                display(Math(rf"[{f.n}]" + r"\text{   }" + f.latex()))
         else:
-            print(
-                "IPython is an optional dependency, pip install gana[all] to get optional dependencies"
-            )
+            display(Math(rf"[{self.n}]" + r"\text{   }" + self.latex()))
 
     @property
     def longname(self):
@@ -1962,4 +1952,8 @@ class F:
         return self.name
 
     def __hash__(self):
-        return hash(self.name)
+        try:
+            return hash(self.name)
+        except AttributeError:
+            # Fallback for uninitialized state during unpickling
+            return id(self)

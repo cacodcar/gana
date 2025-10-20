@@ -1,5 +1,6 @@
 """Program"""
 
+import logging
 import warnings
 from dataclasses import dataclass, field
 from typing import Literal
@@ -27,6 +28,15 @@ from ..sets.parameter import P
 from ..sets.theta import T
 from ..sets.variable import V
 from .solution import Solution
+
+logger = logging.getLogger("gana")
+logger.setLevel(logging.INFO)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 @dataclass
@@ -74,7 +84,7 @@ class Prg:
 
     def __post_init__(self):
 
-        # ------ collections --------
+        # ---collections --------
         # index (I)
         self.index_sets: list[I] = []
         self.indices: list[I] = []
@@ -108,7 +118,7 @@ class Prg:
         # objective (O)
         self.objectives: list[O] = []
 
-        # ------ names --------
+        # ---names --------
         self.names: list[str] = []  # element names
 
         self.names_index_sets: list[str] = []  # index sets
@@ -120,7 +130,7 @@ class Prg:
         self.names_constraint_sets: list[str] = []  # constraints
         self.names_objectives: list[str] = []  # objectives
 
-        # ------ counts --------
+        # ---counts --------
 
         # index (I)
         self.n_index_sets: int = 0  # index sets
@@ -1227,7 +1237,7 @@ class Prg:
     def mps(self, name: str = None):
         """MPS File"""
 
-        print(f"--- Generating {name or self.name}.mps")
+        logger.info(f"Generating {name or self.name}.mps")
 
         # 1 unit of whitespace
         ws = " "
@@ -1366,10 +1376,10 @@ class Prg:
                 if v.nn:
                     f.write(f"{ws}LI{ws}BOUND{ws*4}{v.mps()}{ws*(10 - vs)}{0}\n")
                 else:
-                    print(
+                    logger.warning(
                         "!!! Some solvers need bounds for integer variables provided explicitly"
                     )
-                    print(
+                    logger.warning(
                         f"!!! This can cause issues when providing unbounded integer variables such as {v}"
                     )
 
@@ -1393,10 +1403,10 @@ class Prg:
             self.formulation[self.n_for] = m
             self.n_for += 1
 
-            print(f"--- Optimizing {self} using {using}")
+            logger.info(f"Optimizing {self} using {using}")
             m.optimize()
             try:
-                print("--- Solution found. Use .sol() to display it")
+                logger.info("Solution found. Use .sol() to display it")
 
                 self.X[self.n_sol] = [v.X for v in m.getVars()]
 
@@ -1411,13 +1421,13 @@ class Prg:
                 self.objectives[-1].X = m.ObjVal
                 self.optimized = True
 
-                print("--- Creating Solution object, check.solution")
+                logger.info("Creating Solution object, check.solution")
 
                 self.solution[self.n_sol] = self.birth_solution()
                 self.sol_types["MIP"].append(self.n_sol)
                 self.n_sol += 1
             except AttributeError:
-                print("!!! No solution found. Check the model.")
+                logger.warning("!!! No solution found. Check the model.")
 
     def solve(
         self,
@@ -1442,7 +1452,7 @@ class Prg:
         m = self.ppopt()
         self.formulation[self.n_for] = m
         self.n_for += 1
-        print(f"--- Solving {self} using PPOPT {using} algorithm")
+        logger.info(f"Solving {self} using PPOPT {using} algorithm")
 
         sol = solve_mpqp(m, getattr(mpqp_algorithm, using))
         if sol.critical_regions:
@@ -1557,11 +1567,11 @@ class Prg:
         for v in self.variable_sets:
             v.sol(n_sol=n_sol, compare=compare)
 
-        if slack:
-            display(Markdown("<br><br>"))
-            display(Markdown(r"## Constraint Slack"))
-            for c in self.leqcons():
-                c.sol(n_sol=n_sol, compare=compare)
+        # if slack:
+        #     display(Markdown("<br><br>"))
+        #     display(Markdown(r"## Constraint Slack"))
+        #     for c in self.leqcons():
+        #         c.sol(n_sol=n_sol, compare=compare)
 
     def birth_solution(self):
         """Makes a solution object for the program"""
@@ -1677,7 +1687,7 @@ class Prg:
                         c.show()
 
                 if self.functions:
-                    print()
+                    display(Markdown("<br><br>"))
                     display(Markdown(r"## Functions"))
                     for f in self.functions:
                         f.show()
@@ -1828,7 +1838,7 @@ class Prg:
         _CrB = self.CrB
         _F = self.F
 
-        print(f"--- Creating PPOPT MPLP_Program for {self}")
+        logger.info(f"Creating PPOPT MPLP_Program for {self}")
 
         return MPLP_Program(
             A=nparray(_A + _NN),
@@ -1845,7 +1855,7 @@ class Prg:
         """Gurobi Model"""
 
         self.mps()
-        print(f"--- Creating gurobi model for {self}")
+        logger.info(f"Creating gurobi model for {self}")
         return gpread(f"{self}.mps")
 
     # def pyomo(self):
