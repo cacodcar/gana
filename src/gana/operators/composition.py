@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
 from ..sets.objective import O
 
 if TYPE_CHECKING:
-    from ..sets.variable import V
     from ..sets.function import F
+    from ..sets.variable import V
 
 
 def inf(function: F | V) -> O:

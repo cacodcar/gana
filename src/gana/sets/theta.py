@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from itertools import product
-
 # from functools import reduce
 from math import prod
 from typing import TYPE_CHECKING, Self
