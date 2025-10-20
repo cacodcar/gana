@@ -229,7 +229,7 @@ class P:
 
     def show(self, descriptive: bool = False):
         """Display the variables
-        
+
         Args:
             descriptive (bool, optional): If True, shows all parameters. Defaults to False.
         """
@@ -312,7 +312,7 @@ class P:
     # -----------------------------------------------------
     #                    Operators
     # -----------------------------------------------------
-    # --- Handling basic operations----
+    # Handling basic operations----
     # if there is a zero on the left, just return P
     # if the other is a parameter, add the values
     # if the other is a function/variable, return a function

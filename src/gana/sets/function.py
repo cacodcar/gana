@@ -106,22 +106,22 @@ class F:
 
     def __init__(
         self,
-        # --------- Elements -----------
+        # ------Elements -----------
         one: int | float | list[int | float] | P | V | T | Self | None = None,
         two: int | float | list[int | float] | P | V | T | Self | None = None,
-        # --------- Types --------------
+        # ------Types --------------
         one_type: Elem = None,
         two_type: Elem = None,
-        # ------- Relations -----------
+        # ----Relations -----------
         mul: bool = False,
         add: bool = False,
         sub: bool = False,
         div: bool = False,
-        # ------ Vector ---------------
+        # ---Vector ---------------
         parent: Self = None,
         pos: int = None,
         index: tuple[I] | list[tuple[I]] | None = None,
-        # ------- Other attributes -----
+        # ----Other attributes -----
         case: FCase = None,
         consistent: bool = False,
         issumhow: tuple[V, I, int] = None,
@@ -1928,4 +1928,8 @@ class F:
         return self.name
 
     def __hash__(self):
-        return hash(self.name)
+        try:
+            return hash(self.name)
+        except AttributeError:
+            # Fallback for uninitialized state during unpickling
+            return id(self)
