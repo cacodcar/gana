@@ -1205,7 +1205,7 @@ class Prg:
     def mps(self, name: str = None):
         """MPS File"""
 
-        print(f"Generating {name or self.name}.mps")
+        logger.info(f"Generating {name or self.name}.mps")
 
         # 1 unit of whitespace
         ws = " "
@@ -1344,10 +1344,10 @@ class Prg:
                 if v.nn:
                     f.write(f"{ws}LI{ws}BOUND{ws*4}{v.mps()}{ws*(10 - vs)}{0}\n")
                 else:
-                    print(
+                    logger.warning(
                         "!!! Some solvers need bounds for integer variables provided explicitly"
                     )
-                    print(
+                    logger.warning(
                         f"!!! This can cause issues when providing unbounded integer variables such as {v}"
                     )
 
@@ -1371,10 +1371,10 @@ class Prg:
             self.formulation[self.n_for] = m
             self.n_for += 1
 
-            print(f"Optimizing {self} using {using}")
+            logger.info(f"Optimizing {self} using {using}")
             m.optimize()
             try:
-                print("Solution found. Use .sol() to display it")
+                logger.info("Solution found. Use .sol() to display it")
 
                 self.X[self.n_sol] = [v.X for v in m.getVars()]
 
@@ -1395,7 +1395,7 @@ class Prg:
                 self.sol_types["MIP"].append(self.n_sol)
                 self.n_sol += 1
             except AttributeError:
-                print("!!! No solution found. Check the model.")
+                logger.warning("!!! No solution found. Check the model.")
 
     def solve(
         self,
@@ -1420,7 +1420,7 @@ class Prg:
         m = self.ppopt()
         self.formulation[self.n_for] = m
         self.n_for += 1
-        print(f"Solving {self} using PPOPT {using} algorithm")
+        logger.info(f"Solving {self} using PPOPT {using} algorithm")
 
         sol = solve_mpqp(m, getattr(mpqp_algorithm, using))
         if sol.critical_regions:
@@ -1530,11 +1530,11 @@ class Prg:
         for v in self.variable_sets:
             v.sol(n_sol=n_sol, compare=compare)
 
-        if slack:
-            display(Markdown("<br><br>"))
-            display(Markdown(r"## Constraint Slack"))
-            for c in self.leqcons():
-                c.sol(n_sol=n_sol, compare=compare)
+        # if slack:
+        #     display(Markdown("<br><br>"))
+        #     display(Markdown(r"## Constraint Slack"))
+        #     for c in self.leqcons():
+        #         c.sol(n_sol=n_sol, compare=compare)
 
     def birth_solution(self):
         """Makes a solution object for the program"""
@@ -1650,7 +1650,7 @@ class Prg:
                         c.show()
 
                 if self.functions:
-                    print()
+                    display(Markdown("<br><br>"))
                     display(Markdown(r"## Functions"))
                     for f in self.functions:
                         f.show()
