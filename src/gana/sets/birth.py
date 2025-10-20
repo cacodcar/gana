@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from .cases import PCase
 from .index import I
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 def make_P(
     inp: list[float | int] | float | int,
-    index: Optional[I] = None,
+    index: I | None = None,
 ) -> P:
     """
     Make input into a parameter set (P)
@@ -56,7 +56,7 @@ def make_P(
 
 def make_T(
     inp: tuple[int | float] | list[tuple[int | float]],
-    index: Optional[I] = None,
+    index: I | None = None,
 ) -> T:
     """
     Make input into a theta set (T)
