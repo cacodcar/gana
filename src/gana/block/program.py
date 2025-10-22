@@ -1237,7 +1237,7 @@ class Prg:
     def mps(self, name: str = None):
         """MPS File"""
 
-        logger.info(f"Generating {name or self.name}.mps")
+        logger.info("Generating %s.mps", name or self.name)
 
         # 1 unit of whitespace
         ws = " "
@@ -1403,7 +1403,7 @@ class Prg:
             self.formulation[self.n_formulation] = m
             self.n_formulation += 1
 
-            logger.info(f"Optimizing {self} using {using}")
+            logger.info("Optimizing %s using %s", self, using)
             m.optimize()
             try:
                 logger.info("Solution found. Use .output() to display it")
@@ -1450,9 +1450,9 @@ class Prg:
         """Solve the multiparametric program"""
 
         m = self.ppopt()
-        self.formulation[self.n_formulation] = m
-        self.n_formulation += 1
-        logger.info(f"Solving {self} using PPOPT {using} algorithm")
+        self.formulation[self.n_for] = m
+        self.n_for += 1
+        logger.info("Solving %s using PPOPT %s algorithm", self, using)
 
         sol = solve_mpqp(m, getattr(mpqp_algorithm, using))
         if sol.critical_regions:
@@ -1844,7 +1844,7 @@ class Prg:
         _CrB = self.CrB
         _F = self.F
 
-        logger.info(f"Creating PPOPT MPLP_Program for {self}")
+        logger.info("Creating PPOPT MPLP_Program for %s", self)
 
         return MPLP_Program(
             A=nparray(_A + _NN),
@@ -1861,7 +1861,7 @@ class Prg:
         """Gurobi Model"""
 
         self.mps()
-        logger.info(f"Creating gurobi model for {self}")
+        logger.info("Creating gurobi model for %s", self)
         return gpread(f"{self}.mps")
 
     # def pyomo(self):
