@@ -1381,7 +1381,8 @@ class Prg:
                         "!!! Some solvers need bounds for integer variables provided explicitly"
                     )
                     logger.warning(
-                        f"!!! This can cause issues when providing unbounded integer variables such as {v}"
+                        "!!! This can cause issues when providing unbounded integer variables such as %s",
+                        v,
                     )
 
             # CLOSE the MPS file
@@ -1582,6 +1583,123 @@ class Prg:
 
         return solution
 
+    def latex(
+        self,
+        descriptive: bool = False,
+        categorical: bool = False,
+        category: str = None,
+        as_document: bool = False,
+    ) -> str:
+        r"""
+        Return a LaTeX/Markdown-compatible representation of the mathematical program.
+        - In Markdown mode: uses Markdown headers (##, ###)
+        - In document mode: uses LaTeX section commands
+        """
+
+        if category:
+            categorical = True
+
+        lines: list[str] = []
+        heading = lambda level, text: (
+            rf"\{'sub' * (level - 1)}section*{{{text}}}"
+            if as_document
+            else f"{'#' * (level + 1)} {text}"
+        )
+
+        lines.append(rf"\textbf{{Mathematical Program for }} {self}")
+
+        # --- Index sets ---
+        if getattr(self, "index_sets", None):
+            idx_lines = [
+                i.latex(descriptive=True)
+                for i in self.index_sets
+                if len(i) != 0 and i.case != ICase.SELF
+            ]
+            if idx_lines:
+                lines.append(heading(1, "Index Sets"))
+                lines.extend(idx_lines)
+
+        # --- Objective ---
+        if getattr(self, "objectives", None):
+            obj_lines = [o.latex() for o in self.objectives]
+            if obj_lines:
+                lines.append(heading(1, "Objective"))
+                lines.extend(obj_lines)
+
+        # --- Constraints / Functions ---
+        lines.append(heading(1, "Subject to"))
+
+        def _group_by_category(items):
+            grouped = {}
+            for obj in items:
+                grouped.setdefault(obj.category, []).append(obj)
+            return grouped
+
+        if categorical:
+            cons_src = self.cons() if descriptive else self.constraint_sets
+            func_src = self.functions if descriptive else self.function_sets
+
+            categories = _group_by_category(cons_src)
+            fcategories = _group_by_category(func_src)
+
+            sorted_cons = (
+                [category]
+                if category and category in categories
+                else sorted(categories)
+            )
+            sorted_funcs = (
+                [category]
+                if category and category in fcategories
+                else sorted(fcategories)
+            )
+
+            for cat in sorted_cons:
+                lines.append(heading(2, f"{cat} Constraints"))
+                lines.extend(f"${c.latex()}$" for c in categories[cat])
+
+            for cat in sorted_funcs:
+                lines.append(heading(2, f"{cat} Functions"))
+                lines.extend(f"${f.latex()}$" for f in fcategories[cat])
+
+        else:
+            if descriptive:
+                if self.leqcons():
+                    lines.append(heading(2, "Inequality Constraints"))
+                    lines.extend(f"${c.latex()}$" for c in self.leqcons())
+                if self.eqcons():
+                    lines.append(heading(2, "Equality Constraints"))
+                    lines.extend(f"${c.latex()}$" for c in self.eqcons())
+                if self.nncons():
+                    lines.append(heading(2, "Non-Negative Constraints"))
+                    lines.extend(f"${c.latex()}$" for c in self.nncons())
+                if getattr(self, "functions", None):
+                    lines.append(heading(1, "Functions"))
+                    lines.extend(f"${f.latex()}$" for f in self.functions)
+            else:
+                if getattr(self, "leqcons_sets", None):
+                    lines.append(heading(2, "Inequality Constraint Sets"))
+                    lines.extend(f"${c.latex()}$" for c in self.leqcons_sets)
+                if getattr(self, "eqcons_sets", None):
+                    lines.append(heading(2, "Equality Constraint Sets"))
+                    lines.extend(f"${c.latex()}$" for c in self.eqcons_sets)
+                if getattr(self, "function_sets", None):
+                    lines.append(heading(1, "Functions"))
+                    lines.extend(f"${f.latex()}$" for f in self.function_sets)
+
+        body = "\n\n".join(lines)
+
+        if as_document:
+            return rf"""
+    \documentclass{{article}}
+    \usepackage{{amsmath, amssymb}}
+    \usepackage[margin=1in]{{geometry}}
+    \begin{{document}}
+    {body}
+    \end{{document}}
+    """.strip()
+
+        return body
+
     # # Displaying the program
     # def latex(self, descriptive: bool = False):
     #     """Display LaTeX"""
@@ -1603,7 +1721,6 @@ class Prg:
     #         for c in self.cons():
     #             if not c.parent:
     #                 display(c.latex())
-
     def show(
         self,
         descriptive: bool = False,
@@ -1612,150 +1729,262 @@ class Prg:
         category: str = None,
     ):
         """Pretty Print"""
-
         display(Markdown(rf"# Mathematical Program for {self}"))
 
         if category:
             categorical = True
 
-        if self.index_sets:
-            display(Markdown("<br><br>"))
-            display(Markdown(r"## Index Sets"))
+        def _br(n: int = 2):
+            display(Markdown("<br>" * n))
 
-            for i in self.index_sets:
-                if len(i) != 0 and i.case != ICase.SELF:
-                    i.show(True)
+        def _show_section(title: str, items):
+            """Helper to show a section with Markdown header."""
+            if items:
+                _br()
+                display(Markdown(rf"## {title}"))
+                for obj in items:
+                    obj.show()
 
-        if self.objectives:
-            display(Markdown("<br><br>"))
-            display(Markdown(r"## Objective"))
+        def _group_by_category(items):
+            """Group items (constraints or functions) by category."""
+            grouped = {}
+            for obj in items:
+                grouped.setdefault(obj.category, []).append(obj)
+            return grouped
 
-            for o in self.objectives:
-                o.show()
+        # --- Index sets ---
+        if getattr(self, "index_sets", None):
+            _show_section(
+                "Index Sets",
+                [i for i in self.index_sets if len(i) != 0 and i.case != ICase.SELF],
+            )
 
-        if descriptive:
+        # --- Objectives ---
+        if getattr(self, "objectives", None):
+            _show_section("Objective", self.objectives)
 
-            display(Markdown("<br><br>"))
-            display(Markdown(r"## s.t."))
+        # --- Constraints & Functions ---
+        _br()
+        display(Markdown(r"## s.t."))
 
-            if categorical:
-                # gather the categories if not already done
-                categories: dict[str, list[C]] = {}
-                fcategories: dict[str, list[Func]] = {}
-                for c in self.cons():
-                    if c.category not in categories:
-                        categories[c.category] = []
-                    categories[c.category].append(c)
-                if category and category in categories:
-                    sorted_categories = [category]
-                else:
-                    sorted_categories = sorted(categories.keys())
-                self.categories = categories
+        if categorical:
+            # Pick correct sources depending on descriptive flag
+            cons_src = self.cons() if descriptive else self.constraint_sets
+            func_src = self.functions if descriptive else self.function_sets
 
-                for f in self.function_sets:
-                    if f.category not in fcategories:
-                        fcategories[f.category] = []
-                    fcategories[f.category].append(f)
-                if category and category in fcategories:
-                    sorted_fcategories = [category]
-                else:
-                    sorted_fcategories = sorted(fcategories.keys())
-                self.fcategories = fcategories
+            categories = _group_by_category(cons_src)
+            fcategories = _group_by_category(func_src)
 
-                for category in sorted_categories:
-                    display(Markdown(rf"### {category} Constraints"))
-                    for c in categories[category]:
-                        c.show()
-                for category in sorted_fcategories:
-                    display(Markdown(rf"### {category} Functions"))
-                    for f in fcategories[category]:
-                        f.show()
+            sorted_cons = (
+                [category]
+                if category and category in categories
+                else sorted(categories)
+            )
+            sorted_funcs = (
+                [category]
+                if category and category in fcategories
+                else sorted(fcategories)
+            )
 
-            else:
+            # Store for later access
+            self.categories = categories
+            self.fcategories = fcategories
 
-                if self.leqcons():
-                    display(Markdown(r"### Inequality Constraints"))
-                    for c in self.leqcons():
-                        c.show()
-                if self.eqcons():
-                    display(Markdown(r"### Equality Constraints"))
-                    for c in self.eqcons():
-                        c.show()
+            for cat in sorted_cons:
+                display(
+                    Markdown(
+                        rf"### {cat} Constraints"
+                        if descriptive
+                        else rf"### {cat} Constraint Sets"
+                    )
+                )
+                for c in categories[cat]:
+                    c.show()
 
-                if self.nncons() and nncons:
-                    display(Markdown(r"### Non-Negative Constraints"))
-                    for c in self.nncons():
-                        c.show()
-
-                if self.functions:
-                    display(Markdown("<br><br>"))
-                    display(Markdown(r"## Functions"))
-                    for f in self.functions:
-                        f.show()
+            for cat in sorted_funcs:
+                display(
+                    Markdown(
+                        rf"### {cat} Functions"
+                        if descriptive
+                        else rf"### {cat} Function Sets"
+                    )
+                )
+                for f in fcategories[cat]:
+                    f.show()
 
         else:
-
-            # if self.sets.nncons():
-            #     display(Markdown('<br><br>'))
-            #     display(Markdown(r'## Non-Negative Variables'))
-            #     self.sets.I_nn.show()
-
-            display(Markdown("<br><br>"))
-            display(Markdown(r"## s.t."))
-
-            if categorical:
-                # gather the categories if not already done
-                categories_sets: dict[str, list[C]] = {}
-                fcategories_sets: dict[str, list[Func]] = {}
-
-                for c in self.constraint_sets:
-                    if c.category not in categories_sets:
-                        categories_sets[c.category] = []
-                    categories_sets[c.category].append(c)
-                if category and category in categories_sets:
-                    sorted_categories = [category]
-                else:
-                    sorted_categories = sorted(categories_sets.keys())
-                self.categories_sets = categories_sets
-
-                for f in self.function_sets:
-                    if f.category not in fcategories_sets:
-                        fcategories_sets[f.category] = []
-                    fcategories_sets[f.category].append(f)
-                if category and category in fcategories_sets:
-                    sorted_fcategories = [category]
-                else:
-                    sorted_fcategories = sorted(fcategories_sets.keys())
-                self.fcategories_sets = fcategories_sets
-
-                for category in sorted_categories:
-                    display(Markdown(rf"### {category} Constraint Sets"))
-                    for c in categories_sets[category]:
-                        c.show()
-
-                for category in sorted_fcategories:
-                    display(Markdown(rf"### {category} Function Sets"))
-                    for f in fcategories_sets[category]:
-                        f.show()
-
+            # --- Non-categorical view ---
+            if descriptive:
+                if self.leqcons():
+                    _show_section("Inequality Constraints", self.leqcons())
+                if self.eqcons():
+                    _show_section("Equality Constraints", self.eqcons())
+                if nncons and self.nncons():
+                    _show_section("Non-Negative Constraints", self.nncons())
+                if getattr(self, "functions", None):
+                    _show_section("Functions", self.functions)
             else:
+                if getattr(self, "leqcons_sets", None):
+                    _show_section("Inequality Constraint Sets", self.leqcons_sets)
+                if getattr(self, "eqcons_sets", None):
+                    _show_section("Equality Constraint Sets", self.eqcons_sets)
+                if getattr(self, "function_sets", None):
+                    _show_section("Functions", self.function_sets)
 
-                if self.leqcons_sets:
-                    display(Markdown("<br><br>"))
-                    display(Markdown(r"### Inequality Constraint Sets"))
-                    for c in self.leqcons_sets:
-                        c.show()
-                if self.eqcons_sets:
-                    display(Markdown("<br><br>"))
-                    display(Markdown(r"### Equality Constraint Sets"))
-                    for c in self.eqcons_sets:
-                        c.show()
+        return self
 
-                if self.function_sets:
-                    display(Markdown("<br><br>"))
-                    display(Markdown(r"## Functions"))
-                    for f in self.function_sets:
-                        f.show()
+    # def show(
+    #     self,
+    #     descriptive: bool = False,
+    #     nncons: bool = False,
+    #     categorical: bool = False,
+    #     category: str = None,
+    # ):
+    #     """Pretty Print"""
+
+    #     display(Markdown(rf"# Mathematical Program for {self}"))
+
+    #     if category:
+    #         categorical = True
+
+    #     if self.index_sets:
+    #         display(Markdown("<br><br>"))
+    #         display(Markdown(r"## Index Sets"))
+
+    #         for i in self.index_sets:
+    #             if len(i) != 0 and i.case != ICase.SELF:
+    #                 i.show(True)
+
+    #     if self.objectives:
+    #         display(Markdown("<br><br>"))
+    #         display(Markdown(r"## Objective"))
+
+    #         for o in self.objectives:
+    #             o.show()
+
+    #     if descriptive:
+
+    #         display(Markdown("<br><br>"))
+    #         display(Markdown(r"## s.t."))
+
+    #         if categorical:
+    #             # gather the categories if not already done
+    #             categories: dict[str, list[C]] = {}
+    #             fcategories: dict[str, list[Func]] = {}
+    #             for c in self.cons():
+    #                 if c.category not in categories:
+    #                     categories[c.category] = []
+    #                 categories[c.category].append(c)
+    #             if category and category in categories:
+    #                 sorted_categories = [category]
+    #             else:
+    #                 sorted_categories = sorted(categories.keys())
+    #             self.categories = categories
+
+    #             for f in self.function_sets:
+    #                 if f.category not in fcategories:
+    #                     fcategories[f.category] = []
+    #                 fcategories[f.category].append(f)
+    #             if category and category in fcategories:
+    #                 sorted_fcategories = [category]
+    #             else:
+    #                 sorted_fcategories = sorted(fcategories.keys())
+    #             self.fcategories = fcategories
+
+    #             for category in sorted_categories:
+    #                 display(Markdown(rf"### {category} Constraints"))
+    #                 for c in categories[category]:
+    #                     c.show()
+    #             for category in sorted_fcategories:
+    #                 display(Markdown(rf"### {category} Functions"))
+    #                 for f in fcategories[category]:
+    #                     f.show()
+
+    #         else:
+
+    #             if self.leqcons():
+    #                 display(Markdown(r"### Inequality Constraints"))
+    #                 for c in self.leqcons():
+    #                     c.show()
+    #             if self.eqcons():
+    #                 display(Markdown(r"### Equality Constraints"))
+    #                 for c in self.eqcons():
+    #                     c.show()
+
+    #             if self.nncons() and nncons:
+    #                 display(Markdown(r"### Non-Negative Constraints"))
+    #                 for c in self.nncons():
+    #                     c.show()
+
+    #             if self.functions:
+    #                 display(Markdown("<br><br>"))
+    #                 display(Markdown(r"## Functions"))
+    #                 for f in self.functions:
+    #                     f.show()
+
+    #     else:
+
+    #         # if self.sets.nncons():
+    #         #     display(Markdown('<br><br>'))
+    #         #     display(Markdown(r'## Non-Negative Variables'))
+    #         #     self.sets.I_nn.show()
+
+    #         display(Markdown("<br><br>"))
+    #         display(Markdown(r"## s.t."))
+
+    #         if categorical:
+    #             # gather the categories if not already done
+    #             categories_sets: dict[str, list[C]] = {}
+    #             fcategories_sets: dict[str, list[Func]] = {}
+
+    #             for c in self.constraint_sets:
+    #                 if c.category not in categories_sets:
+    #                     categories_sets[c.category] = []
+    #                 categories_sets[c.category].append(c)
+    #             if category and category in categories_sets:
+    #                 sorted_categories = [category]
+    #             else:
+    #                 sorted_categories = sorted(categories_sets.keys())
+    #             self.categories_sets = categories_sets
+
+    #             for f in self.function_sets:
+    #                 if f.category not in fcategories_sets:
+    #                     fcategories_sets[f.category] = []
+    #                 fcategories_sets[f.category].append(f)
+    #             if category and category in fcategories_sets:
+    #                 sorted_fcategories = [category]
+    #             else:
+    #                 sorted_fcategories = sorted(fcategories_sets.keys())
+    #             self.fcategories_sets = fcategories_sets
+
+    #             for category in sorted_categories:
+    #                 display(Markdown(rf"### {category} Constraint Sets"))
+    #                 for c in categories_sets[category]:
+    #                     c.show()
+
+    #             for category in sorted_fcategories:
+    #                 display(Markdown(rf"### {category} Function Sets"))
+    #                 for f in fcategories_sets[category]:
+    #                     f.show()
+
+    #         else:
+
+    #             if self.leqcons_sets:
+    #                 display(Markdown("<br><br>"))
+    #                 display(Markdown(r"### Inequality Constraint Sets"))
+    #                 for c in self.leqcons_sets:
+    #                     c.show()
+    #             if self.eqcons_sets:
+    #                 display(Markdown("<br><br>"))
+    #                 display(Markdown(r"### Equality Constraint Sets"))
+    #                 for c in self.eqcons_sets:
+    #                     c.show()
+
+    #             if self.function_sets:
+    #                 display(Markdown("<br><br>"))
+    #                 display(Markdown(r"## Functions"))
+    #                 for f in self.function_sets:
+    #                     f.show()
 
     def draw(self, variable: V = None, n_sol: int = 0):
         """Plots the solution for a variable"""
