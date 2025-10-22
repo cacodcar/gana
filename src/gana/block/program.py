@@ -1450,8 +1450,8 @@ class Prg:
         """Solve the multiparametric program"""
 
         m = self.ppopt()
-        self.formulation[self.n_for] = m
-        self.n_for += 1
+        self.formulation[self.n_formulation] = m
+        self.n_formulation += 1
         logger.info("Solving %s using PPOPT %s algorithm", self, using)
 
         sol = solve_mpqp(m, getattr(mpqp_algorithm, using))
