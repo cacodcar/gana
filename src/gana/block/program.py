@@ -8,6 +8,7 @@ from typing import Literal
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
+
 # from numpy import round as npround
 # from numpy import abs as npabs
 from numpy import array as nparray
@@ -1783,7 +1784,6 @@ class Prg:
         # the hashing will be inherited by the subclasses
         cls.__repr__ = Prg.__repr__
         cls.__hash__ = Prg.__hash__
-
 
     # def __add__(self, other: Self):
     #     """Add two programs"""
