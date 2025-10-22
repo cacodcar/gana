@@ -1779,6 +1779,12 @@ class Prg:
     def __hash__(self):
         return hash(str(self))
 
+    def __init_subclass__(cls):
+        # the hashing will be inherited by the subclasses
+        cls.__repr__ = Prg.__repr__
+        cls.__hash__ = Prg.__hash__
+
+
     # def __add__(self, other: Self):
     #     """Add two programs"""
 
