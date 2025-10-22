@@ -165,7 +165,7 @@ class Prg:
         self.solution: dict[int, Solution | MPSolution] = {}
 
         # number of solutions
-        self.n_sol: int = 0
+        self.n_solution: int = 0
 
         # solution matrix
         self.X: dict[int, list[float | int]] = {}
@@ -174,13 +174,13 @@ class Prg:
         self.formulation: dict[int, GPModel | MPLP_Program] = {}
 
         # number of formulations
-        self.n_for: int = 0
+        self.n_formulation: int = 0
 
         # evaluations using parametric solutions
         self.evaluation: dict[int, dict[tuple[float, ...], list[float]]] = {}
 
         # number of evaluations by solution number
-        self.n_eval: dict[int, int] = {}
+        self.n_evaluation: dict[int, int] = {}
 
         # solution types
         self.sol_types: dict[str, list[int]] = {"MIP": [], "mp": []}
@@ -1400,32 +1400,32 @@ class Prg:
         if using == "gurobi":
             m = self.gurobi()
 
-            self.formulation[self.n_for] = m
-            self.n_for += 1
+            self.formulation[self.n_formulation] = m
+            self.n_formulation += 1
 
             logger.info(f"Optimizing {self} using {using}")
             m.optimize()
             try:
                 logger.info("Solution found. Use .sol() to display it")
 
-                self.X[self.n_sol] = [v.X for v in m.getVars()]
+                self.X[self.n_solution] = [v.X for v in m.getVars()]
 
                 _variables = [v for v in self.variables if v.cons_by]
-                for v, val in zip(_variables, self.X[self.n_sol]):
+                for v, val in zip(_variables, self.X[self.n_solution]):
 
-                    v.X[self.n_sol] = val
+                    v.X[self.n_solution] = val
 
                 for c in self.constraint_sets:
-                    c.function.solution(n_sol=self.n_sol)
+                    c.function.solution(n_sol=self.n_solution)
 
                 self.objectives[-1].X = m.ObjVal
                 self.optimized = True
 
                 logger.info("Creating Solution object, check.solution")
 
-                self.solution[self.n_sol] = self.birth_solution()
-                self.sol_types["MIP"].append(self.n_sol)
-                self.n_sol += 1
+                self.solution[self.n_solution] = self.birth_solution()
+                self.sol_types["MIP"].append(self.n_solution)
+                self.n_solution += 1
             except AttributeError:
                 logger.warning("!!! No solution found. Check the model.")
 
@@ -1450,8 +1450,8 @@ class Prg:
         """Solve the multiparametric program"""
 
         m = self.ppopt()
-        self.formulation[self.n_for] = m
-        self.n_for += 1
+        self.formulation[self.n_formulation] = m
+        self.n_formulation += 1
         logger.info(f"Solving {self} using PPOPT {using} algorithm")
 
         sol = solve_mpqp(m, getattr(mpqp_algorithm, using))
@@ -1481,9 +1481,9 @@ class Prg:
             #     for _v, _f in zip(self.variables, f):
             #         _v.eval_funcs.setdefault(self.n_sol, {})[n] = _f
 
-            self.solution[self.n_sol] = sol
-            self.sol_types["mp"].append(self.n_sol)
-            self.n_sol += 1
+            self.solution[self.n_solution] = sol
+            self.sol_types["mp"].append(self.n_solution)
+            self.n_solution += 1
 
     def eval(
         self, *theta_vals: float, n_sol: int = 0, roundoff: int = 4
@@ -1513,11 +1513,11 @@ class Prg:
         sol = [round(float(val[0]), roundoff) for val in sol]
 
         self.evaluation.setdefault(n_sol, {})
-        self.n_eval.setdefault(n_sol, 0)
+        self.n_evaluation.setdefault(n_sol, 0)
 
         self.evaluation[n_sol][theta_vals] = sol
 
-        self.n_eval[n_sol] += 1
+        self.n_evaluation[n_sol] += 1
 
         for n, v in enumerate(self.variables):
             v.evaluation.setdefault(n_sol, {})
@@ -1576,8 +1576,8 @@ class Prg:
     def birth_solution(self):
         """Makes a solution object for the program"""
 
-        solution = Solution(self.name + "_solution_" + str(self.n_sol))
-        solution.update(self.variables, n_sol=self.n_sol)
+        solution = Solution(self.name + "_solution_" + str(self.n_solution))
+        solution.update(self.variables, n_sol=self.n_solution)
 
         return solution
 
