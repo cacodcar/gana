@@ -70,7 +70,7 @@ class O:
         """Matrix as dict"""
         return self.function.matrix
 
-    def sol(self, asfloat: bool = False):
+    def output(self, asfloat: bool = False):
         """Solution"""
         if asfloat:
             return self.X

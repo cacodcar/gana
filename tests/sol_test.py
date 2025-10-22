@@ -116,13 +116,13 @@ def p_energy():
     return p
 
 
-def test_sol(p_energy):
-    assert p_energy.capp.sol(aslist=True) == [150.0, 100.0, 200.0]
-    assert p_energy.caps.sol(aslist=True) == [200.0]
-    assert p_energy.sell.sol(aslist=True) == [50.0, 100.0, 50.0]
-    assert p_energy.con.sol(aslist=True) == [150.0, 0.0, 50.0]
-    assert p_energy.inv.sol(aslist=True) == [100.0, 0.0, 0.0]
-    assert p_energy.prod.sol(aslist=True) == [
+def test_output(p_energy):
+    assert p_energy.capp.output(aslist=True) == [150.0, 100.0, 200.0]
+    assert p_energy.caps.output(aslist=True) == [200.0]
+    assert p_energy.sell.output(aslist=True) == [50.0, 100.0, 50.0]
+    assert p_energy.con.output(aslist=True) == [150.0, 0.0, 50.0]
+    assert p_energy.inv.output(aslist=True) == [100.0, 0.0, 0.0]
+    assert p_energy.prod.output(aslist=True) == [
         150.0,
         0.0,
         50.0,
@@ -133,10 +133,10 @@ def test_sol(p_energy):
         100.0,
         0.0,
     ]
-    assert p_energy.ex_cap.sol(aslist=True) == [750000.0, 100000.0, 0.0]
-    assert p_energy.ex_fop.sol(aslist=True) == [75000.0, 10000.0, 0.0]
-    assert p_energy.ex_vop.sol(aslist=True) == [2000.0, 5000.0, 0.0]
-    assert p_energy.o.sol(True) == 942000.0
+    assert p_energy.ex_cap.output(aslist=True) == [750000.0, 100000.0, 0.0]
+    assert p_energy.ex_fop.output(aslist=True) == [75000.0, 10000.0, 0.0]
+    assert p_energy.ex_vop.output(aslist=True) == [2000.0, 5000.0, 0.0]
+    assert p_energy.o.output(True) == 942000.0
 
 
 @pytest.fixture
@@ -207,10 +207,10 @@ def diet_problem():
 
 
 def test_diet_problem(diet_problem):
-    assert diet_problem.x.sol(aslist=True) == [
+    assert diet_problem.x.output(aslist=True) == [
         1.5652173913043477,
         0.0,
         1.7391304347826089,
     ]
-    assert diet_problem.obj_cost.sol(True) == 2.869565217391304
+    assert diet_problem.obj_cost.output(True) == 2.869565217391304
 

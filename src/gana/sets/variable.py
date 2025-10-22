@@ -346,7 +346,7 @@ class V:
     #                    Solution
     # -----------------------------------------------------
 
-    def sol(
+    def output(
         self, n_sol: int = 0, aslist: bool = False, asdict: bool = False, compare=False
     ) -> list[float] | dict[tuple[I, ...], float] | None:
         """
@@ -1166,7 +1166,7 @@ class V:
         # the indices are the x-axis
         x = [str(idx) for idx in self.map]
         # the values are the y-axis
-        y = self.sol(aslist=True)
+        y = self.output(aslist=True)
 
         if usetex:
             rc(

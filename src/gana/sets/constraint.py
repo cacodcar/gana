@@ -269,7 +269,7 @@ class C:
     #                    Solution
     # -----------------------------------------------------
 
-    def sol(self, n_sol: int = 0, compare=False):
+    def output(self, n_sol: int = 0, compare=False):
         """Solution"""
         if self.leq:
             if compare:

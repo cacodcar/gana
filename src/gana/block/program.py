@@ -1406,7 +1406,7 @@ class Prg:
             logger.info(f"Optimizing {self} using {using}")
             m.optimize()
             try:
-                logger.info("Solution found. Use .sol() to display it")
+                logger.info("Solution found. Use .output() to display it")
 
                 self.X[self.n_solution] = [v.X for v in m.getVars()]
 
@@ -1548,7 +1548,7 @@ class Prg:
     #     """Slack in each constraint"""
     #     return {c: c._ for c in self.leqcons()}
 
-    def sol(self, n_sol: int = 0, slack: bool = True, compare=False):
+    def output(self, n_sol: int = 0, slack: bool = True, compare=False):
         """Print sol"""
 
         if not self.optimized:
@@ -1559,19 +1559,19 @@ class Prg:
         display(Markdown("<br><br>"))
         display(Markdown(r"## Objective"))
 
-        self.objectives[n_sol].sol()
+        self.objectives[n_sol].output()
 
         display(Markdown("<br><br>"))
         display(Markdown(r"## Variables"))
 
         for v in self.variable_sets:
-            v.sol(n_sol=n_sol, compare=compare)
+            v.output(n_sol=n_sol, compare=compare)
 
         # if slack:
         #     display(Markdown("<br><br>"))
         #     display(Markdown(r"## Constraint Slack"))
         #     for c in self.leqcons():
-        #         c.sol(n_sol=n_sol, compare=compare)
+        #         c.output(n_sol=n_sol, compare=compare)
 
     def birth_solution(self):
         """Makes a solution object for the program"""
