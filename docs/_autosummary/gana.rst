@@ -29,8 +29,8 @@
    :recursive:
 
    block
+   examples
    operators
-   programs
    sets
    shapes
    utils

@@ -8,7 +8,6 @@ from typing import Literal
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
-
 # from numpy import round as npround
 # from numpy import abs as npabs
 from numpy import array as nparray
@@ -1032,7 +1031,7 @@ class Prg:
         r"""
         Ordinals of continuous variables :math:`v \in \mathcal{V}`
 
-        .. example::
+        .. admonition:: Example
 
             The following constraints:
 
@@ -1048,11 +1047,11 @@ class Prg:
 
             .. math::
 
-                P = \begin{array}{cc}
+                P = \begin{bmatrix}
                     2 & 3 \\
                     0 & \\
                     3 & 1
-                    \end{array}
+                    \end{bmatrix}
         """
         return [c.P for c in self.cons()]
 
@@ -1061,7 +1060,7 @@ class Prg:
         r"""
         Ordinals of parametric variables :math:`\theta \in \Theta`
 
-        .. example::
+        .. admonition:: Example
 
             The following constraints:
 
@@ -1077,11 +1076,11 @@ class Prg:
 
             .. math::
 
-                Z = \begin{array}{cc}
-                    1 & \\
-                    0 & \\
-                    1 & 
-                    \end{array}
+                Z = \begin{bmatrix}
+                    1 \\
+                    0 \\
+                    1 
+                    \end{bmatrix}
         """
         return [c.Z for c in self.cons()]
 
@@ -1090,9 +1089,18 @@ class Prg:
         r"""
         Coefficient matrix of inequality (leq) constraints
 
-        
+        .. admonition:: Example
 
-        g < = 0
+            The following constraints:
+
+            .. math::
+
+                5 \cdot \mathbf{v}_2 - 3 \cdot \mathbf{v}_3 = 0
+
+                -4 \cdot \mathbf{v}_3 + \frac{\mathbf{v}_1}{13} + 0.55 \leq 0
+
+                3.73 \cdot \mathbf{v}_0 - 2 \cdot \theta_1 + 21 \leq 0
+
         """
         _G = [[0] * len(self.variables) for _ in range(len(self.leqcons()))]
 
@@ -1106,7 +1114,7 @@ class Prg:
     @property
     def H(self) -> list[list[float]]:
         """
-        Matrix of Variable coefficients for type:
+        Coefficient matrix of equality constraints
 
         h = 0
         """
@@ -1885,7 +1893,6 @@ class Prg:
                 if getattr(self, "function_sets", None):
                     _show_section("Functions", self.function_sets)
 
-        return self
 
     # def show(
     #     self,

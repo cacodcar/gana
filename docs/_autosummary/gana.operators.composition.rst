@@ -1,4 +1,4 @@
-﻿gana.operators.composition
+gana.operators.composition
 ==========================
 
 .. automodule:: gana.operators.composition
