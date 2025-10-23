@@ -1008,10 +1008,13 @@ class Prg:
         return _F
 
     @property
-    def C(self) -> list[float]:
-        """Objective Coefficients"""
+    def C(self) -> list[float]:  # noqa: C0103
+        r"""
+        Transpose of the Vector of Objective Coefficients
+        :math:`C^{T}`
+        """
         # no objectives have been set
-        if len(self.objectives) == 0:
+        if not self.objectives:
             return []
 
         if len(self.objectives) == 1:
@@ -1025,18 +1028,69 @@ class Prg:
         return _C
 
     @property
-    def P(self) -> list[list[int]]:
-        """Structure of the constraint matrix"""
+    def P(self) -> list[list[int]]:  # noqa: C0103
+        r"""
+        Ordinals of continuous variables :math:`v \in \mathcal{V}`
+
+        .. example::
+
+            The following constraints:
+
+            .. math::
+
+                5 \cdot \mathbf{v}_2 - 3 \cdot \mathbf{v}_3 + 15.2 \leq 0
+
+                \mathbf{v}_0 = 1
+
+                -4 \cdot \mathbf{v}_3 + \frac{\mathbf{v}_1}{13} = 0
+
+            Correspond to:
+
+            .. math::
+
+                P = \begin{array}{cc}
+                    2 & 3 \\
+                    0 & \\
+                    3 & 1
+                    \end{array}
+        """
         return [c.P for c in self.cons()]
 
     @property
     def Z(self) -> list[list[int]]:
-        """Structure of the constraint matrix"""
+        r"""
+        Ordinals of parametric variables :math:`\theta \in \Theta`
+
+        .. example::
+
+            The following constraints:
+
+            .. math::
+
+                \mathbf{v}_1 - 2 \cdot \theta_1 + 21 \leq 0
+
+                \mathbf{v}_0 - 7.23 \cdot \theta_0 = 0
+
+                \theta_1  - 2 \cdot \mathbf{v}_0 - 31.56
+
+            Corresponds to:
+
+            .. math::
+
+                Z = \begin{array}{cc}
+                    1 & \\
+                    0 & \\
+                    1 & 
+                    \end{array}
+        """
         return [c.Z for c in self.cons()]
 
     @property
     def G(self) -> list[list[float]]:
-        """Matrix of Variable coefficients for type:
+        r"""
+        Coefficient matrix of inequality (leq) constraints
+
+        
 
         g < = 0
         """

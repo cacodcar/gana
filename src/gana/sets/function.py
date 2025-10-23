@@ -727,8 +727,8 @@ class F:
         r"""
         Generates matrices
         A - variable coefficients
-        X - position of continuous variables in program
-        Y - position of discrete variables in program
+        P - position of continuous variables in program
+        Y - position of integer variables in program
         Z - position of parametric variables in program
         B - rhs parameters
         F - pvar (theta) parameters
