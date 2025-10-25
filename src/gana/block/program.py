@@ -8,6 +8,7 @@ from typing import Literal
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
+
 # from numpy import round as npround
 # from numpy import abs as npabs
 from numpy import array as nparray
@@ -1441,10 +1442,10 @@ class Prg:
                     f.write(f"{ws}LI{ws}BOUND{ws*4}{v.mps()}{ws*(10 - vs)}{0}\n")
                 else:
                     logger.warning(
-                        "!!! Some solvers need bounds for integer variables provided explicitly"
+                        "⚠ Some solvers need bounds for integer variables provided explicitly ⚠"
                     )
                     logger.warning(
-                        "!!! This can cause issues when providing unbounded integer variables such as %s",
+                        "⚠ This can cause issues when providing unbounded integer variables such as %s ⚠",
                         v,
                     )
 
@@ -1495,7 +1496,7 @@ class Prg:
 
                 return self, using
             except AttributeError:
-                logger.warning("!!! No solution found. Check the model.")
+                logger.warning("🛑 No solution found. Check the model 🛑")
                 return False
 
     @timer(logger, kind='solve-mpqp')
@@ -1522,7 +1523,7 @@ class Prg:
         m = self.ppopt()
         self.formulation[self.n_formulation] = m
         self.n_formulation += 1
-        
+
         sol = solve_mpqp(m, getattr(mpqp_algorithm, using))
         if sol.critical_regions:
 

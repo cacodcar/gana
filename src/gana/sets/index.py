@@ -530,21 +530,21 @@ class I:
     #                    Export
     # -----------------------------------------------------
 
-    def sympy(self):
-        """Sympy representation"""
-        if has_sympy:
-            return FiniteSet(*[str(s) for s in self._])
-        logger.warning(
-            "sympy is an optional dependency, pip install gana[all] to get optional dependencies"
-        )
+    # def sympy(self):
+    #     """Sympy representation"""
+    #     if has_sympy:
+    #         return FiniteSet(*[str(s) for s in self._])
+    #     logger.warning(
+    #         "⚠ sympy is an optional dependency, pip install gana[all] to get optional dependencies ⚠"
+    #     )
 
-    def pyomo(self):
-        """Pyomo representation"""
-        if has_pyomo:
-            if self.ordered:
-                return PyoRangeSet(len(self), doc=self.tag)
+    # def pyomo(self):
+    #     """Pyomo representation"""
+    #     if has_pyomo:
+    #         if self.ordered:
+    #             return PyoRangeSet(len(self), doc=self.tag)
 
-            return PyoSet(initialize=[i.name for i in self._], doc=self.tag)
-        logger.warning(
-            "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
-        )
+    #         return PyoSet(initialize=[i.name for i in self._], doc=self.tag)
+    #     logger.warning(
+    #         "⚠ pyomo is an optional dependency, pip install gana[all] to get optional dependencies ⚠"
+    #     )

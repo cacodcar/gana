@@ -30,22 +30,22 @@ def timer(logger: logging.Logger, kind: str = None, level=logging.INFO):
             elapsed = time.time() - start
             if result:
                 if kind == 'generate-mps':
-                    msg = f"📝 Generated {result}.mps"
+                    msg = f"📝  Generated {result}.mps"
 
                 if kind == 'generate-solution':
                     msg = f"📝  Generated Solution object for {result}. See .solution"
 
                 if kind == 'generate-ppopt':
-                    msg = "📝 Generated MPLP. See .formulation"
+                    msg = "📝  Generated MPLP. See .formulation"
 
                 if kind == 'generate-gurobi':
-                    msg = "📝 Generated gurobipy model. See .formulation"
+                    msg = "📝  Generated gurobipy model. See .formulation"
 
                 if kind == 'solve-mpqp':
-                    msg = "✅ Solved MPLP using PPOPT. See .solution"
+                    msg = "✅  Solved MPLP using PPOPT. See .solution"
 
                 if kind == 'optimize':
-                    msg = f"✅ {result[0]} optimized using {result[1]}. Display using .output()"
+                    msg = f"✅  {result[0]} optimized using {result[1]}. Display using .output()"
 
                 logger.log(
                     level,

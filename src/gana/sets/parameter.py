@@ -1666,25 +1666,25 @@ class P:
     #                    Export
     # -----------------------------------------------------
 
-    def sympy(self):
-        """symbolic representation"""
-        if has_sympy:
-            return IndexedBase(str(self))[
-                symbols(",".join([f"{d}" for d in self.index]), cls=Idx)
-            ]
-        logger.warning(
-            "sympy is an optional dependency, pip install gana[all] to get optional dependencies"
-        )
+    # def sympy(self):
+    #     """symbolic representation"""
+    #     if has_sympy:
+    #         return IndexedBase(str(self))[
+    #             symbols(",".join([f"{d}" for d in self.index]), cls=Idx)
+    #         ]
+    #     logger.warning(
+    #         "⚠ sympy is an optional dependency, pip install gana[all] to get optional dependencies ⚠"
+    #     )
 
-    def pyomo(self):
-        """Pyomo representation"""
-        # idx = [i.pyomo() for i in self.index]
-        # return PyoParam(*idx, initialize=self._, doc=str(self))
-        if has_pyomo:
-            return PyoParam(
-                initialize=self._,
-                doc=str(self),
-            )
-        logger.warning(
-            "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
-        )
+    # def pyomo(self):
+    #     """Pyomo representation"""
+    #     # idx = [i.pyomo() for i in self.index]
+    #     # return PyoParam(*idx, initialize=self._, doc=str(self))
+    #     if has_pyomo:
+    #         return PyoParam(
+    #             initialize=self._,
+    #             doc=str(self),
+    #         )
+    #     logger.warning(
+    #         "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
+    #     )

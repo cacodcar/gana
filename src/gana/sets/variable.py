@@ -25,8 +25,13 @@ if TYPE_CHECKING:
     from .theta import T
 
 try:
-    from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
-                               NonNegativeReals, Reals)
+    from pyomo.environ import (
+        Binary,
+        Integers,
+        NonNegativeIntegers,
+        NonNegativeReals,
+        Reals,
+    )
     from pyomo.environ import Var as PyoVar
 
     has_pyomo = True
@@ -418,7 +423,8 @@ class V:
             return self.evaluation[n_sol][theta_vals]
         except KeyError:
             logger.warning(
-                "Run program.eval %s for appropriate solution number first", theta_vals
+                "⛔ Run program.eval %s for appropriate solution number first ⛔",
+                theta_vals,
             )
 
     # -----------------------------------------------------
@@ -1100,37 +1106,37 @@ class V:
     #                    Export
     # -----------------------------------------------------
 
-    def sympy(self):
-        """symbolic representation"""
-        if has_sympy:
-            return IndexedBase(str(self))[
-                symbols(",".join([f"{d}" for d in self.index]), cls=Idx)
-            ]
-        logger.warning(
-            "sympy is an optional dependency, pip install gana[all] to get optional dependencies"
-        )
+    # def sympy(self):
+    #     """symbolic representation"""
+    #     if has_sympy:
+    #         return IndexedBase(str(self))[
+    #             symbols(",".join([f"{d}" for d in self.index]), cls=Idx)
+    #         ]
+    #     logger.warning(
+    #         "sympy is an optional dependency, pip install gana[all] to get optional dependencies"
+    #     )
 
-    def pyomo(self):
-        """Pyomo representation"""
-        if has_pyomo:
-            idx = [i.pyomo() for i in self.index]
-            if self.bnr:
-                return PyoVar(*idx, domain=Binary, doc=str(self))
+    # def pyomo(self):
+    #     """Pyomo representation"""
+    #     if has_pyomo:
+    #         idx = [i.pyomo() for i in self.index]
+    #         if self.bnr:
+    #             return PyoVar(*idx, domain=Binary, doc=str(self))
 
-            elif self.itg:
-                if self.nn:
-                    return PyoVar(*idx, domain=NonNegativeIntegers, doc=str(self))
-                else:
-                    return PyoVar(*idx, domain=Integers, doc=str(self))
+    #         elif self.itg:
+    #             if self.nn:
+    #                 return PyoVar(*idx, domain=NonNegativeIntegers, doc=str(self))
+    #             else:
+    #                 return PyoVar(*idx, domain=Integers, doc=str(self))
 
-            else:
-                if self.nn:
-                    return PyoVar(*idx, domain=NonNegativeReals, doc=str(self))
-                else:
-                    return PyoVar(*idx, domain=Reals, doc=str(self))
-        logger.warning(
-            "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
-        )
+    #         else:
+    #             if self.nn:
+    #                 return PyoVar(*idx, domain=NonNegativeReals, doc=str(self))
+    #             else:
+    #                 return PyoVar(*idx, domain=Reals, doc=str(self))
+    #     logger.warning(
+    #         "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
+    #     )
 
     def draw(
         self,
