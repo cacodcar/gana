@@ -1490,13 +1490,11 @@ class Prg:
                 self.optimized = True
 
                 self._birth_solution()
-                # self.solution[self.n_solution] = self._birth_solution()
-                # self.sol_types["MIP"].append(self.n_solution)
-                # self.n_solution += 1
 
                 return self, using
             except AttributeError:
                 logger.warning("🛑 No solution found. Check the model 🛑")
+
                 return False
 
     @timer(logger, kind='solve-mpqp')

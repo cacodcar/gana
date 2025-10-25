@@ -240,12 +240,12 @@ class V:
     def ltx(self) -> str:
         """LaTeX representation of the variable set"""
         if self._ltx:
-            return r"{" + self._ltx + r"}"
+            return r"{\mathbf{" + self._ltx + r"}}"
         # if user has not set the LaTeX representation
         # the name becomes the latex representation
         if self.name:
-            return r"{" + self.name.replace("_", r"\_") + r"}"
-        return self._ltx
+            return r"{\mathbf{" + self.name.replace("_", r"\_") + r"}}"
+        return r"{\mathbf{" + self._ltx + r"}}"
 
     # -----------------------------------------------------
     #                   Matrix
