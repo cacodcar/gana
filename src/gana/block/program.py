@@ -27,6 +27,7 @@ from ..sets.objective import O
 from ..sets.parameter import P
 from ..sets.theta import T
 from ..sets.variable import V
+from ..utils.decorators import timer
 from .solution import Solution
 
 logger = logging.getLogger("gana")
@@ -34,7 +35,7 @@ logger.setLevel(logging.INFO)
 
 ch = logging.StreamHandler()
 ch.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+formatter = logging.Formatter("[%(levelname)s] %(message)s")
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
@@ -1296,11 +1297,11 @@ class Prg:
     # --------------------------------------------------
     #               Write
     # --------------------------------------------------
-
+    @timer(logger, kind='generate-mps')
     def mps(self, name: str = None):
         """MPS File"""
 
-        logger.info("Generating %s.mps", name or self.name)
+        _name = name or self.name
 
         # 1 unit of whitespace
         ws = " "
@@ -1320,7 +1321,7 @@ class Prg:
         # _A = self.A
 
         # write the MPS file
-        with open(f"{name or self.name}.mps", "w", encoding="utf-8") as f:
+        with open(f"{_name}.mps", "w", encoding="utf-8") as f:
 
             # header: NAME          MODEL_NAME
             f.write(f"NAME{ws*10}{self.name.upper()}\n")
@@ -1450,6 +1451,8 @@ class Prg:
             # CLOSE the MPS file
             f.write("ENDATA")
 
+        return _name
+
     def lp(self):
         """LP File"""
         m = self.gurobi()
@@ -1458,6 +1461,8 @@ class Prg:
     # --------------------------------------------------
     #               Optimize
     # --------------------------------------------------
+
+    @timer(logger, kind='optimize')
     def opt(self, using: str = "gurobi"):
         """Determine the optimal solution to the program"""
 
@@ -1467,10 +1472,8 @@ class Prg:
             self.formulation[self.n_formulation] = m
             self.n_formulation += 1
 
-            logger.info("Optimizing %s using %s", self, using)
             m.optimize()
             try:
-                logger.info("Solution found. Use .output() to display it")
 
                 self.X[self.n_solution] = [v.X for v in m.getVars()]
 
@@ -1485,14 +1488,17 @@ class Prg:
                 self.objectives[-1].X = m.ObjVal
                 self.optimized = True
 
-                logger.info("Creating Solution object, check.solution")
+                self._birth_solution()
+                # self.solution[self.n_solution] = self._birth_solution()
+                # self.sol_types["MIP"].append(self.n_solution)
+                # self.n_solution += 1
 
-                self.solution[self.n_solution] = self.birth_solution()
-                self.sol_types["MIP"].append(self.n_solution)
-                self.n_solution += 1
+                return self, using
             except AttributeError:
                 logger.warning("!!! No solution found. Check the model.")
+                return False
 
+    @timer(logger, kind='solve-mpqp')
     def solve(
         self,
         using: Literal[
@@ -1516,8 +1522,7 @@ class Prg:
         m = self.ppopt()
         self.formulation[self.n_formulation] = m
         self.n_formulation += 1
-        logger.info("Solving %s using PPOPT %s algorithm", self, using)
-
+        
         sol = solve_mpqp(m, getattr(mpqp_algorithm, using))
         if sol.critical_regions:
 
@@ -1548,6 +1553,8 @@ class Prg:
             self.solution[self.n_solution] = sol
             self.sol_types["mp"].append(self.n_solution)
             self.n_solution += 1
+
+        return sol
 
     def eval(
         self, *theta_vals: float, n_sol: int = 0, roundoff: int = 4
@@ -1637,13 +1644,18 @@ class Prg:
         #     for c in self.leqcons():
         #         c.output(n_sol=n_sol, compare=compare)
 
-    def birth_solution(self):
+    @timer(logger, kind='generate-solution')
+    def _birth_solution(self):
         """Makes a solution object for the program"""
 
-        solution = Solution(self.name + "_solution_" + str(self.n_solution))
-        solution.update(self.variables, n_sol=self.n_solution)
+        _solution = Solution(self.name + "_solution_" + str(self.n_solution))
+        _solution.update(self.variables, n_sol=self.n_solution)
 
-        return solution
+        self.solution[self.n_solution] = _solution
+        self.sol_types["MIP"].append(self.n_solution)
+        self.n_solution += 1
+
+        return self
 
     def latex(
         self,
@@ -1762,27 +1774,6 @@ class Prg:
 
         return body
 
-    # # Displaying the program
-    # def latex(self, descriptive: bool = False):
-    #     """Display LaTeX"""
-
-    #     for s in self.sets.index:
-    #         display(s.latex(True))
-
-    #     for o in self.objectives:
-    #         display(o.latex())
-
-    #     if descriptive:
-    #         for c in self.cons():
-    #             display(c.latex())
-
-    #     else:
-    #         for c in self.sets.cons():
-    #             display(c.latex())
-
-    #         for c in self.cons():
-    #             if not c.parent:
-    #                 display(c.latex())
     def show(
         self,
         descriptive: bool = False,
@@ -1892,7 +1883,6 @@ class Prg:
                     _show_section("Equality Constraint Sets", self.eqcons_sets)
                 if getattr(self, "function_sets", None):
                     _show_section("Functions", self.function_sets)
-
 
     # def show(
     #     self,
@@ -2134,9 +2124,7 @@ class Prg:
         _CrB = self.CrB
         _F = self.F
 
-        logger.info("Creating PPOPT MPLP_Program for %s", self)
-
-        return MPLP_Program(
+        _mplp = MPLP_Program(
             A=nparray(_A + _NN),
             b=nparray([[i] for i in _B] + [[0]] * self.n_variables),
             c=nparray([[i] for i in _C]),
@@ -2146,12 +2134,16 @@ class Prg:
             H=npzeros((self.n_variables, self.n_thetas)),
             equality_indices=[c.n for c in self.cons() if c.eq],
         )
+        self.formulation[self.n_formulation] = _mplp
+        self.n_formulation += 1
 
+        return _mplp
+
+    @timer(logger, kind='generate-gurobi')
     def gurobi(self) -> GPModel:
         """Gurobi Model"""
 
         self.mps()
-        logger.info("Creating gurobi model for %s", self)
         return gpread(f"{self}.mps")
 
     # def pyomo(self):

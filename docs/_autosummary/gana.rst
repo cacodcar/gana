@@ -29,7 +29,6 @@
    :recursive:
 
    block
-   examples
    operators
    sets
    shapes
