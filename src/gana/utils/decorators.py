@@ -49,7 +49,7 @@ def timer(logger: logging.Logger, kind: str = None, level=logging.INFO):
 
                 logger.log(
                     level,
-                    f"{msg:<100} ⏱ {elapsed:.4f} s",
+                    f"{msg:<75} ⏱ {elapsed:.4f} s",
                 )
 
             return result
