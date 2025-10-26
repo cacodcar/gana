@@ -8,6 +8,7 @@ from typing import Literal
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
+
 # from numpy import round as npround
 # from numpy import abs as npabs
 from numpy import array as nparray
@@ -791,6 +792,17 @@ class Prg:
                             _members.append(member)
 
                     self.add_indices(index_ex, _members)
+
+                # else:
+                #     # for ordered sets, just birth new elements
+
+                #     value.start = len(index_ex)
+                #     value.name = name
+                #     value.birth_elements()
+                #     index_ex = index_ex | value
+                #     index_ex.
+                #     print(len(index_ex), index_ex.latex())
+                    
 
         elif isinstance(value, V):
 

@@ -88,6 +88,7 @@ class I:
         self,
         *members: str | int,
         size: int = None,
+        start: int = 0,
         mutable: bool = False,
         tag: str = None,
         ltx: str = None,
@@ -98,6 +99,7 @@ class I:
         # set by program
         self.name = ""
         self.n = None
+        self.start = start
 
         # this is when children single element sets are created
         # These will be set in ._
@@ -169,7 +171,7 @@ class I:
             # set that this is ordered
             index.ordered = True
             # give the name
-            index.name = rf"{self}[{n}]"
+            index.name = rf"{self}[{self.start + n}]"
             index._hash = hash(index.name)
             # the only element in element (index set of size one)
             # is itself
@@ -238,7 +240,9 @@ class I:
             # this is a true subset, a single index point
             # not a splice or a step
             if self.parent and isinstance(self.parent, list):
-                self._ltx = r"{" + rf"{self.parent[0].ltx}_{self.pos[0]}" + r"}"
+                self._ltx = (
+                    r"{" + rf"{self.parent[0].ltx}" + r"_{" + rf"{self.pos[0]}" + r"}}"
+                )
             elif not self._ltx:
                 self._ltx = self.name.replace("_", r"\_")
 
@@ -258,7 +262,9 @@ class I:
     #         return '-' + self.name[:-1], ''
     #     return r'{' + self.name + r'}'
 
-    def latex(self, descriptive: bool = True, int_not: bool = False) -> str:
+    def latex(
+        self, descriptive: bool = True, int_not: bool = False, dots_limit: int = 5
+    ) -> str:
         """
         LaTeX representation
 
@@ -266,6 +272,9 @@ class I:
         :type descriptive: bool, optional
         :param int_not: Whether to display the set in integer notation.
         :type int_not: bool, optional
+        :param ddot_limit: Maximum size over which ... is used to represent members.
+        :type ddot_limit: int, optional
+
         :returns: LaTeX representation of the index set
         :rtype: str
         """
@@ -292,31 +301,34 @@ class I:
             return ""
 
         if descriptive:
-            if self.ordered:
-                if int_not:
-                    return (
-                        rf"\{{ i = \mathbb{{{self.ltx}}} \mid "
-                        rf"{self._[0]} \leq i \leq {self._[-1]} \}}"
-                    )
+            if self.ordered and int_not:
                 members = (
-                    r", ".join(x.latex() for x in self._)
-                    if len(self) < 5
-                    else rf"{self._[0].latex()},..,{self._[-1].latex()}"
+                    rf"\{{ i = \mathbb{{{self.ltx}}} \mid "
+                    rf"{self._[0].ltx} \leq i \leq {self._[-1].ltx} \}}"
                 )
-                return rf"{self.ltx} = \{{ {members} \}}"
-
-            members = r", ".join(x.latex() for x in self._)
+            else:
+                members = (
+                    r"{"
+                    + (
+                        r", ".join(x.latex() for x in self._)
+                        if len(self) < dots_limit
+                        else rf"{self._[0].latex()}, \dots ,{self._[-1].latex()}"
+                    )
+                    + r"}"
+                )
             return rf"{self.ltx} = \{{ {members} \}}"
         return self.ltx
 
-    def show(self, descriptive: bool = True):
+    def show(
+        self, descriptive: bool = True, int_not: bool = False, dots_limit: int = 5
+    ):
         """
         Display the set
 
         :param descriptive: Print members of the index set
         :type descriptive: bool, optional
         """
-        display(Math(self.latex(descriptive)))
+        display(Math(self.latex(descriptive, int_not, dots_limit)))
 
     def mps(self, pos: int) -> str:
         """
@@ -364,6 +376,8 @@ class I:
         # element index sets (X) again
         index.members = members
         index.ordered = self.ordered
+        index.size = len(members)
+        index.mutable = self.mutable
         return index
 
     # -----------------------------------------------------
