@@ -38,7 +38,7 @@ def test_var(p):
         'bnr': False,
         'mutable': False,
         'tag': 'Empty Variable',
-        'ltx': r'{v}',
+        'ltx': r'{\mathbf{v}}',
     }
     assert is_(p.cap(p.pv, p.y[0])[0], p.cap[0])
     assert is_(p.cap(p.pv, p.y[1])[0], p.cap[1])

@@ -16,7 +16,9 @@ def once(func):
     return wrapper
 
 
-def timer(logger: logging.Logger, kind: str = None, level=logging.INFO):
+def timer(
+    logger: logging.Logger, kind: str = None, with_return=True, level=logging.INFO
+):
     """
     Logs execution time and optionally shows a full computation using function arguments and result.
     """
@@ -30,6 +32,7 @@ def timer(logger: logging.Logger, kind: str = None, level=logging.INFO):
             elapsed = time.time() - start
             if result:
                 if kind == 'generate-mps':
+                    _return = False
                     msg = f"📝  Generated {result}.mps"
 
                 if kind == 'generate-solution':
@@ -52,7 +55,8 @@ def timer(logger: logging.Logger, kind: str = None, level=logging.INFO):
                     f"{msg:<75} ⏱ {elapsed:.4f} s",
                 )
 
-            return result
+            if with_return:
+                return result
 
         return wrapper
 

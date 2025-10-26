@@ -185,16 +185,8 @@ class P:
         """Return the arguments of the parameter set"""
         return {"tag": self.tag, "ltx": self.ltx, "mutable": self.mutable}
 
-    @property
-    def ltx(self) -> str:
-        """LaTeX representation of the variable set"""
-        if self._ltx:
-            return r"{" + self._ltx + r"}"
-        # if user has not set the LaTeX representation
-        # the name becomes the latex representation
-        if self.name:
-            return r"{" + self.name.replace("_", r"\_") + r"}"
-        return self._ltx
+
+
 
     # -----------------------------------------------------
     #                   Matrix
@@ -207,7 +199,26 @@ class P:
     # -----------------------------------------------------
     #                    Printing
     # -----------------------------------------------------
+    @property
+    def ltx(self) -> str:
+        """LaTeX representation"""
+        if not self._ltx:
+            # use name if no LaTeX 
+            self._ltx = self.name.replace("_", r"\_") 
+        return r"{\mathrm{" + self._ltx + r"}}"
 
+    @property
+    def index_ltx(self) -> str:
+        """LaTeX representation of the index"""
+        if len(self.index) == 1:
+            return self.index[0].ltx
+
+        if isinstance(self.index, set):
+            return (
+                rf"({')|('.join(','.join(i.ltx for i in idx) for idx in self.index)})"
+            )
+        return rf"{','.join(i.ltx if not isinstance(i, list) else i[0].ltx for i in self.index)}"
+    
     def latex(self) -> str:
         """
         LaTeX representation
@@ -218,23 +229,8 @@ class P:
 
         if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
             return str(self)
-
-        index = (
-            r"_{"
-            + rf"{self.index}".replace("(", "")
-            .replace(")", "")
-            .replace("[", "{")
-            .replace("]", "}")
-            + r"}"
-        )
-
-        if len(self.index) == 1:
-            # if there is a single index element
-            # then a comma will show up in the end, replace that
-            return self.ltx + index.replace(",", "")  # type: ignore
-
-        return self.ltx + index
-
+        return self.ltx + r"_{" + self.index_ltx + r"}"
+    
     def show(self, descriptive: bool = False):
         """Display the variables
 

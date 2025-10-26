@@ -143,7 +143,7 @@ class I:
         self.constraints = []
 
         # if latex name is given
-        self.ltx = ltx
+        self._ltx = ltx
 
         if dummy:
             self.case = ICase.DUMMY
@@ -177,7 +177,7 @@ class I:
             index.size = 1
             index.members = [index.name]
             self._.append(index)
-            index.ltx = rf"{self.ltx}[{n}]"
+            # index.ltx = r"{" + rf"{self.ltx}_{n}" + r"}"
 
     # -----------------------------------------------------
     #                    Modifiers
@@ -224,13 +224,27 @@ class I:
         # only done for index set
         index.ordered = True
         # latex representation
-        index.ltx = self.ltx
+        index._ltx = self.ltx
 
         return index
 
     # -----------------------------------------------------
     #                    Printing
     # -----------------------------------------------------
+    @property
+    def ltx(self) -> str:
+        """LaTeX representation"""
+        if self.ordered:
+            # this is a true subset, a single index point
+            # not a splice or a step
+            if self.parent and isinstance(self.parent, list):
+                self._ltx = r"{" + rf"{self.parent[0].ltx}_{self.pos[0]}" + r"}"
+            elif not self._ltx:
+                self._ltx = self.name.replace("_", r"\_")
+
+        else:
+            self._ltx = self.name.replace("_", r"\_")
+        return r"{" + self._ltx + r"}"
 
     # def nsplit(self):
     #     """Split the name
@@ -259,22 +273,19 @@ class I:
         if not self.name:
             return ""
 
-        # if the name has underscores, replace them with \_
-        ltx = self.name.replace("_", r"\_")
+        # if self.parent and any(parent.ordered for parent in self.parent):
+        #     ltx = ltx.replace("[", "_{").replace("]", "}")
+        #     ltx = r"{" + ltx + r"}"
 
-        if self.parent and any(parent.ordered for parent in self.parent):
-            ltx = ltx.replace("[", "_{").replace("]", "}")
-            ltx = r"{" + ltx + r"}"
-
-        else:
-            ltx = ltx.replace("[", "{").replace("]", "}")
+        # else:
+        #     ltx = ltx.replace("[", "{").replace("]", "}")
 
         # name, sup = self.nsplit()
-        ltx = ltx.replace("|", r"\cup")
+        # self.ltx = self.ltx
         # mathcal = rf'\mathcal{{{name}{sup}}}'
 
         if self.parent:
-            return ltx
+            return self.ltx
 
         if self.case == ICase.SELF:
             # if this is a self contained index
@@ -284,7 +295,7 @@ class I:
             if self.ordered:
                 if int_not:
                     return (
-                        rf"\{{ i = \mathbb{{{ltx}}} \mid "
+                        rf"\{{ i = \mathbb{{{self.ltx}}} \mid "
                         rf"{self._[0]} \leq i \leq {self._[-1]} \}}"
                     )
                 members = (
@@ -292,12 +303,11 @@ class I:
                     if len(self) < 5
                     else rf"{self._[0].latex()},..,{self._[-1].latex()}"
                 )
-                return rf"{ltx} = \{{ {members} \}}"
+                return rf"{self.ltx} = \{{ {members} \}}"
 
             members = r", ".join(x.latex() for x in self._)
-            return rf"{ltx} = \{{ {members} \}}"
-
-        return ltx
+            return rf"{self.ltx} = \{{ {members} \}}"
+        return self.ltx
 
     def show(self, descriptive: bool = True):
         """

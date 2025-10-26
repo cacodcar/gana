@@ -8,7 +8,6 @@ from typing import Literal
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
-
 # from numpy import round as npround
 # from numpy import abs as npabs
 from numpy import array as nparray
@@ -1298,7 +1297,7 @@ class Prg:
     # --------------------------------------------------
     #               Write
     # --------------------------------------------------
-    @timer(logger, kind='generate-mps')
+    @timer(logger, kind='generate-mps', with_return=False)
     def mps(self, name: str = None):
         """MPS File"""
 
@@ -1463,7 +1462,7 @@ class Prg:
     #               Optimize
     # --------------------------------------------------
 
-    @timer(logger, kind='optimize')
+    @timer(logger, kind='optimize', with_return=False)
     def opt(self, using: str = "gurobi"):
         """Determine the optimal solution to the program"""
 
@@ -1492,6 +1491,7 @@ class Prg:
                 self._birth_solution()
 
                 return self, using
+
             except AttributeError:
                 logger.warning("🛑 No solution found. Check the model 🛑")
 
@@ -1643,7 +1643,7 @@ class Prg:
         #     for c in self.leqcons():
         #         c.output(n_sol=n_sol, compare=compare)
 
-    @timer(logger, kind='generate-solution')
+    @timer(logger, kind='generate-solution', with_return=False)
     def _birth_solution(self):
         """Makes a solution object for the program"""
 
@@ -1882,159 +1882,6 @@ class Prg:
                     _show_section("Equality Constraint Sets", self.eqcons_sets)
                 if getattr(self, "function_sets", None):
                     _show_section("Functions", self.function_sets)
-
-    # def show(
-    #     self,
-    #     descriptive: bool = False,
-    #     nncons: bool = False,
-    #     categorical: bool = False,
-    #     category: str = None,
-    # ):
-    #     """Pretty Print"""
-
-    #     display(Markdown(rf"# Mathematical Program for {self}"))
-
-    #     if category:
-    #         categorical = True
-
-    #     if self.index_sets:
-    #         display(Markdown("<br><br>"))
-    #         display(Markdown(r"## Index Sets"))
-
-    #         for i in self.index_sets:
-    #             if len(i) != 0 and i.case != ICase.SELF:
-    #                 i.show(True)
-
-    #     if self.objectives:
-    #         display(Markdown("<br><br>"))
-    #         display(Markdown(r"## Objective"))
-
-    #         for o in self.objectives:
-    #             o.show()
-
-    #     if descriptive:
-
-    #         display(Markdown("<br><br>"))
-    #         display(Markdown(r"## s.t."))
-
-    #         if categorical:
-    #             # gather the categories if not already done
-    #             categories: dict[str, list[C]] = {}
-    #             fcategories: dict[str, list[Func]] = {}
-    #             for c in self.cons():
-    #                 if c.category not in categories:
-    #                     categories[c.category] = []
-    #                 categories[c.category].append(c)
-    #             if category and category in categories:
-    #                 sorted_categories = [category]
-    #             else:
-    #                 sorted_categories = sorted(categories.keys())
-    #             self.categories = categories
-
-    #             for f in self.function_sets:
-    #                 if f.category not in fcategories:
-    #                     fcategories[f.category] = []
-    #                 fcategories[f.category].append(f)
-    #             if category and category in fcategories:
-    #                 sorted_fcategories = [category]
-    #             else:
-    #                 sorted_fcategories = sorted(fcategories.keys())
-    #             self.fcategories = fcategories
-
-    #             for category in sorted_categories:
-    #                 display(Markdown(rf"### {category} Constraints"))
-    #                 for c in categories[category]:
-    #                     c.show()
-    #             for category in sorted_fcategories:
-    #                 display(Markdown(rf"### {category} Functions"))
-    #                 for f in fcategories[category]:
-    #                     f.show()
-
-    #         else:
-
-    #             if self.leqcons():
-    #                 display(Markdown(r"### Inequality Constraints"))
-    #                 for c in self.leqcons():
-    #                     c.show()
-    #             if self.eqcons():
-    #                 display(Markdown(r"### Equality Constraints"))
-    #                 for c in self.eqcons():
-    #                     c.show()
-
-    #             if self.nncons() and nncons:
-    #                 display(Markdown(r"### Non-Negative Constraints"))
-    #                 for c in self.nncons():
-    #                     c.show()
-
-    #             if self.functions:
-    #                 display(Markdown("<br><br>"))
-    #                 display(Markdown(r"## Functions"))
-    #                 for f in self.functions:
-    #                     f.show()
-
-    #     else:
-
-    #         # if self.sets.nncons():
-    #         #     display(Markdown('<br><br>'))
-    #         #     display(Markdown(r'## Non-Negative Variables'))
-    #         #     self.sets.I_nn.show()
-
-    #         display(Markdown("<br><br>"))
-    #         display(Markdown(r"## s.t."))
-
-    #         if categorical:
-    #             # gather the categories if not already done
-    #             categories_sets: dict[str, list[C]] = {}
-    #             fcategories_sets: dict[str, list[Func]] = {}
-
-    #             for c in self.constraint_sets:
-    #                 if c.category not in categories_sets:
-    #                     categories_sets[c.category] = []
-    #                 categories_sets[c.category].append(c)
-    #             if category and category in categories_sets:
-    #                 sorted_categories = [category]
-    #             else:
-    #                 sorted_categories = sorted(categories_sets.keys())
-    #             self.categories_sets = categories_sets
-
-    #             for f in self.function_sets:
-    #                 if f.category not in fcategories_sets:
-    #                     fcategories_sets[f.category] = []
-    #                 fcategories_sets[f.category].append(f)
-    #             if category and category in fcategories_sets:
-    #                 sorted_fcategories = [category]
-    #             else:
-    #                 sorted_fcategories = sorted(fcategories_sets.keys())
-    #             self.fcategories_sets = fcategories_sets
-
-    #             for category in sorted_categories:
-    #                 display(Markdown(rf"### {category} Constraint Sets"))
-    #                 for c in categories_sets[category]:
-    #                     c.show()
-
-    #             for category in sorted_fcategories:
-    #                 display(Markdown(rf"### {category} Function Sets"))
-    #                 for f in fcategories_sets[category]:
-    #                     f.show()
-
-    #         else:
-
-    #             if self.leqcons_sets:
-    #                 display(Markdown("<br><br>"))
-    #                 display(Markdown(r"### Inequality Constraint Sets"))
-    #                 for c in self.leqcons_sets:
-    #                     c.show()
-    #             if self.eqcons_sets:
-    #                 display(Markdown("<br><br>"))
-    #                 display(Markdown(r"### Equality Constraint Sets"))
-    #                 for c in self.eqcons_sets:
-    #                     c.show()
-
-    #             if self.function_sets:
-    #                 display(Markdown("<br><br>"))
-    #                 display(Markdown(r"## Functions"))
-    #                 for f in self.function_sets:
-    #                     f.show()
 
     def draw(self, variable: V = None, n_sol: int = 0):
         """Plots the solution for a variable"""
