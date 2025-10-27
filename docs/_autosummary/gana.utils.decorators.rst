@@ -1,4 +1,4 @@
-﻿gana.utils.decorators
+gana.utils.decorators
 =====================
 
 .. automodule:: gana.utils.decorators
