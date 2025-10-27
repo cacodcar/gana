@@ -1,4 +1,4 @@
-gana.utils.decorators
+﻿gana.utils.decorators
 =====================
 
 .. automodule:: gana.utils.decorators
@@ -9,4 +9,6 @@ gana.utils.decorators
    .. autosummary::
    
       once
+      timer
+      wraps
    

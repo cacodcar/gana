@@ -1,4 +1,4 @@
-gana.block.program
+﻿gana.block.program
 ==================
 
 .. automodule:: gana.block.program
@@ -18,6 +18,7 @@ gana.block.program
       parametric_plot
       solve_mpqp
       sup
+      timer
    
    .. rubric:: Classes
 
