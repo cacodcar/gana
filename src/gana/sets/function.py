@@ -20,7 +20,8 @@ if TYPE_CHECKING:
 
 class F:
     r"""
-    Provides relational operations between parameter sets, variable sets, or function sets (F).
+    Provides relational operations between parameter, variable, parametric variable,
+    or function sets (F).
 
     This class is not intended to be declared by the user directly.
     It is constructed based on operations between parameter sets (P or list of numbers or number),
