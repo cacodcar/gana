@@ -968,7 +968,7 @@ class F:
 
             # use i for summed index
             index = [
-                "i" if n == pos else str(i).replace("[", "").replace("]", "")
+                "i" if n == pos else i.ltx.replace("[", "").replace("]", "")
                 for n, i in enumerate(v.index)
             ]
             index = ", ".join(index)

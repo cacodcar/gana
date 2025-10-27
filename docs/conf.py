@@ -26,7 +26,7 @@ sys.setrecursionlimit(10000)
 project = 'Gana'
 copyright = str(datetime.now().year)
 author = 'Rahul Kakodkar'
-release = '1.0.4'
+release = '1.0.5'
 
 
 html_logo = "_static/ganalogo.jpg"
