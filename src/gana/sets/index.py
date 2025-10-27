@@ -211,11 +211,13 @@ class I:
             index._ = [None] * -n + in_index
             # the negative sign will come with n
             index.name = f"{self.name}{n}"
+            index._ltx = rf"{self.ltx}{n}"
         else:
             in_index = self._[n:]
             index._ = in_index + [None] * n
             # + needs to be provided
             index.name = f"{self.name}+{n}"
+            index._ltx = rf"{self.ltx}+{n}"
 
         # update the members
         index.members = [i.name for i in in_index]
@@ -225,8 +227,6 @@ class I:
         index.size = self.size
         # only done for index set
         index.ordered = True
-        # latex representation
-        index._ltx = self.ltx
 
         return index
 
