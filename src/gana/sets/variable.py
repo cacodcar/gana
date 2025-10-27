@@ -100,8 +100,8 @@ class V:
         nn: bool = True,
         bnr: bool = False,
         mutable: bool = False,
-        tag: str = None,
-        ltx: str = None,
+        tag: str = "",
+        ltx: str = "",
     ):
         # these are always given during declaration
         self.tag = tag
@@ -231,16 +231,6 @@ class V:
             "ltx": self.ltx,
         }
 
-    @property
-    def ltx(self) -> str:
-        """LaTeX representation of the variable set"""
-        if self._ltx:
-            return r"{" + self._ltx + r"}"
-        # if user has not set the LaTeX representation
-        # the name becomes the latex representation
-        if self.name:
-            return r"{" + self.name.replace("_", r"\_") + r"}"
-        return self._ltx
 
     # -----------------------------------------------------
     #                   Matrix
@@ -418,44 +408,46 @@ class V:
             return self.evaluation[n_sol][theta_vals]
         except KeyError:
             logger.warning(
-                f"Run program.eval{theta_vals} for appropriate solution number first"
+                "⛔ Run program.eval %s for appropriate solution number first ⛔",
+                theta_vals,
             )
 
     # -----------------------------------------------------
     #                    Printing
     # -----------------------------------------------------
 
-    def latex(self, index_only: bool = False) -> str:
+    @property
+    def ltx(self) -> str:
+        """LaTeX representation"""
+
+        if self.parent:
+            return self._ltx
+
+        if not self._ltx:
+            # use name if no LaTeX
+            self._ltx = self.name.replace("_", r"\_")
+
+        return r"{\mathbf{" + self._ltx + r"}}"
+
+    @property
+    def index_ltx(self) -> str:
+        """LaTeX representation of the index"""
+        if len(self.index) == 1:
+            return self.index[0].ltx
+
+        if isinstance(self.index, set):
+            return (
+                rf"({')|('.join(','.join(i.ltx for i in idx) for idx in self.index)})"
+            )
+        return rf"{','.join(i.ltx if not isinstance(i, list) else i[0].ltx for i in self.index)}"
+        
+    def latex(self) -> str:
         """
         LaTeX representation
-
-        :param index_only: If only the index representation is needed. Defaults to False.
-        :type index_only: bool, optional
-
         :returns: LaTeX representation of the variable set
         :rtype: str
         """
-        index = (
-            r"_{"
-            + rf"{self.index}".replace("), (", "|")
-            .replace("(", "")
-            .replace(")", "")
-            .replace("[", "{")
-            .replace("]", "}")
-            + r"}"
-        )
-
-        if index_only:
-            # if only index is requested
-            # return the index in latex format
-            return index
-
-        if len(self.index) == 1:
-            # if there is a single index element
-            # then a comma will show up in the end, replace that
-            return self.ltx + index.replace(",", "")  # type: ignore
-
-        return self.ltx + index
+        return self.ltx + r"_{" + self.index_ltx + r"}"
 
     def show(self, descriptive: bool = False):
         """
@@ -1100,37 +1092,37 @@ class V:
     #                    Export
     # -----------------------------------------------------
 
-    def sympy(self):
-        """symbolic representation"""
-        if has_sympy:
-            return IndexedBase(str(self))[
-                symbols(",".join([f"{d}" for d in self.index]), cls=Idx)
-            ]
-        logger.warning(
-            "sympy is an optional dependency, pip install gana[all] to get optional dependencies"
-        )
+    # def sympy(self):
+    #     """symbolic representation"""
+    #     if has_sympy:
+    #         return IndexedBase(str(self))[
+    #             symbols(",".join([f"{d}" for d in self.index]), cls=Idx)
+    #         ]
+    #     logger.warning(
+    #         "sympy is an optional dependency, pip install gana[all] to get optional dependencies"
+    #     )
 
-    def pyomo(self):
-        """Pyomo representation"""
-        if has_pyomo:
-            idx = [i.pyomo() for i in self.index]
-            if self.bnr:
-                return PyoVar(*idx, domain=Binary, doc=str(self))
+    # def pyomo(self):
+    #     """Pyomo representation"""
+    #     if has_pyomo:
+    #         idx = [i.pyomo() for i in self.index]
+    #         if self.bnr:
+    #             return PyoVar(*idx, domain=Binary, doc=str(self))
 
-            elif self.itg:
-                if self.nn:
-                    return PyoVar(*idx, domain=NonNegativeIntegers, doc=str(self))
-                else:
-                    return PyoVar(*idx, domain=Integers, doc=str(self))
+    #         elif self.itg:
+    #             if self.nn:
+    #                 return PyoVar(*idx, domain=NonNegativeIntegers, doc=str(self))
+    #             else:
+    #                 return PyoVar(*idx, domain=Integers, doc=str(self))
 
-            else:
-                if self.nn:
-                    return PyoVar(*idx, domain=NonNegativeReals, doc=str(self))
-                else:
-                    return PyoVar(*idx, domain=Reals, doc=str(self))
-        logger.warning(
-            "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
-        )
+    #         else:
+    #             if self.nn:
+    #                 return PyoVar(*idx, domain=NonNegativeReals, doc=str(self))
+    #             else:
+    #                 return PyoVar(*idx, domain=Reals, doc=str(self))
+    #     logger.warning(
+    #         "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
+    #     )
 
     def draw(
         self,

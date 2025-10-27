@@ -18,6 +18,7 @@
       parametric_plot
       solve_mpqp
       sup
+      timer
    
    .. rubric:: Classes
 

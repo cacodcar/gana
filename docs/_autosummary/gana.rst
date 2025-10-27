@@ -30,7 +30,6 @@
 
    block
    operators
-   programs
    sets
    shapes
    utils

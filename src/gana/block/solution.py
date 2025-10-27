@@ -40,7 +40,7 @@ class Solution:
                     "index": [],
                 }
             self._[v.parent.name]["latex"].append(v.latex())
-            self._[v.parent.name]["index_latex"].append(r"$" + v.latex(True) + r"$")
+            self._[v.parent.name]["index_latex"].append(r"$" + v.index_ltx + r"$")
             self._[v.parent.name]["positions"].append(v.pos)
             self._[v.parent.name]["n"].append(v.n)
             if v.X:
