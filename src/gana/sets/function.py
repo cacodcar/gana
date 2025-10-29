@@ -5,7 +5,6 @@ from __future__ import annotations
 from functools import cached_property
 from itertools import product
 from typing import TYPE_CHECKING, Self
-from weakref import WeakValueDictionary, proxy
 
 from IPython.display import Math, display
 
@@ -101,7 +100,7 @@ class F:
 
     :raises ValueError: If none of `mul`, `add`, `sub`, or `div` is True
     """
-    
+
     def __init__(
         self,
         # ------Elements -----------
@@ -133,7 +132,7 @@ class F:
         # members of the function set
         self._: list[F] = []
         # maps indices to functions in the set
-        self.map = WeakValueDictionary()
+        self.map = {}
         self.index = index
         # special function cases
         self.case = case
@@ -557,9 +556,7 @@ class F:
 
         _ = []
         map_ = self.map
-        n_functions = min(
-            len(self._one), len(self._two)
-        )  
+        n_functions = min(len(self._one), len(self._two))
         _one_map = list(self._one_map)
         _two_map = list(self._two_map)
 
@@ -579,7 +576,7 @@ class F:
                     index += tuple(two_idx)
                 else:
                     index += (tuple(two_idx),)
-                index = tuple(index)  
+                index = tuple(index)
 
             if two is None:
                 if isinstance(one, (int, float)):
@@ -592,7 +589,7 @@ class F:
                     f.map[index] = f
             else:
                 f = F()
-                f.parent = proxy(self)
+                f.parent = self
                 f.index = index
 
                 f.one = one if one_type in {ElemP, ElemT} else one(*one_idx)
@@ -626,106 +623,6 @@ class F:
         # Replace self._ and set self.n once, outside the loop
         self._ = _
         self.n = len(_)
-
-    # def birth_functions(self):
-    #     """
-    #     Creates a vector of functions
-    #     Accordingly sets n
-    #     sets self._, self.n
-    #     """
-
-    #     n_elements = min(len(self._one), len(self._two))
-
-    #     # _one and _two are used because
-    #     # they are created post handling an length mismatches
-    #     # for n, (one, one_idx, two, two_idx) in enumerate(
-    #     #     zip(self._one, self._one_map, self._two, self._two_map)
-    #     # ):
-
-    #     _one_map = list(self._one_map)
-    #     _two_map = list(self._two_map)
-
-    #     for n in range(n_elements):
-
-    #         one = self._one[n]
-    #         one_idx = _one_map[n]
-    #         two = self._two[n]
-    #         two_idx = _two_map[n]
-
-    #         # only update the indices for F and V for functions
-    #         index: tuple[tuple[I]] = []
-
-    #         if self.one_type == Elem.F:
-    #             index += one_idx
-
-    #         else:
-
-    #             # if self.one_type == Elem.V:
-    #             index += (one_idx,)
-
-    #         if two is None:
-    #             # you can have just a P or T masquerading as a function
-    #             # so check are unnecessary
-    #             # f = one(*one.index)
-
-    #             index = tuple(index)
-
-    #             if isinstance(one, (int, float)):
-    #                 # this happens when there is a skipped index
-    #                 self.map[index] = None
-    #                 self._.append(None)
-    #                 continue
-    #             else:
-    #                 f = one()
-    #                 f.map[index] = f
-
-    #         else:
-    #             # this is done to handle skipping
-    #             #  for shifted indices (.step)
-    #             if self.two_type == Elem.F:
-    #                 index += two_idx
-
-    #             else:
-    #                 index += (two_idx,)
-
-    #             index = tuple(index)
-
-    #             f = F()
-    #             f.parent = proxy(self)
-    #             f.index = index
-
-    #             if one:
-    #                 if self.one_type in [Elem.P, Elem.T]:
-    #                     f.one = one
-    #                 else:
-
-    #                     f.one = one(*one_idx)
-
-    #             if self.two_type in [Elem.P, Elem.T]:
-    #                 f.two = two
-    #             else:
-    #                 f.two = two(*two_idx)
-
-    #             f.pos = n
-    #             f.one_type, f.two_type = self.one_type, self.two_type
-    #             f.mul, f.add, f.sub, f.div = self.mul, self.add, self.sub, self.div
-    #             f.rel = self.rel
-    #             f.consistent = self.consistent
-    #             f.case = self.case
-    #             f.issumhow = self.issumhow
-
-    #             f.update_variables()
-    #             f.give_name()
-    #             f.map[one_idx, two_idx] = f
-    #             f.A = self.A[n]
-    #             f.B = self.B[n]
-
-    #         # update the map
-    #         self.map[index] = f
-
-    #         # only member of the birthed function is itself
-    #         f._ = [f]  # populate the set
-    #         self._.append(f)
 
     def update_variables(self):
         """Updates the variables in the function"""

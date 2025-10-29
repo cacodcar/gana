@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.6] - 2025-10-29
 ### Changed
-- Using weak references for maps 
+- Cleaner sigma and birth functions
 
 
 ## [1.0.5] - 2025-10-27

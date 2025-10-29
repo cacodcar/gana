@@ -32,7 +32,6 @@ def timer(
             elapsed = time.time() - start
             if result:
                 if kind == 'generate-mps':
-                    _return = False
                     msg = f"📝  Generated {result}.mps"
 
                 if kind == 'generate-solution':

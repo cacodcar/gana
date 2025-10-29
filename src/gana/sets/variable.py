@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 from itertools import product
 from typing import TYPE_CHECKING, Self
-from weakref import WeakValueDictionary, proxy
 
 from IPython.display import Math, display
 from matplotlib import pyplot as plt
@@ -142,7 +141,7 @@ class V:
             # if index is a set of indices,
             # needs to be done for each index
             _index = []
-            _map = WeakValueDictionary()
+            _map = {}
             for idx in index:
                 _index.append(tuple([i if not isinstance(i, V) else [i] for i in idx]))
 
@@ -161,7 +160,7 @@ class V:
                 _map = {i: None for i in product(*_index)}
 
             else:
-                _map = WeakValueDictionary()
+                _map = {}
 
         self.index: tuple[I, ...] | set[tuple[I, ...]] = _index
         self.map: dict[tuple[I, ...], V] = _map
@@ -1067,7 +1066,6 @@ class V:
             try:
                 v.map[index] = variable
             except TypeError:
-                # variable cannot be weakly referenced
                 v.map = {index: variable}
 
             v._.append(variable)
