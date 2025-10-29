@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from itertools import product
 from typing import TYPE_CHECKING, Self
+from weakref import WeakValueDictionary, proxy
 
 from IPython.display import Math, display
 from matplotlib import pyplot as plt
@@ -141,7 +142,7 @@ class V:
             # if index is a set of indices,
             # needs to be done for each index
             _index = []
-            _map = {}
+            _map = WeakValueDictionary()
             for idx in index:
                 _index.append(tuple([i if not isinstance(i, V) else [i] for i in idx]))
 
@@ -160,7 +161,7 @@ class V:
                 _map = {i: None for i in product(*_index)}
 
             else:
-                _map = {}
+                _map = WeakValueDictionary()
 
         self.index: tuple[I, ...] | set[tuple[I, ...]] = _index
         self.map: dict[tuple[I, ...], V] = _map
@@ -230,7 +231,6 @@ class V:
             "tag": self.tag,
             "ltx": self.ltx,
         }
-
 
     # -----------------------------------------------------
     #                   Matrix
@@ -440,7 +440,7 @@ class V:
                 rf"({')|('.join(','.join(i.ltx for i in idx) for idx in self.index)})"
             )
         return rf"{','.join(i.ltx if not isinstance(i, list) else i[0].ltx for i in self.index)}"
-        
+
     def latex(self) -> str:
         """
         LaTeX representation
@@ -1063,7 +1063,13 @@ class V:
                 variable = None
             else:
                 variable = self.map[index]
-            v.map[index] = variable
+
+            try:
+                v.map[index] = variable
+            except TypeError:
+                # variable cannot be weakly referenced
+                v.map = {index: variable}
+
             v._.append(variable)
 
         return v

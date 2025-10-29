@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from functools import cached_property
 from itertools import product
 from typing import TYPE_CHECKING, Self
+from weakref import WeakValueDictionary, proxy
 
 from IPython.display import Math, display
 
@@ -131,7 +133,7 @@ class F:
         # members of the function set
         self._: list[F] = []
         # maps indices to functions in the set
-        self.map = {}
+        self.map = WeakValueDictionary()
         self.index = index
         # special function cases
         self.case = case
@@ -593,7 +595,7 @@ class F:
                 index = tuple(index)
 
                 f = F()
-                f.parent = self
+                f.parent = proxy(self)
                 f.index = index
 
                 if one:
@@ -626,8 +628,7 @@ class F:
             self.map[index] = f
 
             # only member of the birthed function is itself
-            f._ = [f]
-            # populate the set
+            f._ = [f]  # populate the set
             self._.append(f)
 
     def update_variables(self):
@@ -1077,7 +1078,7 @@ class F:
         else:
             display(Math(rf"[{self.n}]" + r"\text{   }" + self.latex()))
 
-    @property
+    @cached_property
     def longname(self):
         """Gives a longer more descriptive name for the function"""
         _name = ""

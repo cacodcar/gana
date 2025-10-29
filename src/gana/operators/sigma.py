@@ -28,7 +28,7 @@ def sigma(variable: V, over: I = None, position: int = None) -> F:
     :rtype: F
     """
 
-    def _handle(over, position):
+    def _determine_index(over, position):
         if over:
             length = len(over)
 
@@ -93,7 +93,7 @@ def sigma(variable: V, over: I = None, position: int = None) -> F:
             f_child.one_type = Elem.F
         return f
 
-    _variables, over, length, position = _handle(over, position)
+    _variables, over, length, position = _determine_index(over, position)
 
     if length == 2:
         # short-circuit for length 2
