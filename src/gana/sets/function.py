@@ -101,7 +101,7 @@ class F:
 
     :raises ValueError: If none of `mul`, `add`, `sub`, or `div` is True
     """
-
+    
     def __init__(
         self,
         # ------Elements -----------
