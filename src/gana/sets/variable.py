@@ -231,7 +231,6 @@ class V:
             "ltx": self.ltx,
         }
 
-
     # -----------------------------------------------------
     #                   Matrix
     # -----------------------------------------------------
@@ -440,7 +439,7 @@ class V:
                 rf"({')|('.join(','.join(i.ltx for i in idx) for idx in self.index)})"
             )
         return rf"{','.join(i.ltx if not isinstance(i, list) else i[0].ltx for i in self.index)}"
-        
+
     def latex(self) -> str:
         """
         LaTeX representation
@@ -1063,7 +1062,12 @@ class V:
                 variable = None
             else:
                 variable = self.map[index]
-            v.map[index] = variable
+
+            try:
+                v.map[index] = variable
+            except TypeError:
+                v.map = {index: variable}
+
             v._.append(variable)
 
         return v

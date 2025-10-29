@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 def sigma(variable: V, over: I = None, position: int = None) -> F:
     """
-    Summation, allows better printing, avoids recurssion error
+    Summation without recursion, also allows better printing
 
     :param variable: variable set
     :type variable: V
@@ -28,75 +28,78 @@ def sigma(variable: V, over: I = None, position: int = None) -> F:
     :rtype: F
     """
 
-    if over:
-        length = len(over)
+    def _determine_index(over, position):
+        if over:
+            length = len(over)
 
-        if not position:
-            position = variable.index.index(over)
+            if not position:
+                position = variable.index.index(over)
 
-        # Precompute slices
-        before = variable.index[:position]
-        after = variable.index[position + 1 :]
+            # Precompute slices
+            before = variable.index[:position]
+            after = variable.index[position + 1 :]
 
-        # Build variables
-        _variables = [
-            variable(*before, _index, *after, make_new=True) for _index in over
-        ]
+            # Build variables
+            _variables = [
+                variable(*before, _index, *after, make_new=True) for _index in over
+            ]
 
-    else:
-        # sum over the entire set
-        _variables = variable._
-        length = len(variable)
-        position = None
-        over = variable.index
+        else:
+            # sum over the entire set
+            _variables = variable._
+            length = len(variable)
+            position = None
+            over = variable.index
+
+        return _variables, over, length, position
+
+    def _birth_parent(variable, _variables, over, position, length):
+        _f = F()
+        _f.case = FCase.SUM
+        _f.issumhow = (variable.copy(), over, position)
+        _f.variables = _variables
+        _f.index = tuple(v.index for v in _f.variables)
+        _f.one = _f
+        _f.one_type = Elem.F
+        _f.give_name()
+
+        _f.rhs_thetas = []
+        length_var = len(_variables[0])
+        keys = list(zip(*(v.map for v in _f.variables)))
+        _f.A = [[1] * length for _ in range(length_var)]
+        return _f, length_var, keys
+
+    def _birth_children(f, length_var, keys):
+        for n in range(length_var):
+            # make the child functions
+            f_child = F()
+            f_child.variables = [v[n] for v in f.variables]
+            f_child.P = [v.n for v in f_child.variables]
+            f_child.A = [1] * length
+            key = keys[n]
+            f_child.issumhow = (variable[length * n], over, position)
+            f_child.parent = f
+            f_child.case = FCase.SUM
+            f_child.rhs_thetas = []
+            f.P.append(f_child.P)
+            f_child.give_name()
+            f_child._ = [f_child]
+            f._.append(f_child)
+            f.map[key] = f_child
+            f_child.map[key] = f_child
+            f_child.parent = f
+            f_child.index = key
+            f_child.one = f_child
+            f_child.one_type = Elem.F
+        return f
+
+    _variables, over, length, position = _determine_index(over, position)
 
     if length == 2:
-        # this checks for v_0 + v_1
+        # short-circuit for length 2
+        # just v_0 + v_1
         return _variables[0] + _variables[1]
 
-    f = F()
+    f, length_var, keys = _birth_parent(variable, _variables, over, position, length)
 
-    f.case = FCase.SUM
-
-    f.issumhow = (variable.copy(), over, position)
-
-    f.variables = _variables
-    f.index = tuple(v.index for v in f.variables)
-    f.one = f
-    f.one_type = Elem.F
-    f.give_name()
-    # f.two_type = Elem.V
-    f.rhs_thetas = []
-
-    length_var = len(_variables[0])
-
-    keys = list(zip(*(v.map for v in f.variables)))
-
-    f.A = [[1] * length for _ in range(length_var)]
-
-    for n in range(length_var):
-        # make the child functions
-        f_child = F()
-
-        f_child.variables = [v[n] for v in f.variables]
-        f_child.P = [v.n for v in f_child.variables]
-        f_child.A = [1] * length
-
-        key = keys[n]
-
-        f_child.issumhow = (variable[length * n], over, position)
-        f_child.parent = f
-        f_child.case = FCase.SUM
-        f_child.rhs_thetas = []
-        f.P.append(f_child.P)
-        f_child.give_name()
-        f_child._ = [f_child]
-        f._.append(f_child)
-        f.map[key] = f_child
-        f_child.map[key] = f_child
-        f_child.parent = f
-        f_child.index = key
-        f_child.one = f_child
-        f_child.one_type = Elem.F
-
-    return f
+    return _birth_children(f, length_var, keys)
