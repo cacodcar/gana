@@ -5,6 +5,11 @@ Gana Algebraic Modeling Language
    :parser: myst_parser.sphinx_
    
 
+.. seealso::
+
+   `Energia <https://energiapy.readthedocs.io/en/latest/>`_, a Data-Driven Multiscale 
+   Modeling and Optimization Framework which uses Gana as the AML backend.
+
 .. toctree::
    :maxdepth: 1
    :caption: Tutorials:

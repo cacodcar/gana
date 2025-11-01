@@ -1,4 +1,4 @@
-gana.sets.function
+﻿gana.sets.function
 ==================
 
 .. automodule:: gana.sets.function
@@ -23,5 +23,6 @@ gana.sets.function
       I
       Math
       PCase
+      cached_property
       product
    
