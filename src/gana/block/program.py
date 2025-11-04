@@ -801,7 +801,6 @@ class Prg:
                 #     index_ex = index_ex | value
                 #     index_ex.
                 #     print(len(index_ex), index_ex.latex())
-                    
 
         elif isinstance(value, V):
 

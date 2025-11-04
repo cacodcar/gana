@@ -7,9 +7,8 @@ from itertools import product
 from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math, display
-from matplotlib import pyplot as plt
-from matplotlib import rc
 
+from ..utils.plotting import drawer
 from .birth import make_P, make_T
 from .cases import Elem, FCase
 from .constraint import C
@@ -24,21 +23,26 @@ if TYPE_CHECKING:
     from .parameter import P
     from .theta import T
 
-try:
-    from pyomo.environ import (Binary, Integers, NonNegativeIntegers,
-                               NonNegativeReals, Reals)
-    from pyomo.environ import Var as PyoVar
+# try:
+#     from pyomo.environ import (
+#         Binary,
+#         Integers,
+#         NonNegativeIntegers,
+#         NonNegativeReals,
+#         Reals,
+#     )
+#     from pyomo.environ import Var as PyoVar
 
-    has_pyomo = True
-except ImportError:
-    has_pyomo = False
+#     has_pyomo = True
+# except ImportError:
+#     has_pyomo = False
 
-try:
-    from sympy import Idx, IndexedBase, symbols
+# try:
+#     from sympy import Idx, IndexedBase, symbols
 
-    has_sympy = True
-except ImportError:
-    has_sympy = False
+#     has_sympy = True
+# except ImportError:
+#     has_sympy = False
 
 
 class V:
@@ -1128,7 +1132,11 @@ class V:
     #         "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
     #     )
 
-    def draw(
+    # -----------------------------------------------------
+    #                    Plotting
+    # -----------------------------------------------------
+
+    def _draw(
         self,
         kind: str = "line",
         font_size: float = 16,
@@ -1137,6 +1145,7 @@ class V:
         color: str = "blue",
         grid_alpha: float = 0.3,
         usetex: bool = True,
+        str_idx_lim: int = 10,
     ):
         """
         Plot the variable set
@@ -1155,50 +1164,27 @@ class V:
         :type grid_alpha: float, optional
         :param usetex: Use LaTeX for text rendering. Defaults to True.
         :type usetex: bool, optional
+        :param str_idx_lim: Limit for string indices display. Defaults to 10.
+        :type str_idx_lim: int, optional
         """
 
-        ax = plt.subplots(figsize=fig_size)[1]
-
-        # the indices are the x-axis
-        x = [str(idx) for idx in self.map]
-        # the values are the y-axis
-        y = self.output(aslist=True)
-
-        if usetex:
-            rc(
-                "font",
-                **{"family": "serif", "serif": ["Computer Modern"], "size": font_size},
-            )
-            rc("text", usetex=usetex)
-        else:
-            rc("font", **{"size": font_size})
-
-        if kind == "line":
-            ax.plot(x, y, linewidth=linewidth, color=color)
-
-        elif kind == "bar":
-            ax.bar(x, y, linewidth=linewidth, color=color)
-
-        ax.set_title(rf"${self.latex()}$")
-        ax.set_ylabel(r"Values")
-        ax.set_xlabel(r"Indices")
-        ax.grid(alpha=grid_alpha)
-        ax.set_xticks(x)
-        ax.set_xticklabels(
-            [
-                rf"${tuple([idx.latex() for idx in index])}$".replace("'", "").replace(
-                    "\\", ""
-                )
-                for index in self.map
-            ]
+        drawer(
+            element=self,
+            data=self.output(aslist=True),
+            kind=kind,
+            font_size=font_size,
+            fig_size=fig_size,
+            linewidth=linewidth,
+            color=color,
+            grid_alpha=grid_alpha,
+            usetex=usetex,
+            str_idx_lim=str_idx_lim,
         )
 
-        plt.rcdefaults()
-
-    def draw_line(self, **kwargs):
+    def line(self, **kwargs):
         """Alias for plot with kind='line'"""
-        self.draw(kind="line", **kwargs)
+        self._draw(kind="line", **kwargs)
 
-    def draw_bar(self, **kwargs):
+    def bar(self, **kwargs):
         """Alias for plot with kind='bar'"""
-        self.draw(kind="bar", **kwargs)
+        self._draw(kind="bar", **kwargs)
