@@ -9,7 +9,6 @@ from warnings import warn
 
 from IPython.display import Math, display
 
-from ..utils.draw import draw
 from .birth import make_T
 from .cases import Elem, PCase
 from .function import F
@@ -186,6 +185,9 @@ class P:
         """Return the arguments of the parameter set"""
         return {"tag": self.tag, "ltx": self.ltx, "mutable": self.mutable}
 
+
+
+
     # -----------------------------------------------------
     #                   Matrix
     # -----------------------------------------------------
@@ -201,8 +203,8 @@ class P:
     def ltx(self) -> str:
         """LaTeX representation"""
         if not self._ltx:
-            # use name if no LaTeX
-            self._ltx = self.name.replace("_", r"\_")
+            # use name if no LaTeX 
+            self._ltx = self.name.replace("_", r"\_") 
         return r"{\mathrm{" + self._ltx + r"}}"
 
     @property
@@ -216,7 +218,7 @@ class P:
                 rf"({')|('.join(','.join(i.ltx for i in idx) for idx in self.index)})"
             )
         return rf"{','.join(i.ltx if not isinstance(i, list) else i[0].ltx for i in self.index)}"
-
+    
     def latex(self) -> str:
         """
         LaTeX representation
@@ -228,7 +230,7 @@ class P:
         if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
             return str(self)
         return self.ltx + r"_{" + self.index_ltx + r"}"
-
+    
     def show(self, descriptive: bool = False):
         """Display the variables
 
@@ -1682,89 +1684,3 @@ class P:
     #     logger.warning(
     #         "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
     #     )
-
-    # -----------------------------------------------------
-    #                    Plotting
-    # -----------------------------------------------------
-
-    def line(
-        self,
-        font_size: float = 16,
-        fig_size: tuple[float, float] = (12, 6),
-        linewidth: float = 0.7,
-        color: str = "blue",
-        grid_alpha: float = 0.3,
-        usetex: bool = True,
-        str_idx_lim: int = 10,
-    ):
-        """
-        Plot the parameter set
-
-        :param font_size: Font size for the plot. Defaults to 16.
-        :type font_size: float, optional
-        :param fig_size: Size of the figure. Defaults to (12, 6).
-        :type fig_size: tuple[float, float], optional
-        :param linewidth: Width of the line in the plot. Defaults to 0.7.
-        :type linewidth: float, optional
-        :param color: Color of the line in the plot. Defaults to 'blue'.
-        :type color: str, optional
-        :param grid_alpha: Transparency of the grid lines. Defaults to 0.3.
-        :type grid_alpha: float, optional
-        :param usetex: Use LaTeX for text rendering. Defaults to True.
-        :type usetex: bool, optional
-        :param str_idx_lim: Limit for string indices display. Defaults to 10.
-        :type str_idx_lim: int, optional
-        """
-        draw(
-            element=self,
-            data=self._,
-            kind="line",
-            font_size=font_size,
-            fig_size=fig_size,
-            linewidth=linewidth,
-            color=color,
-            grid_alpha=grid_alpha,
-            usetex=usetex,
-            str_idx_lim=str_idx_lim,
-        )
-
-    def bar(
-        self,
-        font_size: float = 16,
-        fig_size: tuple[float, float] = (12, 6),
-        linewidth: float = 0.7,
-        color: str = "blue",
-        grid_alpha: float = 0.3,
-        usetex: bool = True,
-        str_idx_lim: int = 10,
-    ):
-        """
-        Plot the parameter set
-
-        :param font_size: Font size for the plot. Defaults to 16.
-        :type font_size: float, optional
-        :param fig_size: Size of the figure. Defaults to (12, 6).
-        :type fig_size: tuple[float, float], optional
-        :param linewidth: Width of the line in the plot. Defaults to 0.7.
-        :type linewidth: float, optional
-        :param color: Color of the line in the plot. Defaults to 'blue'.
-        :type color: str, optional
-        :param grid_alpha: Transparency of the grid lines. Defaults to 0.3.
-        :type grid_alpha: float, optional
-        :param usetex: Use LaTeX for text rendering. Defaults to True.
-        :type usetex: bool, optional
-        :param str_idx_lim: Limit for string indices display. Defaults to 10.
-        :type str_idx_lim: int, optional
-        """
-        draw(
-            element=self,
-            data=self._,
-            kind="bar",
-            font_size=font_size,
-            fig_size=fig_size,
-            linewidth=linewidth,
-            color=color,
-            grid_alpha=grid_alpha,
-            usetex=usetex,
-            str_idx_lim=str_idx_lim,
-        )

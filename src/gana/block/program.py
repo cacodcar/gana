@@ -8,7 +8,6 @@ from typing import Literal
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
-
 # from numpy import round as npround
 # from numpy import abs as npabs
 from numpy import array as nparray
@@ -164,19 +163,19 @@ class Prg:
         self.optimized = False
 
         # the solution object
-        self.solutions: dict[int, Solution | MPSolution] = {}
+        self.solution: dict[int, Solution | MPSolution] = {}
 
         # number of solutions
-        self.n_solutions: int = 0
+        self.n_solution: int = 0
 
         # solution matrix
         self.X: dict[int, list[float | int]] = {}
 
         # formulations available
-        self.formulations: dict[int, GPModel | MPLP_Program] = {}
+        self.formulation: dict[int, GPModel | MPLP_Program] = {}
 
         # number of formulations
-        self.n_formulations: int = 0
+        self.n_formulation: int = 0
 
         # evaluations using parametric solutions
         self.evaluation: dict[int, dict[tuple[float, ...], list[float]]] = {}
@@ -186,30 +185,6 @@ class Prg:
 
         # solution types
         self.sol_types: dict[str, list[int]] = {"MIP": [], "mp": []}
-
-    @property
-    def solution(self) -> Solution | MPSolution:
-        """
-        Returns the latest solution of the program
-
-        :returns: Solution object
-        :rtype: Solution | MPSolution
-        """
-        if self.n_solutions > 0:
-            return list(self.solutions.values())[-1]
-        return None
-
-    @property
-    def formulation(self) -> GPModel | MPLP_Program:
-        """
-        Returns the latest formulation of the program
-
-        :returns: Formulation object
-        :rtype: GPModel | MPLP_Program
-        """
-        if self.n_formulations > 0:
-            return list(self.formulations.values())[-1]
-        return None
 
     def add_index(self, name: str, index: I):
         """
@@ -826,6 +801,7 @@ class Prg:
                 #     index_ex = index_ex | value
                 #     index_ex.
                 #     print(len(index_ex), index_ex.latex())
+                    
 
         elif isinstance(value, V):
 
@@ -1504,21 +1480,21 @@ class Prg:
         if using == "gurobi":
             m = self.gurobi()
 
-            self.formulations[self.n_formulations] = m
-            self.n_formulations += 1
+            self.formulation[self.n_formulation] = m
+            self.n_formulation += 1
 
             m.optimize()
             try:
 
-                self.X[self.n_solutions] = [v.X for v in m.getVars()]
+                self.X[self.n_solution] = [v.X for v in m.getVars()]
 
                 _variables = [v for v in self.variables if v.cons_by]
-                for v, val in zip(_variables, self.X[self.n_solutions]):
+                for v, val in zip(_variables, self.X[self.n_solution]):
 
-                    v.X[self.n_solutions] = val
+                    v.X[self.n_solution] = val
 
                 for c in self.constraint_sets:
-                    c.function.solution(n_sol=self.n_solutions)
+                    c.function.solution(n_sol=self.n_solution)
 
                 self.objectives[-1].X = m.ObjVal
                 self.optimized = True
@@ -1554,8 +1530,8 @@ class Prg:
         """Solve the multiparametric program"""
 
         m = self.ppopt()
-        self.formulations[self.n_formulations] = m
-        self.n_formulations += 1
+        self.formulation[self.n_formulation] = m
+        self.n_formulation += 1
 
         sol = solve_mpqp(m, getattr(mpqp_algorithm, using))
         if sol.critical_regions:
@@ -1584,9 +1560,9 @@ class Prg:
             #     for _v, _f in zip(self.variables, f):
             #         _v.eval_funcs.setdefault(self.n_sol, {})[n] = _f
 
-            self.solutions[self.n_solutions] = sol
-            self.sol_types["mp"].append(self.n_solutions)
-            self.n_solutions += 1
+            self.solution[self.n_solution] = sol
+            self.sol_types["mp"].append(self.n_solution)
+            self.n_solution += 1
 
         return sol
 
@@ -1614,7 +1590,7 @@ class Prg:
             )
 
         _theta_vals = nparray([[v] for v in theta_vals])
-        sol = self.solutions[n_sol].evaluate(_theta_vals)
+        sol = self.solution[n_sol].evaluate(_theta_vals)
         sol = [round(float(val[0]), roundoff) for val in sol]
 
         self.evaluation.setdefault(n_sol, {})
@@ -1682,12 +1658,12 @@ class Prg:
     def _birth_solution(self):
         """Makes a solution object for the program"""
 
-        _solution = Solution(self.name + "_solution_" + str(self.n_solutions))
-        _solution.update(self.variables, n_sol=self.n_solutions)
+        _solution = Solution(self.name + "_solution_" + str(self.n_solution))
+        _solution.update(self.variables, n_sol=self.n_solution)
 
-        self.solutions[self.n_solutions] = _solution
-        self.sol_types["MIP"].append(self.n_solutions)
-        self.n_solutions += 1
+        self.solution[self.n_solution] = _solution
+        self.sol_types["MIP"].append(self.n_solution)
+        self.n_solution += 1
 
         return self
 
@@ -1921,9 +1897,9 @@ class Prg:
     def draw(self, variable: V = None, n_sol: int = 0):
         """Plots the solution for a variable"""
         if n_sol in self.sol_types["MIP"]:
-            self.solutions[n_sol].draw(variable)
+            self.solution[n_sol].draw(variable)
         elif n_sol in self.sol_types["mp"]:
-            parametric_plot(self.solutions[n_sol])
+            parametric_plot(self.solution[n_sol])
         else:
             raise ValueError(f"Solution {n_sol} not found")
 
@@ -2015,8 +1991,8 @@ class Prg:
             H=npzeros((self.n_variables, self.n_thetas)),
             equality_indices=[c.n for c in self.cons() if c.eq],
         )
-        self.formulations[self.n_formulations] = _mplp
-        self.n_formulations += 1
+        self.formulation[self.n_formulation] = _mplp
+        self.n_formulation += 1
 
         return _mplp
 

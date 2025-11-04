@@ -145,8 +145,6 @@ class Solution:
 
         hold, free = check_whats_changing()
 
-        print(hold, free)
-
         ax = plt.subplots(figsize=fig_size)[1]
 
         # the indices are the x-axis
@@ -198,13 +196,10 @@ class Solution:
 
         plt.rcdefaults()
 
-    def line(self, **kwargs):
+    def draw_line(self, **kwargs):
         """Alias for plot with kind='line'"""
         self.draw(kind="line", **kwargs)
 
-    def bar(self, **kwargs):
+    def draw_bar(self, **kwargs):
         """Alias for plot with kind='bar'"""
         self.draw(kind="bar", **kwargs)
-
-    def __getitem__(self, item):
-        return self._[item]
