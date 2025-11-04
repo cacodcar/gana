@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Self
 
 from IPython.display import Math, display
 
-from ..utils.plotting import drawer
+from ..utils.draw import draw
 from .birth import make_P, make_T
 from .cases import Elem, FCase
 from .constraint import C
@@ -1164,7 +1164,7 @@ class V:
         :param str_idx_lim: Limit for string indices display. Defaults to 10.
         :type str_idx_lim: int, optional
         """
-        drawer(
+        draw(
             element=self,
             data=self.output(aslist=True),
             kind="line",
@@ -1205,7 +1205,7 @@ class V:
         :param str_idx_lim: Limit for string indices display. Defaults to 10.
         :type str_idx_lim: int, optional
         """
-        drawer(
+        draw(
             element=self,
             data=self.output(aslist=True),
             kind="bar",

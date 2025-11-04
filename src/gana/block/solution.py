@@ -205,3 +205,6 @@ class Solution:
     def bar(self, **kwargs):
         """Alias for plot with kind='bar'"""
         self.draw(kind="bar", **kwargs)
+
+    def __getitem__(self, item):
+        return self._[item]

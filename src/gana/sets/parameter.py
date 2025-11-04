@@ -9,7 +9,7 @@ from warnings import warn
 
 from IPython.display import Math, display
 
-from ..utils.plotting import drawer
+from ..utils.draw import draw
 from .birth import make_T
 from .cases import Elem, PCase
 from .function import F
@@ -1715,7 +1715,7 @@ class P:
         :param str_idx_lim: Limit for string indices display. Defaults to 10.
         :type str_idx_lim: int, optional
         """
-        drawer(
+        draw(
             element=self,
             data=self._,
             kind="line",
@@ -1756,7 +1756,7 @@ class P:
         :param str_idx_lim: Limit for string indices display. Defaults to 10.
         :type str_idx_lim: int, optional
         """
-        drawer(
+        draw(
             element=self,
             data=self._,
             kind="bar",

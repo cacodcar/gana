@@ -26,9 +26,9 @@ def mplp():
 
 
 def test_mplp(mplp):
-    assert len(mplp.solution[0]) == 3
+    assert len(mplp.solutions[0]) == 3
     assert allclose(
-        mplp.solution[0].critical_regions[0].A,
+        mplp.solutions[0].critical_regions[0].A,
         array(
             [
                 [4.55111174e-16, -9.58101146e-17],
@@ -42,7 +42,7 @@ def test_mplp(mplp):
     )
 
     assert allclose(
-        mplp.solution[0].critical_regions[1].A,
+        mplp.solutions[0].critical_regions[1].A,
         array(
             [
                 [1.00000000e00, 2.09065079e-16],
@@ -55,7 +55,7 @@ def test_mplp(mplp):
         atol=1e-12,
     )
     assert allclose(
-        mplp.solution[0].critical_regions[2].A,
+        mplp.solutions[0].critical_regions[2].A,
         array(
             [
                 [1.00000000e00, 0.00000000e00],
@@ -68,63 +68,63 @@ def test_mplp(mplp):
         atol=1e-12,
     )
     assert allclose(
-        mplp.solution[0].critical_regions[0].b,
+        mplp.solutions[0].critical_regions[0].b,
         array([[3.50000000e02], [3.02929788e-14], [-3.50000000e02], [1.05252933e-13]]),
         rtol=1e-9,
         atol=1e-12,
     )
 
     assert allclose(
-        mplp.solution[0].critical_regions[1].b,
+        mplp.solutions[0].critical_regions[1].b,
         array([[8.57310942e-14], [-6.00000000e02], [-8.21908157e-14], [6.00000000e02]]),
         rtol=1e-9,
         atol=1e-12,
     )
 
     assert allclose(
-        mplp.solution[0].critical_regions[2].b,
+        mplp.solutions[0].critical_regions[2].b,
         array([[0.0], [0.0], [0.0], [0.0]]),
         rtol=1e-9,
         atol=1e-12,
     )
     assert allclose(
-        mplp.solution[0].critical_regions[0].C,
+        mplp.solutions[0].critical_regions[0].C,
         array([[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]),
         rtol=1e-9,
         atol=1e-12,
     )
     assert allclose(
-        mplp.solution[0].critical_regions[1].C,
+        mplp.solutions[0].critical_regions[1].C,
         array([[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]),
         rtol=1e-9,
         atol=1e-12,
     )
     assert allclose(
-        mplp.solution[0].critical_regions[2].C,
+        mplp.solutions[0].critical_regions[2].C,
         array([[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]),
         rtol=1e-9,
         atol=1e-12,
     )
     assert allclose(
-        mplp.solution[0].critical_regions[0].d,
+        mplp.solutions[0].critical_regions[0].d,
         array([[12.72792206], [323.89350102], [261.53967194], [45.0]]),
         rtol=1e-9,
         atol=1e-12,
     )
     assert allclose(
-        mplp.solution[0].critical_regions[1].d,
+        mplp.solutions[0].critical_regions[1].d,
         array([[50.91168825], [308.30504375], [323.89350102], [45.0]]),
         rtol=1e-9,
         atol=1e-12,
     )
     assert allclose(
-        mplp.solution[0].critical_regions[2].d,
+        mplp.solutions[0].critical_regions[2].d,
         array([[308.30504375], [261.53967194], [36.0], [9.0]]),
         rtol=1e-9,
         atol=1e-12,
     )
     assert allclose(
-        mplp.solution[0].critical_regions[0].E,
+        mplp.solutions[0].critical_regions[0].E,
         array(
             [
                 [7.07106781e-01, 7.07106781e-01],
@@ -137,7 +137,7 @@ def test_mplp(mplp):
         atol=1e-12,
     )
     assert allclose(
-        mplp.solution[0].critical_regions[1].E,
+        mplp.solutions[0].critical_regions[1].E,
         array(
             [
                 [7.07106781e-01, 7.07106781e-01],
@@ -151,7 +151,7 @@ def test_mplp(mplp):
     )
 
     assert allclose(
-        mplp.solution[0].critical_regions[2].E,
+        mplp.solutions[0].critical_regions[2].E,
         array(
             [
                 [1.00000000e00, 1.45579955e-18],
@@ -165,21 +165,21 @@ def test_mplp(mplp):
     )
 
     assert allclose(
-        mplp.solution[0].critical_regions[0].f,
+        mplp.solutions[0].critical_regions[0].f,
         array([[6.71751442e02], [-3.50000000e02], [1.05252933e-13], [0.00000000e00]]),
         rtol=1e-9,
         atol=1e-12,
     )
 
     assert allclose(
-        mplp.solution[0].critical_regions[1].f,
+        mplp.solutions[0].critical_regions[1].f,
         array([[6.71751442e02], [8.57310942e-14], [-6.00000000e02], [0.00000000e00]]),
         rtol=1e-9,
         atol=1e-12,
     )
 
     assert allclose(
-        mplp.solution[0].critical_regions[2].f,
+        mplp.solutions[0].critical_regions[2].f,
         array([[350.0], [600.0], [0.0], [0.0]]),
         rtol=1e-9,
         atol=1e-12,
