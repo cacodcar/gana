@@ -1,4 +1,4 @@
-gana.utils
+﻿gana.utils
 ==========
 
 .. automodule:: gana.utils
@@ -11,4 +11,5 @@ gana.utils
    :recursive:
 
    decorators
+   draw
    printing

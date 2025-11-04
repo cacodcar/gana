@@ -1,4 +1,4 @@
-gana.sets.parameter
+﻿gana.sets.parameter
 ===================
 
 .. automodule:: gana.sets.parameter
@@ -9,6 +9,7 @@ gana.sets.parameter
    .. autosummary::
    
       display
+      draw
       make_T
       symbols
       warn

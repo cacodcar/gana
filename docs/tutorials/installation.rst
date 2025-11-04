@@ -78,6 +78,36 @@ This will populate your activated environment with Gana and its dependencies.
 
 Once installed, you may need to restart your environment (or terminal). 
 
+To install the most updated, albeit sometimes unstable, version from git, use:
+
+.. code-block:: bash
+
+    pip install git+https://github.com/cacodcar/gana.git
+
+
+
+Try without Installation
+------------------------
+
+To try Gana without installation, use the little rocket icon (🚀) on the upper right
+corner of a notebook tutorial or example. 
+
+The options are:
+
+- `Thebe Live Code <https://teachbooks.io/manual/examples/live_code.html#>`_: Opens an interactive coding environment directly in your browser.
+  You can run and modify code snippets right here on the documentation site.
+
+- `Launch in Binder <https://mybinder.org/>`_: Launches a temporary online environment with Gana installed.
+  Note that any files you create or modify will be lost when you close the session.
+
+- `Launch in Google Colab <https://colab.google/>`_: Opens a Google Colab notebook *without* Gana installed.
+  Uncomment and run the first line (!pip install gana) before running any code cells.
+
+.. note::
+
+    Thebe and Binder are not monetized, and may take some time to start up depending on server engagement.
+    Install Gana locally if possible to avoid overloading these services.
+
 
 .. _ides:
 
@@ -91,6 +121,4 @@ Creating environments, managing projects, and such can be simpler on IDEs. Here 
 - **PyCharm**: `Configuring Python interpreter <https://www.jetbrains.com/help/pycharm/configuring-python-interpreter.html>`_
 
 - **Google Colab**: `Using a local runtime <https://colab.research.google.com/notebooks/snippets/importing_libraries.ipynb>`_
-
-
 

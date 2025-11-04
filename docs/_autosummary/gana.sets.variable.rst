@@ -1,4 +1,4 @@
-gana.sets.variable
+﻿gana.sets.variable
 ==================
 
 .. automodule:: gana.sets.variable
@@ -9,10 +9,9 @@ gana.sets.variable
    .. autosummary::
    
       display
+      draw
       make_P
       make_T
-      rc
-      symbols
    
    .. rubric:: Classes
 
@@ -23,8 +22,6 @@ gana.sets.variable
       F
       FCase
       I
-      Idx
-      IndexedBase
       Math
       V
       product
