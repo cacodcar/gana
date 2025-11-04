@@ -1687,9 +1687,8 @@ class P:
     #                    Plotting
     # -----------------------------------------------------
 
-    def _draw(
+    def line(
         self,
-        kind: str = "line",
         font_size: float = 16,
         fig_size: tuple[float, float] = (12, 6),
         linewidth: float = 0.7,
@@ -1699,10 +1698,8 @@ class P:
         str_idx_lim: int = 10,
     ):
         """
-        Plot the variable set
+        Plot the parameter set
 
-        :param kind: Type of plot ['line', 'bar']. Defaults to 'line'.
-        :type kind: str, optional
         :param font_size: Font size for the plot. Defaults to 16.
         :type font_size: float, optional
         :param fig_size: Size of the figure. Defaults to (12, 6).
@@ -1718,11 +1715,10 @@ class P:
         :param str_idx_lim: Limit for string indices display. Defaults to 10.
         :type str_idx_lim: int, optional
         """
-
         drawer(
             element=self,
             data=self._,
-            kind=kind,
+            kind="line",
             font_size=font_size,
             fig_size=fig_size,
             linewidth=linewidth,
@@ -1732,10 +1728,43 @@ class P:
             str_idx_lim=str_idx_lim,
         )
 
-    def line(self, **kwargs):
-        """Alias for plot with kind='line'"""
-        self._draw(kind="line", **kwargs)
+    def bar(
+        self,
+        font_size: float = 16,
+        fig_size: tuple[float, float] = (12, 6),
+        linewidth: float = 0.7,
+        color: str = "blue",
+        grid_alpha: float = 0.3,
+        usetex: bool = True,
+        str_idx_lim: int = 10,
+    ):
+        """
+        Plot the parameter set
 
-    def bar(self, **kwargs):
-        """Alias for plot with kind='bar'"""
-        self._draw(kind="bar", **kwargs)
+        :param font_size: Font size for the plot. Defaults to 16.
+        :type font_size: float, optional
+        :param fig_size: Size of the figure. Defaults to (12, 6).
+        :type fig_size: tuple[float, float], optional
+        :param linewidth: Width of the line in the plot. Defaults to 0.7.
+        :type linewidth: float, optional
+        :param color: Color of the line in the plot. Defaults to 'blue'.
+        :type color: str, optional
+        :param grid_alpha: Transparency of the grid lines. Defaults to 0.3.
+        :type grid_alpha: float, optional
+        :param usetex: Use LaTeX for text rendering. Defaults to True.
+        :type usetex: bool, optional
+        :param str_idx_lim: Limit for string indices display. Defaults to 10.
+        :type str_idx_lim: int, optional
+        """
+        drawer(
+            element=self,
+            data=self._,
+            kind="bar",
+            font_size=font_size,
+            fig_size=fig_size,
+            linewidth=linewidth,
+            color=color,
+            grid_alpha=grid_alpha,
+            usetex=usetex,
+            str_idx_lim=str_idx_lim,
+        )
