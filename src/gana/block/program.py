@@ -8,6 +8,7 @@ from typing import Literal
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
+
 # from numpy import round as npround
 # from numpy import abs as npabs
 from numpy import array as nparray
@@ -195,7 +196,7 @@ class Prg:
         :rtype: Solution | MPSolution
         """
         if self.n_solutions > 0:
-            return self.solutions[-1]
+            return list(self.solutions.values())[-1]
         return None
 
     @property
@@ -207,7 +208,7 @@ class Prg:
         :rtype: GPModel | MPLP_Program
         """
         if self.n_formulations > 0:
-            return self.formulations[-1]
+            return list(self.formulations.values())[-1]
         return None
 
     def add_index(self, name: str, index: I):
