@@ -442,7 +442,7 @@ class V:
             return (
                 rf"({')|('.join(','.join(i.ltx for i in idx) for idx in self.index)})"
             )
-        return rf"{','.join(i.ltx if not isinstance(i, list) else i[0].ltx for i in self.index)}"
+        return rf"{','.join(i.ltx if not isinstance(i, (list, tuple)) else i[0].ltx for i in self.index)}"
 
     def latex(self) -> str:
         """
