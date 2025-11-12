@@ -155,7 +155,7 @@ class C:
 
     def categorize(self, category: str):
         """Categorizes the constraint
-        
+
         :param category: Category name
         :type category: str
         """
@@ -290,7 +290,7 @@ class C:
     #                    Operators
     # -----------------------------------------------------
 
-    def __add__(self, other: V | P | T | F) -> Self:
+    def __add__(self, other: V | P | T | F | int | float) -> Self:
         if isinstance(other, C):
             if self.leq != other.leq:
                 raise ValueError(
@@ -303,10 +303,10 @@ class C:
             )
         return C(function=self.function + other, leq=self.leq, category=self.category)
 
-    def __radd__(self, other: V | P | T | F) -> Self:
+    def __radd__(self, other: V | P | T | F | int | float) -> Self:
         _ = self + other
 
-    def __sub__(self, other: V | P | T | F) -> Self:
+    def __sub__(self, other: V | P | T | F | int | float) -> Self:
 
         if isinstance(other, C):
             if self.leq != other.leq:
@@ -321,18 +321,18 @@ class C:
 
         return C(function=self.function - other, leq=self.leq, category=self.category)
 
-    def __rsub__(self, other: V | P | T | F) -> Self:
+    def __rsub__(self, other: V | P | T | F | int | float) -> Self:
         _ = self - other
 
-    def __mul__(self, other: V | P | T | F) -> Self:
+    def __mul__(self, other: V | P | T | F | int | float) -> Self:
         if isinstance(other, C):
             raise ValueError("Cannot multiply constraints")
         return C(function=self.function * other, leq=self.leq)
 
-    def __rmul__(self, other: V | P | T | F) -> Self:
+    def __rmul__(self, other: V | P | T | F | int | float) -> Self:
         return C(function=self.function * other, leq=self.leq)
 
-    def __truediv__(self, other: V | P | T | F) -> Self:
+    def __truediv__(self, other: V | P | T | F | int | float) -> Self:
         if isinstance(other, C):
             raise ValueError("Cannot divide constraints")
         return C(function=self.function / other, leq=self.leq)

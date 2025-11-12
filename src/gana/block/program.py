@@ -8,7 +8,6 @@ from typing import Literal
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
-
 # from numpy import round as npround
 # from numpy import abs as npabs
 from numpy import array as nparray
