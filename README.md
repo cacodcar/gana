@@ -8,7 +8,7 @@
 [![PyPI](https://img.shields.io/pypi/v/gana.svg)](https://pypi.org/project/gana)
 [![Downloads](https://static.pepy.tech/personalized-badge/gana?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads)](https://pepy.tech/project/gana)
 [![Python package](https://github.com/cacodcar/gana/actions/workflows/python-package.yml/badge.svg)](https://github.com/cacodcar/gana/actions/workflows/python-package.yml)
-
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gana.svg)](https://pypi.org/project/gana/)
 
 Gana is an Algebraic Modeling Language (AML) for Multiscale Modeling and Optimization. 
 Generated programs (```Prg```) can be subclasses of Multiparametric Mixed Integer Linear Programming (mpMILP). 
