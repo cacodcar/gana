@@ -1000,7 +1000,7 @@ class F:
             else:
                 oneissum = v.name
 
-            ltx = rf"\sum_{{i \in {over}}} {oneissum}_{{{index}}}"
+            ltx = rf"\sum_{{i \in {over.ltx}}} {oneissum}_{{{index}}}"
 
             if self.case == FCase.NEGSUM:
                 # if this is a summation

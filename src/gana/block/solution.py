@@ -145,7 +145,6 @@ class Solution:
 
         hold, free = check_whats_changing()
 
-        print(hold, free)
 
         ax = plt.subplots(figsize=fig_size)[1]
 
