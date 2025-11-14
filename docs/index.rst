@@ -24,7 +24,7 @@ Gana Algebraic Modeling Language
 
 .. toctree::
    :maxdepth: 1
-   :caption: Examples
+   :caption: Interactive Examples
    :hidden:
 
    examples/diet 
