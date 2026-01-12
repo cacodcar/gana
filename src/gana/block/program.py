@@ -1450,8 +1450,8 @@ class Prg:
                 # For each constraint, we write:
                 # RHSn    CONSTRAINT_NAME    RHS_VALUE
                 f.write(ws * 4)
-                f.write(f"RHS{n}")
-                f.write(ws * (10 - len(f"RHS{n+1}")))
+                f.write(f"R{n}")
+                f.write(ws * (10 - len(f"R{n+1}")))
                 f.write(c.mps())
                 f.write(ws * (10 - len(c.mps())))
                 f.write(f"{c.B}")
