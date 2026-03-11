@@ -204,3 +204,6 @@ pyrightconfig.json
 *.lp 
 *.swp
 results/
+
+# ignore solution files
+sol.json
