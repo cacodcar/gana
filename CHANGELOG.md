@@ -46,3 +46,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use logging instead of print
 - X | None instead of Optional[X] 
 
+## [1.0.4] - 2026-03-11
+
+### Fixed
+- .mps generation scheme, formulates larger problems
+
+### New 
+- .import_solution() allows importing JSON or pickle solution files
+
+
+
