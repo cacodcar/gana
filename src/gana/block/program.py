@@ -1,8 +1,11 @@
 """Program"""
 
+import json
 import logging
+import pickle
 import warnings
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Literal
 
 from gurobipy import Model as GPModel
@@ -1509,19 +1512,21 @@ class Prg:
             m.optimize()
             try:
 
-                self.X[self.n_solutions] = [v.X for v in m.getVars()]
+                self._load_values([v.X for v in m.getVars()], m.ObjVal)
 
-                _variables = [v for v in self.variables if v.cons_by]
-                for v, val in zip(_variables, self.X[self.n_solutions]):
+                # self.X[self.n_solutions] = [v.X for v in m.getVars()]
 
-                    v.X[self.n_solutions] = val
+                # _variables = [v for v in self.variables if v.cons_by]
+                # for v, val in zip(_variables, self.X[self.n_solutions]):
 
-                for c in self.constraint_sets:
-                    c.function.solution(n_sol=self.n_solutions)
+                #     v.X[self.n_solutions] = val
 
-                self.objectives[-1].X = m.ObjVal
+                # for c in self.constraint_sets:
+                #     c.function.solution(n_sol=self.n_solutions)
+
+                # self.objectives[-1].X = m.ObjVal
+                
                 self.optimized = True
-
                 self._birth_solution()
 
                 return self, using
@@ -1530,6 +1535,52 @@ class Prg:
                 logger.warning("🛑 No solution found. Check the model 🛑")
 
                 return False
+
+    def _load_values(self, solution_list: list[float], obj: float): 
+        """Loads a solution from a list of variable values"""
+
+        self.X[self.n_solutions] = solution_list
+
+        _variables = [v for v in self.variables if v.cons_by]
+        for v, val in zip(_variables, self.X[self.n_solutions]):
+
+            v.X[self.n_solutions] = val
+
+        for c in self.constraint_sets:
+            c.function.solution(n_sol=self.n_solutions)
+
+        self.objectives[-1].X = obj
+
+
+
+    def import_solution(self, name: str, obj: float):
+        """Imports a solution from an external file
+        Handles JSON and pickle
+
+        :ivar name: file name, with extenstion
+        :vartype name: str
+        :ivar obj: objective value
+        :vartype obj: float
+        """
+        ext = Path(name).suffix
+
+        if ext == ".json":
+            with open(name, "r") as f:
+                solution = json.load(f)
+
+        if ext == ".pkl":
+
+            with open(name, "rb") as f:
+                solution = pickle.load(f)
+
+        
+        self._load_values(solution, obj)
+
+        self.optimized = True
+        self._birth_solution()
+
+
+        
 
     @timer(logger, kind='solve-mpqp')
     def solve(
