@@ -1,4 +1,4 @@
-gana.block.program
+﻿gana.block.program
 ==================
 
 .. automodule:: gana.block.program
@@ -37,6 +37,7 @@ gana.block.program
       O
       P
       PCase
+      Path
       Prg
       Solution
       T

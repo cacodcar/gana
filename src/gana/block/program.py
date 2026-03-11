@@ -1529,8 +1529,8 @@ class Prg:
     ):
         """Loads a solution from a list of variable values
 
-        :ivar sol_and_obj: tuple/list containting list of variable values and objective value
-        :vartype sol_and_obj: tuple[list[float], float] | list[list[float], float]
+        :param sol_and_obj: tuple/list containting list of variable values and objective value
+        :type sol_and_obj: tuple[list[float], float] | list[list[float], float]
         """
 
         sol = sol_and_obj[0]
@@ -1552,8 +1552,8 @@ class Prg:
         """Imports a solution from an external file
         Handles JSON and pickle
 
-        :ivar name: file name, with extenstion
-        :vartype name: str
+        :param name: file name, with extenstion
+        :type name: str
 
         """
         ext = Path(name).suffix
