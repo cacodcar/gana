@@ -21,6 +21,7 @@ Gana Algebraic Modeling Language
    tutorials/parameters
    tutorials/variables
    tutorials/thetas
+   tutorials/import_solution
 
 .. toctree::
    :maxdepth: 1
