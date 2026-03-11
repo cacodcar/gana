@@ -11,7 +11,6 @@ from typing import Literal
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
-
 # from numpy import round as npround
 # from numpy import abs as npabs
 from numpy import array as nparray
@@ -1513,7 +1512,7 @@ class Prg:
             m.optimize()
             try:
 
-                self._load_values([v.X for v in m.getVars()], m.ObjVal)
+                self._load_values(([v.X for v in m.getVars()], m.ObjVal))
 
                 # self.X[self.n_solutions] = [v.X for v in m.getVars()]
 
@@ -1537,10 +1536,19 @@ class Prg:
 
                 return False
 
-    def _load_values(self, solution_list: list[float], obj: float):
-        """Loads a solution from a list of variable values"""
+    def _load_values(
+        self, sol_and_obj: tuple[list[float], float] | list[list[float], float]
+    ):
+        """Loads a solution from a list of variable values
 
-        self.X[self.n_solutions] = solution_list
+        :ivar sol_and_obj: tuple/list containting list of variable values and objective value
+        :vartype sol_and_obj: tuple[list[float], float] | list[list[float], float]
+        """
+
+        sol = sol_and_obj[0]
+        obj = sol_and_obj[1]
+
+        self.X[self.n_solutions] = sol
 
         _variables = [v for v in self.variables if v.cons_by]
         for v, val in zip(_variables, self.X[self.n_solutions]):
@@ -1552,7 +1560,7 @@ class Prg:
 
         self.objectives[-1].X = obj
 
-    def import_solution(self, name: str, obj: float):
+    def import_solution(self, name: str):
         """Imports a solution from an external file
         Handles JSON and pickle
 
@@ -1565,17 +1573,17 @@ class Prg:
 
         if ext == ".json":
             with open(name, "r") as f:
-                solution = json.load(f)
+                sol_and_obj = json.load(f)
 
         elif ext == ".pkl":
 
             with open(name, "rb") as f:
-                solution = pickle.load(f)
+                sol_and_obj = pickle.load(f)
 
         else:
             raise ValueError("Unsupported file type. Use .json or .pkl")
 
-        self._load_values(solution, obj)
+        self._load_values(sol_and_obj)
 
         self.optimized = True
         self._birth_solution()
