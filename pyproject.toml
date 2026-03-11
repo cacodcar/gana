@@ -27,7 +27,7 @@ classifiers = [
 dependencies = ["ppopt", "gurobipy", "IPython", "numpy", "pandas", "matplotlib"]
 [project.optional-dependencies]
 all = ["pyomo", "sympy"]
-test = ["coverage", "pytest", "hypothesis", "flake8"]
+test = ["coverage", "pytest", "hypothesis", "flake8", "gurobipy"]
 docs = [
     "sphinx",            
     "sphinx-book-theme",  

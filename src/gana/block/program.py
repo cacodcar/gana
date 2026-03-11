@@ -1566,8 +1566,7 @@ class Prg:
 
         :ivar name: file name, with extenstion
         :vartype name: str
-        :ivar obj: objective value
-        :vartype obj: float
+
         """
         ext = Path(name).suffix
 
