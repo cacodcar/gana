@@ -11,6 +11,7 @@ from typing import Literal
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
+
 # from numpy import round as npround
 # from numpy import abs as npabs
 from numpy import array as nparray
@@ -1513,19 +1514,6 @@ class Prg:
             try:
 
                 self._load_values(([v.X for v in m.getVars()], m.ObjVal))
-
-                # self.X[self.n_solutions] = [v.X for v in m.getVars()]
-
-                # _variables = [v for v in self.variables if v.cons_by]
-                # for v, val in zip(_variables, self.X[self.n_solutions]):
-
-                #     v.X[self.n_solutions] = val
-
-                # for c in self.constraint_sets:
-                #     c.function.solution(n_sol=self.n_solutions)
-
-                # self.objectives[-1].X = m.ObjVal
-
                 self.optimized = True
                 self._birth_solution()
 
