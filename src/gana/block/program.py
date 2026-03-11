@@ -1,13 +1,17 @@
 """Program"""
 
+import json
 import logging
+import pickle
 import warnings
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Literal
 
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
+
 # from numpy import round as npround
 # from numpy import abs as npabs
 from numpy import array as nparray
@@ -1450,8 +1454,8 @@ class Prg:
                 # For each constraint, we write:
                 # RHSn    CONSTRAINT_NAME    RHS_VALUE
                 f.write(ws * 4)
-                f.write(f"RHS{n}")
-                f.write(ws * (10 - len(f"RHS{n+1}")))
+                f.write(f"R{n}")
+                f.write(ws * (10 - len(f"R{n+1}")))
                 f.write(c.mps())
                 f.write(ws * (10 - len(c.mps())))
                 f.write(f"{c.B}")
@@ -1509,19 +1513,8 @@ class Prg:
             m.optimize()
             try:
 
-                self.X[self.n_solutions] = [v.X for v in m.getVars()]
-
-                _variables = [v for v in self.variables if v.cons_by]
-                for v, val in zip(_variables, self.X[self.n_solutions]):
-
-                    v.X[self.n_solutions] = val
-
-                for c in self.constraint_sets:
-                    c.function.solution(n_sol=self.n_solutions)
-
-                self.objectives[-1].X = m.ObjVal
+                self._load_values(([v.X for v in m.getVars()], m.ObjVal))
                 self.optimized = True
-
                 self._birth_solution()
 
                 return self, using
@@ -1530,6 +1523,57 @@ class Prg:
                 logger.warning("🛑 No solution found. Check the model 🛑")
 
                 return False
+
+    def _load_values(
+        self, sol_and_obj: tuple[list[float], float] | list[list[float], float]
+    ):
+        """Loads a solution from a list of variable values
+
+        :ivar sol_and_obj: tuple/list containting list of variable values and objective value
+        :vartype sol_and_obj: tuple[list[float], float] | list[list[float], float]
+        """
+
+        sol = sol_and_obj[0]
+        obj = sol_and_obj[1]
+
+        self.X[self.n_solutions] = sol
+
+        _variables = [v for v in self.variables if v.cons_by]
+        for v, val in zip(_variables, self.X[self.n_solutions]):
+
+            v.X[self.n_solutions] = val
+
+        for c in self.constraint_sets:
+            c.function.solution(n_sol=self.n_solutions)
+
+        self.objectives[-1].X = obj
+
+    def import_solution(self, name: str):
+        """Imports a solution from an external file
+        Handles JSON and pickle
+
+        :ivar name: file name, with extenstion
+        :vartype name: str
+
+        """
+        ext = Path(name).suffix
+
+        if ext == ".json":
+            with open(name, "r") as f:
+                sol_and_obj = json.load(f)
+
+        elif ext == ".pkl":
+
+            with open(name, "rb") as f:
+                sol_and_obj = pickle.load(f)
+
+        else:
+            raise ValueError("Unsupported file type. Use .json or .pkl")
+
+        self._load_values(sol_and_obj)
+
+        self.optimized = True
+        self._birth_solution()
 
     @timer(logger, kind='solve-mpqp')
     def solve(

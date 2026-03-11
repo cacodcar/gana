@@ -7,6 +7,9 @@ from src.gana.sets.variable import V
 from src.gana.sets.theta import T
 from src.gana.operators.sigma import sigma
 from numpy import allclose, array
+import gurobipy as gp
+import pickle
+import json
 
 
 @pytest.fixture
@@ -186,7 +189,7 @@ def p2():
 
 @pytest.fixture
 def diet_problem():
-    p = Prg()
+    p = Prg(name="diet")
     p.item = I('milk', 'cheese', 'apples', tag='food item')
     p.x = V(p.item, tag='amount of food item to intake')
     p.protein = P(p.item, _=[40, 20, 10])
@@ -202,11 +205,11 @@ def diet_problem():
     p.cons_vitC = sum(p.vitC(i) * p.x(i) for i in p.item) >= 30
 
     p.obj_cost = inf(sum(p.cost(i) * p.x(i) for i in p.item))
-    p.opt(using='gurobi')
     return p
 
 
 def test_diet_problem(diet_problem):
+    diet_problem.opt(using='gurobi')
     assert diet_problem.x.output(aslist=True) == [
         1.5652173913043477,
         0.0,
@@ -214,3 +217,37 @@ def test_diet_problem(diet_problem):
     ]
     assert diet_problem.obj_cost.output(True) == 2.869565217391304
 
+
+def dump_solution(diet_problem, pickleit=False, jsonit=False):
+    gm = gp.read("diet.mps")
+    gm.optimize()
+
+    if pickleit:
+        with open("sol.pkl", "wb") as f:
+            pickle.dump(([v.X for v in gm.getVars()], gm.ObjVal), f)
+
+    if jsonit:
+        with open("sol.json", "w") as f:
+            json.dump(([v.X for v in gm.getVars()], gm.ObjVal), f)
+
+
+def test_import_solution(diet_problem):
+    dump_solution(diet_problem, pickleit=True)
+    diet_problem.import_solution("sol.pkl")
+    assert diet_problem.x.output(aslist=True) == [
+        1.5652173913043477,
+        0.0,
+        1.7391304347826089,
+    ]
+    assert diet_problem.obj_cost.output(True) == 2.869565217391304
+
+
+def test_import_solution(diet_problem):
+    dump_solution(diet_problem, jsonit=True)
+    diet_problem.import_solution("sol.json")
+    assert diet_problem.x.output(aslist=True) == [
+        1.5652173913043477,
+        0.0,
+        1.7391304347826089,
+    ]
+    assert diet_problem.obj_cost.output(True) == 2.869565217391304
