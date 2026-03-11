@@ -11,6 +11,7 @@ from typing import Literal
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
+
 # from numpy import round as npround
 # from numpy import abs as npabs
 from numpy import array as nparray
@@ -1525,7 +1526,7 @@ class Prg:
                 #     c.function.solution(n_sol=self.n_solutions)
 
                 # self.objectives[-1].X = m.ObjVal
-                
+
                 self.optimized = True
                 self._birth_solution()
 
@@ -1536,7 +1537,7 @@ class Prg:
 
                 return False
 
-    def _load_values(self, solution_list: list[float], obj: float): 
+    def _load_values(self, solution_list: list[float], obj: float):
         """Loads a solution from a list of variable values"""
 
         self.X[self.n_solutions] = solution_list
@@ -1550,8 +1551,6 @@ class Prg:
             c.function.solution(n_sol=self.n_solutions)
 
         self.objectives[-1].X = obj
-
-
 
     def import_solution(self, name: str, obj: float):
         """Imports a solution from an external file
@@ -1568,19 +1567,18 @@ class Prg:
             with open(name, "r") as f:
                 solution = json.load(f)
 
-        if ext == ".pkl":
+        elif ext == ".pkl":
 
             with open(name, "rb") as f:
                 solution = pickle.load(f)
 
-        
+        else:
+            raise ValueError("Unsupported file type. Use .json or .pkl")
+
         self._load_values(solution, obj)
 
         self.optimized = True
         self._birth_solution()
-
-
-        
 
     @timer(logger, kind='solve-mpqp')
     def solve(
