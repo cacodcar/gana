@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Self
 from IPython.display import Math, display
 
 from ..utils.draw import draw
+from ._element import _E
 from .birth import make_P, make_T
 from .cases import Elem, FCase
 from .constraint import C
@@ -45,7 +46,7 @@ if TYPE_CHECKING:
 #     has_sympy = False
 
 
-class V:
+class V(_E):
     """
     Ordered set of variables (Var).
 
@@ -106,15 +107,14 @@ class V:
         mutable: bool = False,
         tag: str = "",
         ltx: str = "",
+        name: str = "",
     ):
-        # these are always given during declaration
-        self.tag = tag
+        _E.__init__(self, *index, tag=tag, ltx=ltx, mutable=mutable, name=name)
+
         # integer variable set
         self.itg = itg
         # non-negative variable set
         self.bnr = bnr
-        # latex representation
-        self._ltx = ltx
 
         if self.bnr:
             self.itg = bnr
@@ -122,55 +122,14 @@ class V:
                 raise ValueError("Binary variables must be non-negative")
 
         self.nn = nn
-        self.mutable = mutable
 
         # a variable set of size 1 is a scalar variable
         # these are created at each index in the set
         # their position in the parent set is recorded
-        # Example: if v = V(I('i', 'j')) then v._ = [V(I('i)), V(I('j'))]
-        self.parent: Self = None
-        self.pos: int = None
+        # # Example: if v = V(I('i', 'j')) then v._ = [V(I('i)), V(I('j'))]
+        # self.parent: Self = None
+        # self.pos: int = None
         self._: list[Self] = []
-
-        # set by program
-        self.name: str = ""
-
-        # the check helps to handle if a variable itself is an index
-        # we do not want to iterate over the entire variable set
-        # but treat the variable as a single index element
-
-        # this takes any variable in the indices and sets them as [V]
-        # and them creates an empty list for the rest of the indices
-        if any([isinstance(i, tuple) for i in index]):
-            # if index is a set of indices,
-            # needs to be done for each index
-            _index = []
-            _map = {}
-            for idx in index:
-                _index.append(tuple([i if not isinstance(i, V) else [i] for i in idx]))
-
-            # iterates over each individual index
-            # and creates a mapping for it
-            for idx in _index:
-                for i in product(*idx):
-                    _map[i] = None
-            _index = set(_index)
-
-        else:
-            # if not set
-            _index = tuple([i if not isinstance(i, V) else [i] for i in index])
-
-            if _index:
-                _map = {i: None for i in product(*_index)}
-
-            else:
-                _map = {}
-
-        self.index: tuple[I, ...] | set[tuple[I, ...]] = _index
-        self.map: dict[tuple[I, ...], V] = _map
-
-        # this is the nth parameter declared in the
-        self.n: int = None
 
         # updated by the constraint
         # what constraints constrain this variable
@@ -189,7 +148,6 @@ class V:
         # at position 1, v1 - 0 = v1, which is a variable
         # these attribute evades the need for an instance check
         self.variables = [self]
-        self.elements = [self]
         self.struct = (Elem.V, None)
         self.case = FCase.VAR
         # TODO: check
@@ -1008,16 +966,6 @@ class V:
             "Raising variable to a power, non-linear operations are not supported yet"
         )
 
-    # -----------------------------------------------------
-    #                    Vector
-    # -----------------------------------------------------
-
-    def __iter__(self) -> Self:
-        """Iterate over the variables in the set"""
-        return iter(self._)
-
-    def __len__(self) -> int:
-        return len(self._)
 
     def __call__(self, *key: I, make_new: bool = False) -> Self:
 
@@ -1076,25 +1024,7 @@ class V:
 
         return v
 
-    def __getitem__(self, pos: int) -> V:
-        return self._[pos]
 
-    # -----------------------------------------------------
-    #                    Hashing
-    # -----------------------------------------------------
-
-    def __str__(self):
-        return rf"{self.name}"
-
-    def __repr__(self):
-        return str(self.name)
-
-    def __hash__(self):
-        try:
-            return hash(self.name)
-        except AttributeError:
-            # Fallback for uninitialized state during unpickling
-            return id(self)
 
     # -----------------------------------------------------
     #                    Export

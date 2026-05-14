@@ -10,6 +10,7 @@ from warnings import warn
 from IPython.display import Math, display
 
 from ..utils.draw import draw
+from ._element import _E
 from .birth import make_T
 from .cases import Elem, PCase
 from .function import F
@@ -36,7 +37,7 @@ except ImportError:
     has_sympy = False
 
 
-class P:
+class P(_E):
     """
     Ordered set of parameters.
 
@@ -78,55 +79,16 @@ class P:
     def __init__(
         self,
         *index: I,
-        _: list[float] | float = None,
+        _: list[float] | float | None = None,
         mutable: bool = False,
-        tag: str = None,
-        ltx: str = None,
+        tag: str = "",
+        ltx: str = "",
+        name: str = "",
     ):
-        # given at declaration
-        self.tag = tag
-        self._ltx = ltx
-        self.mutable = mutable
-
-        # name will be set by the program later
-        # if dummy index, the name is set to 'φ' (phi)
-        self.name = ""
+        _E.__init__(self, *index, tag=tag, ltx=ltx, mutable=mutable, name=name)
 
         # special case of the parameter
         self.case: PCase = PCase.SET
-        # set the index
-        # self.index: tuple[I] | set[tuple[I]] = index
-
-        if any([isinstance(i, tuple) for i in index]):
-            self.n_splices = len(index)
-            # if index is a set of indices,
-            # needs to be done for each index
-            _index = []
-            _map = {}
-            for idx in index:
-                _index.append(tuple([i if not isinstance(i, V) else [i] for i in idx]))
-
-            # iterates over each individual index
-            # and creates a mapping for it
-            for idx in _index:
-                for i in product(*idx):
-                    _map[i] = None
-            _index = set(_index)
-
-        else:
-            # number of splices of the index set
-            self.n_splices = 1
-            # if not set
-            _index = tuple([i if not isinstance(i, V) else [i] for i in index])
-
-            if _index:
-                _map = {i: None for i in product(*_index)}
-
-            else:
-                _map = {}
-
-        self.index: tuple[I] | set[tuple[I]] = _index
-        self.map: dict[I, V] = _map
 
         # contains the set of parameters
         if _ is None:
@@ -134,12 +96,6 @@ class P:
         else:
             self._: list[float | int] = _  # always a list of parameters
 
-        # set by the program
-        # this is the nth parameter declared
-        self.n: int = None
-
-        # this helps in the index check when calling functions
-        self.elements = [self]
 
         if isinstance(self._, (int, float)):
             # if int or float is passed it is a single number
@@ -1584,15 +1540,7 @@ class P:
         # else let other handle this
         return self > other
 
-    # -----------------------------------------------------
-    #                    Vector
-    # -----------------------------------------------------
 
-    def __iter__(self) -> Self:
-        return iter(self._)
-
-    def __len__(self):
-        return len(self.map)
 
     def __call__(self, *key: I) -> Self:
 
@@ -1640,18 +1588,11 @@ class P:
 
         return p
 
-    def __getitem__(self, pos: int) -> float | int:
-        return self._[pos]
+
 
     # -----------------------------------------------------
     #                    Hashing
     # -----------------------------------------------------
-
-    def __str__(self):
-        return rf"{self.name}"
-
-    def __repr__(self):
-        return str(self.name)
 
     def __hash__(self):
         return hash(str(self.name))
