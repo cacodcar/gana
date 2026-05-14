@@ -110,11 +110,6 @@ class V(_E):
         name:str = "",
     ):
         _E.__init__(self, *index, tag = tag, ltx= ltx, mutable=mutable, name = name)
-        # # these are always given during declaration
-        # self.tag = tag
-        # # latex representation
-        # self._ltx = ltx
-        # self.mutable = mutables
 
         # integer variable set
         self.itg = itg
@@ -136,46 +131,6 @@ class V(_E):
         # self.pos: int = None
         self._: list[Self] = []
 
-        # set by program
-        # self.name: str = ""
-
-        # the check helps to handle if a variable itself is an index
-        # we do not want to iterate over the entire variable set
-        # but treat the variable as a single index element
-
-        # this takes any variable in the indices and sets them as [V]
-        # and them creates an empty list for the rest of the indices
-        # if any([isinstance(i, tuple) for i in index]):
-        #     # if index is a set of indices,
-        #     # needs to be done for each index
-        #     _index = []
-        #     _map = {}
-        #     for idx in index:
-        #         _index.append(tuple([i if not isinstance(i, V) else [i] for i in idx]))
-
-        #     # iterates over each individual index
-        #     # and creates a mapping for it
-        #     for idx in _index:
-        #         for i in product(*idx):
-        #             _map[i] = None
-        #     _index = set(_index)
-
-        # else:
-        #     # if not set
-        #     _index = tuple([i if not isinstance(i, V) else [i] for i in index])
-
-        #     if _index:
-        #         _map = {i: None for i in product(*_index)}
-
-        #     else:
-        #         _map = {}
-
-        # self.index: tuple[I, ...] | set[tuple[I, ...]] = _index
-        # self.map: dict[tuple[I, ...], V] = _map
-
-        # # this is the nth parameter declared in the
-        # self.n: int = None
-
         # updated by the constraint
         # what constraints constrain this variable
         self.cons_by: list[C] = []
@@ -193,7 +148,6 @@ class V(_E):
         # at position 1, v1 - 0 = v1, which is a variable
         # these attribute evades the need for an instance check
         self.variables = [self]
-        self.elements = [self]
         self.struct = (Elem.V, None)
         self.case = FCase.VAR
         # TODO: check

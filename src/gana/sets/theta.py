@@ -10,6 +10,7 @@ from warnings import warn
 
 from IPython.display import Math, display
 
+from ._element import _E
 from .birth import make_P
 from .cases import Elem
 from .function import F
@@ -20,7 +21,7 @@ if TYPE_CHECKING:
     from .parameter import P
 
 
-class T:
+class T(_E):
     """
     Ordered set of parametric variables (theta).
 
@@ -56,108 +57,20 @@ class T:
         tag: str = None,
         mutable: bool = False,
         ltx: str = None,
+        name: str = "",
     ):
 
-        self.tag = tag
-        self._ltx = ltx
-        self.mutable = mutable
-
-        # set the index
-        self.index: tuple[I] | set[tuple[I]] = index
+        _E.__init__(self, *index, tag=tag, ltx=ltx, mutable=mutable, name=name)
 
         # name will be set by the program later
         # if dummy index, the name is set to 'φ' (phi)
-        self.name = "θ"
-
-        # set by the program
-        # this is the nth parameteric variable set declared
-        self.n: int | None = None
-
-        # a Theta set of size 1 is a parameteric variable
-        # these are created at each index in the set
-        self.parent: Self | None = None
-
-        # their position in the parent set is recorded
-        self.pos: int | None = None
+        self.name = self.name or "θ"
 
         # containt the set of parameteric variables
         self._: list[Self] = _  # always a list of parameteric variables
 
-
-
-        if isinstance(self._, tuple):
-            # if a single parameteric variable is passed
-            # stretch it into a list of the same
-
-            if self.index:
-                self._ = [self._] * len(list(product(*self.index)))
-            else:
-                self.index = (I(size=1, dummy=True),)
-                self._ = [self._]
-
-        else:
-            # some iterable is passed
-
-            if not self.index:
-                # if index is not passed
-                # create a dummy index
-                if self._:
-                    self.index = (I(size=len(self._), dummy=True),)
-
-        if any([isinstance(i, tuple) for i in index]):
-            # if index is a set of indices,
-            # needs to be done for each index
-            _index = []
-            _map = {}
-            for idx in index:
-                _index.append(tuple([i if not isinstance(i, V) else [i] for i in idx]))
-
-            # iterates over each individual index
-            # and creates a mapping for it
-            for idx in _index:
-                for i in product(*idx):
-                    _map[i] = None
-            _index = set(_index)
-
-        else:
-            # if not set
-            _index = tuple([i if not isinstance(i, V) else [i] for i in index])
-
-            if _index:
-                _map = {i: None for i in product(*_index)}
-
-            else:
-                _map = {}
-
-        self.index: tuple[I] | set[tuple[I]] = _index
-        self.map: dict[I, V] = _map
-
         self.lb: float | int = None
         self.ub: float | int = None
-
-        # if self.index:
-        #     # only do this if index is passed
-        #     self.create_map()
-
-        #     # check if there is a mismatch between the length of data
-        #     # and the length of index passed
-        #     if len(self.map) != len(self._):
-        #         raise ValueError(
-        #             f"Index mismatch: len(values) ({len(self._)}) ! = len(index) ({len(self.map)})"
-        #         )
-
-        # else:
-        #     # empty Ts are created in __call__()
-        #     # they are populated from the outside
-        #     # which is more efficient
-        #     # because it avoids birthing the same theta elements again
-        #     # moreover, the same element objects are used in called sets
-
-        #     self.map = {}
-        #     self._ = []
-
-        # this helps in the index check when calling functions
-        self.elements = [self]
 
         # flag to check if the set has been birthed
         self.birthed = False

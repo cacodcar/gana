@@ -25,6 +25,8 @@ class _E:
         self.tag = tag
         self._ltx = ltx
         self.mutable = mutable
+        self.name = name
+
 
         from .variable import V
 
@@ -63,4 +65,5 @@ class _E:
         self.parent: Self = None
         self.pos: int = None
 
-        self.name = name
+        # this helps in the index check when calling functions
+        self.elements = [self]
