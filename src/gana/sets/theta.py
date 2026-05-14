@@ -59,8 +59,8 @@ class T:
     ):
 
         self.tag = tag
-        self.mutable = mutable
         self._ltx = ltx
+        self.mutable = mutable
 
         # set the index
         self.index: tuple[I] | set[tuple[I]] = index
@@ -69,18 +69,21 @@ class T:
         # if dummy index, the name is set to 'φ' (phi)
         self.name = "θ"
 
+        # set by the program
+        # this is the nth parameteric variable set declared
+        self.n: int | None = None
+
         # a Theta set of size 1 is a parameteric variable
         # these are created at each index in the set
-        self.parent: Self = None
+        self.parent: Self | None = None
+
         # their position in the parent set is recorded
-        self.pos: int = None
+        self.pos: int | None = None
 
         # containt the set of parameteric variables
         self._: list[Self] = _  # always a list of parameteric variables
 
-        # set by the program
-        # this is the nth parameteric variable set declared
-        self.n: int = None
+
 
         if isinstance(self._, tuple):
             # if a single parameteric variable is passed

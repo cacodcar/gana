@@ -1,0 +1,66 @@
+"""Element of a Program"""
+
+from __future__ import annotations
+
+from itertools import product
+from typing import TYPE_CHECKING, Self
+
+if TYPE_CHECKING:
+    from .index import I
+
+
+class _E:
+    """
+    Element base class
+    """
+
+    def __init__(
+        self,
+        *index: I,
+        tag: str = "",
+        ltx: str = "",
+        mutable: bool = False,
+        name: str = "",
+    ):
+        self.tag = tag
+        self._ltx = ltx
+        self.mutable = mutable
+
+        from .variable import V
+
+        # this takes any variable in the indices and sets them as [V]
+        # and them creates an empty list for the rest of the indices
+        if any([isinstance(i, tuple) for i in index]):
+            # if index is a set of indices,
+            # needs to be done for each index
+            _index = []
+            _map = {}
+            for idx in index:
+                _index.append(tuple([i if not isinstance(i, V) else [i] for i in idx]))
+
+            # iterates over each individual index
+            # and creates a mapping for it
+            for idx in _index:
+                for i in product(*idx):
+                    _map[i] = None
+            _index = set(_index)
+
+        else:
+            # if not set
+            _index = tuple([i if not isinstance(i, V) else [i] for i in index])
+
+            if _index:
+                _map = {i: None for i in product(*_index)}
+
+            else:
+                _map = {}
+
+        self.index: tuple[I, ...] | set[tuple[I, ...]] = _index
+        self.map: dict[tuple[I, ...], V] = _map
+
+        # this is the nth element of its type
+        self.n: int = None
+        self.parent: Self = None
+        self.pos: int = None
+
+        self.name = name
