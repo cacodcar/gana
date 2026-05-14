@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
     from .index import I
+    from .variable import V as VType
 
 
 class _E:
@@ -76,7 +77,7 @@ class _E:
     def __iter__(self) -> Self:
         return iter(self._)
 
-    def __getitem__(self, pos: int) -> V:
+    def __getitem__(self, pos: int) -> VType:
         return self._[pos]
 
     def __len__(self):
