@@ -27,7 +27,6 @@ class _E:
         self.mutable = mutable
         self.name = name
 
-
         from .variable import V
 
         # this takes any variable in the indices and sets them as [V]
@@ -65,5 +64,42 @@ class _E:
         self.parent: Self = None
         self.pos: int = None
 
+        self._: list[Self] = []
+
         # this helps in the index check when calling functions
         self.elements = [self]
+
+    # -----------------------------------------------------
+    #                    Vector
+    # -----------------------------------------------------
+
+    def __iter__(self) -> Self:
+        return iter(self._)
+
+    def __getitem__(self, pos: int) -> V:
+        return self._[pos]
+
+    def __len__(self):
+        return len(self.map)
+
+    # -----------------------------------------------------
+    #                    Hashing
+    # -----------------------------------------------------
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return self.name
+
+    def __hash__(self):
+        try:
+            return hash(self.name)
+        except AttributeError:
+            # Fallback for uninitialized state during unpickling
+            return id(self)
+
+    def __init_subclass__(cls):
+        # the hashing will be inherited by the subclasses
+        cls.__repr__ = _E.__repr__
+        cls.__hash__ = _E.__hash__

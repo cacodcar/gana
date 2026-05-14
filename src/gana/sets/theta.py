@@ -53,10 +53,10 @@ class T(_E):
     def __init__(
         self,
         *index: I,
-        _: list[tuple[float]] | tuple[float] = None,
-        tag: str = None,
+        _: list[tuple[float]] | tuple[float] | None = None,
+        tag: str | None = None,
         mutable: bool = False,
-        ltx: str = None,
+        ltx: str | None = None,
         name: str = "",
     ):
 
@@ -69,8 +69,8 @@ class T(_E):
         # containt the set of parameteric variables
         self._: list[Self] = _  # always a list of parameteric variables
 
-        self.lb: float | int = None
-        self.ub: float | int = None
+        self.lb: float | int | None = None
+        self.ub: float | int | None = None
 
         # flag to check if the set has been birthed
         self.birthed = False
@@ -422,10 +422,6 @@ class T(_E):
             "Division by anything other than numeric is not implemented for theta sets."
         )
 
-    # -----------------------------------------------------
-    #                    Vector
-    # -----------------------------------------------------
-
     def __call__(self, *key: I) -> Self:
 
         if not key or (key == self.index):
@@ -457,29 +453,3 @@ class T(_E):
             t._.append(theta)
 
         return t
-
-    def __getitem__(self, pos: int) -> float | int:
-        return self._[pos]
-
-    def __iter__(self) -> Self:
-        return iter(self._)
-
-    def __len__(self):
-        return len(self.map)
-
-    # -----------------------------------------------------
-    #                    Hashing
-    # -----------------------------------------------------
-
-    def __str__(self):
-        return self.name
-
-    def __repr__(self):
-        return self.name
-
-    def __hash__(self):
-        try:
-            return hash(self.name)
-        except AttributeError:
-            # Fallback for uninitialized state during unpickling
-            return id(self)

@@ -1540,15 +1540,7 @@ class P(_E):
         # else let other handle this
         return self > other
 
-    # -----------------------------------------------------
-    #                    Vector
-    # -----------------------------------------------------
 
-    def __iter__(self) -> Self:
-        return iter(self._)
-
-    def __len__(self):
-        return len(self.map)
 
     def __call__(self, *key: I) -> Self:
 
@@ -1596,18 +1588,11 @@ class P(_E):
 
         return p
 
-    def __getitem__(self, pos: int) -> float | int:
-        return self._[pos]
+
 
     # -----------------------------------------------------
     #                    Hashing
     # -----------------------------------------------------
-
-    def __str__(self):
-        return rf"{self.name}"
-
-    def __repr__(self):
-        return str(self.name)
 
     def __hash__(self):
         return hash(str(self.name))

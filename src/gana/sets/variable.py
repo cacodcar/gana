@@ -107,9 +107,9 @@ class V(_E):
         mutable: bool = False,
         tag: str = "",
         ltx: str = "",
-        name:str = "",
+        name: str = "",
     ):
-        _E.__init__(self, *index, tag = tag, ltx= ltx, mutable=mutable, name = name)
+        _E.__init__(self, *index, tag=tag, ltx=ltx, mutable=mutable, name=name)
 
         # integer variable set
         self.itg = itg
@@ -966,16 +966,6 @@ class V(_E):
             "Raising variable to a power, non-linear operations are not supported yet"
         )
 
-    # -----------------------------------------------------
-    #                    Vector
-    # -----------------------------------------------------
-
-    def __iter__(self) -> Self:
-        """Iterate over the variables in the set"""
-        return iter(self._)
-
-    def __len__(self) -> int:
-        return len(self._)
 
     def __call__(self, *key: I, make_new: bool = False) -> Self:
 
@@ -1034,25 +1024,7 @@ class V(_E):
 
         return v
 
-    def __getitem__(self, pos: int) -> V:
-        return self._[pos]
 
-    # -----------------------------------------------------
-    #                    Hashing
-    # -----------------------------------------------------
-
-    def __str__(self):
-        return rf"{self.name}"
-
-    def __repr__(self):
-        return str(self.name)
-
-    def __hash__(self):
-        try:
-            return hash(self.name)
-        except AttributeError:
-            # Fallback for uninitialized state during unpickling
-            return id(self)
 
     # -----------------------------------------------------
     #                    Export
