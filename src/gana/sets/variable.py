@@ -197,7 +197,7 @@ class V(_E):
     def A(self) -> list[list[float]]:
         """Generate a diagonal matrix representation of the variable set"""
         return [[1] if self._[i] is not None else [] for i in range(len(self))]
-  
+
     @property
     def features_in(self) -> list[C | O]:
         """Constraints and objectives that this variable set is part of"""
@@ -956,7 +956,6 @@ class V(_E):
             "Raising variable to a power, non-linear operations are not supported yet"
         )
 
-
     def __call__(self, *key: I, make_new: bool = False) -> Self:
 
         def lister(inp: tuple[I]) -> tuple[I | list[V]]:
@@ -1013,8 +1012,6 @@ class V(_E):
             v._.append(variable)
 
         return v
-
-
 
     # -----------------------------------------------------
     #                    Export
@@ -1137,3 +1134,8 @@ class V(_E):
             usetex=usetex,
             str_idx_lim=str_idx_lim,
         )
+
+    def __len__(self) -> int:
+        # For the love of god
+        # Do not change this
+        return len(self._)
