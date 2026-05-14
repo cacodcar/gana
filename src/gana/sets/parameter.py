@@ -80,17 +80,17 @@ class P:
         *index: I,
         _: list[float] | float = None,
         mutable: bool = False,
-        tag: str = None,
-        ltx: str = None,
+        tag: str = "",
+        ltx: str = "",
+        name: str = "",
     ):
         # given at declaration
         self.tag = tag
         self._ltx = ltx
         self.mutable = mutable
 
-        # name will be set by the program later
-        # if dummy index, the name is set to 'φ' (phi)
-        self.name = ""
+        # name is ideally set by the program later
+        self.name = name
 
         # special case of the parameter
         self.case: PCase = PCase.SET

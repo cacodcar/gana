@@ -250,17 +250,6 @@ class I:
             self._ltx = self.name.replace("_", r"\_")
         return r"{" + self._ltx + r"}"
 
-    # def nsplit(self):
-    #     """Split the name
-    #     If there is an underscore, the name is split into name and superscript
-    #     """
-    #     if '_' in self.name:
-    #         name, sup = self.name.split('_')
-    #         if sup:
-    #             return r'{' + name + r'}', r'^{' + sup + r'}'
-    #         # this is used for negation sometimes
-    #         return '-' + self.name[:-1], ''
-    #     return r'{' + self.name + r'}'
 
     def latex(
         self, descriptive: bool = True, int_not: bool = False, dots_limit: int = 5
@@ -281,17 +270,6 @@ class I:
 
         if not self.name:
             return ""
-
-        # if self.parent and any(parent.ordered for parent in self.parent):
-        #     ltx = ltx.replace("[", "_{").replace("]", "}")
-        #     ltx = r"{" + ltx + r"}"
-
-        # else:
-        #     ltx = ltx.replace("[", "{").replace("]", "}")
-
-        # name, sup = self.nsplit()
-        # self.ltx = self.ltx
-        # mathcal = rf'\mathcal{{{name}{sup}}}'
 
         if self.parent:
             return self.ltx
@@ -524,9 +502,6 @@ class I:
     #                    Hashing
     # -----------------------------------------------------
 
-    # __str__ = lambda self: self.name
-    # __repr__ = __str__
-    # __hash__ = lambda self: hash(self.name)
 
     def __str__(self):
         return self.name
@@ -544,11 +519,6 @@ class I:
             self._hash = hash(self.name)
             # self._hash = hash(self.name)
             return self.__hash__()
-
-        # if not self._hash:
-        #     self._hash = hash(self.name)
-
-        # return self._hash
 
     # -----------------------------------------------------
     #                    Export
