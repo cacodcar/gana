@@ -197,14 +197,7 @@ class V(_E):
     def A(self) -> list[list[float]]:
         """Generate a diagonal matrix representation of the variable set"""
         return [[1] if self._[i] is not None else [] for i in range(len(self))]
-        # return [
-        #     [
-        #         1 if i == j and list(self.map)[i] iif self._[i] is not Nones not None else 0
-        #         for j in range(len(self))
-        #     ]
-        #     for i in range(len(self))
-        # ]
-
+  
     @property
     def features_in(self) -> list[C | O]:
         """Constraints and objectives that this variable set is part of"""
