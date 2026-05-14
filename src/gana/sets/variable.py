@@ -127,9 +127,6 @@ class V(_E):
         # these are created at each index in the set
         # their position in the parent set is recorded
         # # Example: if v = V(I('i', 'j')) then v._ = [V(I('i)), V(I('j'))]
-        # self.parent: Self = None
-        # self.pos: int = None
-        self._: list[Self] = []
 
         # updated by the constraint
         # what constraints constrain this variable
