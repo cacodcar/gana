@@ -391,7 +391,7 @@ class V(_E):
                 return self.index[0].ltx
             except AttributeError:
                 # if index is of the type ((a,b),)
-                self.index = tuple(*self.index) 
+                self.index = tuple(*self.index)
 
         if isinstance(self.index, set):
             return (
