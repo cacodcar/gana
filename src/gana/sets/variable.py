@@ -115,10 +115,13 @@ class V(_E):
         self.itg = itg
         # non-negative variable set
         self.bnr = bnr
-
+        
+        # all binaries are integer variables as well
         if self.bnr:
-            self.itg = bnr
+            self.itg = True
             if not nn:
+                # Cannot be non negative and binary
+                # {-1, 0, 1} is equivalent to {0, 1, 2}
                 raise ValueError("Binary variables must be non-negative")
 
         self.nn = nn
@@ -150,7 +153,7 @@ class V(_E):
         # TODO: check
         self.P = [self.n]
 
-        self.copyof: Self = None
+        self.copyof: Self | None = None
 
         # number of splices of the index set
         self.n_splices = 1

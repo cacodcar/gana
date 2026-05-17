@@ -90,14 +90,11 @@ class P(_E):
         # special case of the parameter
         self.case: PCase = PCase.SET
 
-        # contains the set of parameters
+        # No value is provided
         if _ is None:
             self._ = []
-        else:
-            self._: list[float | int] = _  # always a list of parameters
 
-
-        if isinstance(self._, (int, float)):
+        elif isinstance(_, (int, float)):
             # if int or float is passed it is a single number
             # names for these are generated automatically
             # in __str__()
@@ -124,14 +121,14 @@ class P(_E):
             # if some sort of iterable is passed
             # preferably a list
             # set by program
-            if not self.index and self._:
+            if not self.index and _:
                 # if index is not passed
                 # make a dummy index
-                self.index = (I(size=len(self._), dummy=True),)
+                self.index = (I(size=len(_), dummy=True),)
                 # here the map needs to be remade
-                self.map = {i: None for i in list(product(*self.index))}
+                self.map = {i: None for i in product(*self.index)}
                 self.name = "φ"  # set the name to phi
-            self._ = [float(p) for p in self._]
+            self._ = [float(p) for p in _]
 
         # fill in the values
         for n, k in enumerate(self.map):
@@ -1540,8 +1537,6 @@ class P(_E):
         # else let other handle this
         return self > other
 
-
-
     def __call__(self, *key: I) -> Self:
 
         def lister(inp: tuple[I]) -> tuple[I | list[V]]:
@@ -1587,8 +1582,6 @@ class P(_E):
             p._.append(parameter)
 
         return p
-
-
 
     # -----------------------------------------------------
     #                    Hashing
