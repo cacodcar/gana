@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Indexing of variables with stepped indexes, e.g. i, j-1
 
 ### Changed
-
+- Any object with a __str__ implemented can be used as element in I
 
 
 ## [1.0.12] - 2026-05-13
