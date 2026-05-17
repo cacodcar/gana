@@ -116,9 +116,12 @@ class V(_E):
         # non-negative variable set
         self.bnr = bnr
 
+        # all binaries are integer variables as well
         if self.bnr:
-            self.itg = bnr
+            self.itg = True
             if not nn:
+                # Cannot be non negative and binary
+                # {-1, 0, 1} is equivalent to {0, 1, 2}
                 raise ValueError("Binary variables must be non-negative")
 
         self.nn = nn
@@ -150,7 +153,7 @@ class V(_E):
         # TODO: check
         self.P = [self.n]
 
-        self.copyof: Self = None
+        self.copyof: Self | None = None
 
         # number of splices of the index set
         self.n_splices = 1
@@ -384,7 +387,11 @@ class V(_E):
     def index_ltx(self) -> str:
         """LaTeX representation of the index"""
         if len(self.index) == 1:
-            return self.index[0].ltx
+            try:
+                return self.index[0].ltx
+            except AttributeError:
+                # if index is of the type ((a,b),)
+                self.index = tuple(*self.index)
 
         if isinstance(self.index, set):
             return (
@@ -541,7 +548,7 @@ class V(_E):
                 return F(
                     one=self,
                     add=True,
-                    two=make_P(other),
+                    two=make_P(other, index=self.index),
                     one_type=Elem.V,
                     two_type=Elem.P,
                     consistent=True,
@@ -957,7 +964,6 @@ class V(_E):
         )
 
     def __call__(self, *key: I, make_new: bool = False) -> Self:
-
         def lister(inp: tuple[I]) -> tuple[I | list[V]]:
             return tuple([i] if isinstance(i, V) else i for i in inp)
 
@@ -991,18 +997,13 @@ class V(_E):
         v = V(**self.args)
         v.name, v.n = self.name, self.n
         v.index = key
-
         # should be able to map these
         for index in product(*key):
-            # this helps weed out any None indices
-            # i.e. skips
-            if any(i is None for i in index):
-                index = None
 
-            if index is None:
-                variable = None
-            else:
+            try:
                 variable = self.map[index]
+            except KeyError:
+                variable = None
 
             try:
                 v.map[index] = variable
