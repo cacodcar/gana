@@ -115,13 +115,13 @@ class F:
         sub: bool = False,
         div: bool = False,
         # ------ Vector ---------------
-        parent: Self = None,
-        pos: int = None,
+        parent: Self | None = None,
+        pos: int | None = None,
         index: tuple[I] | list[tuple[I]] | None = None,
         # ------- Other attributes -----
-        case: FCase = None,
+        case: FCase | None = None,
         consistent: bool = False,
-        issumhow: tuple[V, I, int] = None,
+        issumhow: tuple[V, I, int] | None = None,
     ):
         # set by program or birther function (parent)
         self.parent = parent
@@ -557,7 +557,6 @@ class F:
         # for n, (one, one_idx, two, two_idx) in enumerate(
         #     zip(self._one, self._one_map, self._two, self._two_map)
         # ):
-
         _one_map = list(self._one_map)
         _two_map = list(self._two_map)
 

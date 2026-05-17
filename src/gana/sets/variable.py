@@ -544,7 +544,7 @@ class V(_E):
                 return F(
                     one=self,
                     add=True,
-                    two=make_P(other),
+                    two=make_P(other, index=self.index),
                     one_type=Elem.V,
                     two_type=Elem.P,
                     consistent=True,
@@ -1000,9 +1000,8 @@ class V(_E):
             # this helps weed out any None indices
             # i.e. skips
             if any(i is None for i in index):
-                index = None
-
-            if index is None:
+                variable = None
+            elif index is None:
                 variable = None
             else:
                 variable = self.map[index]

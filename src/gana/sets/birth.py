@@ -32,12 +32,15 @@ def make_P(
     # index is only passed when
     # a numeric type is being stretched
     if index:
-        if inp > 0:
-            case = PCase.NUM
-        elif inp < 0:
-            case = PCase.NEGNUM
-        else:
-            case = PCase.ZERO
+        try:
+            if inp > 0:
+                case = PCase.NUM
+            elif inp < 0:
+                case = PCase.NEGNUM
+            else:
+                case = PCase.ZERO
+        except TypeError:
+            case = PCase.SET
 
         # if number is passed
         # give it the same index as self
