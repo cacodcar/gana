@@ -11,7 +11,6 @@ from typing import Literal
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, display
-
 # from numpy import round as npround
 # from numpy import abs as npabs
 from numpy import array as nparray
@@ -252,10 +251,20 @@ class Prg:
 
         # for unordered sets, the elements are set on the program
         for n, member in enumerate(members):
-
-            if member not in self.names_indices:
+            member = str(member)
+            if member in self.names_indices:
                 # if this element has not been added to the program before
                 # create an element set
+                # if the element is already set on the program
+                # it can be part of another set already, get it from the program
+                # e.g. human is both part of the kingdom index set animalia
+                # and the family set hominidae
+                # so its parent sets need to be animalia as well as hominidae
+                # so update parent and add position in the new index set
+                element: I = getattr(self, member)
+                # these should not be set again
+                _new_elm = False
+            else:
                 element = I()
                 # set the name
                 element.name = member
@@ -269,18 +278,6 @@ class Prg:
                 self.indices.append(element)
                 # if new element, it should be set on the program
                 _new_elm = True
-
-            else:
-
-                # if the element is already set on the program
-                # it can be part of another set already, get it from the program
-                # e.g. human is both part of the kingdom index set animalia
-                # and the family set hominidae
-                # so its parent sets need to be animalia as well as hominidae
-                # so update parent and add position in the new index set
-                element: I = getattr(self, member)
-                # these should not be set again
-                _new_elm = False
 
             # update the index (I) as a parent
             element.parent.append(index)

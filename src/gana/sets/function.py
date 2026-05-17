@@ -613,7 +613,6 @@ class F:
                     if self.one_type in [Elem.P, Elem.T]:
                         f.one = one
                     else:
-
                         f.one = one(*one_idx)
 
                 if self.two_type in [Elem.P, Elem.T]:
