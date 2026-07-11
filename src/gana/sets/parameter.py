@@ -86,6 +86,7 @@ class P(_E):
         name: str = "",
     ):
         _E.__init__(self, *index, tag=tag, ltx=ltx, mutable=mutable, name=name)
+
     
         # special case of the parameter
         self.case: PCase = PCase.SET
@@ -128,6 +129,7 @@ class P(_E):
                 # here the map needs to be remade
                 # self.map = {i: None for i in product(*self.index)}
                 self.name = "φ"  # set the name to phi
+                self.map = {i: None for i in product(*self.index)}
             self._ = [float(p) for p in _]
 
         # fill in the values
