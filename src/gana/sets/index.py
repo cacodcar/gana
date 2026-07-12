@@ -97,7 +97,7 @@ class I:
         self.tag = tag
         self.mutable = mutable
         # set by program
-        self.name = ""
+        self.name = "i"
         self.n = None
         self.start = start
 
@@ -249,7 +249,6 @@ class I:
         else:
             self._ltx = self.name.replace("_", r"\_")
         return r"{" + self._ltx + r"}"
-
 
     def latex(
         self, descriptive: bool = True, int_not: bool = False, dots_limit: int = 5
@@ -501,7 +500,6 @@ class I:
     # -----------------------------------------------------
     #                    Hashing
     # -----------------------------------------------------
-
 
     def __str__(self):
         return self.name
