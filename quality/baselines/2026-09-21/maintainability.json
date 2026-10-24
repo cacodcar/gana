@@ -1,0 +1,130 @@
+{
+  "src/gana/__init__.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/block/__init__.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/block/program.py": {
+    "mi": 0.0,
+    "rank": "C"
+  },
+  "src/gana/block/solution.py": {
+    "mi": 57.041900061664634,
+    "rank": "A"
+  },
+  "src/gana/operators/__init__.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/operators/composition.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/operators/convolution.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/operators/sigma.py": {
+    "mi": 72.43889145214052,
+    "rank": "A"
+  },
+  "src/gana/sets/__init__.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/sets/_element.py": {
+    "mi": 76.34974837351882,
+    "rank": "A"
+  },
+  "src/gana/sets/_set.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/sets/birth.py": {
+    "mi": 86.07101845696369,
+    "rank": "A"
+  },
+  "src/gana/sets/cases.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/sets/constraint.py": {
+    "mi": 51.398985489033464,
+    "rank": "A"
+  },
+  "src/gana/sets/function.py": {
+    "mi": 0.0,
+    "rank": "C"
+  },
+  "src/gana/sets/index.py": {
+    "mi": 46.567649587640695,
+    "rank": "A"
+  },
+  "src/gana/sets/objective.py": {
+    "mi": 76.30125951599355,
+    "rank": "A"
+  },
+  "src/gana/sets/parameter.py": {
+    "mi": 0.0,
+    "rank": "C"
+  },
+  "src/gana/sets/theta.py": {
+    "mi": 48.5364741510234,
+    "rank": "A"
+  },
+  "src/gana/sets/variable.py": {
+    "mi": 36.65672599129362,
+    "rank": "A"
+  },
+  "src/gana/shapes/__init__.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/shapes/box.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/shapes/edge.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/shapes/facet.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/shapes/vertex.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/utils/__init__.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/utils/decorators.py": {
+    "mi": 69.90074888804645,
+    "rank": "A"
+  },
+  "src/gana/utils/draw.py": {
+    "mi": 81.66808855865243,
+    "rank": "A"
+  },
+  "src/gana/utils/printing.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/value/__init__.py": {
+    "mi": 100.0,
+    "rank": "A"
+  },
+  "src/gana/value/bigm.py": {
+    "mi": 61.933512036735486,
+    "rank": "A"
+  },
+  "src/gana/value/zero.py": {
+    "mi": 47.68182738795266,
+    "rank": "A"
+  }
+}

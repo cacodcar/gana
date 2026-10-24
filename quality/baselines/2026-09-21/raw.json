@@ -1,0 +1,290 @@
+{
+  "src/gana/__init__.py": {
+    "blank": 2,
+    "comments": 0,
+    "lloc": 10,
+    "loc": 12,
+    "multi": 0,
+    "single_comments": 1,
+    "sloc": 9
+  },
+  "src/gana/block/__init__.py": {
+    "blank": 0,
+    "comments": 0,
+    "lloc": 0,
+    "loc": 0,
+    "multi": 0,
+    "single_comments": 0,
+    "sloc": 0
+  },
+  "src/gana/block/program.py": {
+    "blank": 384,
+    "comments": 393,
+    "lloc": 1051,
+    "loc": 2089,
+    "multi": 241,
+    "single_comments": 404,
+    "sloc": 1060
+  },
+  "src/gana/block/solution.py": {
+    "blank": 39,
+    "comments": 2,
+    "lloc": 112,
+    "loc": 209,
+    "multi": 24,
+    "single_comments": 7,
+    "sloc": 139
+  },
+  "src/gana/operators/__init__.py": {
+    "blank": 0,
+    "comments": 0,
+    "lloc": 0,
+    "loc": 0,
+    "multi": 0,
+    "single_comments": 0,
+    "sloc": 0
+  },
+  "src/gana/operators/composition.py": {
+    "blank": 10,
+    "comments": 0,
+    "lloc": 13,
+    "loc": 29,
+    "multi": 8,
+    "single_comments": 1,
+    "sloc": 10
+  },
+  "src/gana/operators/convolution.py": {
+    "blank": 0,
+    "comments": 0,
+    "lloc": 0,
+    "loc": 0,
+    "multi": 0,
+    "single_comments": 0,
+    "sloc": 0
+  },
+  "src/gana/operators/sigma.py": {
+    "blank": 21,
+    "comments": 7,
+    "lloc": 67,
+    "loc": 105,
+    "multi": 11,
+    "single_comments": 8,
+    "sloc": 65
+  },
+  "src/gana/sets/__init__.py": {
+    "blank": 0,
+    "comments": 0,
+    "lloc": 0,
+    "loc": 0,
+    "multi": 0,
+    "single_comments": 0,
+    "sloc": 0
+  },
+  "src/gana/sets/_element.py": {
+    "blank": 25,
+    "comments": 17,
+    "lloc": 62,
+    "loc": 106,
+    "multi": 3,
+    "single_comments": 18,
+    "sloc": 60
+  },
+  "src/gana/sets/_set.py": {
+    "blank": 5,
+    "comments": 0,
+    "lloc": 9,
+    "loc": 32,
+    "multi": 12,
+    "single_comments": 1,
+    "sloc": 14
+  },
+  "src/gana/sets/birth.py": {
+    "blank": 20,
+    "comments": 12,
+    "lloc": 34,
+    "loc": 88,
+    "multi": 18,
+    "single_comments": 13,
+    "sloc": 37
+  },
+  "src/gana/sets/cases.py": {
+    "blank": 17,
+    "comments": 21,
+    "lloc": 28,
+    "loc": 66,
+    "multi": 0,
+    "single_comments": 26,
+    "sloc": 23
+  },
+  "src/gana/sets/constraint.py": {
+    "blank": 79,
+    "comments": 51,
+    "lloc": 182,
+    "loc": 383,
+    "multi": 47,
+    "single_comments": 67,
+    "sloc": 190
+  },
+  "src/gana/sets/function.py": {
+    "blank": 300,
+    "comments": 346,
+    "lloc": 795,
+    "loc": 1979,
+    "multi": 180,
+    "single_comments": 349,
+    "sloc": 1150
+  },
+  "src/gana/sets/index.py": {
+    "blank": 94,
+    "comments": 121,
+    "lloc": 220,
+    "loc": 542,
+    "multi": 89,
+    "single_comments": 124,
+    "sloc": 235
+  },
+  "src/gana/sets/objective.py": {
+    "blank": 28,
+    "comments": 11,
+    "lloc": 58,
+    "loc": 99,
+    "multi": 5,
+    "single_comments": 19,
+    "sloc": 47
+  },
+  "src/gana/sets/parameter.py": {
+    "blank": 261,
+    "comments": 318,
+    "lloc": 657,
+    "loc": 1706,
+    "multi": 73,
+    "single_comments": 318,
+    "sloc": 1054
+  },
+  "src/gana/sets/theta.py": {
+    "blank": 88,
+    "comments": 92,
+    "lloc": 196,
+    "loc": 455,
+    "multi": 39,
+    "single_comments": 96,
+    "sloc": 232
+  },
+  "src/gana/sets/variable.py": {
+    "blank": 147,
+    "comments": 194,
+    "lloc": 311,
+    "loc": 1142,
+    "multi": 155,
+    "single_comments": 202,
+    "sloc": 638
+  },
+  "src/gana/shapes/__init__.py": {
+    "blank": 0,
+    "comments": 0,
+    "lloc": 0,
+    "loc": 0,
+    "multi": 0,
+    "single_comments": 0,
+    "sloc": 0
+  },
+  "src/gana/shapes/box.py": {
+    "blank": 0,
+    "comments": 0,
+    "lloc": 0,
+    "loc": 0,
+    "multi": 0,
+    "single_comments": 0,
+    "sloc": 0
+  },
+  "src/gana/shapes/edge.py": {
+    "blank": 0,
+    "comments": 0,
+    "lloc": 0,
+    "loc": 0,
+    "multi": 0,
+    "single_comments": 0,
+    "sloc": 0
+  },
+  "src/gana/shapes/facet.py": {
+    "blank": 0,
+    "comments": 0,
+    "lloc": 0,
+    "loc": 0,
+    "multi": 0,
+    "single_comments": 0,
+    "sloc": 0
+  },
+  "src/gana/shapes/vertex.py": {
+    "blank": 0,
+    "comments": 0,
+    "lloc": 0,
+    "loc": 0,
+    "multi": 0,
+    "single_comments": 0,
+    "sloc": 0
+  },
+  "src/gana/utils/__init__.py": {
+    "blank": 0,
+    "comments": 0,
+    "lloc": 0,
+    "loc": 0,
+    "multi": 0,
+    "single_comments": 0,
+    "sloc": 0
+  },
+  "src/gana/utils/decorators.py": {
+    "blank": 17,
+    "comments": 1,
+    "lloc": 38,
+    "loc": 62,
+    "multi": 3,
+    "single_comments": 3,
+    "sloc": 39
+  },
+  "src/gana/utils/draw.py": {
+    "blank": 17,
+    "comments": 2,
+    "lloc": 37,
+    "loc": 95,
+    "multi": 19,
+    "single_comments": 3,
+    "sloc": 56
+  },
+  "src/gana/utils/printing.py": {
+    "blank": 7,
+    "comments": 0,
+    "lloc": 8,
+    "loc": 21,
+    "multi": 7,
+    "single_comments": 1,
+    "sloc": 6
+  },
+  "src/gana/value/__init__.py": {
+    "blank": 0,
+    "comments": 0,
+    "lloc": 0,
+    "loc": 0,
+    "multi": 0,
+    "single_comments": 0,
+    "sloc": 0
+  },
+  "src/gana/value/bigm.py": {
+    "blank": 23,
+    "comments": 3,
+    "lloc": 49,
+    "loc": 75,
+    "multi": 0,
+    "single_comments": 5,
+    "sloc": 47
+  },
+  "src/gana/value/zero.py": {
+    "blank": 34,
+    "comments": 5,
+    "lloc": 84,
+    "loc": 123,
+    "multi": 0,
+    "single_comments": 8,
+    "sloc": 81
+  }
+}

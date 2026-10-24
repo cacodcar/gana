@@ -1,4 +1,4 @@
-gana.sets.index
+﻿gana.sets.index
 ===============
 
 .. automodule:: gana.sets.index
@@ -15,7 +15,6 @@ gana.sets.index
 
    .. autosummary::
    
-      FiniteSet
       I
       ICase
       Math

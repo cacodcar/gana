@@ -1,0 +1,40 @@
+name: Native backend
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    env:
+      CARGO_HOME: ${{ github.workspace }}/.cache/cargo
+      GANA_BACKEND: rust-parameters
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Pin Rust and LLVM coverage tooling
+        run: |
+          rustup toolchain install 1.88.0 --profile minimal --component rustfmt,clippy,llvm-tools-preview
+          rustup override set 1.88.0
+      - name: Install isolated native tools and Python dependencies
+        run: |
+          python -m venv .native-venv
+          .native-venv/bin/python -m pip install -r requirements/native.txt
+          cargo fetch --locked
+          python -m pip install -e '.[test,quality]'
+      - name: Native gates and separate core coverage
+        run: python tools/native_quality.py --output quality/reports/native
+      - name: Python compatibility and function profiles
+        if: ${{ !cancelled() }}
+        run: python tools/quality.py tests --output quality/reports/native-python
+      - name: Preserve native and Python evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.python-version }}
+          path: quality/reports/

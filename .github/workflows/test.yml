@@ -1,3 +1,4 @@
+#  retain required test jobs and add coverage gates.
 name: Run Tests
 
 on:
@@ -25,7 +26,15 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .[test]
+          pip install '.[test,quality]'
 
       - name: Run tests
-        run: pytest tests/
+        run: python tools/quality.py tests --output quality/reports/tests
+
+      #  retain profiles even for failed tests.
+      - name: Preserve test and profiling evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-and-profile-${{ matrix.python-version }}
+          path: quality/reports/tests/

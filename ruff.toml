@@ -1,0 +1,61 @@
+#  adapted from Energia.
+# Match the editor, quality environment, hooks and CI.
+required-version = "==0.16.9"
+target-version = "py312"
+line-length = 79
+
+[lint]
+# what rules to check against
+select = ["C90", "F", "E", "W", "I", "NPY", "S", "B", "BLE", "A", "COM", "C4", "T10", "RET", "ARG", "PL", "TRY", "RUF"]
+
+
+# rules to ignore
+ignore = ["COM812", "E501", "RET505", "E731", "B905", "PLR0913", "PLR0917", "ARG001", "B028","PLW1641"]
+
+# Rule explanations:
+# COM812: Ruff format owns trailing commas; the lint fix conflicts with it.
+# E501: line too long
+# RET505:  Unnecessary `{branch}` after `return` statement
+# E731: do not assign a lambda expression, use a def
+# B905: Use of zip without strict parameter
+# PLR0913: to many arguments
+# PLR0917: User-approved policy; preserve positional APIs without a fixed cap.
+# ARG001: unused argument
+# B028: use of warning without stack level declared
+
+
+# exclude some directories
+exclude = ['docs', '.github']
+
+[lint.per-file-ignores]
+# Pytest assertions are executable test checks; numeric literals are intentional
+# model inputs and independent expected results. Keep both rules in production.
+"tests/**/*.py" = ["S101", "PLR2004"]
+# I (indices) and O (objectives) are established public mathematical names.
+"src/gana/sets/index.py" = ["E742"]
+"src/gana/sets/objective.py" = ["E742"]
+# These modules resolve mutually dependent model classes after initialization.
+"src/gana/sets/_element.py" = ["PLC0415"]
+"src/gana/sets/birth.py" = ["PLC0415"]
+"src/gana/sets/function.py" = ["PLC0415"]
+# These tests exercise overloaded symbolic addition, not list concatenation.
+"tests/var_test.py" = ["RUF005"]
+# Only locally generated pickle bytes are loaded in these roundtrip tests.
+# Keep S301 active for production loaders and other tests.
+"tests/mutation_test.py" = ["S301"]
+"tests/native_constraint_rows_test.py" = ["S301"]
+"tests/native_expression_rows_test.py" = ["S301"]
+"tests/native_indexing_test.py" = ["S301"]
+"tests/native_membership_test.py" = ["S301"]
+"tests/native_symbols_test.py" = ["S301"]
+"tests/objective_copy_test.py" = ["S301"]
+
+[lint.mccabe]
+max-complexity = 10
+
+# Quality checks run in temporary directories; classify local imports
+# explicitly so sorting is identical there and in the checkout.
+[lint.isort]
+known-first-party = ["gana", "src", "tools", "baseline", "quality", "quality_checks", "quality_lock", "native_quality", "profile_context", "profile_stats", "pytest_profile"]
+# Test cache directories can share dependency names inside the scratch cwd.
+known-third-party = ["hypothesis", "pytest", "numpy", "pandas", "matplotlib", "gurobipy", "ppopt", "scipy", "IPython"]

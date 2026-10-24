@@ -7,8 +7,10 @@ class Z:
     """Zero, Shunya"""
 
     def __init__(self, _: float = 0, neg: bool = False):
+        """Store a nonnegative tolerance and the independent symbolic sign."""
         if _ and _ < 0:
-            raise ValueError("Zero value cant be negative, give neg = True")
+            _error_message = "Zero value cant be negative, give neg = True"
+            raise ValueError(_error_message)
         # a tolerance value if needed
         self._ = _
         self.neg = neg
@@ -68,30 +70,24 @@ class Z:
         return self
 
     def __rtruediv__(self, other: Self | float):
-        raise ValueError("Cant divide by zero")
+        """Reject division by symbolic zero with the established exception."""
+        _error_message = "Cant divide by zero"
+        raise ValueError(_error_message)
 
     def __gt__(self, other: Self | float):
+        """Preserve signed-zero ordering and None for unordered operands.
 
+        Gana historically orders negative signed zero above positive zero.
+        NaN and unsupported operands return None rather than False.
+        """
         if isinstance(other, Z):
-            if self.neg and not other.neg:
-                return True
-
-            if not self.neg and other.neg:
-                return False
-
-            if self.neg and other.neg:
-                return False
-
-            if not self.neg and not other.neg:
-                return False
-
+            return bool(self.neg and not other.neg)
         if isinstance(other, (int, float)):
-
             if other < 0:
                 return True
-
             if other >= 0:
                 return False
+        return None
 
     def __ge__(self, other: Self | float):
         return self > other
@@ -102,7 +98,8 @@ class Z:
     def __le__(self, other: Self | float):
         return not self > other
 
-    def __eq__(self, other: Self | float):
+    def __eq__(self, other: object):
+        """Compare symbolic sign for zeros; other objects are unequal."""
         if isinstance(other, Z):
             if self.neg and other.neg:
                 return True
@@ -114,8 +111,10 @@ class Z:
                 return False
         else:
             return False
+        return None
 
-    def __ne__(self, other: Self | float):
+    def __ne__(self, other: object):
+        """Return the complement of symbolic equality for any operand."""
         return not self == other
 
     # def __call__(self) -> IndexedBase:

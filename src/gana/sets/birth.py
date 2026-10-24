@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
+
+from gana.types import Number, NumericTuple
 
 from .cases import PCase
 from .index import I
@@ -13,8 +15,8 @@ if TYPE_CHECKING:
 
 
 def make_P(
-    inp: list[float | int] | float | int,
-    index: I | None = None,
+    inp: list[Number] | Number,
+    index: I | tuple | set | None = None,
 ) -> P:
     """
     Make input into a parameter set (P)
@@ -33,9 +35,12 @@ def make_P(
     # a numeric type is being stretched
     if index:
         try:
-            if inp > 0:
+            # Numeric comparison chooses scalar cases. Lists/custom operands
+            # retain the existing TypeError fallback rather than conversion.
+            scalar = cast(Number, inp)
+            if scalar > 0:
                 case = PCase.NUM
-            elif inp < 0:
+            elif scalar < 0:
                 case = PCase.NEGNUM
             else:
                 case = PCase.ZERO
@@ -53,13 +58,12 @@ def make_P(
 
     # if a list is passed
     # the parameter will make a dummy index to meet the size
-    p = P(_=inp)
-    return p
+    return P(_=inp)
 
 
 def make_T(
-    inp: tuple[int | float] | list[tuple[int | float]],
-    index: I | None = None,
+    inp: NumericTuple | list[NumericTuple],
+    index: I | tuple | set | None = None,
 ) -> T:
     """
     Make input into a theta set (T)
@@ -79,10 +83,8 @@ def make_T(
     # a tuple is being stretched
 
     if index:
-        t = T(*index, _=inp)
-        return t
+        return T(*index, _=inp)
 
     # if a list is passed
     # the theta will make a dummy index to meet the size
-    t = T(_=inp)
-    return t
+    return T(_=inp)

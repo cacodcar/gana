@@ -1,0 +1,629 @@
+{
+  "complexity": {
+    "average": 4.473239436619719,
+    "blocks": 355,
+    "grades": {
+      "A": 277,
+      "B": 43,
+      "C": 20,
+      "D": 10,
+      "E": 4,
+      "F": 1
+    },
+    "hotspots": [
+      {
+        "file": "src/gana/sets/function.py",
+        "grade": "F",
+        "line": 738,
+        "name": "generate_matrices",
+        "score": 50
+      },
+      {
+        "file": "src/gana/sets/function.py",
+        "grade": "E",
+        "line": 948,
+        "name": "latex",
+        "score": 39
+      },
+      {
+        "file": "src/gana/block/program.py",
+        "grade": "E",
+        "line": 1734,
+        "name": "latex",
+        "score": 38
+      },
+      {
+        "file": "src/gana/sets/function.py",
+        "grade": "E",
+        "line": 1562,
+        "name": "__mul__",
+        "score": 34
+      },
+      {
+        "file": "src/gana/block/program.py",
+        "grade": "E",
+        "line": 763,
+        "name": "__setattr__",
+        "score": 31
+      },
+      {
+        "file": "src/gana/block/program.py",
+        "grade": "D",
+        "line": 1851,
+        "name": "show",
+        "score": 29
+      },
+      {
+        "file": "src/gana/sets/function.py",
+        "grade": "D",
+        "line": 1356,
+        "name": "__sub__",
+        "score": 29
+      },
+      {
+        "file": "src/gana/sets/parameter.py",
+        "grade": "D",
+        "line": 557,
+        "name": "__mul__",
+        "score": 27
+      },
+      {
+        "file": "src/gana/sets/parameter.py",
+        "grade": "D",
+        "line": 283,
+        "name": "__add__",
+        "score": 25
+      },
+      {
+        "file": "src/gana/sets/parameter.py",
+        "grade": "D",
+        "line": 422,
+        "name": "__sub__",
+        "score": 25
+      }
+    ]
+  },
+  "coverage": {
+    "covered_branches": 585,
+    "covered_lines": 1871,
+    "excluded_lines": 38,
+    "missing_branches": 1077,
+    "missing_lines": 1636,
+    "num_branches": 1662,
+    "num_partial_branches": 217,
+    "num_statements": 3507,
+    "percent_covered": 47.51402592377636,
+    "percent_covered_display": "48"
+  },
+  "coverage_by_file": {
+    "src/gana/__init__.py": {
+      "covered_branches": 0,
+      "covered_lines": 9,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 9,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/block/__init__.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/block/program.py": {
+      "covered_branches": 136,
+      "covered_lines": 516,
+      "excluded_lines": 0,
+      "missing_branches": 214,
+      "missing_lines": 379,
+      "num_branches": 350,
+      "num_partial_branches": 36,
+      "num_statements": 895,
+      "percent_covered": 52.369477911646584,
+      "percent_covered_display": "52"
+    },
+    "src/gana/block/solution.py": {
+      "covered_branches": 5,
+      "covered_lines": 27,
+      "excluded_lines": 0,
+      "missing_branches": 35,
+      "missing_lines": 64,
+      "num_branches": 40,
+      "num_partial_branches": 1,
+      "num_statements": 91,
+      "percent_covered": 24.427480916030536,
+      "percent_covered_display": "24"
+    },
+    "src/gana/operators/__init__.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/operators/composition.py": {
+      "covered_branches": 0,
+      "covered_lines": 7,
+      "excluded_lines": 3,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 7,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/operators/convolution.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/operators/sigma.py": {
+      "covered_branches": 6,
+      "covered_lines": 58,
+      "excluded_lines": 3,
+      "missing_branches": 2,
+      "missing_lines": 1,
+      "num_branches": 8,
+      "num_partial_branches": 2,
+      "num_statements": 59,
+      "percent_covered": 95.5223880597015,
+      "percent_covered_display": "96"
+    },
+    "src/gana/sets/__init__.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/sets/_element.py": {
+      "covered_branches": 10,
+      "covered_lines": 44,
+      "excluded_lines": 3,
+      "missing_branches": 0,
+      "missing_lines": 4,
+      "num_branches": 10,
+      "num_partial_branches": 0,
+      "num_statements": 48,
+      "percent_covered": 93.10344827586206,
+      "percent_covered_display": "93"
+    },
+    "src/gana/sets/_set.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 7,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 7,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0"
+    },
+    "src/gana/sets/birth.py": {
+      "covered_branches": 4,
+      "covered_lines": 18,
+      "excluded_lines": 3,
+      "missing_branches": 4,
+      "missing_lines": 9,
+      "num_branches": 8,
+      "num_partial_branches": 2,
+      "num_statements": 27,
+      "percent_covered": 62.857142857142854,
+      "percent_covered_display": "63"
+    },
+    "src/gana/sets/cases.py": {
+      "covered_branches": 0,
+      "covered_lines": 23,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 23,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/sets/constraint.py": {
+      "covered_branches": 10,
+      "covered_lines": 88,
+      "excluded_lines": 6,
+      "missing_branches": 40,
+      "missing_lines": 60,
+      "num_branches": 50,
+      "num_partial_branches": 4,
+      "num_statements": 148,
+      "percent_covered": 49.494949494949495,
+      "percent_covered_display": "49"
+    },
+    "src/gana/sets/function.py": {
+      "covered_branches": 178,
+      "covered_lines": 384,
+      "excluded_lines": 4,
+      "missing_branches": 248,
+      "missing_lines": 314,
+      "num_branches": 426,
+      "num_partial_branches": 58,
+      "num_statements": 698,
+      "percent_covered": 50.0,
+      "percent_covered_display": "50"
+    },
+    "src/gana/sets/index.py": {
+      "covered_branches": 38,
+      "covered_lines": 147,
+      "excluded_lines": 0,
+      "missing_branches": 32,
+      "missing_lines": 49,
+      "num_branches": 70,
+      "num_partial_branches": 10,
+      "num_statements": 196,
+      "percent_covered": 69.54887218045113,
+      "percent_covered_display": "70"
+    },
+    "src/gana/sets/objective.py": {
+      "covered_branches": 5,
+      "covered_lines": 36,
+      "excluded_lines": 3,
+      "missing_branches": 1,
+      "missing_lines": 7,
+      "num_branches": 6,
+      "num_partial_branches": 1,
+      "num_statements": 43,
+      "percent_covered": 83.6734693877551,
+      "percent_covered_display": "84"
+    },
+    "src/gana/sets/parameter.py": {
+      "covered_branches": 126,
+      "covered_lines": 242,
+      "excluded_lines": 2,
+      "missing_branches": 310,
+      "missing_lines": 385,
+      "num_branches": 436,
+      "num_partial_branches": 74,
+      "num_statements": 627,
+      "percent_covered": 34.61900282220132,
+      "percent_covered_display": "35"
+    },
+    "src/gana/sets/theta.py": {
+      "covered_branches": 6,
+      "covered_lines": 64,
+      "excluded_lines": 2,
+      "missing_branches": 68,
+      "missing_lines": 111,
+      "num_branches": 74,
+      "num_partial_branches": 4,
+      "num_statements": 175,
+      "percent_covered": 28.11244979919679,
+      "percent_covered_display": "28"
+    },
+    "src/gana/sets/variable.py": {
+      "covered_branches": 47,
+      "covered_lines": 175,
+      "excluded_lines": 4,
+      "missing_branches": 73,
+      "missing_lines": 90,
+      "num_branches": 120,
+      "num_partial_branches": 23,
+      "num_statements": 265,
+      "percent_covered": 57.66233766233766,
+      "percent_covered_display": "58"
+    },
+    "src/gana/shapes/__init__.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/shapes/box.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/shapes/edge.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/shapes/facet.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/shapes/vertex.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/utils/__init__.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/utils/decorators.py": {
+      "covered_branches": 14,
+      "covered_lines": 28,
+      "excluded_lines": 0,
+      "missing_branches": 4,
+      "missing_lines": 6,
+      "num_branches": 18,
+      "num_partial_branches": 2,
+      "num_statements": 34,
+      "percent_covered": 80.76923076923077,
+      "percent_covered_display": "81"
+    },
+    "src/gana/utils/draw.py": {
+      "covered_branches": 0,
+      "covered_lines": 5,
+      "excluded_lines": 3,
+      "missing_branches": 10,
+      "missing_lines": 23,
+      "num_branches": 10,
+      "num_partial_branches": 0,
+      "num_statements": 28,
+      "percent_covered": 13.157894736842104,
+      "percent_covered_display": "13"
+    },
+    "src/gana/utils/printing.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 2,
+      "missing_branches": 0,
+      "missing_lines": 4,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 4,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0"
+    },
+    "src/gana/value/__init__.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100"
+    },
+    "src/gana/value/bigm.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 4,
+      "missing_lines": 46,
+      "num_branches": 4,
+      "num_partial_branches": 0,
+      "num_statements": 46,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0"
+    },
+    "src/gana/value/zero.py": {
+      "covered_branches": 0,
+      "covered_lines": 0,
+      "excluded_lines": 0,
+      "missing_branches": 32,
+      "missing_lines": 77,
+      "num_branches": 32,
+      "num_partial_branches": 0,
+      "num_statements": 77,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0"
+    }
+  },
+  "maintainability": {
+    "src/gana/__init__.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/block/__init__.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/block/program.py": {
+      "mi": 0.0,
+      "rank": "C"
+    },
+    "src/gana/block/solution.py": {
+      "mi": 57.041900061664634,
+      "rank": "A"
+    },
+    "src/gana/operators/__init__.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/operators/composition.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/operators/convolution.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/operators/sigma.py": {
+      "mi": 72.43889145214052,
+      "rank": "A"
+    },
+    "src/gana/sets/__init__.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/sets/_element.py": {
+      "mi": 76.34974837351882,
+      "rank": "A"
+    },
+    "src/gana/sets/_set.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/sets/birth.py": {
+      "mi": 86.07101845696369,
+      "rank": "A"
+    },
+    "src/gana/sets/cases.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/sets/constraint.py": {
+      "mi": 51.398985489033464,
+      "rank": "A"
+    },
+    "src/gana/sets/function.py": {
+      "mi": 0.0,
+      "rank": "C"
+    },
+    "src/gana/sets/index.py": {
+      "mi": 46.567649587640695,
+      "rank": "A"
+    },
+    "src/gana/sets/objective.py": {
+      "mi": 76.30125951599355,
+      "rank": "A"
+    },
+    "src/gana/sets/parameter.py": {
+      "mi": 0.0,
+      "rank": "C"
+    },
+    "src/gana/sets/theta.py": {
+      "mi": 48.5364741510234,
+      "rank": "A"
+    },
+    "src/gana/sets/variable.py": {
+      "mi": 36.65672599129362,
+      "rank": "A"
+    },
+    "src/gana/shapes/__init__.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/shapes/box.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/shapes/edge.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/shapes/facet.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/shapes/vertex.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/utils/__init__.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/utils/decorators.py": {
+      "mi": 69.90074888804645,
+      "rank": "A"
+    },
+    "src/gana/utils/draw.py": {
+      "mi": 81.66808855865243,
+      "rank": "A"
+    },
+    "src/gana/utils/printing.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/value/__init__.py": {
+      "mi": 100.0,
+      "rank": "A"
+    },
+    "src/gana/value/bigm.py": {
+      "mi": 61.933512036735486,
+      "rank": "A"
+    },
+    "src/gana/value/zero.py": {
+      "mi": 47.68182738795266,
+      "rank": "A"
+    }
+  },
+  "raw": {
+    "blank": 1618,
+    "comments": 1596,
+    "lloc": 4021,
+    "loc": 9418,
+    "multi": 934,
+    "single_comments": 1674,
+    "sloc": 5192
+  },
+  "tests": {
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "tests": 14
+  }
+}

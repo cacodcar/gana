@@ -1,0 +1,25 @@
+{
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.defaultInterpreterPath": "${workspaceFolder}/.quality-venv/bin/python",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.rulers": [
+      79
+    ],
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "never",
+      "source.fixAll.ruff": "never",
+      "source.organizeImports": "never",
+      "source.organizeImports.ruff": "never"
+    }
+  },
+  "ruff.path": [
+    "${workspaceFolder}/.quality-venv/bin/ruff"
+  ],
+  "ruff.configurationPreference": "filesystemFirst"
+}

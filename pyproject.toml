@@ -1,6 +1,12 @@
 [build-system]
-requires = ["setuptools>61"]
-build-backend = "setuptools.build_meta"
+requires = ["maturin==1.9.6"]
+build-backend = "maturin"
+
+[tool.maturin]
+manifest-path = "crates/gana-python/Cargo.toml"
+python-source = "src"
+module-name = "gana._native"
+features = ["extension-module"]
 
 [project]
 name = "gana"
@@ -27,7 +33,9 @@ classifiers = [
 dependencies = ["ppopt", "gurobipy", "IPython", "numpy", "pandas", "matplotlib"]
 [project.optional-dependencies]
 all = ["pyomo", "sympy"]
-test = ["coverage", "pytest", "hypothesis", "flake8", "gurobipy"]
+#  complete test tooling.
+test = ["coverage", "pytest", "hypothesis", "flake8", "gurobipy", "pytest-cov"]
+quality = ["radon", "ruff==0.16.9", "mypy", "tox", "build", "setuptools", "wheel", "packaging", "pandas-stubs==2.3.3.260113", "scipy-stubs==1.16.2.4"]
 docs = [
     "sphinx",            
     "sphinx-book-theme",  
@@ -48,3 +56,26 @@ docs = [
 Homepage = "https://github.com/cacodcar/gana"
 Issues = "https://github.com/cacodcar/gana/issues"
 
+
+#  independent measured coverage floors.
+[tool.research-quality]
+package = "gana"
+statement-floor = 53
+branch-floor = 35
+local-dependencies = []
+
+#  check annotated and unannotated bodies.
+[tool.mypy]
+python_version = "3.12"
+check_untyped_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+explicit_package_bases = true
+namespace_packages = true
+mypy_path = ["$MYPY_CONFIG_FILE_DIR/src", "$MYPY_CONFIG_FILE_DIR/tools"]
+
+# PPOPT 1.6.12 ships annotations without a py.typed marker. Analyze its actual
+# source so callers are checked against those signatures; do not ignore imports.
+[[tool.mypy.overrides]]
+module = ["ppopt", "ppopt.*"]
+follow_untyped_imports = true

@@ -1,0 +1,8 @@
+; adapted from Energia.
+engines:
+  python:
+    enabled: true
+exclude_paths:
+  - "tests/**"
+  - "docs/**"
+  - "quality/**"

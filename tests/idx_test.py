@@ -1,4 +1,5 @@
 import pytest
+
 from src.gana.block.program import Prg
 from src.gana.sets.index import I
 
@@ -7,11 +8,11 @@ from src.gana.sets.index import I
 def repeat_elem():
     """Element is repeated"""
     _p = Prg()
-    _p.i0 = I('a', 'b', mutable=True)
+    _p.i0 = I("a", "b", mutable=True)
     # a is repeated
-    _p.i1 = I('d', 'a')
+    _p.i1 = I("d", "a")
     # i0 is mutated
-    _p.i0 = I('d', 'a', 'c')
+    _p.i0 = I("d", "a", "c")
     return _p
 
 
@@ -32,19 +33,19 @@ def test_repeat_elem(repeat_elem):
 @pytest.fixture
 def solarsys():
     _p = Prg()
-    _p.giants = I('jupiter', 'saturn', 'uranus', 'neptune')
-    _p.rocky = I('mercury', 'venus', 'earth', 'mars')
-    _p.gasgiants = I('jupiter', 'saturn')
-    _p.minor = I('ceres', 'pluto', 'makemake', 'eris')
-    _p.asteroid = I('ceres')
-    _p.former = I('pluto')
-    _p.voyager = I('saturn', 'neptune', 'uranus', 'titan', 'earth', 'jupiter')
+    _p.giants = I("jupiter", "saturn", "uranus", "neptune")
+    _p.rocky = I("mercury", "venus", "earth", "mars")
+    _p.gasgiants = I("jupiter", "saturn")
+    _p.minor = I("ceres", "pluto", "makemake", "eris")
+    _p.asteroid = I("ceres")
+    _p.former = I("pluto")
+    _p.voyager = I("saturn", "neptune", "uranus", "titan", "earth", "jupiter")
     _p.icegiants = _p.giants - _p.gasgiants
     _p.hasheart = _p.minor & _p.former
     _p.planets = _p.gasgiants | _p.icegiants | _p.rocky
     _p.dense = _p.voyager ^ _p.giants
-    _p.i = I('a', 'b', 'c')
-    _p.j = I('p')
+    _p.i = I("a", "b", "c")
+    _p.j = I("p")
     _p.k = I(size=2)
     # _p.l = _p.i * _p.j * _p.k
     return _p
@@ -87,7 +88,11 @@ def test_idx_operations(solarsys):
     assert solarsys.mars.parent == [solarsys.rocky, solarsys.planets]
     assert solarsys.ceres.parent == [solarsys.minor, solarsys.asteroid]
     assert solarsys.eris.parent == [solarsys.minor]
-    assert solarsys.pluto.parent == [solarsys.minor, solarsys.former, solarsys.hasheart]
+    assert solarsys.pluto.parent == [
+        solarsys.minor,
+        solarsys.former,
+        solarsys.hasheart,
+    ]
     assert solarsys.jupiter.pos == [0, 0, 5, 0]
     assert solarsys.saturn.pos == [1, 1, 0, 1]
     assert solarsys.uranus.pos == [2, 2, 0, 2]

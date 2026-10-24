@@ -1,6 +1,7 @@
 from operator import is_
 
 import pytest
+
 from src.gana.block.program import Prg
 from src.gana.sets.index import I
 from src.gana.sets.parameter import P
@@ -12,13 +13,13 @@ def p():
     _p = Prg()
     _p.y = I(size=2)
     _p.q = I(size=4)
-    _p.v = V(tag='Empty Variable')
-    _p.p = I('pv', 'wf')
-    _p.cap = V(_p.p, _p.y, tag='Compound Index Variable')
+    _p.v = V(tag="Empty Variable")
+    _p.p = I("pv", "wf")
+    _p.cap = V(_p.p, _p.y, tag="Compound Index Variable")
     _p.prod = V(_p.p, _p.y, _p.q)
-    _p.x = V(_p.p, _p.y, bnr=True, tag='Binary Variable')
-    _p.n = V(_p.p, _p.y, itg=True, tag='Integer Variable')
-    _p.rev = V(_p.p, _p.y, _p.q, nn=False, tag='Free Variable')
+    _p.x = V(_p.p, _p.y, bnr=True, tag="Binary Variable")
+    _p.n = V(_p.p, _p.y, itg=True, tag="Integer Variable")
+    _p.rev = V(_p.p, _p.y, _p.q, nn=False, tag="Free Variable")
     _p.i = I(size=3)
     _p.p1 = P(_p.i, _=[1, 2, 4])
     _p.v1 = V(_p.i)
@@ -33,12 +34,12 @@ def p():
 
 def test_var(p):
     assert p.v.args == {
-        'itg': False,
-        'nn': True,
-        'bnr': False,
-        'mutable': False,
-        'tag': 'Empty Variable',
-        'ltx': r'{\mathbf{v}}',
+        "itg": False,
+        "nn": True,
+        "bnr": False,
+        "mutable": False,
+        "tag": "Empty Variable",
+        "ltx": r"{\mathbf{v}}",
     }
     assert is_(p.cap(p.pv, p.y[0])[0], p.cap[0])
     assert is_(p.cap(p.pv, p.y[1])[0], p.cap[1])

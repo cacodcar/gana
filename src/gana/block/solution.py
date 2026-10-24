@@ -1,10 +1,13 @@
 """Solution"""
 
+from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import cast
 
 from matplotlib import pyplot as plt
 from matplotlib import rc
 
+from ..backends.native.results import _SolutionColumn, update_solution
 from ..sets.index import I
 from ..sets.variable import V
 
@@ -27,49 +30,79 @@ class Solution:
         """Return the solution as a dictionary"""
         return {v: values["values"] for v, values in self._.items()}
 
-    def update(self, variable_sets: list[V], n_sol: int = 0):
-        """Add variables to the solution"""
-        for v in variable_sets:
-            if v.parent.name not in self._:
-                self._[v.parent.name] = {
-                    "latex": [],
-                    "index_latex": [],
-                    "positions": [],
-                    "n": [],
-                    "values": [],
-                    "index": [],
-                }
-            self._[v.parent.name]["latex"].append(v.latex())
-            self._[v.parent.name]["index_latex"].append(r"$" + v.index_ltx + r"$")
-            self._[v.parent.name]["positions"].append(v.pos)
-            self._[v.parent.name]["n"].append(v.n)
-            if v.X:
-                self._[v.parent.name]["values"].append(v.X[n_sol])
-            else:
-                self._[v.parent.name]["values"].append(None)
-            self._[v.parent.name]["index"].append(
-                {
-                    idx.name: {par.name: pos for par, pos in zip(idx.parent, idx.pos)}
-                    for idx in v.index
-                    if isinstance(idx, I)
-                }
-            )
+    def update(self, variable_sets: Sequence[V], n_sol: int = 0):
+        """
+        Read either a legacy list or a lazy registry into solution output.
+        """
+        if update_solution(self, variable_sets, n_sol):
+            return
+        for variable in variable_sets:
+            self._add_variable(variable, n_sol)
+
+    def _add_variable(self, variable: V | _SolutionColumn, number: int):
+        """
+        Append one output record from a scalar or lightweight native adapter.
+        """
+        parent = variable.parent
+        if parent is None:
+            message = "Solution output requires a registered scalar variable"
+            raise ValueError(message)
+        name = parent.name
+        if name not in self._:
+            self._[name] = {
+                key: []
+                for key in (
+                    "latex",
+                    "index_latex",
+                    "positions",
+                    "n",
+                    "values",
+                    "index",
+                )
+            }
+        record = self._[name]
+        record["latex"].append(variable.latex())
+        record["index_latex"].append(r"$" + variable.index_ltx + r"$")
+        record["positions"].append(variable.pos)
+        record["n"].append(variable.n)
+        record["values"].append(variable.X[number] if variable.X else None)
+        record["index"].append(self._index_metadata(variable.index))
+
+    @staticmethod
+    def _index_metadata(index):
+        """
+        Retain the established nested coordinate description for plotting.
+        """
+        return {
+            idx.name: {par.name: pos for par, pos in zip(idx.parent, idx.pos)}
+            for idx in index
+            if isinstance(idx, I)
+        }
 
     def __call__(self, variable: V):
+        """Return scalar metadata or lists of metadata for a selection.
+
+        Scalar members have a parent and an integer position within it;
+        selections retain those original member positions and row order.
+        """
 
         if variable.parent:
+            position = cast("int", variable.pos)
             return {
-                "latex": self._[variable.parent.name]["latex"][variable.pos],
+                "latex": self._[variable.parent.name]["latex"][position],
                 "index_latex": r"$"
-                + self._[variable.parent.name]["index_latex"][variable.pos]
+                + self._[variable.parent.name]["index_latex"][position]
                 + r"$",
-                "positions": self._[variable.parent.name]["positions"][variable.pos],
-                "n": self._[variable.parent.name]["n"][variable.pos],
-                "values": self._[variable.parent.name]["values"][variable.pos],
-                "index": self._[variable.parent.name]["index"][variable.pos],
+                "positions": self._[variable.parent.name]["positions"][
+                    position
+                ],
+                "n": self._[variable.parent.name]["n"][position],
+                "values": self._[variable.parent.name]["values"][position],
+                "index": self._[variable.parent.name]["index"][position],
             }
 
-        _return = {
+        # Each field collects its own metadata kind in the same row order.
+        _return: dict[str, list[object]] = {
             "latex": [],
             "index_latex": [],
             "positions": [],
@@ -78,14 +111,21 @@ class Solution:
             "index": [],
         }
         for var in variable:
-            _return["latex"].append(self._[var.parent.name]["latex"][var.pos])
+            # Iteration supplies scalar members, including for selections.
+            parent = cast("V", var.parent)
+            position = cast("int", var.pos)
+            _return["latex"].append(self._[parent.name]["latex"][position])
             _return["index_latex"].append(
-                self._[var.parent.name]["index_latex"][var.pos]
+                self._[parent.name]["index_latex"][position],
             )
-            _return["positions"].append(self._[var.parent.name]["positions"][var.pos])
-            _return["n"].append(self._[var.parent.name]["n"][var.pos])
-            _return["values"].append(self._[var.parent.name]["values"][var.pos])
-            _return["index"].append(self._[var.parent.name]["index"][var.pos])
+            _return["positions"].append(
+                self._[parent.name]["positions"][position],
+            )
+            _return["n"].append(self._[parent.name]["n"][position])
+            _return["values"].append(
+                self._[parent.name]["values"][position],
+            )
+            _return["index"].append(self._[parent.name]["index"][position])
         return _return
 
     def draw(
@@ -118,33 +158,14 @@ class Solution:
         :type grid_alpha: float, optional
         :param usetex: Use LaTeX for text rendering, defaults to True
         :type usetex: bool, optional
-        :param x_ticks_lim: Maximum number of x-ticks to display, defaults to 20
+        :param x_ticks_lim: Maximum number of x-ticks to display, defaults to
+            20
         :type x_ticks_lim: int, optional
         """
 
         data = self(variable)
 
-        def check_whats_changing():
-            check_unique: dict[int, list] = {}
-            for index in data["index"]:
-                for n, idx in enumerate(index):
-                    if n not in check_unique:
-                        check_unique[n] = []
-                    if idx not in check_unique[n]:
-                        check_unique[n].append(idx)
-            _hold = []
-            _free = []
-
-            for unq in check_unique.values():
-                if len(unq) == 1:
-                    _hold.append(unq[0])
-                else:
-                    _free.append(unq)
-
-            return _hold, _free
-
-        hold, free = check_whats_changing()
-
+        hold = self._held_indices(data["index"])
 
         ax = plt.subplots(figsize=fig_size)[1]
 
@@ -156,7 +177,11 @@ class Solution:
         if usetex:
             rc(
                 "font",
-                **{"family": "serif", "serif": ["Computer Modern"], "size": font_size},
+                **{
+                    "family": "serif",
+                    "serif": ["Computer Modern"],
+                    "size": font_size,
+                },
             )
             rc("text", usetex=usetex)
         else:
@@ -170,12 +195,8 @@ class Solution:
 
         title = rf"${variable.tag or variable.name}$"
 
-        if len(hold) > 0:
-            title += r" ("
-            for h in hold:
-                title += rf"{h}, "
-
-            title = title[:-2] + r")"
+        if hold:
+            title += " (" + ", ".join(str(item) for item in hold) + ")"
 
         ax.set_title(title)
         ax.set_ylabel(r"Values")
@@ -186,16 +207,36 @@ class Solution:
         if len(x) <= x_ticks_lim:
             ax.set_xticks(x)
 
-            _xtick_labels = []
-            for idx_latex, idx in zip(data["index_latex"], data["index"]):
-                for i in idx:
-                    if i in hold:
-                        idx_latex = idx_latex.replace(i + ",", "").replace(i, "")
-                _xtick_labels.append(idx_latex)
-
-            ax.set_xticklabels(_xtick_labels)
+            ax.set_xticklabels(self._plot_tick_labels(data, hold))
 
         plt.rcdefaults()
+
+    @staticmethod
+    def _held_indices(indices):
+        """Find fixed coordinates by position, retaining first-seen order.
+
+        The plotting metadata uses ordered coordinate names as dictionary
+        keys. Compare those names, not their nested position descriptions.
+        """
+        unique: dict[int, list] = {}
+        for index in indices:
+            for position, name in enumerate(index):
+                names = unique.setdefault(position, [])
+                if name not in names:
+                    names.append(name)
+        return [names[0] for names in unique.values() if len(names) == 1]
+
+    @staticmethod
+    def _plot_tick_labels(data, hold):
+        """Strip fixed-coordinate names with the existing LaTeX convention."""
+        labels = []
+        for original, index in zip(data["index_latex"], data["index"]):
+            latex = original
+            for name in index:
+                if name in hold:
+                    latex = latex.replace(name + ",", "").replace(name, "")
+            labels.append(latex)
+        return labels
 
     def line(self, **kwargs):
         """Alias for plot with kind='line'"""

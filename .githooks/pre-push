@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Run every gate; propagate failure instead of silently allowing Git operations.
+set -eu
+repository=$(git rev-parse --show-toplevel)
+if [ ! -x "$repository/.quality-venv/bin/python" ]; then
+    echo "Create .quality-venv and install .[test,quality,docs] first." >&2
+    exit 1
+fi
+exec "$repository/.quality-venv/bin/python" "$repository/tools/quality.py" all

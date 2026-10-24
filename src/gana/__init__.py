@@ -8,5 +8,5 @@ from .sets.parameter import P
 from .sets.theta import T
 from .sets.variable import V
 
-__all__ = ["V", "P", "I", "T", "Prg", "inf", "sup", "sigma"]
+__all__ = ["I", "P", "Prg", "T", "V", "inf", "sigma", "sup"]
 __version__ = "1.0.14"
