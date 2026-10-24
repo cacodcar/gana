@@ -6,6 +6,10 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Authenticate Codecov uploads using this GitHub job's identity.
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -24,7 +28,9 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           files: quality/reports/ci/coverage.xml
-          token: ${{ secrets.CODECOV_TOKEN }}
+          # Exclude preserved baseline reports from the current measurement.
+          disable_search: true
+          use_oidc: true
           fail_ci_if_error: true
       - name: Preserve gate evidence
         if: ${{ always() }}
