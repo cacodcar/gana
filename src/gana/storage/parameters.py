@@ -1,9 +1,8 @@
-"""Development parameter adapter: one native payload, two Python facades.
+"""Native parameter storage with synchronized Python facades.
 
-Set GANA_BACKEND=rust-parameters before importing Gana. Unregistered
-declarations
-keep their legacy staging buffers. Coordinates remain Python objects in this
-first integration; only numeric values and immutable versions live in Rust.
+Registered parameters require the Rust extension. Unregistered declarations
+retain editable staging buffers; registered aliases share native payloads or
+captured immutable versions.
 """
 
 from __future__ import annotations
@@ -20,16 +19,45 @@ from ..indexing.coordinates import Positions
 from ..sets.cases import PCase
 from ..utils._display import MappingPreview, SequencePreview
 
-BACKEND = os.environ.get("GANA_BACKEND", "python")
-if BACKEND not in {"python", "rust-parameters"}:
-    message = f"Unknown GANA_BACKEND: {BACKEND}"
-    raise ValueError(message)
-if BACKEND == "rust-parameters":
-    # An explicitly requested native run must fail when its extension is
-    # absent.
-    import_module("gana._native")
 
-NATIVE = BACKEND == "rust-parameters"
+def _validate_backend_setting() -> None:
+    """Accept the old native setting; reject retired and invalid modes."""
+    setting = os.environ.get("GANA_BACKEND")
+    if setting == "python":
+        message = (
+            "GANA_BACKEND=python is no longer supported. Gana requires Rust; "
+            "unset GANA_BACKEND or use rust-parameters."
+        )
+        raise ValueError(message)
+    if setting not in (None, "rust-parameters"):
+        message = (
+            f"Unknown GANA_BACKEND: {setting!r}. "
+            "Unset GANA_BACKEND to use the required Rust backend."
+        )
+        raise ValueError(message)
+
+
+def _require_native() -> None:
+    """Explain missing extensions; preserve dependency and ABI failures."""
+    try:
+        import_module("gana._native")
+    except ModuleNotFoundError as error:
+        if error.name != "gana._native":
+            raise
+        message = (
+            "Gana requires its Rust extension (gana._native). Install a "
+            "compatible Gana wheel, or build the extension from this source "
+            "checkout with 'python -m pip install .'. A source build requires "
+            "Rust 1.88 or newer."
+        )
+        raise ModuleNotFoundError(message, name="gana._native") from error
+
+
+_validate_backend_setting()
+_require_native()
+# Fixed diagnostics retain existing consumers during the branch cleanup.
+BACKEND = "rust-parameters"
+NATIVE = True
 
 _STRUCTURAL = (
     "Native parameter storage has fixed coordinates; assign P(...) through "
@@ -257,11 +285,10 @@ def register(parameter) -> None:
     extracts its own vector, so retaining the old staging list cannot mutate
     the installed payload. Lazy selection facades still need a sequence export.
     """
-    if BACKEND == "rust-parameters":
-        values = (
-            parameter._ if isinstance(parameter._, list) else list(parameter._)
-        )
-        ParameterStorage(parameter.map, values).install(parameter)
+    values = (
+        parameter._ if isinstance(parameter._, list) else list(parameter._)
+    )
+    ParameterStorage(parameter.map, values).install(parameter)
 
 
 def replace(parameter, mapping) -> None:
