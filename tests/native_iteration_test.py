@@ -7,7 +7,6 @@ import pytest
 
 from gana import I, P, Prg, T, V
 from gana.indexing.coordinates import Positions
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 
@@ -74,7 +73,6 @@ def test_exhausted_iterator_stays_exhausted(kind):
     )
 
 
-@pytest.mark.skipif(not NATIVE, reason="native lazy member ownership")
 @pytest.mark.parametrize("kind", [V, T])
 def test_partial_iteration_only_creates_consumed_symbols(kind):
     """Iteration allocates only the symbolic members it has consumed."""
@@ -87,7 +85,6 @@ def test_partial_iteration_only_creates_consumed_symbols(kind):
     CHECK.assertEqual(set(p.e._symbol_storage.states), {0})
 
 
-@pytest.mark.skipif(not NATIVE, reason="native coordinate interning")
 def test_equal_atoms_share_stable_tokens_through_growth():
     """Equal Python keys reuse the original atom, including token zero."""
     positions = Positions.create([(1, "a"), (True, "b"), (0, "a")])

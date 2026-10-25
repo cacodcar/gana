@@ -7,7 +7,6 @@ from unittest import TestCase
 import pytest
 
 from gana import I, P, Prg, V, inf, sigma, sup
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 
@@ -28,9 +27,8 @@ def test_scalar_objective_prints_captured_numbers(compose, sign, roundtrip):
     p = model()
     expression = sum(p.k(i) * p.x(i) for i in p.i)
     p.o = compose(expression)
-    if NATIVE:
-        CHECK.assertEqual(p.x._symbol_storage.states, {})
-        CHECK.assertNotIn("_legacy_cache", expression.__dict__)
+    CHECK.assertEqual(p.x._symbol_storage.states, {})
+    CHECK.assertNotIn("_legacy_cache", expression.__dict__)
     if roundtrip:
         p = deepcopy(p)
     p.k._[:] = [99, 99, 99]
@@ -64,8 +62,7 @@ def test_snapshot_retains_existing_font_depth(selected, expected):
     p = model()
     x, k = (p.x(p.a), p.k(p.a)) if selected else (p.x, p.k)
     expression = k * x
-    if NATIVE:
-        CHECK.assertEqual(p.x._symbol_storage.states, {})
+    CHECK.assertEqual(p.x._symbol_storage.states, {})
     CHECK.assertEqual(expression.latex(), expected)
     CHECK.assertEqual(expression.latex(), expected)
     CHECK.assertEqual(p.x.latex(), r"{\mathbf{\chi}}_{{i}}")

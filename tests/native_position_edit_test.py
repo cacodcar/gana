@@ -7,7 +7,6 @@ from unittest import TestCase
 import pytest
 
 from gana.backends.native.constraints import compile_program
-from gana.storage.parameters import NATIVE
 
 from .native_membership_edit_test import (
     memberships,
@@ -20,10 +19,6 @@ from .native_membership_edit_test import (
 from .native_membership_test import clone_fixture
 
 CHECK = TestCase()
-pytestmark = pytest.mark.skipif(
-    not NATIVE,
-    reason="requires native membership",
-)
 
 
 def edit(values, mutation, variable):

@@ -5,33 +5,37 @@ Native symbolic ownership, lazy identity, exact intervals and serialization.
 import gc
 import pickle
 import weakref
+from copy import deepcopy
 from unittest import TestCase
 
 import pytest
 
 from gana import I, P, Prg, T, V, inf, sigma
-from gana.storage import parameters as storage
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
-pytestmark = pytest.mark.skipif(not NATIVE, reason="requires native owners")
 
 
 @pytest.mark.parametrize("kind", [V, T])
-def test_python_growth_after_restoring_a_native_registry(kind, monkeypatch):
+@pytest.mark.parametrize("roundtrip", ["copy", "pickle"])
+def test_growth_after_restoring_a_native_registry(kind, roundtrip):
     """
-    A saved registry accepts new Python owners and their subsequent growth.
+    Restored registries preserve native ownership, growth and write guards.
     """
     p = Prg()
     p.i, p.j = I("a", "b"), I("c")
     args = {"_": (0, 2)} if kind is T else {}
     p.native = kind(p.i, **args)
-    monkeypatch.setattr(storage, "NATIVE", False)
-    p.legacy = kind(p.i, mutable=True, **args)
-    p.legacy = kind(p.j, **args)
+    original = p
+    p = deepcopy(p) if roundtrip == "copy" else pickle.loads(pickle.dumps(p))
+    p.growing = kind(p.i, mutable=True, **args)
+    p.growing = kind(p.j, **args)
     registry = p.variables if kind is V else p.thetas
     CHECK.assertEqual([member.n for member in registry], [0, 1, 2, 3, 4])
-    CHECK.assertEqual(len(p.legacy), 3)
+    CHECK.assertEqual(len(p.growing), 3)
+    CHECK.assertEqual(len(original.native), 2)
+    CHECK.assertIs(registry[0], p.native[0])
+    with pytest.raises(TypeError, match="cannot be replaced"):
+        p.native._ = []
 
 
 @pytest.mark.parametrize("kind", [V, T])

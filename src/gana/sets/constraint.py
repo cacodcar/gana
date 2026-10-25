@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING, Self, TypedDict, Union, cast
 
 from IPython.display import Math, display
 
-from gana.storage.parameters import NATIVE
 from gana.types import Number
 
 from .cases import FCase
@@ -89,7 +88,7 @@ class C:
 
     def __new__(cls, function=None, *args, **kwargs):
         """Dispatch affine roots before compatibility rows are born."""
-        if NATIVE and cls is C:
+        if cls is C:
             native = import_module("gana.backends.native.constraints")
             parent = args[1] if len(args) > 1 else kwargs.get("parent")
             if native.supported(function, parent):

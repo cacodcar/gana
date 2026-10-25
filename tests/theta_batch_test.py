@@ -10,7 +10,6 @@ import pytest
 
 from gana import I, Prg, T
 from gana.indexing.coordinates import encode_bounds
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 Bounds = namedtuple("Bounds", "lower upper")
@@ -93,7 +92,6 @@ def test_theta_subclass_keeps_its_validator():
     CHECK.assertEqual((p.t[1].lb, p.t[1].ub), (0, 1))
 
 
-@pytest.mark.skipif(not NATIVE, reason="native batch entry points")
 def test_batch_callbacks_keep_nonprimitive_rows_in_order():
     """Boolean, Fraction, namedtuple and member rows retain Python handling."""
     native = import_module("gana._native")
@@ -147,7 +145,6 @@ class RefusingFloat(float):
         raise ValueError(message)
 
 
-@pytest.mark.skipif(not NATIVE, reason="native batch entry points")
 def test_batch_encoding_stops_at_subclass_failure():
     """An exception from an endpoint cannot be hidden by fast conversion."""
     native = import_module("gana._native")

@@ -12,7 +12,6 @@ from unittest import TestCase
 import pytest
 
 from gana import I, P, Prg, T, V, inf, sigma
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 
@@ -195,7 +194,6 @@ def test_selection_serialization_and_lifetime(kind, gaps):
     CHECK.assertEqual([value(item, kind) for item in selected._], expected)
 
 
-@pytest.mark.skipif(not NATIVE, reason="native storage ownership contract")
 def test_cartesian_parameter_snapshots_detach_after_nested_selection():
     """
     Nested products retain old values even after root and selection writes.
@@ -210,7 +208,6 @@ def test_cartesian_parameter_snapshots_detach_after_nested_selection():
     CHECK.assertEqual(list(p.e._), [99] * 12)
 
 
-@pytest.mark.skipif(not NATIVE, reason="native lazy member contract")
 @pytest.mark.parametrize("kind", [V, T])
 @pytest.mark.parametrize("gaps", [False, True])
 def test_selection_does_not_materialize_scalar_members(kind, gaps):
@@ -270,10 +267,6 @@ def test_skips_do_not_hide_non_skipped_missing_coordinates(kind):
     CHECK.assertEqual(error.value.args[0], (p.extra[0], p.j[0]))
 
 
-@pytest.mark.skipif(
-    not NATIVE,
-    reason="native missing-coordinate construction",
-)
 def test_missing_variables_do_not_replay_python_coordinate_lookups(
     monkeypatch,
 ):

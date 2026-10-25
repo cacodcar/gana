@@ -10,7 +10,6 @@ import pytest
 
 from gana import I, Prg, T
 from gana.indexing.coordinates import decode_bounds, encode_bounds
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 
@@ -84,8 +83,7 @@ def test_valid_edits_are_consumed_with_exact_bounds_and_stable_members(
         p.t = root
     else:
         root.birth_thetas(n_start=1)
-    if NATIVE:
-        CHECK.assertEqual(root._symbol_storage.states, {})
+    CHECK.assertEqual(root._symbol_storage.states, {})
     first = root[0]
     CHECK.assertEqual((first.lb, first.ub, first.n), (-large, large, 1))
     CHECK.assertIs(first.parent, root)

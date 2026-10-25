@@ -12,14 +12,12 @@ import pytest
 
 from gana import I, P, Prg, T, V, inf, sigma, sup
 from gana.backends.native.algebra import NativeRows
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 ROW_BOUND = 11
 MIXED_BOUND = 7
 REDUCED_BOUND = 17
 COPY_BOUND = 4
-pytestmark = pytest.mark.skipif(not NATIVE, reason="requires native theta")
 
 
 def model(size=4):

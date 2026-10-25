@@ -7,7 +7,6 @@ from unittest import TestCase
 import pytest
 
 from gana import I, Prg, V, inf, sigma
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 
@@ -77,10 +76,9 @@ def check_objective(objective, program):
         CHECK.assertTrue(copied is not original)
         CHECK.assertTrue(any(item is objective for item in copied.min_by))
         CHECK.assertTrue(all(item is not program.o for item in copied.min_by))
-    if NATIVE:
-        CHECK.assertTrue(
-            objective._native_batch is objective.function._native_batch,
-        )
+    CHECK.assertTrue(
+        objective._native_batch is objective.function._native_batch,
+    )
     objective.unregister_variables()
     CHECK.assertTrue(
         all(not variable.min_by for variable in objective.variables),

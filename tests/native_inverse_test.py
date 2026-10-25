@@ -6,13 +6,8 @@ import pytest
 
 from gana import I, Prg, V, sigma
 from gana.backends.native import membership
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
-pytestmark = pytest.mark.skipif(
-    not NATIVE,
-    reason="requires native membership",
-)
 
 
 def model(size):

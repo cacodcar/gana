@@ -9,9 +9,7 @@ from unittest import TestCase
 import pytest
 
 from gana.indexing.coordinates import encode_bounds
-from gana.storage.parameters import NATIVE
 
-pytestmark = pytest.mark.skipif(not NATIVE, reason="native bound ingestion")
 CHECK = TestCase()
 
 

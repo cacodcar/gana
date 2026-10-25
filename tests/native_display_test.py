@@ -10,7 +10,6 @@ from IPython.lib.pretty import pretty
 
 from gana import I, P, Prg, T, V
 from gana.storage.parameters import (
-    NATIVE,
     ParameterMap,
     ParameterStorage,
     ParameterValues,
@@ -18,7 +17,6 @@ from gana.storage.parameters import (
 from gana.storage.symbols import SymbolMap, SymbolStorage, SymbolValues
 
 CHECK = TestCase()
-pytestmark = pytest.mark.skipif(not NATIVE, reason="requires native owners")
 PREVIEW_SIZE = 10
 
 

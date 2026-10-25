@@ -9,10 +9,8 @@ import pytest
 
 from gana import I, P, Prg, T, V
 from gana.indexing.ordered import OrderedMembers
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
-pytestmark = pytest.mark.skipif(not NATIVE, reason="native ordered indices")
 
 
 @pytest.mark.parametrize("kind", [P, V, T])

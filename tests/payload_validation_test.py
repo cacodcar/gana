@@ -8,7 +8,6 @@ from unittest import TestCase
 import pytest
 
 from gana import I, P, Prg, T
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 Bounds = namedtuple("Bounds", "lower upper")
@@ -23,7 +22,6 @@ class UnconvertibleFloat(float):
         raise ValueError(message)
 
 
-@pytest.mark.skipif(not NATIVE, reason="compact native declaration buffers")
 @pytest.mark.parametrize("value", [0.0, -0.0, inf, -inf, float("nan")])
 def test_compact_float_values_preserve_special_values_and_detach(value):
     """Keep IEEE values without retaining editable raw buffers."""
@@ -44,7 +42,6 @@ def test_compact_float_values_preserve_special_values_and_detach(value):
     CHECK.assertEqual(root._[-1], 3)
 
 
-@pytest.mark.skipif(not NATIVE, reason="compact native declaration buffers")
 @pytest.mark.parametrize(
     ("edit", "error"),
     [("3", TypeError), (4.0, ValueError), (UnconvertibleFloat(3), ValueError)],
@@ -94,7 +91,6 @@ def test_theta_member_payload_is_read_again_after_declaration_edit():
     CHECK.assertEqual((p.source[0].lb, p.source[0].ub), (1, 3))
 
 
-@pytest.mark.skipif(not NATIVE, reason="compact native declaration buffers")
 @pytest.mark.parametrize(
     ("original", "edited"),
     [("2.5", "2.5"), ("0.0", "-0.0"), ("inf", "inf")],
@@ -115,7 +111,6 @@ def test_equal_float_edits_preserve_the_accepted_value(original, edited):
     CHECK.assertEqual(copysign(1, root._[0]), copysign(1, value))
 
 
-@pytest.mark.skipif(not NATIVE, reason="compact native declaration buffers")
 def test_distinct_nan_edit_is_rejected_without_expanding_the_map():
     """Identity acceptance of NaN must not turn unequal NaNs into a match."""
     p = Prg()
@@ -141,7 +136,6 @@ class UnequalFloat(float):
         return True
 
 
-@pytest.mark.skipif(not NATIVE, reason="compact native declaration buffers")
 def test_mapped_float_subclass_keeps_its_inequality_hook():
     """A primitive value must not bypass the mapped object's comparison."""
     p = Prg()

@@ -35,22 +35,10 @@ STRUCTURAL = (
 
 
 def guard_attribute(element: Any, name: str, value: Any) -> None:
-    """
-    Protect native facades without adding assignment overhead to Python-only
-    runs.
-    """
+    """Protect registered native facades while allowing declaration edits."""
     if name in {"_", "map"} and "_symbol_storage" in element.__dict__:
         raise TypeError(STRUCTURAL)
     object.__setattr__(element, name, value)
-
-
-def _restore_guards():
-    """
-    Saved native owners need protection even under the Python backend default.
-    """
-    for module, name in (("variable", "V"), ("theta", "T")):
-        kind = getattr(import_module(f"..sets.{module}", __package__), name)
-        kind.__setattr__ = guard_attribute
 
 
 class SymbolStorage:
@@ -180,7 +168,6 @@ class SymbolStorage:
 
     def __setstate__(self, state):
         """Restore lookup machinery without retaining dead wrapper objects."""
-        _restore_guards()
         members = state.pop("live_members")
         self.__dict__.update(state)
         self.cache = WeakValueDictionary(members)

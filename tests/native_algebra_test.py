@@ -9,10 +9,8 @@ import pytest
 
 from gana import I, P, Prg, T, V, inf, sigma, sup
 from gana.backends.native.algebra import NativeRows
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
-pytestmark = pytest.mark.skipif(not NATIVE, reason="requires native algebra")
 
 
 def model(size=6):

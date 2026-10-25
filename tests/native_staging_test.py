@@ -9,13 +9,8 @@ import pytest
 from gana import I, P, Prg, T, V
 from gana.indexing.coordinates import CoordinateOwner
 from gana.indexing.staging import CartesianMap
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
-pytestmark = pytest.mark.skipif(
-    not NATIVE,
-    reason="native declaration storage",
-)
 
 
 def declaration(kind, *axes):

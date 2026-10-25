@@ -10,15 +10,10 @@ import pytest
 
 from gana import I, Prg, V
 from gana.backends.native.constraints import compile_program
-from gana.storage.parameters import NATIVE
 
 from .native_membership_test import clone_fixture
 
 CHECK = TestCase()
-pytestmark = pytest.mark.skipif(
-    not NATIVE,
-    reason="requires native membership",
-)
 
 
 def model():

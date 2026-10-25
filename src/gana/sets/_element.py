@@ -10,7 +10,6 @@ from typing import Generic, Self, TypedDict, TypeVar, cast, overload
 from IPython.display import Math, display
 
 from ..indexing.staging import CartesianMap
-from ..storage import parameters as storage
 from .index import I
 from .operands import NumericDispatch
 
@@ -140,8 +139,7 @@ class _E(NumericDispatch, ABC, Generic[_Member]):
         and hashing behavior. Union domains keep explicit insertion order.
         """
         return bool(
-            storage.NATIVE
-            and self._compact_staging
+            self._compact_staging
             and axes
             and all(type(axis) is I for axis in axes),
         )

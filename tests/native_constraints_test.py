@@ -12,7 +12,6 @@ import pytest
 from gana import I, P, Prg, T, V, inf, sigma
 from gana.backends.native.constraints import NativeConstraint
 from gana.sets.constraint import C
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 
@@ -33,10 +32,9 @@ def test_sparse_and_dense_independent_coefficients():
     np.testing.assert_array_equal(p.A, np.diag([0, 1, 2, 3]))
     np.testing.assert_array_equal(p.A_sparse.toarray(), np.diag([0, 1, 2, 3]))
     CHECK.assertEqual(p.B, [7, 17, 27, 37])
-    if NATIVE:
-        CHECK.assertIsInstance(p.c, NativeConstraint)
-        CHECK.assertEqual(p.x._symbol_storage.states, {})
-        CHECK.assertNotIn("_legacy_cache", p.c.__dict__)
+    CHECK.assertIsInstance(p.c, NativeConstraint)
+    CHECK.assertEqual(p.x._symbol_storage.states, {})
+    CHECK.assertNotIn("_legacy_cache", p.c.__dict__)
 
 
 def test_constraint_order_and_nonnegativity():
@@ -204,7 +202,6 @@ def test_deepcopy_keeps_one_owner_graph():
     CHECK.assertIs(copied.c[0].variables[0].parent, copied.x)
 
 
-@pytest.mark.skipif(not NATIVE, reason="requires native sparse compiler")
 def test_native_sparse_bounds_and_detached_exports():
     """
     Checked IDs prevent out-of-bounds writes; detached buffers are harmless.
@@ -221,7 +218,6 @@ def test_native_sparse_bounds_and_detached_exports():
     CHECK.assertGreater(compiled.reserved_bytes, 0)
 
 
-@pytest.mark.skipif(not NATIVE, reason="requires native sparse compiler")
 def test_exact_native_integers_and_overflow():
     """
     Native inputs retain integer kinds and signal overflow for Python fallback.

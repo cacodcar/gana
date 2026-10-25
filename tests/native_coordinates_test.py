@@ -11,13 +11,8 @@ import pytest
 from gana import I, Prg, V, sigma
 from gana.backends.native.algebra import NativeRows
 from gana.indexing.coordinates import Positions
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
-pytestmark = pytest.mark.skipif(
-    not NATIVE,
-    reason="requires native coordinates",
-)
 
 
 @pytest.mark.parametrize("reduced", [False, True])

@@ -6,7 +6,6 @@ from unittest import TestCase
 import pytest
 
 from gana import I, Prg, V
-from gana.storage.parameters import NATIVE
 from gana.storage.symbols import SymbolRegistry
 
 CHECK = TestCase()
@@ -63,20 +62,18 @@ def test_replacement_preserves_compact_siblings_and_memberships(size, expose):
     held, links = expose_rows(p, expose)
     p.first.categorize("Capacity")
     p.first = 5 * p.x(p.i[:size]) <= REPLACEMENT
-    if NATIVE:
-        CHECK.assertIsInstance(p.constraints, SymbolRegistry)
-        CHECK.assertIsNot(p.constraints, registry)
-        if expose != "other":
-            CHECK.assertNotIn("_legacy_cache", p.eq.__dict__)
-            CHECK.assertFalse(p.eq.__dict__.get("_native_rows"))
+    CHECK.assertIsInstance(p.constraints, SymbolRegistry)
+    CHECK.assertIsNot(p.constraints, registry)
+    if expose != "other":
+        CHECK.assertNotIn("_legacy_cache", p.eq.__dict__)
+        CHECK.assertFalse(p.eq.__dict__.get("_native_rows"))
     CHECK.assertEqual(p.n_constraints, size + 8)
     CHECK.assertEqual(p.first.category, "Capacity")
     expected = matrix(size)
     CHECK.assertEqual(p.A, expected)
     CHECK.assertEqual(p.B, [10] * size + [9] * 4 + [0] * 4)
     CHECK.assertEqual(p.cons(n=True), list(range(size + 8)))
-    if NATIVE:
-        CHECK.assertIs(registry[0], old[0])
+    CHECK.assertIs(registry[0], old[0])
     if held is not None:
         CHECK.assertIs(old[0], held)
     if links is not None:
@@ -101,11 +98,10 @@ def test_successive_replacements_keep_later_additions_compact():
     for size in (2, 4, 1):
         p.first = 7 * p.x(p.i[:size]) <= GROWTH
     p.extra = 2 * p.y <= EXTRA
-    if NATIVE:
-        CHECK.assertIsInstance(p.constraints, SymbolRegistry)
-        for root in (p.eq, p.extra):
-            CHECK.assertNotIn("_legacy_cache", root.__dict__)
-            CHECK.assertFalse(root.__dict__.get("_native_rows"))
+    CHECK.assertIsInstance(p.constraints, SymbolRegistry)
+    for root in (p.eq, p.extra):
+        CHECK.assertNotIn("_legacy_cache", root.__dict__)
+        CHECK.assertFalse(root.__dict__.get("_native_rows"))
     p.renumber()
     CHECK.assertEqual(p.cons(n=True), list(range(13)))
     CHECK.assertEqual(p.B, [14] + [6] * 4 + [9] * 4 + [0] * 4)
@@ -145,9 +141,6 @@ def test_shared_scalar_rows_keep_identity_removal_fallback():
     p = model()
     shared = p.first._[0]
     p.eq._[1] = shared
-    if not NATIVE:
-        # Python registration already copied the rows into its own list.
-        p.constraints[5] = shared
     survivor = p.eq._[0]
     p.first = 5 * p.x(p.i[:1]) <= REPLACEMENT
     CHECK.assertFalse(any(row is shared for row in p.constraints))

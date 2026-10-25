@@ -6,12 +6,10 @@ from unittest import TestCase
 import pytest
 
 from gana import I, Prg, T, V
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 
 
-@pytest.mark.skipif(not NATIVE, reason="requires native sparse compiler")
 @pytest.mark.parametrize(("rows", "columns"), [(0, 0), (0, 5), (3, 0), (3, 5)])
 def test_empty_dense_shapes_and_independent_rows(rows, columns):
     """Empty rows keep their shape and never share mutable list storage."""
@@ -33,7 +31,6 @@ def test_empty_dense_shapes_and_independent_rows(rows, columns):
     CHECK.assertEqual(compiled.dense(), expected)
 
 
-@pytest.mark.skipif(not NATIVE, reason="requires native sparse compiler")
 def test_dense_number_kinds_cancellation_and_detachment():
     """Keep large integers and explicit float zeros without float coercion."""
     native = import_module("gana._native")

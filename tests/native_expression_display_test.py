@@ -12,13 +12,8 @@ from IPython.lib.pretty import pretty
 from gana import I, P, Prg, T, V, inf, sigma, sup
 from gana.backends.native.algebra import NativeRows
 from gana.sets.function import F
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
-pytestmark = pytest.mark.skipif(
-    not NATIVE,
-    reason="requires native expressions",
-)
 
 
 def model(size=12):

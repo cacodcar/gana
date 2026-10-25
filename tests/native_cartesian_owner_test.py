@@ -8,10 +8,8 @@ from unittest import TestCase
 import pytest
 
 from gana.indexing.coordinates import Positions
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
-pytestmark = pytest.mark.skipif(not NATIVE, reason="requires native owners")
 
 
 @pytest.mark.parametrize("direct", [False, True])

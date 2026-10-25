@@ -11,7 +11,6 @@ from IPython.display import Math, display
 
 from gana.types import Number, NumericList, NumericTuple
 
-from ..storage import parameters as storage
 from ..storage import symbols as symbol_storage
 from ..utils.draw import draw
 from ._element import _E, _ElementArgs
@@ -138,8 +137,8 @@ class V(_E["V"]):
     __slots__ = ("_selection_owner",)
     _compact_staging = True
 
-    if storage.NATIVE:
-        __setattr__ = symbol_storage.guard_attribute
+    # Registered owners protect their native facades; staging stays editable.
+    __setattr__ = symbol_storage.guard_attribute
 
     # region Construction and ownership
 
@@ -275,15 +274,7 @@ class V(_E["V"]):
         del mutating
         if self._:
             return
-        if storage.NATIVE:
-            symbol_storage.register(self, n_start)
-            return
-        members = [
-            self._new_member(key, pos, n_start + pos)
-            for pos, key in enumerate(self.map)
-        ]
-        self._ = members
-        self.map.update(zip(self.map, members))
+        symbol_storage.register(self, n_start)
 
     def copy(self) -> V:
         """

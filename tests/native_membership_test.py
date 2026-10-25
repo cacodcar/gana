@@ -9,13 +9,8 @@ import pytest
 from gana import I, P, Prg, V, sigma
 from gana.backends.native import constraint_rows as native_constraint_rows
 from gana.backends.native.constraints import compile_program
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
-pytestmark = pytest.mark.skipif(
-    not NATIVE,
-    reason="requires native membership",
-)
 
 
 def model(size=8):

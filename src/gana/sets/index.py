@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING, Self, SupportsIndex
 from IPython.display import Math, display
 
 from ..indexing.ordered import OrderedMembers
-from ..storage import parameters as storage
 from .cases import ICase
 
 if TYPE_CHECKING:
@@ -198,7 +197,7 @@ class I:
 
     def _member_buffer(self, size):
         """Limit deferred birth to ordinary native ordered declarations."""
-        if storage.NATIVE and size and type(self) is I:
+        if size and type(self) is I:
             return OrderedMembers()
         return []
 

@@ -14,7 +14,6 @@ from typing import Self, cast
 from gana.types import Number
 
 from ..indexing.staging import fill_map
-from ..storage import parameters as storage
 from ..storage import symbols as symbol_storage
 from ._element import _E
 from .birth import make_P
@@ -67,8 +66,8 @@ class T(_E["T | tuple[float, ...] | None"]):
     # Internal affine snapshots retain the original public operand for replay.
     _native_theta_source: T
 
-    if storage.NATIVE:
-        __setattr__ = symbol_storage.guard_attribute
+    # Registered owners protect their native facades; staging stays editable.
+    __setattr__ = symbol_storage.guard_attribute
 
     # region Construction and validation
 
@@ -146,7 +145,7 @@ class T(_E["T | tuple[float, ...] | None"]):
         if len(self._) != len(self.map):
             message = "Theta bounds length must match its coordinates"
             raise ValueError(message)
-        if storage.NATIVE and type(self) is T:
+        if type(self) is T:
             return import_module("gana._native").validate_bounds(
                 self._,
                 self._bound_pair,
@@ -221,15 +220,7 @@ class T(_E["T | tuple[float, ...] | None"]):
         """
         if self.birthed:
             return
-        if storage.NATIVE:
-            symbol_storage.register(self, n_start, bounds)
-            self.birthed = True
-            return
-        self._ = [
-            self._new_member(key, pos, n_start + pos, pair)
-            for pos, (key, pair) in enumerate(zip(self.map, bounds))
-        ]
-        self.create_map()
+        symbol_storage.register(self, n_start, bounds)
         self.birthed = True
 
     def create_map(self):

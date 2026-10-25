@@ -10,12 +10,7 @@ from gana import I, P, Prg, T, V, sigma
 from gana.backends.native.constraints import compile_program
 from gana.backends.native.export import renumber
 from gana.sets.constraint import C
-from gana.storage.parameters import NATIVE
 
-pytestmark = pytest.mark.skipif(
-    not NATIVE,
-    reason="requires native constraint projection",
-)
 CHECK = TestCase()
 
 

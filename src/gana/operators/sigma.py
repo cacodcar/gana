@@ -13,7 +13,6 @@ from gana.types import Number
 from ..sets.cases import Elem, FCase
 from ..sets.function import F
 from ..sets.rows import sum_expression
-from ..storage.parameters import NATIVE
 
 if TYPE_CHECKING:
     from ..sets.index import I
@@ -138,14 +137,13 @@ def sigma(
     ):
         return variable
 
-    if NATIVE:
-        result = import_module("gana.backends.native.algebra").try_sum(
-            variable,
-            over,
-            position,
-        )
-        if result is not None:
-            return result
+    result = import_module("gana.backends.native.algebra").try_sum(
+        variable,
+        over,
+        position,
+    )
+    if result is not None:
+        return result
 
     if isinstance(variable, F):
         return sum_expression(variable, over, position)

@@ -10,10 +10,8 @@ import pytest
 from gana import I, Prg, V
 from gana.backends.native import rows as native_rows
 from gana.backends.native.algebra import _DISPLAY
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
-pytestmark = pytest.mark.skipif(not NATIVE, reason="requires native rows")
 
 
 def model():

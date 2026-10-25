@@ -118,9 +118,7 @@ class Prg:
 
         # variable (V)
         self.variable_sets: list[V] = []
-        self.variables: Sequence[V] = (
-            symbol_storage.SymbolRegistry() if storage.NATIVE else []
-        )
+        self.variables: Sequence[V] = symbol_storage.SymbolRegistry()
 
         # parameter (P)
         self.parameter_sets: list[P] = []  # parameter sets
@@ -128,21 +126,19 @@ class Prg:
 
         # parametric variable (T)
         self.theta_sets: list[T] = []
-        self.thetas: Sequence[T] = (
-            symbol_storage.SymbolRegistry() if storage.NATIVE else []
-        )
+        self.thetas: Sequence[T] = symbol_storage.SymbolRegistry()
 
         # function (F)
         # Scalar variable objectives also retain their original display node.
         self.function_sets: list[Func | V] = []
         self.functions: list[Func] | symbol_storage.SymbolRegistry = (
-            symbol_storage.SymbolRegistry() if storage.NATIVE else []
+            symbol_storage.SymbolRegistry()
         )
 
         # constraint (C)
         self.constraint_sets: list[C] = []
         self.constraints: list[C] | symbol_storage.SymbolRegistry = (
-            symbol_storage.SymbolRegistry() if storage.NATIVE else []
+            symbol_storage.SymbolRegistry()
         )
 
         self.categories_sets: dict[
@@ -1134,8 +1130,6 @@ class Prg:
 
     def _compile_constraints(self):
         """Compile native rows without caching mutable model structure."""
-        if not storage.NATIVE:
-            return None
         return compile_program(self)
 
     @property
@@ -1204,9 +1198,7 @@ class Prg:
     @property
     def F(self) -> list[list[float]]:
         """Export RHS theta coefficients in their independent column space."""
-        compiled = (
-            compile_program(self, theta=True) if storage.NATIVE else None
-        )
+        compiled = compile_program(self, theta=True)
         if compiled is not None:
             return compiled.dense()
         constraints = self.cons()
@@ -1680,7 +1672,7 @@ class Prg:
         """
         Build a transient sparse adapter only for supported native models.
         """
-        return build_native_export(self) if storage.NATIVE else None
+        return build_native_export(self)
 
     def _write_native_mps(self, snapshot, name):
         """

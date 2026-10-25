@@ -10,12 +10,7 @@ import pytest
 
 from gana import I, P, Prg, T, V, sigma
 from gana.backends.native.algebra import _LEGACY
-from gana.storage.parameters import NATIVE
 
-pytestmark = pytest.mark.skipif(
-    not NATIVE,
-    reason="requires native row projection",
-)
 CHECK = TestCase()
 
 

@@ -9,7 +9,6 @@ import numpy as np
 import pytest
 
 from gana import I, P, Prg, V, inf, sigma
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 
@@ -31,11 +30,10 @@ def untouched(p):
     """
     Native adapters must leave symbolic member states and scalar rows unborn.
     """
-    if NATIVE:
-        for root in p.variable_sets:
-            CHECK.assertEqual(root._symbol_storage.states, {})
-        for constraint in p.constraint_sets:
-            CHECK.assertNotIn("_legacy_cache", constraint.__dict__)
+    for root in p.variable_sets:
+        CHECK.assertEqual(root._symbol_storage.states, {})
+    for constraint in p.constraint_sets:
+        CHECK.assertNotIn("_legacy_cache", constraint.__dict__)
 
 
 @pytest.mark.parametrize(
@@ -152,8 +150,7 @@ def test_held_history_observes_new_solutions():
     history = p.x[0].X
     p._load_values(([-2, 0, 3], 14))
     CHECK.assertEqual(history, {0: -2})
-    if NATIVE:
-        CHECK.assertEqual(list(p.x._symbol_storage.states), [0])
+    CHECK.assertEqual(list(p.x._symbol_storage.states), [0])
     p._birth_solution()
     p._load_values(([1, 2, 3], 21))
     CHECK.assertEqual(history, {0: -2, 1: 1})
@@ -219,14 +216,13 @@ def test_import_keeps_registration_row_numbers():
     p = model([1, 2, 3])
     limit = 10
     p.cap = 3 * p.x <= limit
-    if NATIVE:
-        before = [c._native_number_start for c in p.constraint_sets]
-        p._load_values(([1, 2, 3], 21))
-        CHECK.assertEqual(
-            [c._native_number_start for c in p.constraint_sets],
-            before,
-        )
-        untouched(p)
+    before = [c._native_number_start for c in p.constraint_sets]
+    p._load_values(([1, 2, 3], 21))
+    CHECK.assertEqual(
+        [c._native_number_start for c in p.constraint_sets],
+        before,
+    )
+    untouched(p)
 
 
 def test_nonstandard_result_values_use_compatibility():
@@ -240,7 +236,6 @@ def test_nonstandard_result_values_use_compatibility():
     CHECK.assertEqual(p.fixed.function.solution(), [0, 0, 0])
 
 
-@pytest.mark.skipif(not NATIVE, reason="native solver resource cleanup")
 def test_failed_solver_construction_releases_model():
     """An adapter error must release an already-created solver resource."""
     p = model(nn=False)

@@ -14,7 +14,6 @@ import pytest
 from gana import I, P, Prg, V, inf, sigma
 from gana.backends.native.algebra import _LEGACY, NativeRows
 from gana.sets.constraint import C
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 
@@ -30,11 +29,10 @@ def grid():
 
 def assert_lazy(p, *expressions):
     """Check that native construction has not requested any scalar wrappers."""
-    if NATIVE:
-        CHECK.assertEqual(p.x._symbol_storage.states, {})
-        for expression in expressions:
-            CHECK.assertIsInstance(expression, NativeRows)
-            CHECK.assertNotIn("_legacy_cache", expression.__dict__)
+    CHECK.assertEqual(p.x._symbol_storage.states, {})
+    for expression in expressions:
+        CHECK.assertIsInstance(expression, NativeRows)
+        CHECK.assertNotIn("_legacy_cache", expression.__dict__)
 
 
 @pytest.mark.parametrize("nested", [False, True])
@@ -285,7 +283,6 @@ def test_derived_expression_captures_rows_before_later_edits(edit_list):
     CHECK.assertEqual([row.B for row in derived], [-5, -5])
 
 
-@pytest.mark.skipif(not NATIVE, reason="requires native replay dependencies")
 def test_discarded_native_selections_are_not_retained():
     """Replay notifications must not cache transient expressions."""
     p = grid()
@@ -298,7 +295,6 @@ def test_discarded_native_selections_are_not_retained():
     CHECK.assertEqual(len(source._native_dependents), 0)
 
 
-@pytest.mark.skipif(not NATIVE, reason="requires native replay dependencies")
 def test_ancestor_exposure_does_not_recurse_through_descendants():
     """A long chain captures coefficients before its first owner is edited."""
     p = Prg()
@@ -313,7 +309,6 @@ def test_ancestor_exposure_does_not_recurse_through_descendants():
     CHECK.assertEqual(expression[0].A, [expected])
 
 
-@pytest.mark.skipif(not NATIVE, reason="requires native row ownership")
 def test_native_row_selection_checks_bounds_and_exact_coefficients():
     """
     Exercise native repeated IDs, detached export and checked integer math.

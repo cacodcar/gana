@@ -7,7 +7,6 @@ import pytest
 
 from gana import I, P, Prg, T, V
 from gana.indexing.coordinates import Positions
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 
@@ -92,7 +91,6 @@ class CollidingAtom:
         return isinstance(other, CollidingAtom) and self.value == other.value
 
 
-@pytest.mark.skipif(not NATIVE, reason="requires native coordinate storage")
 def test_equal_colliding_atoms_keep_first_identity_through_growth():
     """Interning and append preserve IDs and fixed snapshot domains."""
     first, equal, other = map(CollidingAtom, ["a", "a", "b"])
@@ -115,7 +113,6 @@ def test_equal_colliding_atoms_keep_first_identity_through_growth():
     CHECK.assertIs(positions.key(3)[1], first)
 
 
-@pytest.mark.skipif(not NATIVE, reason="requires native coordinate storage")
 def test_empty_coordinates_and_equal_zero_atoms_preserve_root_uniqueness():
     """Equal atoms share tokens, including zero, within unique root rows."""
     positions = Positions.create([(0, 0), (False, None), (None, 0)])

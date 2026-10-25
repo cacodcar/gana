@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING, Self, Union, cast, overload
 
 from IPython.display import Math, display
 
-from gana.storage.parameters import NATIVE
 from gana.types import Number, NumericList, NumericTuple
 
 from .birth import make_P, make_T
@@ -177,8 +176,8 @@ class F(NumericDispatch):
     # region Construction and normalization
 
     def __new__(cls, *args, **kwargs):
-        """Use native affine batches when the backend supports them."""
-        if NATIVE and cls is F:
+        """Use native affine batches for supported base-class operands."""
+        if cls is F:
             if len(args) <= _BINARY_OPERANDS:
                 factory = import_module(
                     "gana.backends.native.algebra",
@@ -1174,7 +1173,7 @@ class F(NumericDispatch):
         Lists and shifted/gapped facades retain their actual values so None
         boundaries and numeric/F payloads keep their existing semantics.
         """
-        if NATIVE and kind in (Elem.V, Elem.T):
+        if kind in (Elem.V, Elem.T):
             facade = import_module("gana.storage.symbols").SymbolValues
             if isinstance(values, facade):
                 return repeat(True, len(values))

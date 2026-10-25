@@ -6,7 +6,6 @@ from unittest import TestCase
 import pytest
 
 from gana import I, P, Prg
-from gana.storage.parameters import NATIVE
 
 CHECK = TestCase()
 
@@ -96,10 +95,9 @@ def test_registration_consumes_values_and_preserves_ownership(values):
         else:
             CHECK.assertEqual(actual, original)
             CHECK.assertEqual(copysign(1, actual), copysign(1, original))
-    if NATIVE:
-        old_values[-1] = 99
-        old_map[keys[-1]] = 98
-        CHECK.assertEqual(root._[-1], expected[-1])
+    old_values[-1] = 99
+    old_map[keys[-1]] = 98
+    CHECK.assertEqual(root._[-1], expected[-1])
 
 
 def test_selected_parameter_cannot_acquire_a_second_program_owner():

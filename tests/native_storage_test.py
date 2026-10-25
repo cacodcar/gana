@@ -9,16 +9,9 @@ import numpy as np
 import pytest
 
 from gana import I, P, Prg, V, inf
-from gana.storage.parameters import BACKEND
+from gana._native import NumericOwner, NumericPayload
 
 CHECK = TestCase()
-
-pytestmark = pytest.mark.skipif(
-    BACKEND != "rust-parameters",
-    reason="requires the explicit native backend",
-)
-if BACKEND == "rust-parameters":
-    from gana._native import NumericOwner, NumericPayload
 
 
 def parameter():
