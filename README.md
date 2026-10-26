@@ -4,11 +4,18 @@
 </p>
 
 
-[![Documentation](https://img.shields.io/badge/docs-Read%20the%20Docs-blue)](https://gana.readthedocs.io/en/latest/)
+<!-- Release and adoption -->
 [![PyPI](https://img.shields.io/pypi/v/gana.svg)](https://pypi.org/project/gana)
+[![Python Versions](https://img.shields.io/pypi/pyversions/gana.svg)](https://pypi.org/project/gana/)
 [![Downloads](https://static.pepy.tech/personalized-badge/gana?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads)](https://pepy.tech/project/gana)
-[![Python package](https://github.com/cacodcar/gana/actions/workflows/python-package.yml/badge.svg)](https://github.com/cacodcar/gana/actions/workflows/python-package.yml)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gana.svg)](https://pypi.org/project/gana/)
+[![Monthly Downloads](https://img.shields.io/pypi/dm/gana)](https://pypi.org/project/gana/)
+[![Documentation](https://img.shields.io/badge/docs-Read%20the%20Docs-blue)](https://gana.readthedocs.io/en/latest/)
+
+<!-- Quality and development -->
+[![Quality](https://github.com/cacodcar/gana/actions/workflows/python-package.yml/badge.svg)](https://github.com/cacodcar/gana/actions/workflows/python-package.yml)
+[![Coverage](https://codecov.io/gh/cacodcar/gana/graph/badge.svg)](https://codecov.io/gh/cacodcar/gana)
+[![License](https://img.shields.io/github/license/cacodcar/gana)](https://github.com/cacodcar/gana/blob/main/LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/cacodcar/gana)](https://github.com/cacodcar/gana/commits/main)
 
 Gana is an Algebraic Modeling Language (AML) for Multiscale Modeling and Optimization. 
 Generated programs (```Prg```) can be subclasses of Multiparametric Mixed Integer Linear Programming (mpMILP). 
