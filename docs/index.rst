@@ -70,6 +70,7 @@ Gana Algebraic Modeling Language
    :hidden:
 
    NATIVE_BACKEND
+   PUBLISHING_1_1_0
    QUALITY_BASELINE
    QUALITY_GATES
    REPRODUCIBLE_BASELINE
