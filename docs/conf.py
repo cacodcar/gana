@@ -191,6 +191,7 @@ exclude_patterns = [
     'Thumbs.db',
     '.DS_Store',
     'jupyter_execute',
+    'examples/insurance.ipynb',  # Unimplemented placeholder; exclude from Sphinx build.
     '**.ipynb_checkpoints',
 ]
 
