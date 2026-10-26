@@ -4,7 +4,7 @@
 </p>
 
 
-[![Documentation Status](https://readthedocs.org/projects/gana/badge/)](https://gana.readthedocs.io/en/latest/)
+[![Documentation](https://img.shields.io/badge/docs-Read%20the%20Docs-blue)](https://gana.readthedocs.io/en/latest/)
 [![PyPI](https://img.shields.io/pypi/v/gana.svg)](https://pypi.org/project/gana)
 [![Downloads](https://static.pepy.tech/personalized-badge/gana?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads)](https://pepy.tech/project/gana)
 [![Python package](https://github.com/cacodcar/gana/actions/workflows/python-package.yml/badge.svg)](https://github.com/cacodcar/gana/actions/workflows/python-package.yml)
