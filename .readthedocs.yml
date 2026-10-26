@@ -13,15 +13,12 @@ build:
     rust: "1.86"
   jobs:
     pre_install:
-      - rustup toolchain install 1.88.0 --profile minimal
+      # Read the Docs manages rustup through asdf; do not replace that executable.
+      - rustup toolchain install 1.88.0 --profile minimal --no-self-update
       - rustup override set 1.88.0
-
-python:
-  install:
-    - method: pip
-      path: . 
-      extra_requirements:
-        - docs
+    post_install:
+      # Sphinx imports src/gana, which must contain the compiled extension.
+      - python -m pip install -e '.[docs]'
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
