@@ -51,13 +51,6 @@ Gana Algebraic Modeling Language
 
 .. toctree::
    :maxdepth: 1
-   :caption: Examples under development
-   :hidden:
-
-   examples/insurance
-
-.. toctree::
-   :maxdepth: 1
    :caption: Information
    :hidden:
 

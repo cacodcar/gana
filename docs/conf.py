@@ -214,6 +214,8 @@ autodoc_member_order = 'bysource'
 html_theme = 'sphinx_book_theme'
 html_static_path = ['_static']
 html_css_files = ['custom.css']
+# Work around inactive sidebar toggle handlers in some book-theme builds.
+html_js_files = ['sidebar-toggle.js']
 html_copy_source = True
 html_last_updated_fmt = ""
 # MyST-NB registers the same parser for Markdown and notebook sources.
