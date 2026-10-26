@@ -207,3 +207,18 @@ results/
 
 # ignore solution files
 sol.json
+
+# Reproducible quality runs (the reference in quality/baselines is retained)
+/quality/runs/
+
+#  isolated quality tooling and reports.
+.quality-venv/
+quality/runs/
+quality/reports/
+.mypy_cache/
+
+#  automatic per-run profiling artifacts.
+/quality/profiles/
+
+# Isolated Rust build tooling; pinned Python reference environments stay intact.
+.native-venv/

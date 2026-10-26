@@ -1,0 +1,20 @@
+[package]
+name = "gana-python"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lib]
+name = "_native"
+crate-type = ["cdylib"]
+
+[dependencies]
+gana-core = { path = "../gana-core" }
+pyo3 = { version = "=0.27.2", features = ["abi3-py312"] }
+
+[features]
+extension-module = ["pyo3/extension-module"]
+
+[lints]
+workspace = true

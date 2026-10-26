@@ -1,8 +1,23 @@
 Gana Algebraic Modeling Language
 ================================
 
+.. Use local theme-aware banners; skip the README's light-only HTML banner.
+
+.. image:: _static/ganalogo.jpg
+   :alt: Gana
+   :width: 75%
+   :align: center
+   :class: only-light
+
+.. image:: _static/gana-logo-soft-white.png
+   :alt: Gana
+   :width: 75%
+   :align: center
+   :class: only-dark
+
 .. include:: ../README.md
    :parser: myst_parser.sphinx_
+   :start-after: </p>
    
 
 .. seealso::
@@ -36,11 +51,29 @@ Gana Algebraic Modeling Language
 
 .. toctree::
    :maxdepth: 1
+   :caption: Examples under development
+   :hidden:
+
+   examples/insurance
+
+.. toctree::
+   :maxdepth: 1
    :caption: Information
    :hidden:
 
    license
    changelog
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Development and validation
+   :hidden:
+
+   NATIVE_BACKEND
+   QUALITY_BASELINE
+   QUALITY_GATES
+   REPRODUCIBLE_BASELINE
+   TYPE_ALIASES
    
 
 
@@ -54,6 +87,19 @@ API Reference
    :nosignatures:
 
    gana
+   gana.block
+   gana.operators
+   gana.sets
+   gana.shapes
+   gana.utils
+   gana.value
+   gana.types
+   gana.backends
+   gana.indexing
+   gana.storage
+   gana.storage.members
+   gana.storage.parameters
+   gana.storage.symbols
 
 
 

@@ -1,0 +1,13 @@
+diff --git a/src/gana/sets/parameter.py b/src/gana/sets/parameter.py
+index d7ffaea..1a7d692 100644
+--- a/src/gana/sets/parameter.py
++++ b/src/gana/sets/parameter.py
+@@ -129,7 +129,7 @@ class P(_E):
+                 # here the map needs to be remade
+                 # self.map = {i: None for i in product(*self.index)}
+                 self.name = "φ"  # set the name to phi
+-                self.map = {i: None for i in product(*self.index)}
++                self.map = {i: None for i in self.index}
+             self._ = [float(p) for p in _]
+ 
+         # fill in the values

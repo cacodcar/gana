@@ -1,0 +1,4911 @@
+{
+  "program_sha256": "84be44e26157ac891db5b1415a96ed407d9bfde3a932ec94016127af3c12c6d7",
+  "captured_backends": [
+    "python",
+    "rust-parameters"
+  ],
+  "outputs": {
+    "latex": {
+      "[\"empty\", {\"as_document\": false, \"categorical\": false, \"category\": null, \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": false, \"category\": null, \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": false, \"category\": \"Capacity\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": false, \"category\": \"Capacity\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": false, \"category\": \"Costs\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": false, \"category\": \"Costs\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": false, \"category\": \"missing\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": false, \"category\": \"missing\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": false, \"category\": \"\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": false, \"category\": \"\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": true, \"category\": null, \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": true, \"category\": null, \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": true, \"category\": \"Capacity\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": true, \"category\": \"Capacity\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": true, \"category\": \"Costs\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": true, \"category\": \"Costs\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": true, \"category\": \"missing\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": true, \"category\": \"missing\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": true, \"category\": \"\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": true, \"category\": \"\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": false, \"category\": null, \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": false, \"category\": null, \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": false, \"category\": \"Capacity\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": false, \"category\": \"Capacity\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": false, \"category\": \"Costs\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": false, \"category\": \"Costs\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": false, \"category\": \"missing\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": false, \"category\": \"missing\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": false, \"category\": \"\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": false, \"category\": \"\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": true, \"category\": null, \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": true, \"category\": null, \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": true, \"category\": \"Capacity\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": true, \"category\": \"Capacity\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": true, \"category\": \"Costs\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": true, \"category\": \"Costs\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": true, \"category\": \"missing\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": true, \"category\": \"missing\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"empty\", {\"as_document\": false, \"categorical\": true, \"category\": \"\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Subject to",
+      "[\"empty\", {\"as_document\": true, \"categorical\": true, \"category\": \"\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Subject to}\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": false, \"category\": null, \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### Inequality Constraint Sets\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n### Equality Constraint Sets\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n## Functions\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$",
+      "[\"full\", {\"as_document\": true, \"categorical\": false, \"category\": null, \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{Inequality Constraint Sets}\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n\\subsection*{Equality Constraint Sets}\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n\\section*{Functions}\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": false, \"category\": \"Capacity\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### Capacity Constraints\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n###  Functions\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n\n### Costs Functions\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": false, \"category\": \"Capacity\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{Capacity Constraints}\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n\\subsection*{ Functions}\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n\n\\subsection*{Costs Functions}\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": false, \"category\": \"Costs\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### Balance Constraints\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n### Bounds Constraints\n\n$[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0$\n\n### Capacity Constraints\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n### Costs Functions\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": false, \"category\": \"Costs\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{Balance Constraints}\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n\\subsection*{Bounds Constraints}\n\n$[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0$\n\n\\subsection*{Capacity Constraints}\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n\\subsection*{Costs Functions}\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": false, \"category\": \"missing\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### Balance Constraints\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n### Bounds Constraints\n\n$[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0$\n\n### Capacity Constraints\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n###  Functions\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n\n### Costs Functions\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": false, \"category\": \"missing\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{Balance Constraints}\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n\\subsection*{Bounds Constraints}\n\n$[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0$\n\n\\subsection*{Capacity Constraints}\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n\\subsection*{ Functions}\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n\n\\subsection*{Costs Functions}\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": false, \"category\": \"\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### Inequality Constraint Sets\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n### Equality Constraint Sets\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n## Functions\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$",
+      "[\"full\", {\"as_document\": true, \"categorical\": false, \"category\": \"\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{Inequality Constraint Sets}\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n\\subsection*{Equality Constraint Sets}\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n\\section*{Functions}\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": true, \"category\": null, \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### Balance Constraints\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n### Bounds Constraints\n\n$[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0$\n\n### Capacity Constraints\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n###  Functions\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n\n### Costs Functions\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": true, \"category\": null, \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{Balance Constraints}\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n\\subsection*{Bounds Constraints}\n\n$[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0$\n\n\\subsection*{Capacity Constraints}\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n\\subsection*{ Functions}\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n\n\\subsection*{Costs Functions}\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": true, \"category\": \"Capacity\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### Capacity Constraints\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n###  Functions\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n\n### Costs Functions\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": true, \"category\": \"Capacity\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{Capacity Constraints}\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n\\subsection*{ Functions}\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n\n\\subsection*{Costs Functions}\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": true, \"category\": \"Costs\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### Balance Constraints\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n### Bounds Constraints\n\n$[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0$\n\n### Capacity Constraints\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n### Costs Functions\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": true, \"category\": \"Costs\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{Balance Constraints}\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n\\subsection*{Bounds Constraints}\n\n$[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0$\n\n\\subsection*{Capacity Constraints}\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n\\subsection*{Costs Functions}\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": true, \"category\": \"missing\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### Balance Constraints\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n### Bounds Constraints\n\n$[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0$\n\n### Capacity Constraints\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n###  Functions\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n\n### Costs Functions\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": true, \"category\": \"missing\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{Balance Constraints}\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n\\subsection*{Bounds Constraints}\n\n$[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0$\n\n\\subsection*{Capacity Constraints}\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n\\subsection*{ Functions}\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n\n\\subsection*{Costs Functions}\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": true, \"category\": \"\", \"descriptive\": false}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### Balance Constraints\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n### Bounds Constraints\n\n$[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0$\n\n### Capacity Constraints\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n###  Functions\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n\n### Costs Functions\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": true, \"category\": \"\", \"descriptive\": false}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{Balance Constraints}\n\n$[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0$\n\n\\subsection*{Bounds Constraints}\n\n$[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0$\n\n\\subsection*{Capacity Constraints}\n\n$[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0$\n\n\\subsection*{ Functions}\n\n$\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)$\n\n\\subsection*{Costs Functions}\n\n$2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": false, \"category\": null, \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### Inequality Constraints\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n### Equality Constraints\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n### Non-Negative Constraints\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n## Functions\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": false, \"category\": null, \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{Inequality Constraints}\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n\\subsection*{Equality Constraints}\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n\\subsection*{Non-Negative Constraints}\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n\\section*{Functions}\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": false, \"category\": \"Capacity\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### General Constraints\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n###  Functions\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": false, \"category\": \"Capacity\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{General Constraints}\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n\\subsection*{ Functions}\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": false, \"category\": \"Costs\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### General Constraints\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n###  Functions\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": false, \"category\": \"Costs\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{General Constraints}\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n\\subsection*{ Functions}\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": false, \"category\": \"missing\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### General Constraints\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n###  Functions\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": false, \"category\": \"missing\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{General Constraints}\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n\\subsection*{ Functions}\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": false, \"category\": \"\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### Inequality Constraints\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n### Equality Constraints\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n### Non-Negative Constraints\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n## Functions\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": false, \"category\": \"\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{Inequality Constraints}\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n\\subsection*{Equality Constraints}\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n\\subsection*{Non-Negative Constraints}\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n\\section*{Functions}\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": true, \"category\": null, \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### General Constraints\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n###  Functions\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": true, \"category\": null, \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{General Constraints}\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n\\subsection*{ Functions}\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": true, \"category\": \"Capacity\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### General Constraints\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n###  Functions\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": true, \"category\": \"Capacity\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{General Constraints}\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n\\subsection*{ Functions}\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": true, \"category\": \"Costs\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### General Constraints\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n###  Functions\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": true, \"category\": \"Costs\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{General Constraints}\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n\\subsection*{ Functions}\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": true, \"category\": \"missing\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### General Constraints\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n###  Functions\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": true, \"category\": \"missing\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{General Constraints}\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n\\subsection*{ Functions}\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$\n    \\end{document}",
+      "[\"full\", {\"as_document\": false, \"categorical\": true, \"category\": \"\", \"descriptive\": true}]": "\\textbf{Mathematical Program for } Display contracts\n\n## Index Sets\n\n{i} = \\{ {{a}, {b}} \\}\n\n## Objective\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n## Subject to\n\n### General Constraints\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n###  Functions\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$",
+      "[\"full\", {\"as_document\": true, \"categorical\": true, \"category\": \"\", \"descriptive\": true}]": "\\documentclass{article}\n    \\usepackage{amsmath, amssymb}\n    \\usepackage[margin=1in]{geometry}\n    \\begin{document}\n    \\textbf{Mathematical Program for } Display contracts\n\n\\section*{Index Sets}\n\n{i} = \\{ {{a}, {b}} \\}\n\n\\section*{Objective}\n\nmin \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)\n\n\\section*{Subject to}\n\n\\subsection*{General Constraints}\n\n$[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0$\n\n$[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0$\n\n$[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0$\n\n$[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0$\n\n$[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0$\n\n$[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0$\n\n\\subsection*{ Functions}\n\n$2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}$\n\n$2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}$\n    \\end{document}"
+    },
+    "show": {
+      "[\"empty\", {\"categorical\": false, \"category\": null, \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": null, \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"Capacity\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"Capacity\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"Costs\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"Costs\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"missing\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"missing\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": null, \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": null, \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"Capacity\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"Capacity\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"Costs\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"Costs\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"missing\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"missing\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": null, \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": null, \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"Capacity\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"Capacity\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"Costs\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"Costs\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"missing\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"missing\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": false, \"category\": \"\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": null, \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": null, \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"Capacity\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"Capacity\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"Costs\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"Costs\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"missing\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"missing\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"empty\", {\"categorical\": true, \"category\": \"\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": null, \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Inequality Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Equality Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": null, \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Inequality Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Equality Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"Capacity\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"Capacity\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"Costs\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Balance Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "### Bounds Constraint Sets"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"Costs\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Balance Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "### Bounds Constraint Sets"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"missing\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Balance Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "### Bounds Constraint Sets"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"missing\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Balance Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "### Bounds Constraint Sets"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Inequality Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Equality Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Inequality Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Equality Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": null, \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Balance Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "### Bounds Constraint Sets"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": null, \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Balance Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "### Bounds Constraint Sets"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"Capacity\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"Capacity\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"Costs\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Balance Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "### Bounds Constraint Sets"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"Costs\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Balance Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "### Bounds Constraint Sets"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"missing\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Balance Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "### Bounds Constraint Sets"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"missing\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Balance Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "### Bounds Constraint Sets"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"\", \"descriptive\": false, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Balance Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "### Bounds Constraint Sets"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"\", \"descriptive\": false, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### Balance Constraint Sets"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}} - 5 = 0"
+          ],
+          [
+            "Markdown",
+            "### Bounds Constraint Sets"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }-{\\mathbf{{\\mathbf{x}}}}_{{i}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "### Capacity Constraint Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{{\\mathbf{x}}}}_{{i}} - 3 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }\\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "### Costs Function Sets"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "Capacity": [
+              "x-3<=0"
+            ],
+            "Balance": [
+              "x+y-5=0"
+            ],
+            "Bounds": [
+              "-1\u00d7x<=0"
+            ]
+          },
+          "fcategories": {
+            "Costs": [
+              "2\u00d7x+y"
+            ],
+            "": [
+              "sigma(2\u00d7x+y,None)"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": null, \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Inequality Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Equality Constraints"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": null, \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Inequality Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Equality Constraints"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Non-Negative Constraints"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"Capacity\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"Capacity\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"Costs\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"Costs\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"missing\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"missing\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Inequality Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Equality Constraints"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"full\", {\"categorical\": false, \"category\": \"\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Inequality Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Equality Constraints"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Non-Negative Constraints"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {},
+          "fcategories": {}
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": null, \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": null, \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"Capacity\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"Capacity\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"Costs\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"Costs\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"missing\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"missing\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"\", \"descriptive\": true, \"nncons\": false}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      },
+      "[\"full\", {\"categorical\": true, \"category\": \"\", \"descriptive\": true, \"nncons\": true}]": {
+        "events": [
+          [
+            "Markdown",
+            "# Mathematical Program for Display contracts"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Index Sets"
+          ],
+          [
+            "Math",
+            "{i} = \\{ {{a}, {b}} \\}"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## Objective"
+          ],
+          [
+            "Math",
+            "min \\hspace{0.2cm} \\sum \\left(2 \\cdot {\\mathbf{{\\mathbf{x}}}}_{{i}} + {\\mathbf{{\\mathbf{y}}}}_{{i}}\\right)"
+          ],
+          [
+            "Markdown",
+            "<br><br>"
+          ],
+          [
+            "Markdown",
+            "## s.t."
+          ],
+          [
+            "Markdown",
+            "### General Constraints"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }{\\mathbf{x}}_{{a}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }{\\mathbf{x}}_{{b}} - 3.0 \\leq 0"
+          ],
+          [
+            "Math",
+            "[2]\\text{   }{\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[3]\\text{   }{\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}} - 5.0 = 0"
+          ],
+          [
+            "Math",
+            "[4]\\text{   }-{\\mathbf{x}}_{{a}} \\leq 0"
+          ],
+          [
+            "Math",
+            "[5]\\text{   }-{\\mathbf{x}}_{{b}} \\leq 0"
+          ],
+          [
+            "Markdown",
+            "###  Functions"
+          ],
+          [
+            "Math",
+            "[0]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{a}} + {\\mathbf{y}}_{{a}}"
+          ],
+          [
+            "Math",
+            "[1]\\text{   }2.0 \\cdot {\\mathbf{x}}_{{b}} + {\\mathbf{y}}_{{b}}"
+          ]
+        ],
+        "caches": {
+          "categories": {
+            "General": [
+              "x[0]-3.0<=0",
+              "x[1]-3.0<=0",
+              "x[0]+y[0]-5.0=0",
+              "x[1]+y[1]-5.0=0",
+              "-1.0\u00d7x[0]<=0",
+              "-1.0\u00d7x[1]<=0"
+            ]
+          },
+          "fcategories": {
+            "": [
+              "2.0\u00d7x[0]+y[0]",
+              "2.0\u00d7x[1]+y[1]"
+            ]
+          }
+        }
+      }
+    },
+    "frames": {
+      "[\"empty\", {\"longname\": false}]": {
+        "frame": {
+          "index": [
+            "Minimize"
+          ],
+          "columns": [
+            "RHS"
+          ],
+          "data": [
+            [
+              0
+            ]
+          ]
+        },
+        "dtypes": [
+          "int64"
+        ]
+      },
+      "[\"empty\", {\"longname\": true}]": {
+        "frame": {
+          "index": [
+            "Minimize"
+          ],
+          "columns": [
+            "RHS"
+          ],
+          "data": [
+            [
+              0
+            ]
+          ]
+        },
+        "dtypes": [
+          "int64"
+        ]
+      },
+      "[\"full\", {\"longname\": false}]": {
+        "frame": {
+          "index": [
+            "Minimize",
+            "x[0]-3.0<=0",
+            "x[1]-3.0<=0",
+            "x[0]+y[0]-5.0=0",
+            "x[1]+y[1]-5.0=0",
+            "-1.0\u00d7x[0]<=0",
+            "-1.0\u00d7x[1]<=0"
+          ],
+          "columns": [
+            "x[0]",
+            "x[1]",
+            "y[0]",
+            "y[1]",
+            "RHS"
+          ],
+          "data": [
+            [
+              2.0,
+              2.0,
+              1,
+              1,
+              0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0,
+              0,
+              3.0
+            ],
+            [
+              0.0,
+              1.0,
+              0,
+              0,
+              3.0
+            ],
+            [
+              1.0,
+              0.0,
+              1,
+              0,
+              5.0
+            ],
+            [
+              0.0,
+              1.0,
+              0,
+              1,
+              5.0
+            ],
+            [
+              -1.0,
+              0.0,
+              0,
+              0,
+              -0.0
+            ],
+            [
+              0.0,
+              -1.0,
+              0,
+              0,
+              -0.0
+            ]
+          ]
+        },
+        "dtypes": [
+          "float64",
+          "float64",
+          "int64",
+          "int64",
+          "float64"
+        ]
+      },
+      "[\"full\", {\"longname\": true}]": {
+        "frame": {
+          "index": [
+            "Minimize",
+            "x(a)-3.0 <= 0",
+            "x(b)-3.0 <= 0",
+            "x(a)+y(a)-5.0 == 0",
+            "x(b)+y(b)-5.0 == 0",
+            "-1.0\u00d7x(a) <= 0",
+            "-1.0\u00d7x(b) <= 0"
+          ],
+          "columns": [
+            "x(a)",
+            "x(b)",
+            "y(a)",
+            "y(b)",
+            "RHS"
+          ],
+          "data": [
+            [
+              2.0,
+              2.0,
+              1,
+              1,
+              0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0,
+              0,
+              3.0
+            ],
+            [
+              0.0,
+              1.0,
+              0,
+              0,
+              3.0
+            ],
+            [
+              1.0,
+              0.0,
+              1,
+              0,
+              5.0
+            ],
+            [
+              0.0,
+              1.0,
+              0,
+              1,
+              5.0
+            ],
+            [
+              -1.0,
+              0.0,
+              0,
+              0,
+              -0.0
+            ],
+            [
+              0.0,
+              -1.0,
+              0,
+              0,
+              -0.0
+            ]
+          ]
+        },
+        "dtypes": [
+          "float64",
+          "float64",
+          "int64",
+          "int64",
+          "float64"
+        ]
+      }
+    }
+  }
+}

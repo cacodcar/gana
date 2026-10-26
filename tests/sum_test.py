@@ -1,4 +1,5 @@
 import pytest
+
 from src.gana.block.program import Prg
 from src.gana.operators.sigma import sigma
 from src.gana.sets.index import I
@@ -126,5 +127,5 @@ def test_sigma(p):
         [p.v[110], p.v[111], p.v[112], p.v[113], p.v[114]],
     ]
     assert [[j[n] for j in p.f5.variables] for n in range(len(p.f5))] == [
-        [p.w[0], p.w[1], p.w[2], p.w[3], p.w[4]]
+        [p.w[0], p.w[1], p.w[2], p.w[3], p.w[4]],
     ]

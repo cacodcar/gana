@@ -1,29 +1,40 @@
 """A set of index elements (X)"""
 
 import logging
+from collections.abc import Iterator, Sequence
+from operator import add as add_operands
 from operator import is_
-from typing import Self
+from typing import TYPE_CHECKING, Self, SupportsIndex
 
 from IPython.display import Math, display
 
+from ..indexing.ordered import OrderedMembers
 from .cases import ICase
+
+if TYPE_CHECKING:
+    from .constraint import C
+    from .function import F
+    from .parameter import P
+    from .variable import V
 
 logger = logging.getLogger("gana")
 
-try:
-    from pyomo.environ import RangeSet as PyoRangeSet
-    from pyomo.environ import Set as PyoSet
-
-    has_pyomo = True
-except ImportError:
-    has_pyomo = False
-
-try:
-    from sympy import FiniteSet
-
-    has_sympy = True
-except ImportError:
-    has_sympy = False
+# Optional adapters below are disabled; retain their imports and availability
+# checks alongside that commented implementation until the adapters return.
+# try:
+#     from pyomo.environ import RangeSet as PyoRangeSet
+#     from pyomo.environ import Set as PyoSet
+#
+#     has_pyomo = True
+# except ImportError:
+#     has_pyomo = False
+#
+# try:
+#     from sympy import FiniteSet
+#
+#     has_sympy = True
+# except ImportError:
+#     has_sympy = False
 
 
 class I:
@@ -31,22 +42,23 @@ class I:
     Set of index elements (X).
 
     :param members: Members of the Index set.
-    :type members: str | int, optional
+    :type members: str | int | I, optional
     :param size: Size of the Index set, creates an ordered set if given.
     :type size: int, optional
     :param mutable: If the Index set is mutable. Defaults to False.
     :type mutable: bool, optional
     :param tag: Tag/details. Defaults to None.
     :type tag: str, optional
-    :param dummy: If the Index set is a dummy set, elements are created immediately. Defaults to False.
+    :param dummy: If the Index set is a dummy set, elements are created
+        immediately. Defaults to False.
     :type dummy: bool, optional
 
     :ivar _: Elements of the index set
     :vartype _: list[X]
     :ivar tag: Tag/details
     :vartype tag: str
-    :ivar ordered: Ordered set, True if size is given
-    :vartype ordered: bool
+    :ivar ordered: Ordered set flag; None for named scalar members
+    :vartype ordered: bool | None
     :ivar name: Name, set by the program
     :vartype name: str
     :ivar n: Number id, set by the program
@@ -84,40 +96,60 @@ class I:
             # I('b', 'c')
     """
 
+    # region Construction and ownership
+
+    # Declared here because dummy and ordinary construction assign different
+    # cases; both paths share the same optional member metadata contract.
+    case: ICase | None
+    ordered: bool | None
+    # Hashes remain lazily cached; registration assigns numeric IDs later.
+    _hash: int
+    # Labels arrive as tuples; derived sets also retain existing index members.
+    members: "Sequence[str | int | I]"
+    # Registries retain the associated model objects, not their numeric IDs.
+    parameters: "list[P]"
+    variables: "list[V]"
+    functions: "list[F]"
+    constraints: "list[C]"
+
     def __init__(
         self,
-        *members: str | int,
-        size: int = None,
+        *members: "str | int | I",
+        size: int | None = None,
         start: int = 0,
         mutable: bool = False,
-        tag: str = None,
-        ltx: str = None,
+        tag: str | None = None,
+        ltx: str | None = None,
         dummy: bool = False,
     ):
+        """Declare an index before naming or creating its members."""
         self.tag = tag
         self.mutable = mutable
         # set by program
         self.name = "i"
-        self.n = None
+        self.n: int | None = None
         self.start = start
 
         # this is when children single element sets are created
         # These will be set in ._
-        self.parent: list[Self] = []
+        # Members retain all owning axes; shifts/slices retain their source.
+        self.parent: "list[I] | I" = []
         self.pos: list[int] = []
-        self._: list[Self] = []
+        self._: list | OrderedMembers = self._member_buffer(size)
 
         # if it is a slice
-        self.slice: slice = None
+        self.slice: slice | None = None
 
         # hash passed on along with name
         # self._hash = ''
 
         if size:
             if members:
-                raise ValueError(
-                    "An index set can either be defined by members or size, not both"
+                _error_message = (
+                    "An index set can either be defined by members or size, "
+                    "not both"
                 )
+                raise ValueError(_error_message)
             self.size = size
             self.members = []
             self.ordered = True
@@ -152,40 +184,92 @@ class I:
             self.birth_elements()
 
         else:
-            self.case: ICase = None
+            self.case = None
 
     def birth_elements(self):
-        """Create elements for the index set"""
-        # if self.ordered:
+        """Birth native ordered members lazily, respecting list edits."""
         self.size = int(self.size)
+        if isinstance(self._, OrderedMembers) and not self._:
+            self._.birth(self)
+            return
         for n in range(self.size):
-            # this is called from outside
-            # (once the name is set)
-            # for an ordered index set
-            # create new index
-            index = I()
-            # append parent
-            index.parent.append(self)
-            # update position in parent
-            index.pos.append(n)
-            # set that this is ordered
-            index.ordered = True
-            # give the name
-            index.name = rf"{self}[{self.start + n}]"
-            index._hash = hash(index.name)
-            # the only element in element (index set of size one)
-            # is itself
-            index._ = [index]
-            index.size = 1
-            index.members = [index.name]
-            self._.append(index)
-            # index.ltx = r"{" + rf"{self.ltx}_{n}" + r"}"
+            self._.append(self._ordered_member(n))
 
-    # -----------------------------------------------------
-    #                    Modifiers
-    # -----------------------------------------------------
+    def _member_buffer(self, size):
+        """Limit deferred birth to ordinary native ordered declarations."""
+        if size and type(self) is I:
+            return OrderedMembers()
+        return []
 
-    def step(self, n: int) -> list[Self]:
+    def __getstate__(self):
+        """Copy public metadata; the owning family restores weak provenance."""
+        state = self.__dict__.copy()
+        state.pop("_ordered_origin", None)
+        return state
+
+    def _ordered_member(self, position: int, *, name=None) -> "I":
+        """Build a concrete I member without discarded empty-set buffers.
+
+        Ordered members use I's default metadata, not their parent's options.
+        Initialize each field once and keep every mutable list independent.
+        Ordinary attribute writes retain Python's shared instance-dict keys.
+        """
+        index = object.__new__(I)
+        index.tag = None
+        index.mutable = False
+        index.name = (
+            rf"{self}[{self.start + position}]" if name is None else name
+        )
+        index.n = None
+        index.start = 0
+        index.parent = [self]
+        index.pos = [position]
+        index._ = [index]
+        index.slice = None
+        index.members = [index.name]
+        index.ordered = True
+        index.parameters = []
+        index.variables = []
+        index.functions = []
+        index.constraints = []
+        index._ltx = None
+        index.case = None
+        index._hash = hash(index.name)
+        index.size = 1
+        return index
+
+    def birth_index(
+        self, name: str, members: "Sequence[str | int | I]"
+    ) -> "I":
+        """
+        Updates the parent, sets new positions and mutable/ordered attributes
+
+        :param name: Name of the new index set
+        :type name: str
+        :param members: Members of the new index set
+        :type members: Sequence[str | int | I]
+
+        :returns: New index set
+        :rtype: I
+        """
+        # set new members for the index
+        index = I()
+        # set a name for the new index
+        index.name = name
+        # update the members of the index
+        # doing this from outside avoids creating
+        # element index sets (X) again
+        index.members = members
+        index.ordered = self.ordered
+        index.size = len(members)
+        index.mutable = self.mutable
+        return index
+
+    # endregion
+
+    # region Indexing and selection
+
+    def step(self, n: int) -> "I":
         """
         Step up or down the index set
 
@@ -196,9 +280,11 @@ class I:
         :rtype: I
         """
         if not self.ordered:
-            raise ValueError(
-                "Index set is not ordered, cannot step up or down the index set"
+            _error_message = (
+                "Index set is not ordered, "
+                "cannot step up or down the index set"
             )
+            raise ValueError(_error_message)
         if not n:
             # if no step (0)
             return self
@@ -230,9 +316,160 @@ class I:
 
         return index
 
-    # -----------------------------------------------------
-    #                    Printing
-    # -----------------------------------------------------
+    def __getitem__(self, key: SupportsIndex | slice) -> "I":
+        """Select a member or a concrete I slice using list index rules."""
+        if isinstance(key, slice):
+            #  if this is a slice [start:stop]
+            # generate a new index set for that stretch
+            index = I(*self._[key], mutable=self.mutable, tag=self.tag)
+            # mark this as a subset of self
+            index.parent = self
+            index.slice = key
+            # note the start and stops
+            if key.start is None:
+                index.name = rf"{self.name}[0:{key.stop}]"
+            else:
+                index.name = rf"{self.name}[{key.start}:{key.stop}]"
+
+            index.ordered = self.ordered
+            index._ = self._[key]
+            return index
+        return self._[key]
+
+    def __iter__(self) -> Iterator:
+        """Iterate current members, creating lazy indices as requested."""
+        return iter(self._)
+
+    def __len__(self) -> int:
+        return len(self._)
+        # return len([i for i in self._ if not isinstance(i, Skip)])
+
+    def __contains__(self, other: Self):
+        return True if other in self._ else False
+
+    # endregion
+
+    # region Set operations and index shifts
+
+    def __and__(self, other: Self):
+        # Members that exist in both Index sets
+        _and = [i for i in self.members if i in other.members]
+
+        return self.birth_index(rf"{self.name} & {other.name}", _and)
+
+    def __or__(self, other: Self):
+        # members that exist in either self or other
+        # make a copy of the members in self
+        _or = list(self.members)
+        # if a member in other is not included
+        for i in other.members:
+            if i not in _or:
+                # append it to the list
+                _or.append(i)
+        # mutable sets will have the same name
+        # and are mutated using | (__or__)
+        # repeated names are not allowed,
+        # thus if the same name is coming in,
+        # the index is definitely being mutated
+        if self.name == other.name:
+            return self.birth_index(self.name, _or)
+
+        # else create a new name that reflects the operation
+        return self.birth_index(rf"{self.name} | {other.name}", _or)
+
+    def __xor__(self, other: Self):
+        """Return members in exactly one domain, retaining their order."""
+        # members that exist in either self or other, but not both
+        # create an empty list to be updated
+        _xor: list[str | int | I] = []
+        # if something is in self but not in other
+        for i in self.members:
+            if i not in other.members:
+                _xor.append(i)
+        # if something is in other but not in self
+        for i in other.members:
+            if i not in self.members:
+                _xor.append(i)
+        return self.birth_index(rf"{self.name} ^ {other.name}", _xor)
+
+    def __add__(self, other: int | Self):
+        # if other is an integer, step up the index set
+        if isinstance(other, int):
+            return self.step(other)
+
+        raise NotImplementedError(
+            "Addition of Index sets is not implemented. "
+            'Use | or the "or" operator for union.\n'
+            "+  can be used to step up the index set by an integer.",
+        )
+
+    def __sub__(self, other: int | Self):
+        # other is an integer, step down the index set
+        """Shift an ordered index or remove members of another index."""
+        if isinstance(other, int):
+            if len(self) == 1:
+                return None
+            return self.step(-other)
+
+        # members from other are removed from self
+        # if other is some type of an Index set
+        # create an empty list
+        _sub = []
+        # if a member of self is in the other set
+        for i in self.members:
+            if i not in other.members:
+                # do not append
+                _sub.append(i)
+        return self.birth_index(rf"{self.name} - {other.name}", _sub)
+
+    def __mul__(self, other: Self | tuple | None):
+        """Prepend this axis, preserving custom tuple addition behavior."""
+
+        if other is None:
+            # This will likely be used mostly for element indices
+            # allowing indices to be skipped while generating elements
+            return None
+
+        # if other is a tuple, return a tuple with self as the first element
+        if isinstance(other, tuple):
+            if type(other) is tuple:
+                return (self, *other)
+            # A subclass may customize reflected addition or iteration.
+            return add_operands((self,), other)
+
+        # if other is an Index set, return a tuple of index sets
+        return (self, other)
+
+    def __rmul__(self, other: Self | tuple | None):
+        """Append this axis while retaining product identities and dispatch."""
+        if other is None:
+            return None
+
+        if isinstance(other, int):
+            # This allows the use of math.prod
+            if other == 1:
+                return self
+
+        if type(other) is tuple:
+            return (*other, self)
+        # Retain custom addition and the existing errors for other operands.
+        return add_operands(other, (self,))
+
+    # endregion
+
+    # region Comparisons
+
+    # Avoid running instance checks
+    def __eq__(self, other: object):
+        """Index equality is identity comparison for every operand type."""
+        # equality checks for index sets are only done
+        # on the basis of names
+        return is_(self, other)
+
+    # endregion
+
+    # region Display and export
+
     @property
     def ltx(self) -> str:
         """LaTeX representation"""
@@ -241,7 +478,11 @@ class I:
             # not a splice or a step
             if self.parent and isinstance(self.parent, list):
                 self._ltx = (
-                    r"{" + rf"{self.parent[0].ltx}" + r"_{" + rf"{self.pos[0]}" + r"}}"
+                    r"{"
+                    + rf"{self.parent[0].ltx}"
+                    + r"_{"
+                    + rf"{self.pos[0]}"
+                    + r"}}"
                 )
             elif not self._ltx:
                 self._ltx = self.name.replace("_", r"\_")
@@ -251,7 +492,10 @@ class I:
         return r"{" + self._ltx + r"}"
 
     def latex(
-        self, descriptive: bool = True, int_not: bool = False, dots_limit: int = 5
+        self,
+        descriptive: bool = True,
+        int_not: bool = False,
+        dots_limit: int = 5,
     ) -> str:
         """
         LaTeX representation
@@ -260,7 +504,8 @@ class I:
         :type descriptive: bool, optional
         :param int_not: Whether to display the set in integer notation.
         :type int_not: bool, optional
-        :param ddot_limit: Maximum size over which ... is used to represent members.
+        :param ddot_limit: Maximum size over which ... is used to represent
+            members.
         :type ddot_limit: int, optional
 
         :returns: LaTeX representation of the index set
@@ -289,7 +534,10 @@ class I:
                     + (
                         r", ".join(x.latex() for x in self._)
                         if len(self) < dots_limit
-                        else rf"{self._[0].latex()}, \dots ,{self._[-1].latex()}"
+                        else (
+                            rf"{self._[0].latex()}, \dots ,"
+                            rf"{self._[-1].latex()}"
+                        )
                     )
                     + r"}"
                 )
@@ -297,7 +545,10 @@ class I:
         return self.ltx
 
     def show(
-        self, descriptive: bool = True, int_not: bool = False, dots_limit: int = 5
+        self,
+        descriptive: bool = True,
+        int_not: bool = False,
+        dots_limit: int = 5,
     ):
         """
         Display the set
@@ -328,179 +579,6 @@ class I:
         """
         return rf"_{self[pos]}"
 
-    # -----------------------------------------------------
-    #                    Birth
-    # -----------------------------------------------------
-
-    def birth_index(self, name: str, members: list[Self]) -> Self:
-        """
-        Updates the parent, sets new positions and mutable/ordered attributes
-
-        :param name: Name of the new index set
-        :type name: str
-        :param members: Members of the new index set
-        :type members: list[I]
-
-        :returns: New index set
-        :rtype: I
-        """
-        # set new members for the index
-        index = I()
-        # set a name for the new index
-        index.name = name
-        # update the members of the index
-        # doing this from outside avoids creating
-        # element index sets (X) again
-        index.members = members
-        index.ordered = self.ordered
-        index.size = len(members)
-        index.mutable = self.mutable
-        return index
-
-    # -----------------------------------------------------
-    #                    Operators
-    # -----------------------------------------------------
-
-    # Avoid running instance checks
-    def __eq__(self, other: Self):
-        # equality checks for index sets are only done
-        # on the basis of names
-        return is_(self, other)
-
-    def __and__(self, other: Self):
-        # Members that exist in both Index sets
-        _and = [i for i in self.members if i in other.members]
-
-        return self.birth_index(rf"{self.name} & {other.name}", _and)
-
-    def __or__(self, other: Self):
-        # members that exist in either self or other
-        # make a copy of the members in self
-        _or = list(self.members)
-        # if a member in other is not included
-        for i in other.members:
-            if i not in _or:
-                # append it to the list
-                _or.append(i)
-        # mutable sets will have the same name
-        # and are mutated using | (__or__)
-        # repeated names are not allowed,
-        # thus if the same name is coming in,
-        # the index is definitely being mutated
-        if self.name == other.name:
-            return self.birth_index(self.name, _or)
-
-        # else create a new name that reflects the operation
-        return self.birth_index(rf"{self.name} | {other.name}", _or)
-
-    def __xor__(self, other: Self):
-        # members that exist in either self or other, but not both
-        # create an empty list to be updated
-        _xor: list[Self] = []
-        # if something is in self but not in other
-        for i in self.members:
-            if i not in other.members:
-                _xor.append(i)
-        # if something is in other but not in self
-        for i in other.members:
-            if i not in self.members:
-                _xor.append(i)
-        return self.birth_index(rf"{self.name} ^ {other.name}", _xor)
-
-    def __sub__(self, other: int | Self):
-        # other is an integer, step down the index set
-        if isinstance(other, int):
-            if len(self) == 1:
-                return
-            return self.step(-other)
-
-        # members from other are removed from self
-        # if other is some type of an Index set
-        # create an empty list
-        _sub = []
-        # if a member of self is in the other set
-        for i in self.members:
-            if i not in other.members:
-                # do not append
-                _sub.append(i)
-        return self.birth_index(rf"{self.name} - {other.name}", _sub)
-
-    def __add__(self, other: int | Self):
-        # if other is an integer, step up the index set
-        if isinstance(other, int):
-            return self.step(other)
-
-        raise NotImplementedError(
-            'Addition of Index sets is not implemented. Use | or the "or" operator for union.\n'
-            "+  can be used to step up the index set by an integer."
-        )
-
-    def __mul__(self, other: Self | tuple | None):
-        # product of two Index sets
-
-        if other is None:
-            # This will likely be used mostly for element indices
-            # allowing indices to be skipped while generating elements
-            return None
-
-        # if other is a tuple, return a tuple with self as the first element
-        if isinstance(other, tuple):
-            return (self,) + other
-
-        # if other is an Index set, return a tuple of index sets
-        return (self, other)
-
-    def __rmul__(self, other: Self | tuple | None):
-        if other is None:
-            return None
-
-        if isinstance(other, int):
-            # This allows the use of math.prod
-            if other == 1:
-                return self
-
-        # the only other allowed instance for which this
-        # is called is tuple
-        # Not running an instance check to save time
-        return other + (self,)
-
-    # -----------------------------------------------------
-    #                    Vector
-    # -----------------------------------------------------
-
-    def __len__(self) -> int:
-        return len(self._)
-        # return len([i for i in self._ if not isinstance(i, Skip)])
-
-    def __iter__(self) -> Self:
-        return iter(self._)
-
-    def __getitem__(self, key: int | str | slice) -> Self:
-        if isinstance(key, slice):
-            #  if this is a slice [start:stop]
-            # generate a new index set for that stretch
-            index = I(*self._[key], mutable=self.mutable, tag=self.tag)
-            # mark this as a subset of self
-            index.parent = self
-            index.slice = key
-            # note the start and stops
-            if key.start is None:
-                index.name = rf"{self.name}[0:{key.stop}]"
-            else:
-                index.name = rf"{self.name}[{key.start}:{key.stop}]"
-
-            index.ordered = self.ordered
-            index._ = self._[key]
-            return index
-        return self._[key]
-
-    def __contains__(self, other: Self):
-        return True if other in self._ else False
-
-    # -----------------------------------------------------
-    #                    Hashing
-    # -----------------------------------------------------
-
     def __str__(self):
         return self.name
 
@@ -518,16 +596,17 @@ class I:
             # self._hash = hash(self.name)
             return self.__hash__()
 
-    # -----------------------------------------------------
-    #                    Export
-    # -----------------------------------------------------
+    # endregion
+
+    # region Legacy export sketches
 
     # def sympy(self):
     #     """Sympy representation"""
     #     if has_sympy:
     #         return FiniteSet(*[str(s) for s in self._])
     #     logger.warning(
-    #         "⚠ sympy is an optional dependency, pip install gana[all] to get optional dependencies ⚠"
+    # "⚠ sympy is an optional dependency, pip install gana[all] to get optional
+    # dependencies ⚠"
     #     )
 
     # def pyomo(self):
@@ -538,5 +617,8 @@ class I:
 
     #         return PyoSet(initialize=[i.name for i in self._], doc=self.tag)
     #     logger.warning(
-    #         "⚠ pyomo is an optional dependency, pip install gana[all] to get optional dependencies ⚠"
+    # "⚠ pyomo is an optional dependency, pip install gana[all] to get optional
+    # dependencies ⚠"
     #     )
+
+    # endregion

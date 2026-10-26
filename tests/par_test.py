@@ -1,9 +1,11 @@
 """Parameter tests"""
 
 import math
+
 import pytest
 from hypothesis import given
 from hypothesis import strategies as st
+
 from src.gana.block.program import Prg
 from src.gana.sets.cases import PCase
 from src.gana.sets.index import I
@@ -52,26 +54,26 @@ def test_parameter(p):
     assert p.p3._ == [1, 2, 3]
     assert p.p3.case == PCase.SET
     assert p.p11._ == [15] * 3
-    assert p.p11.name == '15.0'
+    assert p.p11.name == "15.0"
     assert p.p11.case == PCase.NUM
     assert p.p12._ == [-5] * 3
-    assert p.p12.name == '-5.0'
+    assert p.p12.name == "-5.0"
     assert p.p12.case == PCase.NEGNUM
     assert p.p13._ == [50] * 3
-    assert p.p13.name == '50.0'
+    assert p.p13.name == "50.0"
     assert p.p13.case == PCase.NUM
     assert p.p14._ == [0.5] * 3
-    assert p.p14.name == '0.5'
+    assert p.p14.name == "0.5"
     assert p.p14.case == PCase.NUM
     assert p.p15 == 0
     assert p.p16._ == [10] * 3
-    assert p.p16.name == '10.0'
+    assert p.p16.name == "10.0"
     assert p.p16.case == PCase.NUM
     assert p.p17._ == [-25] * 3
-    assert p.p17.name == '-25.0'
+    assert p.p17.name == "-25.0"
     assert p.p17.case == PCase.NEGNUM
     assert p.p18._ == [-1.0] * 3
-    assert p.p18.name == '-1.0'
+    assert p.p18.name == "-1.0"
     assert p.p18.case == PCase.NEGNUM
     assert p.p19._ == [-1, -2, -3]
     assert p.p19.case == PCase.NEGSET
@@ -98,7 +100,7 @@ same_size_lists = st.integers(min_value=1, max_value=100).flatmap(
             max_size=x,
         ),
         st.just(x),  # also return x if you need it
-    )
+    ),
 )
 
 
@@ -124,7 +126,6 @@ def test_pset_operations(data):
     p.mod = p.a % p.b
 
     if not any(math.isnan(x) for x in p.mod._):
-
         assert p.mod._ == [a[i] % b[i] for i in range(x)]
 
     p.pow = p.b**p.c
@@ -138,12 +139,14 @@ def test_pset_operations(data):
         assert p.floor._ == [math.floor(a[i] // b[i]) for i in range(x)]
 
 
-test_pset_operations()
-
-
 @given(
     st.floats(allow_nan=False, allow_infinity=False),
-    st.floats(allow_nan=False, allow_infinity=False, min_value=1, max_value=10**9),
+    st.floats(
+        allow_nan=False,
+        allow_infinity=False,
+        min_value=1,
+        max_value=10**9,
+    ),
     st.integers(min_value=1, max_value=50),
 )
 def test_pnum_operations(a, b, x):
@@ -160,44 +163,54 @@ def test_pnum_operations(a, b, x):
     if a == -b:
         assert p.add == 0
     else:
-        assert all(math.isclose(v, a + b, rel_tol=1e-9, abs_tol=0.0) for v in p.add._)
+        assert all(
+            math.isclose(v, a + b, rel_tol=1e-9, abs_tol=0.0) for v in p.add._
+        )
 
     p.sub = p.a - p.b
     if a == b:
         assert p.sub == 0
     else:
-        assert all(math.isclose(v, a - b, rel_tol=1e-9, abs_tol=0.0) for v in p.sub._)
+        assert all(
+            math.isclose(v, a - b, rel_tol=1e-9, abs_tol=0.0) for v in p.sub._
+        )
 
     p.mul = p.a * p.b
     if not isinstance(p.mul, (int, float)):
-        assert all(math.isclose(v, a * b, rel_tol=1e-9, abs_tol=0.0) for v in p.mul._)
+        assert all(
+            math.isclose(v, a * b, rel_tol=1e-9, abs_tol=0.0) for v in p.mul._
+        )
     else:
         assert p.mul == 0
 
     p.div = p.a / p.b
     if a == b:
         assert p.div == 1
+    elif not isinstance(p.mul, (int, float)):
+        assert all(
+            math.isclose(v, a / b, rel_tol=1e-9, abs_tol=0.0) for v in p.div._
+        )
     else:
-        if not isinstance(p.mul, (int, float)):
-            assert all(
-                math.isclose(v, a / b, rel_tol=1e-9, abs_tol=0.0) for v in p.div._
-            )
-        else:
-            assert p.div == 0
-
-
-test_pnum_operations()
+        assert p.div == 0
 
 
 @given(
     st.lists(
         st.floats(
-            min_value=-(10**9), max_value=10**9, allow_nan=False, allow_infinity=False
+            min_value=-(10**9),
+            max_value=10**9,
+            allow_nan=False,
+            allow_infinity=False,
         ),
         min_size=1,
         max_size=100,
     ),
-    st.floats(allow_nan=False, allow_infinity=False, min_value=1, max_value=10**9),
+    st.floats(
+        allow_nan=False,
+        allow_infinity=False,
+        min_value=1,
+        max_value=10**9,
+    ),
 )
 def test_p_operations(a, b):
     p = Prg()
@@ -238,4 +251,9 @@ def test_p_operations(a, b):
         )
 
 
-test_p_operations()
+# Pytest runs these with its seed, health checks and automatic profiler.
+# Direct calls are only for explicit script execution, never module collection.
+if __name__ == "__main__":
+    test_pset_operations()
+    test_pnum_operations()
+    test_p_operations()

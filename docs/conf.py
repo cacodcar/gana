@@ -5,7 +5,9 @@
 
 import os
 import sys
+import tomllib
 from datetime import datetime
+from pathlib import Path
 
 
 for x in os.walk("../src"):
@@ -26,7 +28,10 @@ sys.setrecursionlimit(10000)
 project = 'Gana'
 copyright = str(datetime.now().year)
 author = 'Rahul Kakodkar'
-release = '1.0.9'
+# Read the measured source version; publishing metadata changes separately.
+release = tomllib.loads(
+    (Path(__file__).resolve().parents[1] / 'pyproject.toml').read_text()
+)['project']['version']
 
 
 html_logo = "_static/ganalogo.jpg"
@@ -35,7 +40,8 @@ html_theme_options = {
     # These are specific to the package
     "repository_url": "https://github.com/cacodcar/gana",
     "logo": {
-        "image_dark": "_static/ganalogo.jpg",
+        # Soft-white transparent logo from the project's Google Drive assets.
+        "image_dark": "_static/gana-logo-soft-white.png",
         # "text": html_title,  # Uncomment to try text with logo
     },
     "icon_links": [
@@ -189,7 +195,10 @@ exclude_patterns = [
 ]
 
 autosummary_generate = True
-autosummary_imported_members = True
+# Document Gana definitions and explicit public exports, rather than every
+# imported NumPy, pandas, or solver implementation symbol.
+autosummary_imported_members = False
+autosummary_ignore_module_all = False
 autodoc_inherit_docstrings = True
 autodoc_default_options = {
     'members': True,
@@ -207,7 +216,8 @@ html_static_path = ['_static']
 html_css_files = ['custom.css']
 html_copy_source = True
 html_last_updated_fmt = ""
-source_suffix = {".rst": 'restructuredtext', ".md": 'markdown', ".ipynb": 'myst-nb'}
+# MyST-NB registers the same parser for Markdown and notebook sources.
+source_suffix = {".rst": 'restructuredtext', ".md": 'myst-nb', ".ipynb": 'myst-nb'}
 html_context = {
     # ...
     "default_mode": "light"

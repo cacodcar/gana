@@ -1,0 +1,191 @@
+// Authored by OpenAI Codex (GPT-6): unified blocking quality tasks.
+{
+  "version": "2.0.0",
+  "options": {
+    "cwd": "${workspaceFolder}",
+    "env": {
+      "PYTHONDONTWRITEBYTECODE": "1"
+    }
+  },
+  "presentation": {
+    "reveal": "always",
+    "panel": "shared",
+    "echo": true
+  },
+  "tasks": [
+    {
+      "label": "Gana: Reproducible Baseline",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "args": [
+        "-B",
+        "tools/baseline.py"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: Test Coverage",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "tools/quality.py",
+        "tests"
+      ],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: Cyclomatic Complexity",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "tools/quality.py",
+        "complexity"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: Maintainability Index",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "tools/quality.py",
+        "maintainability"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: Raw Metrics",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "tools/quality.py",
+        "raw"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: Lint",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "tools/quality.py",
+        "lint"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: Format Check",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "tools/quality.py",
+        "format"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: Type Check",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "tools/quality.py",
+        "types"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: Documentation Build",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "tools/quality.py",
+        "docs"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: Dependency Check",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "tools/quality.py",
+        "dependencies"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: All Quality Checks",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "tools/quality.py",
+        "all"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: Locked Quality Baseline",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "tools/quality.py",
+        "all",
+        "--baseline"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: Python Version Matrix",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "-m",
+        "tox"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: Complexity B or worse report",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "-m",
+        "radon",
+        "cc",
+        "src",
+        "--min",
+        "B",
+        "-s",
+        "-a"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Gana: Native Quality",
+      "type": "process",
+      "command": "${workspaceFolder}/.quality-venv/bin/python",
+      "args": [
+        "tools/native_quality.py"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

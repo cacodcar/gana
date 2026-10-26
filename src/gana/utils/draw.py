@@ -6,15 +6,20 @@ from typing import TYPE_CHECKING
 
 from matplotlib import pyplot as plt
 from matplotlib import rc
+from numpy import asarray
+
+from gana.types import Number
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from ..sets.parameter import P
     from ..sets.variable import V
 
 
 def draw(
     element: V | P,
-    data: list[float] | None = None,
+    data: Sequence[Number | None] | None = None,
     kind: str = "line",
     font_size: float = 16,
     fig_size: tuple[float, float] = (12, 6),
@@ -25,7 +30,11 @@ def draw(
     str_idx_lim: int = 10,
 ):
     """
-    Plot the variable set
+    Plot values, leaving gaps for omitted solution columns (None).
+
+    Missing data is invalid; missing individual values become NaN without
+    changing the caller's list. Numeric conversion also gives both plot kinds
+    the same behavior for omitted columns.
 
     :param kind: Type of plot ['line', 'bar']. Defaults to 'line'.
     :type kind: str, optional
@@ -48,11 +57,15 @@ def draw(
     ax = plt.subplots(figsize=fig_size)[1]
 
     # the values are the y-axis
-    y = data
+    if data is None:
+        message = "Plot data is required"
+        raise TypeError(message)
+    y = asarray(data, dtype=float)
 
     _len = len(y)
 
     # the indices are the x-axis
+    x: list[str] | list[int]
     if _len <= str_idx_lim:
         x = [str(idx) for idx in element.map]
     else:
@@ -61,7 +74,11 @@ def draw(
     if usetex:
         rc(
             "font",
-            **{"family": "serif", "serif": ["Computer Modern"], "size": font_size},
+            **{
+                "family": "serif",
+                "serif": ["Computer Modern"],
+                "size": font_size,
+            },
         )
         rc("text", usetex=usetex)
     else:
@@ -84,11 +101,15 @@ def draw(
         ax.set_xticks(x)
         ax.set_xticklabels(
             [
-                rf"${tuple([idx.ltx for idx in index])}$".replace("'", "").replace(
-                    "\\", ""
+                rf"${tuple([idx.ltx for idx in index])}$".replace(
+                    "'",
+                    "",
+                ).replace(
+                    "\\",
+                    "",
                 )
                 for index in element.map
-            ]
+            ],
         )
 
     plt.rcdefaults()

@@ -11,7 +11,6 @@
       display
       draw
       make_T
-      symbols
       warn
    
    .. rubric:: Classes
@@ -21,8 +20,6 @@
       Elem
       F
       I
-      Idx
-      IndexedBase
       Math
       P
       PCase

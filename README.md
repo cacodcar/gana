@@ -13,6 +13,35 @@
 Gana is an Algebraic Modeling Language (AML) for Multiscale Modeling and Optimization. 
 Generated programs (```Prg```) can be subclasses of Multiparametric Mixed Integer Linear Programming (mpMILP). 
 
+# Installation
+
+The current development checkout requires the Rust extension, `gana._native`.
+The Python modeling API is unchanged. Use Python 3.12 or 3.13 for the candidate
+validation matrix; other versions and wheel platforms are not yet verified.
+
+Install an available release and its dependencies in a fresh environment:
+
+```sh
+python3.13 -m venv .venv
+.venv/bin/python -m pip install gana
+```
+
+On Windows, use `.venv\Scripts\python` instead. Published releases may predate
+the backend retirement described here. A compatible wheel includes the native
+extension and needs no Rust compiler at runtime. A source installation, including
+this checkout, needs Rust/Cargo 1.88 or newer and a platform linker; validation
+uses Rust 1.88.0:
+
+```sh
+.venv/bin/python -m pip install .
+```
+
+Leave `GANA_BACKEND` unset. The old `rust-parameters` value is accepted as an
+alias; `python` and unknown values are rejected. A missing extension produces
+installation guidance instead of selecting a Python backend. See the
+[installation guide](https://gana.readthedocs.io/en/latest/tutorials/installation.html)
+and [native implementation notes](https://gana.readthedocs.io/en/latest/NATIVE_BACKEND.html).
+
 # Features 
 
 Gana supports:

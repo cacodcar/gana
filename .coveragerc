@@ -1,0 +1,12 @@
+#  measure complete source and branches.
+[run]
+source = src/gana
+branch = True
+relative_files = True
+
+[report]
+show_missing = True
+include_namespace_packages = True
+
+[xml]
+output = quality/reports/coverage.xml

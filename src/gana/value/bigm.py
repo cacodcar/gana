@@ -6,7 +6,8 @@ from typing import Self
 class M:
     """BigM, infinity basically"""
 
-    def __init__(self, _: float = None, neg: bool = False):
+    def __init__(self, _: float | None = None, neg: bool = False):
+        """Retain an optional finite placeholder and the symbolic sign."""
 
         # big value if needed
         self._ = _
@@ -56,8 +57,10 @@ class M:
         return 0
 
     def __gt__(self, other: Self):
+        """Exceed finite numbers; retain None for unsupported comparisons."""
         if isinstance(other, (float, int)):
             return True
+        return None
 
     def __ge__(self, other: Self):
         return self > other
@@ -68,8 +71,10 @@ class M:
     def __le__(self, other: Self):
         return not self > other
 
-    def __eq__(self, other: Self):
+    def __eq__(self, other: object):
+        """Preserve symbolic infinity's non-equality with every operand."""
         return False
 
-    def __ne__(self, other: Self):
+    def __ne__(self, other: object):
+        """Return the complement of symbolic equality for any operand."""
         return not self == other

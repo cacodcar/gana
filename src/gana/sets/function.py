@@ -2,30 +2,68 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator, Sequence
 from functools import cached_property
-from itertools import product
-from typing import TYPE_CHECKING, Self
+from importlib import import_module
+from itertools import repeat
+from operator import add as add_operands
+from typing import TYPE_CHECKING, Self, Union, cast, overload
 
 from IPython.display import Math, display
 
+from gana.types import Number, NumericList, NumericTuple
+
 from .birth import make_P, make_T
-from .cases import Elem, FCase, PCase
+from .cases import Elem, FCase
 from .constraint import C
 from .index import I
+from .operands import NumericDispatch, normalize_operand, reject_disequality
 
 if TYPE_CHECKING:
+    from collections.abc import Collection, Iterable
+
     from .parameter import P
     from .theta import T
     from .variable import V
 
+# Forward references preserve runtime introspection without circular imports.
+type ExpressionSet = Union["V", "P", "T"]
+type FunctionInput = Union[Number, list[Number], "P", "V", "T"]
+type ThetaTerm = tuple["T", tuple, Number]
+# Public inputs are normalized before collection alignment. Scalar rows then
+# replace parameter containers with numbers; empty shells retain None.
+type SymbolicOperand = Union["F", ExpressionSet]
+type StoredOperand = SymbolicOperand | Number | None
+type RowOperand = StoredOperand | tuple[Number, ...]
+type ReductionInfo = tuple[Union["V", "F"], I | tuple | None, int | None]
+type CoefficientData = list[Number] | list[list[Number]]
+type ColumnData = list[int | None] | list[list[int | None]]
+# Matrix fields F and P shadow class names in class-scope annotations.
+type FunctionNode = Union["F"]
+type ParameterSet = Union["P"]
 
-class F:
+type ArithmeticOperand = Union[
+    "V",
+    "P",
+    "T",
+    Number,
+    NumericTuple,
+    NumericList,
+]
+
+# Additional positional arguments belong to the legacy constructor's options.
+_BINARY_OPERANDS = 2
+
+
+class F(NumericDispatch):
     r"""
-    Provides relational operations between parameter, variable, parametric variable,
+    Provides relational operations between parameter, variable, parametric
+    variable,
     or function sets (F).
 
     This class is not intended to be declared by the user directly.
-    It is constructed based on operations between parameter sets (P or list of numbers or number),
+    It is constructed based on operations between parameter sets (P or list of
+    numbers or number),
     variable sets (V), or function sets (F).
 
     :param one: First element.
@@ -44,7 +82,8 @@ class F:
     :type sub: bool, optional
     :param div: Division operation. Defaults to False.
     :type div: bool, optional
-    :param consistent: If the function is already consistent, saves computation. Defaults to False.
+    :param consistent: If the function is already consistent, saves
+        computation. Defaults to False.
     :type consistent: bool, optional
     :param case: Special function case. Defaults to None.
     :type case: FCase, optional
@@ -54,7 +93,8 @@ class F:
     :type pos: int, optional
     :param index: Index of the function. Defaults to None.
     :type index: tuple[I] | list[tuple[I]] | None, optional
-    :param issumhow: If the function is a summation, provides variable, index, and position. Defaults to None.
+    :param issumhow: If the function is a summation, provides variable, index,
+        and position. Defaults to None.
     :type issumhow: tuple[V, I, int], optional
     :param process: Whether to make matrices. Defaults to True.
     :type process: bool, optional
@@ -101,11 +141,57 @@ class F:
     :raises ValueError: If none of `mul`, `add`, `sub`, or `div` is True
     """
 
+    # Retain theta owner/coordinate references until registration.
+    # Empty and legacy sum rows have no parametric terms.
+    _theta_terms: Sequence[ThetaTerm] = ()
+    _theta_rows: Sequence[Sequence[ThetaTerm]] = ()
+    _row_layout: tuple[tuple, tuple]
+    rhs_thetas: list[T]
+    B: list[Number] | Number
+    # Scalar rows use flat lists; root collections retain lists of those rows.
+    A: CoefficientData
+    F: CoefficientData
+    P: ColumnData
+    Z: ColumnData
+    # Legacy scratch metadata remains independently mutable on each row.
+    Y: list[object]
+    variables: list[V]
+    mul_parameters: list[ParameterSet]
+    rhs_parameters: list[ParameterSet]
+    map: dict[tuple, FunctionNode | None]
+    one: StoredOperand
+    two: StoredOperand
+    one_type: Elem | None
+    two_type: Elem | None
+    _one: Sequence[RowOperand]
+    _two: Sequence[RowOperand]
+    # Composite coordinates retain nested axes and custom tuple contents.
+    index: tuple[object, ...] | list[tuple] | None
+    # Naming and empty-row initialization share this program-assigned label.
+    pname: str
+    # Row keys use dictionaries or broadcast lists; skipped keys may be None.
+    _one_map: Collection
+    _two_map: Collection
+
+    # region Construction and normalization
+
+    def __new__(cls, *args, **kwargs):
+        """Use native affine batches for supported base-class operands."""
+        if cls is F:
+            if len(args) <= _BINARY_OPERANDS:
+                factory = import_module(
+                    "gana.backends.native.algebra",
+                ).try_build
+                result = factory(*args, **kwargs)
+                if result is not None:
+                    return result
+        return object.__new__(cls)
+
     def __init__(
         self,
         # ------Elements -----------
-        one: int | float | list[int | float] | P | V | T | Self | None = None,
-        two: int | float | list[int | float] | P | V | T | Self | None = None,
+        one: Self | FunctionInput | None = None,
+        two: Self | FunctionInput | None = None,
         # --------- Types --------------
         one_type: Elem | None = None,
         two_type: Elem | None = None,
@@ -121,90 +207,64 @@ class F:
         # ------- Other attributes -----
         case: FCase | None = None,
         consistent: bool = False,
-        issumhow: tuple[V, I, int] | None = None,
+        issumhow: ReductionInfo | None = None,
     ):
-        # set by program or birther function (parent)
+        """
+        Initialize a row container, capturing mutable variable membership.
+        """
+        # Registration assigns ownership, coordinates and a model number.
         self.parent = parent
-        # position of the function in the parent
         self.pos = pos
-        # number id, set by the program based on order of declaration
-        self.n = None
-        # members of the function set
-        self._: list[F] = []
-        # maps indices to functions in the set
+        self.n: int | None = None
+        self._: list[F | None] = []
         self.map = {}
         self.index = index
-        # special function cases
         self.case = case
         self.consistent = consistent
-
-        # this gives you (variable, list of indices, set to sum, pos of set to sum)
         self.issumhow = issumhow
-
-        # evaluates the value of the function
-        self.X: {int, float} = {}
-
-        # calculated variable
-        self.calculation: V = None
-
-        # category of the constraint
-        # constraints can be printed by category
-        self.category: str = ""
-
-        self._matrix: dict = {}
+        self._initialize_evaluation()
 
         if self.issumhow:
-
-            #     self.one =
-
-            self.mis = 0
-            self._one = one._
-            self._two = two._
-            self.one = one
-            self.two = two
-            self.index = one.index + (two.index,)
-
+            # This legacy reduction branch labels its operands F and V below.
+            self._capture_reduction(cast("F", one), cast("V", two))
             self.handle_rel(mul, add, sub, div, ignore=True)
 
             self.one_type = Elem.F
             self.two_type = Elem.V
             self.make_args()
-            self._ = []
-            self.n = 0
-            self.name, self.pname = "", ""
-            self.A, self.P, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
-            self.variables = []
+            self._initialize_empty_rows()
 
         elif one is not None or two is not None:
             # A basic Function is of the type
             # P*V, V + P, V - P
-            # P can be a number (int or float), parameter set (P) or list[int | float]
+            # P can be a number (int or float), parameter set (P) or list[int |
+            # float]
             # for multiplication P comes before variable
 
-            one, two = self.types(one, one_type, two, two_type)
+            left, right = self.types(one, one_type, two, two_type)
 
             if not self.consistent:
                 # internal operations are made to adhere to the consistent form
                 # this is notified to avoid doing this operation
                 # saves time and computational resources
-                one, one_type, two, two_type, add, sub, mul, div = self.make_consistent(
-                    one, one_type, two, two_type, add, sub, mul, div
+                left, one_type, right, two_type, add, sub, mul, div = (
+                    self.make_consistent(
+                        left,
+                        one_type,
+                        right,
+                        two_type,
+                        add,
+                        sub,
+                        mul,
+                        div,
+                    )
                 )
 
             # now that the function is consistent
             # set one and two
 
-            self.one = one()
-            self.two = two()
-
-            # if the entirety of self is being returned on call
-            # this prevents the entirety of self being an element of a function
-            # as variables can mutate in gana
-            if self.one_type == Elem.V and self.one.make_copy:
-                self.one = self.one.copy()
-
-            if self.two_type == Elem.V and self.two.make_copy:
-                self.two = self.two.copy()
+            self.one = self._snapshot_operand(left(), self.one_type)
+            self.two = self._snapshot_operand(right(), self.two_type)
 
             # check the mismatch
             # and rectify it if necessary
@@ -222,28 +282,15 @@ class F:
 
             # self.give_name()
 
-            # donot birth for birthed functions
-            if self.parent is None:
-                # needs the mismatch to generate matrices
-                self.generate_matrices()
-                # matrix is passed on to the birthed functions
-                self.birth_functions()
-                # make a matrix of positions
-                self.P = [f.P for f in self._ if f is not None]
-
-            else:
-                self.update_variables()
-
-                # self.variables = [
-                #     v(*i) for v, i in zip(self.parent.variables, self.index)
-                # ]
+            self._build_rows()
         else:
             # if an empty function is created, attributes still need to be set
             # empty functions are used when doing operations outside
             # is more efficient computationally
             # this is especially true when the final structure is known
             # sum(variable_{i}) for example, where
-            # instead of adding the function recursively, the final structure can be passed
+            # instead of adding the function recursively, the final structure
+            # can be passed
 
             self.mis = 0
             self._one = []
@@ -256,204 +303,283 @@ class F:
             self.one_type = one_type
             self.two_type = two_type
             self.make_args()
-            self._ = []
-            self.n = 0
-            self.name, self.pname = "", ""
-            self.A, self.P, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
-            self.variables = []
+            self._initialize_empty_rows()
 
         self.give_name()
 
-    @property
-    def matrix(self) -> dict:
-        """Matrix as dict
+    def _capture_reduction(self, one: FunctionNode, two: V) -> None:
+        """Capture legacy reduction operands without flattening their axes."""
+        self.mis = 0
+        self._one, self._two = one._, two._
+        self.one, self.two = one, two
+        one_index, two_index = one.index, two.index
+        # Custom left addition and its original exceptions remain observable.
+        self.index = (
+            (*one_index, two_index)
+            if type(one_index) is tuple
+            else add_operands(one_index, (two_index,))
+        )
 
-        Returns:
-            dict: Dictionary mapping of positions to values in A matrix
+    def _initialize_evaluation(self) -> None:
+        """Initialize result storage, calculated variable and category."""
+        self.X: dict[int, Number] = {}
+        self.calculation: V | None = None
+        self.category: str = ""
+        self._matrix: dict = {}
+
+    def _initialize_empty_rows(self) -> None:
+        """Give empty and reduction shells independent row storage."""
+        self._ = []
+        self.n = 0
+        self.name, self.pname = "", ""
+        self.A, self.P, self.Y, self.Z, self.B, self.F = ([] for _ in range(6))
+        self.variables = []
+
+    @staticmethod
+    def _snapshot_operand(
+        operand: SymbolicOperand, kind: Elem | None
+    ) -> SymbolicOperand:
         """
-        if self._matrix:
-            return self._matrix
+        Freeze variable membership while sharing its existing scalar members.
+        """
+        if kind == Elem.V and cast("V", operand).make_copy:
+            return cast("V", operand).copy()
+        return operand
 
-        if self.parent is not None:
-            self._matrix = dict(zip(self.P, self.A))
+    def _build_rows(self):
+        """
+        Compile a collection once; scalar construction only collects columns.
+        """
+        if self.parent is None:
+            self._one_map = self._aligned_row_keys(
+                self.one,
+                self._one,
+                self._one_map,
+            )
+            self._two_map = self._aligned_row_keys(
+                self.two,
+                self._two,
+                self._two_map,
+            )
+            self.generate_matrices()
+            self.birth_functions()
+            # Newly birthed children have flat column IDs, unlike this root.
+            self.P = [
+                cast("list[int | None]", f.P) for f in self._ if f is not None
+            ]
         else:
-            self._matrix = {f: f.matrix for f in self._}
+            self.update_variables()
 
-        return self._matrix
+    @staticmethod
+    def _aligned_row_keys(operand, values, keys: Collection) -> Collection:
+        """Retain repeated expression keys when a dictionary collapses them.
 
-    @property
-    def struct(self) -> tuple[Elem, Elem]:
-        """Structure of the function"""
-        return (self.one_type, self.two_type)
-
-    @property
-    def elements(self) -> list[T | P | V]:
-        """Elements in the function"""
-        return (
-            self.variables + self.mul_parameters + self.rhs_parameters + self.rhs_thetas
-        )
-
-    @property
-    def index_flat(self) -> list[tuple[I, ...] | set[tuple[I, ...]]]:
-        """Flattens the index of the function"""
-        return (
-            [v.index for v in self.variables]
-            + [p.index for p in self.mul_parameters]
-            + [r.index for r in self.rhs_parameters]
-            + [t.index for t in self.rhs_thetas]
-        )
-
-    # -----------------------------------------------------
-    #                    Helpers
-    # -----------------------------------------------------
-
-    def categorize(self, category: str):
-        """Categorizes the function
-
-        :param category: Category name
-        :type category: str
+        Compiled selections keep their output coordinates separately. Other F
+        collections retain composite coordinates on each scalar row. Expand
+        these occurrences using the same consecutive-repeat rule as values.
+        Ordinary one-to-one maps retain their existing representation.
         """
-        self.category = category
-        for c in self._:
-            c.category = category
+        if len(keys) == len(values) or not isinstance(operand, F):
+            return keys
+        layout = operand.__dict__.get("_row_layout")
+        occurrences = (
+            [(key,) for key in layout[1]]
+            if layout is not None
+            else [cast("F", row).index for row in operand]
+        )
+        repeat = len(values) // len(occurrences)
+        return [key for key in occurrences for _ in range(repeat)]
+
+    def types(
+        self,
+        one: FunctionNode | FunctionInput | None,
+        one_type: Elem | None,
+        two: FunctionNode | FunctionInput | None,
+        two_type: Elem | None,
+    ) -> tuple[SymbolicOperand, SymbolicOperand]:
+        """
+        Sets whether there is an element of a particular type in one and two
+
+        :param one: First element
+        :param one_type: Type of V | P | T | F
+        :param two: Second element
+        :param two_type: Type of V | P | T | F
+
+        :return: Updated elements
+        :rtype: tuple[V | P | T | F, V | P | T | F]
+        """
+        # this is meant to be avoided as far as possible
+        # look at how the operations for each element is defined
+        # to some extent it is difficult to avoid some sort of instance check
+        # but if there is an instance check happening prior to the operation
+        # it is better to pass the type directly
+        # every instance check is time consumed, so at the least
+        # avoid multiple instance checks for the same element
+
+        def check_type(elem: object) -> Elem | None:
+            """Identify symbolic operands; retain None for unknown types."""
+            from .parameter import P
+            from .theta import T
+            from .variable import V
+
+            if isinstance(elem, V):
+                return Elem.V
+            if isinstance(elem, P):
+                return Elem.P
+            if isinstance(elem, T):
+                return Elem.T
+            if isinstance(elem, F):
+                return Elem.F
+            return None
+
+        if not one_type:
+            # If one type is not known
+            # perform instance check
+            one = self._coerce_addend(one)
+            one_type = check_type(one)
+
+        if not two_type:
+            two = self._coerce_addend(two)
+            two_type = check_type(two)
+
+        self.one_type = one_type
+        self.two_type = two_type
+        if one_type is None or two_type is None:
+            message = "Arithmetic requires numeric or Gana operands"
+            raise TypeError(message)
+
+        # Inferred tags follow coercion; explicit tags are the caller's
+        # contract. Keep the historical errors for incorrectly supplied tags.
+        return cast("SymbolicOperand", one), cast("SymbolicOperand", two)
 
     def make_consistent(
         self,
-        one: V | P | T | Self,
+        one: SymbolicOperand,
         one_type: Elem | None,
-        two: V | P | T | Self,
+        two: SymbolicOperand,
         two_type: Elem | None,
         add: bool,
         sub: bool,
         mul: bool,
         div: bool,
-    ) -> tuple[V | P | T | Self, Elem, V | P | T | Self, Elem, bool, bool, bool | bool]:
-        """Sets the function in a consistent form
-        Also makes parameters from int, float, or list[int|float] if needed
-        sets self.isconsistent to True
+    ) -> tuple[
+        SymbolicOperand,
+        Elem | None,
+        SymbolicOperand,
+        Elem | None,
+        bool,
+        bool,
+        bool,
+        bool,
+    ]:
+        """Normalize operands and keep their resolved type labels aligned.
 
-        :param one: First element
-        :type one: V | P | T | F
-        :param one_type: Type of `one`
-        :type one_type: Elem | None
-        :param two: Second element
-        :type two: V | P | T | F
-        :param two_type: Type of `two`
-        :type two_type: Elem | None
-        :param add: Addition operation
-        :type add: bool
-        :param sub: Subtraction operation
-        :type sub: bool
-        :param mul: Multiplication operation
-        :type mul: bool
-        :param div: Division operation
-        :type div: bool
-
-        :returns: Consistent elements and their types along with relation flags
-        :rtype: tuple[V | P | T | F, Elem, V | P | T | F, Elem, bool, bool, bool | bool]
+        The constructor has already resolved omitted type hints with ``types``.
+        Addition keeps numeric/theta operands on the right; multiplication
+        keeps coefficients on the left. Subtraction and division transform
+        an operand, so infer its new type: negating a V produces an F, while
+        negating a negative-variable F can produce a V again. Theta subtraction
+        retains its operand because direct T negation creates a new interval.
         """
-        # make consistent
         self.isconsistent = True
-
-        # basically, keep variables (or function) to the left for add and sub
-        # if function involves a parameters and variable or function
-        # for multiplication keep variable (or function) on the right (P*V|F)
-        if (add and one_type in [Elem.P, Elem.T]) or (
-            mul and two_type in [Elem.P, Elem.T]
+        one_type, two_type = self.one_type, self.two_type
+        if (add and one_type in (Elem.P, Elem.T)) or (
+            mul and two_type == Elem.P
         ):
-            # for addition, always keep V|F + P
-            # for multiplication, always keep P * V|F
-            return two, two_type, one, one_type, add, sub, mul, div
-
-        elif sub and one_type in [Elem.P, Elem.T]:
-            # for subtraction, always keep -V + P
-            add = True
-            sub = False
-            one_type, two_type = two_type, one_type
-            return -two, two_type, one, one_type, add, sub, mul, div
-
+            one, two = two, one
+            self.one_type, self.two_type = two_type, one_type
+        elif sub and one_type in (Elem.P, Elem.T) and two_type != Elem.T:
+            one, two = self._coerce_addend(-two), one
+            add, sub = True, False
+            self.types(one, None, two, one_type)
         elif div and two_type == Elem.P:
-            div = False
-            mul = True
-            one_type, two_type = two_type, one_type
-            return 1 / two, two_type, one, one_type, add, sub, mul, div
+            # The resolved Elem.P tag identifies a numerical parameter.
+            one, two = self._coerce_addend(1 / cast("P", two)), one
+            div, mul = False, True
+            self.types(one, None, two, one_type)
+        return one, self.one_type, two, self.two_type, add, sub, mul, div
 
-        return one, one_type, two, two_type, add, sub, mul, div
+    def handle_mismatch(self) -> None:
+        """Align collection rows or retain a scalar member's operand maps.
 
-    def handle_mismatch(self):
-        r"""Determine mismatch between indices
-
-        Stretches the shorter index to match the longer one.
-
-        This comes up in writing 'multiscale' constraints, e.g.:
-
-        .. math::
-
-            \mathbf{production}_{operation, hour} - \mathrm{Parameter}_{operation, time} \cdot \mathbf{capacity}_{operation, year} \leq \theta
-
-        One of the indices needs to be divisible by the other if there is a mismatch
-
-        Sets ``self.mis``, ``self._one``, ``self._two``, ``self.one``, ``self.two``
+        Root collections repeat shorter operands consecutively. Parented rows
+        and false-valued operands retain singleton wrapping and their original
+        maps. An unchanged collection keeps its values and map by identity.
         """
-
-        if self.parent is None and (self.one and self.two):
-
-            # only applies for non birthed functions
-            lone = len(self.one)
-            ltwo = len(self.two)
-
-            # check the compatibility
-            if not lone % ltwo == 0 and not ltwo % lone == 0:
-                raise ValueError(
-                    f"{self.one} with index {self.one.index} (length = {lone}) and {self.two} with {self.two.index} (length = {ltwo}) are not compatible"
-                )
-            if lone > ltwo:
-                # one is longer, keep as is
-                # negative informs that one is longer
-                self.mis = -int(lone / ltwo)
-                self._one, self._one_map = self.one._, self.one.map
-                # stretch two
-
-                self._two = [x for x in self.two._ for _ in range(-self.mis)]
-                self._two_map = [i for i in self.two.map for _ in range(-self.mis)]
-                # self._two_map = (
-                #     self.one.map
-                # )  # [i for i in self.two.map for _ in range(-self.mis)]
-
-            elif ltwo > lone:
-                # two is longer, keep as is
-                # positive informs that two is longer
-                self.mis = int(ltwo / lone)
-
-                # stretch one
-                self._one = [x for x in self.one._ for _ in range(self.mis)]
-                self._one_map = [i for i in self.one.map for _ in range(self.mis)]
-                self._two, self._two_map = self.two._, self.two.map
-
-            else:
-                self.mis = 0
-                self._one, self._one_map = self.one._, self.one.map
-                self._two, self._two_map = self.two._, self.two.map
-
+        if self.parent is None and self.one and self.two:
+            # Root operands have been coerced; only scalar rows store numbers.
+            self._align_collection_operands(
+                cast("SymbolicOperand", self.one),
+                cast("SymbolicOperand", self.two),
+            )
         else:
-            # for birthed functions, there is never a mismatch
-            # moreover, the variables are passed on from the parent
-
             self.mis = 0
-
-            # this handles both P and the rest
             self._one, self._two = [self.one], [self.two]
+            self._one_map = self._scalar_operand_map(self.one, self.two)
+            self._two_map = self._scalar_operand_map(self.two, self.one)
 
-            # parameters will be passing floats and ints
-            if isinstance(self.one, (int, float)) or self.one is None:
-                self._one_map = self.two.map
-            else:
-                self._one_map = self.one.map
+    def _align_collection_operands(
+        self,
+        one: SymbolicOperand,
+        two: SymbolicOperand,
+    ) -> None:
+        """Validate divisibility before changing state, then align row counts.
 
-            if isinstance(self.two, (int, float)) or self.two is None:
-                self._two_map = self.one.map
-            else:
-                self._two_map = self.two.map
+        The caller has already excluded None and empty root operands.
+        Negative mismatch means the left collection is longer; positive means
+        the right is longer. Keep the established int(length / length) ratio
+        calculation and error text, including operand/index representations.
+        """
+        lone, ltwo = len(one), len(two)
+        if lone % ltwo != 0 and ltwo % lone != 0:
+            message = (
+                f"{one} with index {one.index} (length = {lone}) and "
+                f"{two} with {two.index} (length = {ltwo}) "
+                "are not compatible"
+            )
+            raise ValueError(message)
+        if lone > ltwo:
+            self.mis = -int(lone / ltwo)
+            self._one, self._one_map = one._, one.map
+            self._two = self._repeat_members(two._, -self.mis)
+            self._two_map = self._repeat_members(two.map, -self.mis)
+        elif ltwo > lone:
+            self.mis = int(ltwo / lone)
+            self._one = self._repeat_members(one._, self.mis)
+            self._one_map = self._repeat_members(one.map, self.mis)
+            self._two, self._two_map = two._, two.map
+        else:
+            self.mis = 0
+            self._one, self._one_map = one._, one.map
+            self._two, self._two_map = two._, two.map
+
+    @staticmethod
+    def _repeat_members[Member](
+        members: Iterable[Member],
+        count: int,
+    ) -> list[Member]:
+        """Repeat each member consecutively, retaining its original identity.
+
+        Values and map keys use this same operation independently. Callers
+        assign each result in the original order, including if iteration fails.
+        Mapping iteration retains key insertion order without reindexing.
+        """
+        return [member for member in members for _ in range(count)]
+
+    @staticmethod
+    def _scalar_operand_map(
+        operand: StoredOperand,
+        other: StoredOperand,
+    ) -> Collection:
+        """Numeric and None members borrow the opposite symbolic operand map.
+
+        Bool retains its existing int behavior. Empty symbolic collections keep
+        their own maps; truth testing here would incorrectly borrow another.
+        """
+        if isinstance(operand, (int, float)) or operand is None:
+            # A numeric/absent scalar borrows its paired symbolic operand.
+            return cast("SymbolicOperand", other).map
+        return operand.map
 
     def handle_index(self):
         r"""
@@ -474,55 +600,69 @@ class F:
         """
 
         # index is a combination of one and two
-        index: tuple[tuple[I]] = []
+        index: list[object] = []
+        # Called during root normalization, before scalar operands are stored.
+        one = cast("SymbolicOperand", self.one)
+        two = cast("SymbolicOperand", self.two)
 
         # update the index
         if self.one_type == Elem.F:
-            index += self.one.index
+            index += cast("tuple[object, ...]", one.index)
         else:
             # elif self.one_type in [Elem.V, Elem.T, Elem.P]:
 
-            index += (self.one.index,)
+            index += (one.index,)
 
         if self.two_type == Elem.F:
-            index += self.two.index
+            index += cast("tuple[object, ...]", two.index)
         else:
             # if self.two_type in [Elem.V, Elem.T, Elem.P]:
-            index += (self.two.index,)
+            index += (two.index,)
 
         self.index = tuple(index)
 
     def handle_rel(
-        self, mul: bool, add: bool, sub: bool, div: bool, ignore: bool = False
+        self,
+        mul: bool,
+        add: bool,
+        sub: bool,
+        div: bool,
+        ignore: bool = False,
     ):
-        """
-        Handles the relation of the function
-        sets self.args, self.mul, self.add, self.sub, self.div, self.rel
-        """
-        # rel is used for printing
-        # For the purpose of operations signs are explicit bools
+        """Set relation metadata after enforcing the affine compiler's domain.
 
-        self.mul = mul
-        self.add = add
-        self.sub = sub
-        self.div = div
+        The internal reduction sentinel bypasses this check. Arithmetic
+        requires a numeric left multiplier; numeric division has already
+        been normalized into reciprocal multiplication.
+        """
+        if not ignore:
+            self._validate_affine_relation(mul, div)
+        self.mul, self.add, self.sub, self.div = mul, add, sub, div
+        for enabled, symbol in (
+            (mul, "\N{MULTIPLICATION SIGN}"),
+            (add, "+"),
+            (sub, "-"),
+            (div, "÷"),
+        ):
+            if enabled:
+                self.rel = symbol
+                return
+        if not ignore:
+            _error_message = "one of mul, add, sub or div must be True"
+            raise ValueError(_error_message)
 
-        # rel looks good for printing
-        # one rel two
-        if self.mul:
-            self.rel = "×"
-        elif self.add:
-            self.rel = "+"
-        elif self.sub:
-            self.rel = "-"
-        elif self.div:
-            self.rel = "÷"
-        else:
-            if not ignore:
-                # if no operation is specified, raise an error
-                # this is to avoid confusion
-                # if you want to create a function without an operation, use F()
-                raise ValueError("one of mul, add, sub or div must be True")
+    @staticmethod
+    def _nonlinear_error():
+        """Reject expressions outside the affine matrix representation."""
+        message = (
+            "Nonlinear operations are not supported; use numeric coefficients"
+        )
+        raise ValueError(message)
+
+    def _validate_affine_relation(self, mul, div):
+        """Reject symbolic products and unnormalized matrix division."""
+        if div or (mul and self.one_type != Elem.P):
+            self._nonlinear_error()
 
     def make_args(self):
         """
@@ -543,120 +683,174 @@ class F:
             "case": self.case,
         }
 
+    @staticmethod
+    def _aligned_operand(operand, kind, index, source=None):
+        """Reuse numeric values, thetas and aligned scalar expressions.
+
+        ``handle_mismatch`` aligns F rows before child creation.
+        Selecting those rows again interprets nested operand keys as domains
+        and can require parent-only maps. Variables retain their existing
+        coordinate-selection behavior, including shifted indices.
+        """
+        if kind == Elem.T and isinstance(operand, tuple):
+            # Keep ownership without allocating a full selection per row.
+            return source._row_reference(index)
+        if kind in (Elem.P, Elem.T, Elem.F):
+            return operand
+        return operand(*index)
+
+    def _remaining_row(self, operand, index, position):
+        """Represent a surviving variable as a scalar F with flat columns.
+
+        Shifted boundaries must neither edit the variable's coordinate map nor
+        hand a vector-shaped variable wrapper to a scalar constraint row.
+        """
+        if self.one_type != Elem.V:
+            return operand()
+        row = operand.make_function()[0]
+        row.parent, row.pos, row.index = self, position, index
+        row.map = {index: row}
+        self._inherit_compiled_row(row, position)
+        return row
+
     def birth_functions(self):
+        """Create scalar children from aligned operands and compiled rows.
+
+        Preserve composite map keys for display and indexing, while reusing
+        scalar F operands directly so nested rows keep their original columns.
         """
-        Creates a vector of functions
-        Accordingly sets n
-        sets self._, self.n
-        """
 
-        n_elements = min(len(self._one), len(self._two))
-
-        # _one and _two are used because
-        # they are created post handling an length mismatches
-        # for n, (one, one_idx, two, two_idx) in enumerate(
-        #     zip(self._one, self._one_map, self._two, self._two_map)
-        # ):
-        _one_map = list(self._one_map)
-        _two_map = list(self._two_map)
-
-        for n in range(n_elements):
-
-            one = self._one[n]
-            one_idx = _one_map[n]
-            two = self._two[n]
-            two_idx = _two_map[n]
-
-            # only update the indices for F and V for functions
-            index: tuple[tuple[I]] = []
-
-            if self.one_type == Elem.F:
-                index += one_idx
-
-            else:
-
-                # if self.one_type == Elem.V:
-                index += (one_idx,)
-
+        one_keys, two_keys = list(self._one_map), list(self._two_map)
+        one_function = self.one_type == Elem.F
+        two_function = self.two_type == Elem.F
+        template = self._scalar_template()
+        for position in range(min(len(self._one), len(self._two))):
+            one, two = self._one[position], self._two[position]
+            one_key, two_key = one_keys[position], two_keys[position]
+            # F keys already contain composite coordinates. Ordinary operands
+            # contribute one coordinate; build tuples without a staging list.
+            left = tuple(one_key) if one_function else (one_key,)
             if two is None:
-                # you can have just a P or T masquerading as a function
-                # so check are unnecessary
-                # f = one(*one.index)
-
-                index = tuple(index)
-
-                if isinstance(one, (int, float)):
-                    # this happens when there is a skipped index
-                    self.map[index] = None
-                    self._.append(None)
-                    continue
-                else:
-                    f = one()
-                    f.map[index] = f
-
+                row = (
+                    None
+                    if isinstance(one, (int, float))
+                    else self._remaining_row(one, left, position)
+                )
+                key = left
             else:
-                # this is done to handle skipping
-                #  for shifted indices (.step)
-                if self.two_type == Elem.F:
-                    index += two_idx
+                right = tuple(two_key) if two_function else (two_key,)
+                key = left + right
+                row = self._new_aligned_row(
+                    template,
+                    one,
+                    two,
+                    one_key,
+                    two_key,
+                    index=key,
+                    position=position,
+                )
+            self.map[key] = row
+            self._.append(row)
 
-                else:
-                    index += (two_idx,)
+    def _scalar_template(self):
+        """Prepare invariant scalar metadata once per normalized collection.
 
-                index = tuple(index)
+        Child construction replaces mutable defaults before exposing a row.
+        Keep the empty constructor's argument metadata for compatibility;
+        relation and ownership fields match the validated parent collection.
+        """
+        template = F().__dict__
+        template.update(
+            parent=self,
+            one_type=self.one_type,
+            two_type=self.two_type,
+            mul=self.mul,
+            add=self.add,
+            sub=self.sub,
+            div=self.div,
+            rel=self.rel,
+            consistent=self.consistent,
+            case=self.case,
+            issumhow=self.issumhow,
+        )
+        return template
 
-                f = F()
-                f.parent = self
-                f.index = index
+    def _new_aligned_row(
+        self,
+        template,
+        one,
+        two,
+        one_idx,
+        two_idx,
+        *,
+        index,
+        position,
+    ):
+        """Build a public scalar from compiled data and empty-row metadata.
 
-                if one:
-                    if self.one_type in [Elem.P, Elem.T]:
-                        f.one = one
-                    else:
-                        f.one = one(*one_idx)
+        Copy only invariant defaults from the per-collection template. Every
+        mutable field is either fresh here or replaced by the row builders;
+        only compiled A and theta terms deliberately share parent storage.
+        Avoid running constructor dispatch, validation and empty formatting
+        for every scalar of an already validated collection.
+        """
+        row = object.__new__(F)
+        row.__dict__ = template.copy()
+        row.__dict__.update(
+            map={},
+            X={},
+            _matrix={},
+            _one=[],
+            _two=[],
+            args=template["args"].copy(),
+            Y=[],
+            Z=[],
+            F=[],
+            index=index,
+            pos=position,
+        )
+        if one:
+            row.one = self._aligned_operand(
+                one,
+                self.one_type,
+                one_idx,
+                self.one,
+            )
+        row.two = self._aligned_operand(two, self.two_type, two_idx, self.two)
+        row.update_variables()
+        row.give_name()
+        row.map[one_idx, two_idx] = row
+        self._inherit_compiled_row(row, position)
+        row._ = [row]
+        return row
 
-                if self.two_type in [Elem.P, Elem.T]:
-                    f.two = two
-                else:
-                    f.two = two(*two_idx)
-
-                f.pos = n
-                f.one_type, f.two_type = self.one_type, self.two_type
-                f.mul, f.add, f.sub, f.div = self.mul, self.add, self.sub, self.div
-                f.rel = self.rel
-                f.consistent = self.consistent
-                f.case = self.case
-                f.issumhow = self.issumhow
-
-                f.update_variables()
-                f.give_name()
-                f.map[one_idx, two_idx] = f
-                f.A = self.A[n]
-                f.B = self.B[n]
-
-            # update the map
-            self.map[index] = f
-
-            # only member of the birthed function is itself
-            f._ = [f]  # populate the set
-            self._.append(f)
+    def _inherit_compiled_row(self, child, position):
+        """
+        Share a compiled scalar row's values and symbolic owner references.
+        """
+        child.A = self.A[position]
+        child.B = cast("list[Number]", self.B)[position]
+        child._theta_terms = (
+            self._theta_rows[position] if self._theta_rows else ()
+        )
+        child.rhs_thetas = self.rhs_thetas
 
     def update_variables(self):
         """Updates the variables in the function"""
-        self.variables: list[V] = []
+        self.variables = []
 
         if self.one_type == Elem.F:
             # if function, extend the lists
-            self.variables.extend(self.one.variables)
+            self.variables.extend(cast("F", self.one).variables)
         elif self.one_type == Elem.V:
             # if variable, append the variable
-            self.variables.append(self.one)
+            self.variables.append(cast("V", self.one))
 
         if self.two_type == Elem.F:
-            self.variables.extend(self.two.variables)
+            self.variables.extend(cast("F", self.two).variables)
 
         elif self.two_type == Elem.V:
-            self.variables.append(self.two)
+            self.variables.append(cast("V", self.two))
 
         # make a matrix of positions of the variables
         self.P = [v.n for v in self.variables if v is not None]
@@ -665,1228 +859,510 @@ class F:
         """Gives a name to the function"""
 
         # set by program
-        self.pname: str = ""
+        self.pname = ""
 
         if self.case == FCase.SUM:
-            variable, over, _ = self.issumhow
+            variable, over, _ = cast("ReductionInfo", self.issumhow)
 
             self.name = f"sigma({variable}({variable.index}),{over})"
         # elif self.case == FCase.NEGSUM:
-        #     self.name = f'-sigma({self.variables[0].parent}[{self.variables[0].pos}:{self.variables[-1].pos}])'
+        # self.name =
+        # f'-sigma({self.variables[0].parent}[{self.variables[0].pos}:{self.variables[-1].pos}])'
         else:
-            _name = ""
-            if self.one is not None:
-                _name += str(self.one)
-            if self.two is not None:
-                _name += f"{self.rel}{self.two}"
+            one = "" if self.one is None else str(self.one)
+            two = "" if self.two is None else str(self.two)
+            self.name = self._join_display(one, two)
 
-            self.name = _name
+    def _join_display(self, one, two):
+        """Join displayed operands, retaining readable signs on theta terms."""
+        if not two:
+            return one
+        signed = self._signed_theta_display(one, two)
+        return signed if signed is not None else f"{one}{self.rel}{two}"
 
-    def types(
-        self,
-        one: V | P | T | Self,
-        one_type: Elem | None,
-        two: V | P | T | Self,
-        two_type: Elem | None,
-    ) -> tuple[V | P | T | Self, V | P | T | Self]:
-        """
-        Sets whether there is an element of a particular type in one and two
-
-        :param one: First element
-        :param one_type: Type of V | P | T | F
-        :param two: Second element
-        :param two_type: Type of V | P | T | F
-
-        :return: Updated elements
-        :rtype: tuple[V | P | T | F, V | P | T | F]
-        """
-        # this is meant to be avoided as far as possible
-        # look at how the operations for each element is defined
-        # to some extent it is difficult to avoid some sort of instance check
-        # but if there is an instance check happening prior to the operation
-        # it is better to pass the type directly
-        # every instance check is time consumed, so at the least
-        # avoid multiple instance checks for the same element
-
-        def check_type(elem: P | V | T | Self):
-            from .parameter import P
-            from .theta import T
-            from .variable import V
-
-            if isinstance(elem, V):
-                return Elem.V
-            if isinstance(elem, P):
-                return Elem.P
-            if isinstance(elem, T):
-                return Elem.T
-            if isinstance(elem, F):
-                return Elem.F
-
-        if not one_type:
-            # If one type is not known
-            # perform instance check
-            one_type = check_type(one)
-
-        if not two_type:
-            two_type = check_type(two)
-
-        self.one_type = one_type
-        self.two_type = two_type
-
-        return one, two
-
-    def generate_matrices(self):
-        r"""
-        Generates matrices
-        A - variable coefficients
-        P - position of continuous variables in program
-        Y - position of integer variables in program
-        Z - position of parametric variables in program
-        B - rhs parameters
-        F - pvar (theta) parameters
-
-        The general form is:
-
-        .. math::
-
-            \mathrm{A} \cdot \mathbf{V} = \mathrm{B} + \mathrm{F} \cdot \theta
-
-        sets ``self.A``, ``self.P``, ``self.Y``, ``self.Z``, ``self.B``, ``self.F``
-        """
-
-        # TODO, pass this on for birthed functions
-        self.variables: list[V] = []
-        self.rhs_parameters: list[P] = []
-        self.mul_parameters: list[P] = []
-        self.rhs_thetas: list[T] = []
-
-        # theta parameter multipliers
-        self.F = []
-        # theta parameter positions
-        self.Z = []
-
-        # The following are a list of cases:
-        # Base cases:
-        # V + P (parameter is always on the right)
-        # V - P (parameter is always on the right)
-        # P*V (parameter is always on the left)
-        # Function cases
-        # F + P (parameter is computed in total and pushed to the right)
-        # F - P (parameter is computed in total and pushed to the right)
-        # Compound cases:
-        # V + F (both have A, two has B)
-        # V - F (both have A, two has B)
-        # V*F (not implemented yet)
-
-        # these (SUM, NEGSUM) are just boxes
-        # if self.case == FCase.SUM:
-        #     # all positive
-        #     self.A = [[1] * len(self.index)] * len(self.index)
-        #     self.B = [0] * len(self.index)
-
-        # elif self.case == FCase.NEGSUM:
-        #     # all negative
-        #     self.A = [[-1] * len(self.index)] * len(self.index)
-        #     self.B = [0] * len(self.index)
-
-        # else:
-        # update the elements in the function
-        if self.one_type == Elem.F:
-            # two can be F, V, P, or T
-
-            self.variables.extend(self.one.variables)
-            # irrespective, we only need to take A here
-            if self.mis > 0:
-                # if there is a mismatch,
-                # positive indicates that two is longer
-                # so scale the A to match
-                self.A = [row[:] for _ in range(self.mis) for row in self.one.A]
-            else:
-                self.A = self.one.A
-
-        elif self.one_type == Elem.V:
-            # two can be F, V, P, or T
-            self.variables.append(self.one)
-            # irrespective, we only need to take A here
-            if self.mis > 0:
-                # if there is a mismatch,
-                # positive indicates that two is longer
-                # so scale the A to match
-                self.A = [row[:] for _ in range(self.mis) for row in self.one.A]
-            else:
-                self.A = self.one.A
-
-        elif self.one_type == Elem.T:
-            # TODO Bilevel: this is only possible for multiplication of variable/function with theta
-            pass
-
-        elif self.one_type == Elem.P:
-            # this is only possible if mul is True
-            # and two is V
-            self.mul_parameters.append(self.one)
-            if self.mul:
-                if self.two_type == Elem.F and self.two.case == FCase.SUM:
-                    if self.two.parent is not None:
-                        self.A = [self.one._[n] * i for n, i in enumerate(self.two.A)]
-                    else:
-                        self.A = [
-                            [self.one._[n] * i for i in j]
-                            for n, j in enumerate(self.two.A)
-                        ]
-                else:
-                    # so you A is a the parameter matrix
-                    # self.A = self.one.A
-                    if self.mis > 0:
-                        # if there is a mismatch,
-                        # positive indicates that two is longer
-                        self.A = [row[:] for _ in range(self.mis) for row in self.one.A]
-                    else:
-                        self.A = self.one.A
-
-                # at this point, it can be of the type P*(V|F)
-                # if F = V +- P, we use the operation P*V +- P*P
-                # so P always shows up at two
-                # if this is just of the form (P*V) or (P*F) where F = P*V
-                # B will not be set if self.two_type is not P
-                # it is just safe to set a B here, if needed it will be overwritten
-                if self.mis > 0:
-                    # if there is a mismatch,
-                    # positive indicates that two is longer
-                    # make a B of length of two
-                    self.B = [0] * len(self._two)
-                else:
-                    # if one is longer
-                    # or there is no mismatch (either one or two will do)
-                    self.B = [0] * len(self._one)
-
-        # update the elements in the function
-        if self.two_type == Elem.F:
-            # one could have been a V, T, or F
-            self.variables.extend(self.two.variables)
-            if self.one_type in [Elem.F, Elem.V]:
-                # if V or F, A definitely exists, so update A
-                if self.mis < 0:
-                    # if there is a mismatch,
-                    # negative indicates that one is longer
-                    # scale two's A to correct mismatch
-                    _A = [row[:] for _ in range(-self.mis) for row in self.two.A]
-
-                else:
-                    _A = self.two.A
-                if self.add:
-                    self.A = [a + b for a, b in zip(self.A, _A)]
-                if self.sub:
-                    self.A = [a + [-bb for bb in b] for a, b in zip(self.A, _A)]
-
-        elif self.two_type == Elem.V:
-            # one could have been a V, T, or F
-            self.variables.append(self.two)
-
-            if self.one_type in [Elem.F, Elem.V]:
-                # if V or F, A definitely exists, so update A
-                if self.mis < 0:
-                    # if there is a mismatch,
-                    # negative indicates that one is longer
-                    # scale two's A to correct mismatch
-                    _A = [row[:] for _ in range(-self.mis) for row in self.two.A]
-                else:
-                    _A = self.two.A
-
-                if self.add:
-
-                    self.A = [a + b for a, b in zip(self.A, _A)]
-
-                if self.sub:
-                    self.A = [a + [-bb for bb in b] for a, b in zip(self.A, _A)]
-
-        elif self.two_type == Elem.T:
-            # if self.one_type == Elem.F and self.one.two_type == Elem.T:
-            #     if self.add:
-            #         self.F = [i + [-1] for i in self.one.F]
-            #     if self.sub:
-            #         self.F = [i + [1] for i in self.one.F]
-            # else:
-            #     if self.add:
-            #         self.F = [[-1]] * len(self._one)
-            #     if self.sub:
-            #         self.F = [[1]] * len(self._one)
-            self.rhs_thetas.append(self.two)
-
-        if self.two_type == Elem.P:
-
-            # this is only possible for addition and subtraction
+    def _signed_theta_display(self, one, two):
+        """Absorb a negative theta label into an additive display operator."""
+        if self.two_type == Elem.T and two.startswith("-"):
             if self.add:
-                self.rhs_parameters.append(self.two)
-                # if addition, since B is rhs, negate
-                if self.mis < 0:
-                    # if there is a mismatch,
-                    # negative indicates that one is longer
-                    # so scale the parameter to match
-                    self.B = [-b for b in self.two._] * (-self.mis)
-                else:
-                    self.B = [-b for b in self.two._]
-            elif self.sub:
-                self.rhs_parameters.append(self.two)
-                # if subtraction, since B is rhs, keep as is
-                if self.mis < 0:
-                    # if there is a mismatch,
-                    # negative indicates that one is longer
-                    # so scale the parameter to match
-                    self.B = self.two._ * (-self.mis)
-                else:
-                    self.B = self.two._
-
-        else:
-            # if not caught by the parameter check
-            # set a B of zeros
-            self.B = [0] * len(self.A)
-
-    # -----------------------------------------------------
-    #                    Printing
-    # -----------------------------------------------------
-
-    def latex(self) -> str:
-        """LaTeX Equation"""
-
-        if self.case == FCase.CALC:
-            # if this is a calculated variable
-            if self.calculation.case == FCase.SUM:
-                # self.case = FCase.SUM
-                # two_ = self.latex()
-                # self.case = FCase.CALC
-                self.case = FCase.SUM
-                two = self.latex()
-                self.case = FCase.CALC
-                return rf"{self.calculation.latex()} = {two}"
-
-            if self.one_type == Elem.P and self.parent:
-                # if this is a child function with a parameter
-                # one will int/float
-                one = self.one
-            else:
-                one = self.one.latex()
-
-            return rf"{self.calculation.latex()} = {one} \cdot {self.two.latex()}"
-
-        if self.case == FCase.FVAR:
-            # if this is a variable being treated as a function
-            return self.two.latex()
-
-        if self.case in [FCase.SUM, FCase.NEGSUM]:
-            # if this is a summation
-
-            v, over, pos = self.issumhow
-            # the position of the index over which it is being summed is passed by sigma
-
-            # use i for summed index
-            index = [
-                (
-                    "i"
-                    if n == pos
-                    else (
-                        i[0].ltx
-                        if isinstance(i, list)
-                        else i.ltx.replace("[", "").replace("]", "")
-                    )
-                )
-                for n, i in enumerate(v.index)
-            ]
-            index = ", ".join(index)
-
-            if v.ltx:
-                oneissum = v.ltx
-            else:
-                oneissum = v.name
-
-            ltx = rf"\sum_{{i \in {over.ltx}}} {oneissum}_{{{index}}}"
-
-            if self.case == FCase.NEGSUM:
-                # if this is a summation
-                # return the summation
-                return rf"-{ltx}"
-            return rf"{ltx}"
-
-        if self.one is None and self.mul:
-
-            one = "0"
-
-        elif self.one is not None:
-            # _one = self.one(self.index.one)
-            if self.one_type == Elem.P and self.parent:
-                # if this is a child function with a parameter
-                # one will int/float
-                one = self.one
-            else:
-                one = self.one.latex()
-
-        else:
-            one = ""
-
-        if self.two is not None:
-            # _two = self.two(self.index.two)
-            if self.two_type == Elem.P and self.parent:
-                # if this is a child function with a parameter
-                # two will int/float
-                two = self.two
-            else:
-                two = self.two.latex()
-        else:
-            two = None
-
-        if two is None:
-            return rf"{one}"
-
-        if one is None:
-            return rf"{two}"
-
-        if self.add:
-            return rf"{one} + {two}"
-
-        if self.sub:
-            if (
-                self.one_type == Elem.F
-                and self.one.struct != (Elem.P, Elem.V)
-                and self.two_type == Elem.F
-                and self.two.struct != (Elem.P, Elem.V)
-                and not self.two.case == FCase.SUM
-            ):
-                # bracket are important for function minuses
-                # alternatively, the entire function can be negated
-                return rf"({one}) - ({two})"
-            if (
-                self.two_type == Elem.F
-                and self.two.struct != (Elem.P, Elem.V)
-                and not self.two.case == FCase.SUM
-            ):
-
-                return rf"{one} - ({two})"
-            return rf"{one} - {two}"
-
-        if self.mul:
-            # handling special case where something is multiplied by -1
-            if self.case == FCase.NEGVAR:
-                # if self.one and self.one.isnum and self.one[0] in [-1, -1.0]:
-                return rf"-{two}"
-            if self.one_type == Elem.F:
-                # if one is a function, it should be bracketed
-                return rf"({one}) \cdot {two}"
-            if self.two_type == Elem.F:
-                # if two is a function, it should be bracketed
-                return rf"{one} \cdot ({two})"
-            if self.one_type == Elem.F and self.two_type == Elem.F:
-                # if both are functions, they should be bracketed
-                return rf"({one}) \cdot ({two})"
-
-            return rf"{one} \cdot {two}"
-
-        if self.div:
-            # not the most developed gana operation, yet
-            return rf"\frac{{{one}}}{{{two}}}"
-
-    def show(self, descriptive: bool = False):
-        """
-        Display the function
-
-        :param descriptive: Whether to show all birthed functions, defaults to False
-        :type descriptive: bool, optional
-        """
-        if descriptive:
-            for f in self._:
-                display(Math(rf"[{f.n}]" + r"\text{   }" + f.latex()))
-        else:
-            display(Math(rf"[{self.n}]" + r"\text{   }" + self.latex()))
-
-    @cached_property
-    def longname(self):
-        """Gives a longer more descriptive name for the function"""
-        _name = ""
-        if self.one is not None:
-            if isinstance(self.one, (int, float)):
-                _name += str(self.one)
-            else:
-                _name += self.one.longname
-        if self.two is not None:
-            if isinstance(self.two, (int, float)):
-                _name += f"{self.rel}{self.two}"
-            else:
-                _name += f"{self.rel}{self.two.longname}"
-        return _name
-
-    # -----------------------------------------------------
-    #                    Operators
-    # -----------------------------------------------------
-
-    def __neg__(self):
-
-        if self.case == FCase.NEGVAR:
-            # if function is a negated variable
-            # return the variable
-            return self.two
-
-        if self.one_type == Elem.V:
-            # negative of variable is -1*v
-            # which is a function
-            one_type = Elem.F
-
-        else:
-            one_type = self.one_type
-
-        if self.case == FCase.SUM:
-            # -(E1 + ... + En) = -E1 - ... - En
-            # create and return a negative summation
-            return
-
-        if self.add:
-
-            return F(
-                # -(E1 + E2) = -E1 - E2
-                one=-self.one,
-                sub=True,
-                two=self.two,
-                one_type=one_type,
-                two_type=self.two_type,
-            )
-
-        if self.sub:
-            # -(E1 - E2) = -E1 + E2
-            return F(
-                one=-self.one,
-                add=True,
-                two=self.two,
-                one_type=one_type,
-                two_type=self.two_type,
-            )
-
-        if self.mul:
-            # -(E1 * E2) = -E1 * E2
-            return F(
-                one=-self.one,
-                mul=True,
-                two=self.two,
-                one_type=one_type,
-                two_type=self.two_type,
-            )
-        if self.div:
-            # -(E1 / E2) = -E1 / E2
-            return F(
-                one=-self.one,
-                div=True,
-                two=self.two,
-                one_type=one_type,
-                two_type=self.two_type,
-            )
-
-    def __pos__(self):
-        return self
-
-    def __add__(
-        self,
-        other: (
-            V
-            | P
-            | T
-            | Self
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> Self:
-        from .parameter import P
-
-        # F + None = F
-        if other is None:
-            # if adding with nothing, return itself
-            return self
-
-        if isinstance(other, (int, float)):
-            # if adding with a number
-            # F + 0 = F
-            if other in [0, 0.0]:
-                # if adding with 0, return self
-                return self
-
-            if self.two_type == Elem.P:
-                if self.add:
-                    # of the type, (V | F + P) + P
-                    return F(
-                        one=self.one,
-                        add=True,
-                        two=self.two + make_P(other, index=self.two.index),
-                        one_type=self.one_type,
-                        two_type=Elem.P,
-                        consistent=True,
-                    )
-                if self.sub:
-                    # of the type, (V | F - P1) + P2
-                    # add if P2 > P1
-                    two = make_P(other, index=self.two.index) - self.two
-
-                    if two == 0:
-                        # if equal to zero, return one
-                        return self.one
-
-                    if self.two.case in [PCase.NEGNUM, PCase.NUM]:
-                        # if subtracting a number from a parameter
-                        # return the parameter
-                        if two._[0] < 0:
-                            # this is leading to a negative parameter
-                            return F(
-                                one=self.one,
-                                sub=True,
-                                two=two,
-                                one_type=self.one_type,
-                                two_type=Elem.P,
-                                consistent=True,
-                            )
-            if other < 0:
-
-                return F(
-                    one=self,
-                    sub=True,
-                    two=make_P(other, index=self.two.index),
-                    one_type=Elem.F,
-                    two_type=Elem.P,
-                    consistent=True,
-                )
-
-            return F(
-                one=self,
-                add=True,
-                two=make_P(other, index=self.two.index),
-                one_type=Elem.F,
-                two_type=Elem.P,
-                consistent=True,
-            )
-
-        if isinstance(other, tuple):
-            # if adding with a tuple
-            # this is a theta
-            other = make_T(other, index=self.one.index)
-
-        if isinstance(other, list):
-            # check 0th to see if tuple
-            if isinstance(other[0], tuple):
-                # if adding with a list of tuples
-                # this is a theta
-                other = make_T(other)
-                return F(
-                    one=self, add=True, two=other, one_type=Elem.F, two_type=Elem.T
-                )
-
-            if self.two_type == Elem.P:
-                if self.add:
-                    # of the type, V | F + P + P
-                    return F(
-                        one=self.one,
-                        add=True,
-                        two=self.two + make_P(other),
-                        one_type=self.one_type,
-                        two_type=Elem.P,
-                        consistent=True,
-                    )
-                if self.sub:
-                    # of the type, V | F - P + P
-                    return F(
-                        one=self.one,
-                        sub=True,
-                        two=make_P(other) - self.two,
-                        one_type=self.one_type,
-                        two_type=Elem.P,
-                        consistent=True,
-                    )
-
-            return F(
-                one=self,
-                add=True,
-                two=make_P(other),
-                one_type=Elem.F,
-                two_type=Elem.P,
-            )
-
-        if isinstance(other, P):
-            # if adding with a parameter
-            if self.two_type == Elem.P:
-                if self.add:
-                    # of the type, V | F + P1 + P2
-                    return F(
-                        one=self.one,
-                        add=True,
-                        two=self.two + other,
-                        one_type=self.one_type,
-                        two_type=Elem.P,
-                        consistent=True,
-                    )
-                if self.sub:
-                    # of the type, V | F - P + P
-                    return F(
-                        one=self.one,
-                        sub=True,
-                        two=other - self.two,
-                        one_type=self.one_type,
-                        two_type=Elem.P,
-                        consistent=True,
-                    )
-
-        # these are of the type
-        # F + P where F can be P*V or V/P
-
-        if isinstance(other, F):
-            return F(one=self, add=True, two=other, one_type=Elem.F, two_type=Elem.F)
-
-        return F(one=self, add=True, two=other, one_type=Elem.F, issumhow=self.issumhow)
-
-    def __radd__(
-        self,
-        other: (
-            V
-            | P
-            | T
-            | Self
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> Self:
-        return self + other
-
-    def __sub__(
-        self,
-        other: (
-            V
-            | P
-            | T
-            | Self
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> Self:
-        from .parameter import P
-
-        if other is None:
-            # if subtracting with nothing, return itself
-            return self
-
-        if isinstance(other, (int, float)):
-            # if substracting with a number
-            if other in [0, 0.0]:
-                # if subtracting with 0, return self
-                return self
-
-            if self.two_type == Elem.P:
-                if self.add:
-                    # of the type, V | F + P + P
-                    two = self.two - make_P(other, index=self.two.index)
-                    if two.case in [PCase.NUM, PCase.NEGNUM]:
-                        if two > 0:
-                            # if self.two - other is positive
-                            return F(
-                                one=self.one,
-                                add=True,
-                                two=two,
-                                one_type=self.one_type,
-                                two_type=Elem.P,
-                                consistent=True,
-                            )
-                        if two < 0:
-                            # if self.two - other is negative
-                            return F(
-                                one=self.one,
-                                sub=True,
-                                two=-two,
-                                one_type=self.one_type,
-                                two_type=Elem.P,
-                                consistent=True,
-                            )
-                        else:
-                            # if they are equal only self.one remains
-                            return self.one
-                    else:
-                        # if self.two - other is not a number
-                        return F(
-                            one=self.one,
-                            add=True,
-                            two=two - make_P(other, index=self.two.index),
-                            one_type=self.one_type,
-                            two_type=Elem.P,
-                            consistent=True,
-                        )
-
-                if self.sub:
-                    # for substraction # of the type, V | F - P - P := V | F - (P + P)
-                    return F(
-                        one=self.one,
-                        sub=True,
-                        two=two + make_P(other, index=self.two.index),
-                        one_type=self.one_type,
-                        two_type=Elem.P,
-                        consistent=True,
-                    )
-
-            if not self.two:
-                index = self.one.index
-            elif not self.one:
-                index = self.two.index
-            else:
-                if self.two and self.one and len(self.two) > len(self.one):
-                    index = self.two.index
-                else:
-                    index = self.one.index
-
-            return F(
-                one=self,
-                sub=True,
-                two=make_P(other, index=index),
-                one_type=Elem.F,
-                two_type=Elem.P,
-                consistent=True,
-            )
-
-        if isinstance(other, tuple):
-            # if subtracting with a tuple
-            # this is a theta
-            other = make_T(other, index=self.one.index)
-
-        if isinstance(other, list):
-            # check 0th to see if tuple
-            if isinstance(other[0], tuple):
-                # if subtracting with a list of tuples
-                # this is a theta
-                other = make_T(other)
-                return F(
-                    one=self, sub=True, two=other, one_type=Elem.F, two_type=Elem.T
-                )
-            if self.two_type == Elem.P:
-                if self.add:
-                    # of the type, V | F + P + P
-                    return F(
-                        one=self.one,
-                        add=True,
-                        two=self.two + make_P(other),
-                        one_type=self.one_type,
-                        two_type=Elem.P,
-                        consistent=True,
-                    )
-                if self.sub:
-                    # of the type, V | F - P + P
-                    return F(
-                        one=self.one,
-                        sub=True,
-                        two=make_P(other) - self.two,
-                        one_type=self.one_type,
-                        two_type=Elem.P,
-                        consistent=True,
-                    )
-
-            return F(
-                one=self,
-                sub=True,
-                two=make_P(other),
-                one_type=Elem.F,
-                two_type=Elem.P,
-                consistent=True,
-            )
-
-        if isinstance(other, P):
-            # if subtracting with a parameter
-            if self.two_type == Elem.P:
-                if self.add:
-                    two = self.two - other
-                    if two.case in [PCase.NUM, PCase.NEGNUM]:
-                        # of the type, V | F + P1 - P2 := V | F + P3
-                        if two > 0:
-                            return F(
-                                one=self.one,
-                                add=True,
-                                two=two,
-                                one_type=self.one_type,
-                                two_type=Elem.P,
-                                consistent=True,
-                            )
-                        elif two < 0:
-                            # of the type, V | F + P1 - P2:= V | F - P3
-                            return F(
-                                one=self.one,
-                                sub=True,
-                                two=-two,
-                                one_type=self.one_type,
-                                two_type=Elem.P,
-                                consistent=True,
-                            )
-                    else:
-                        return F(
-                            one=self.one,
-                            add=True,
-                            two=self.two + other,
-                            one_type=self.one_type,
-                            two_type=Elem.P,
-                            consistent=True,
-                        )
-                if self.sub:
-                    # of the type, V | F - (P + P)
-                    return F(
-                        one=self.one,
-                        sub=True,
-                        two=self.two + other,
-                        one_type=self.one_type,
-                        two_type=Elem.P,
-                        consistent=True,
-                    )
-        if isinstance(other, F):
-            return F(one=self, sub=True, two=other, one_type=Elem.F, two_type=Elem.F)
-
-        return F(one=self, sub=True, two=other, one_type=Elem.F, issumhow=self.issumhow)
-
-    def __rsub__(
-        self,
-        other: (
-            V
-            | P
-            | T
-            | Self
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> Self:
-        return -self + other
-
-    def __mul__(
-        self,
-        other: (
-            V
-            | P
-            | T
-            | Self
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> Self:
-        from .theta import T
-        from .variable import V
-
-        if other is None:
-            # multiplying by nothing
-            return None
-
-        if isinstance(other, (int, float)):
-            if other in [0, 0.0]:
-                # multiplying by 0
-                return 0
-
-            if other in [1, 1.0]:
-                # multiplying by 1
-                return self
-
-            # make a numeric parameter
-            if self.case == FCase.SUM:
-                one = make_P([other] * len(self))
-                one.index = self.index
-                return F(
-                    one=one,
-                    mul=True,
-                    two=self,
-                    one_type=Elem.P,
-                    two_type=Elem.F,
-                )
-
-            two = make_P(other, index=self.one.index)
-
-            if self.mul:
-                return F(one=two * self.one, mul=True, two=self.two)
-
-            if self.div:
-                return F(one=two * self.one, div=True, two=self.two)
-
-            if self.add:
-                if two < 0:
-                    # if multiplying a negative number
-                    return F(one=two * self.one, sub=True, two=-two * self.two)
-                if two > 0:
-                    # if multiplying a positive number
-                    return F(one=two * self.one, add=True, two=two * self.two)
-
+                return f"{one} - {two[1:]}"
             if self.sub:
-                if two < 0:
-                    # if multiplying a negative number
-                    return F(one=two * self.one, add=True, two=-two * self.two)
-                if two > 0:
-                    # if multiplying a positive number
-                    return F(one=two * self.one, sub=True, two=two * self.two)
+                return f"{one} + {two[1:]}"
+        return None
 
-        if isinstance(other, list):
-            # check 0th to see if tuple
-            if isinstance(other[0], tuple):
-                # if multiplying with a list of tuples
-                # this is a theta
-                raise NotImplementedError(
-                    f"{self}*{other}: Multiplication with a parametric variable is not implemented yet."
-                )
+    def categorize(self, category: str):
+        """Categorizes the function
 
-            # make a parameter from the list
-            two = make_P(other)
-            # this by default is a parameter set
+        :param category: Category name
+        :type category: str
+        """
+        self.category = category
+        for c in self._:
+            # Categorization requires populated rows; holes still fail.
+            cast("F", c).category = category
 
-            if self.case == FCase.SUM:
-                return F(
-                    one=two,
-                    mul=True,
-                    two=self,
-                    one_type=Elem.P,
-                    two_type=Elem.F,
-                )
+    @property
+    def struct(self) -> tuple[Elem | None, Elem | None]:
+        """Structure of the function"""
+        return (self.one_type, self.two_type)
 
-            if self.mul:
-                return F(one=two * self.one, mul=True, two=self.two)
+    @property
+    def elements(self) -> list[T | ParameterSet | V]:
+        """Elements in the function"""
+        return (
+            self.variables
+            + self.mul_parameters
+            + self.rhs_parameters
+            + self.rhs_thetas
+        )
 
-            if self.div:
-                return F(one=two * self.one, div=True, two=self.two)
+    @property
+    def index_flat(self) -> list[tuple[I, ...] | set[tuple[I, ...]]]:
+        """Flattens the index of the function"""
+        return (
+            [v.index for v in self.variables]
+            + [p.index for p in self.mul_parameters]
+            + [r.index for r in self.rhs_parameters]
+            + [t.index for t in self.rhs_thetas]
+        )
 
-            if self.add:
-                return F(one=two * self.one, add=True, two=two * self.two)
+    # endregion
 
-            if self.sub:
-                return F(one=two * self.one, sub=True, two=two * self.two)
+    # region Indexing and selection
 
-        if isinstance(other, tuple):
-            # if multiplying with a tuple
-            # this is a theta
-            raise NotImplementedError(
-                f"{self}*{other}: Multiplication of function and parametric variable is not implemented yet."
-            )
-
-        if isinstance(other, F):
-            raise NotImplementedError(
-                f"{self}*{other}: Multiplication of two functions is not implemented yet."
-            )
-
-        if isinstance(other, V):
-            raise NotImplementedError(
-                f"{self}*{other}: Multiplication of variable and function is not implemented yet."
-            )
-
-        if isinstance(other, T):
-            raise NotImplementedError(
-                f"{self}*{other}: Multiplication of function and parametric variable is not implemented yet."
-            )
-
-        # what remains is P
-        if self.case == FCase.SUM:
-            return F(one=other, mul=True, two=self, one_type=Elem.P, two_type=Elem.F)
-
-        if self.mul:
-            return F(one=other * self.one, mul=True, two=self.two)
-
-        if self.div:
-            return F(one=other * self.one, div=True, two=self.two)
-
-        if self.add:
-
-            if other < 0:
-                # multiplying a negative number
-                return F(one=other * self.one, sub=True, two=-other * self.two)
-
-            if other > 0:
-                # multiplying a positive number
-                return F(one=other * self.one, add=True, two=other * self.two)
-
-        if self.sub:
-            if other < 0:
-                # multiplying a negative number
-                return F(one=other * self.one, add=True, two=-other * self.two)
-            if other > 0:
-                # multiplying a positive number
-                return F(one=other * self.one, sub=True, two=other * self.two)
-
-    def __rmul__(
-        self,
-        other: (
-            V
-            | P
-            | T
-            | Self
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> Self:
-        return self * other
-
-    def __truediv__(
-        self,
-        other: (
-            V
-            | P
-            | T
-            | Self
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> Self:
-        return self * (1 / other)
-
-    # -----------------------------------------------------
-    #                    Relational
-    # -----------------------------------------------------
-    def __eq__(self, other: Self | P | V | T):
-        return C(self - other)
-
-    def __le__(self, other: Self | P | V | T):
-
-        return C(self - other, leq=True)
-
-    def __ge__(self, other: Self | P | V | T):
-        return C(-self + other, leq=True)
-
-    def __lt__(self, other: Self | P | V | T):
-        return self <= other
-
-    def __gt__(self, other: Self | P | V | T):
-        return self >= other
-
-    # -----------------------------------------------------
-    #                    Vector
-    # -----------------------------------------------------
-
-    def __call__(self, *key: list[I]) -> Self:
-
-        if not key or (key == self.index):
-            # if the index is an exact match
-            # or no key is passed
+    def __call__(self, *key) -> FunctionNode:
+        """Select existing compiled rows without rebuilding operand trees."""
+        if not key or key == self.index:
             return self
+        from .rows import select_expression
 
-        # if a subset is passed,
-        # first create a product to match
-        # the indices
+        return select_expression(self, key)
 
-        indices = list(product(*[list(product(*k)) for k in key]))
-
-        # create a new function set to return
-        f = F(**self.args)
-        f.name, f.pname, f.n = self.name, self.pname, self.n
-        f.A = []
-        f.B = []
-        f.P = []
-        f.index = key
-
-        # should be able to map these
-        for n, index in enumerate(indices):
-            # this helps weed out any None indices
-            # i.e. skips
-            if index is None:
-                function = None
-            else:
-                # here the index could match the entire function index or
-                # be the index of one or two
-
-                # we can check whether it matches the entire function index first
-                if index in self.map:
-                    # if the index matches the entire function index
-                    # then we can just use the function from the map
-                    function = self.map[index]
-
-                elif index[0] in self._one_map:
-                    # if the index matches the first element of _one_map
-                    # this is a one type function
-                    index = list(self.map)[list(self._one_map).index(index[0])]
-
-                elif index[0] in self._two_map:
-                    # if the index matches the second element of _two_map
-                    # this is a two type function
-                    index = list(self.map)[list(self._two_map).index(index[0])]
-
-                elif (
-                    tuple(index[0] for _ in range(len(self.one.elements)))
-                    in self._one_map
-                ):
-                    # if the index matches the first element of _one_map
-                    index = list(self.map)[
-                        list(self._one_map).index(
-                            tuple(index[0] for _ in range(len(self.one.elements)))
-                        )
-                    ]
-
-                elif (
-                    tuple(index[0] for _ in range(len(self.two.elements)))
-                    in self._two_map
-                ):
-                    # if the index matches the second element of _two_map
-                    index = list(self.map)[
-                        list(self._two_map).index(
-                            tuple(index[0] for _ in range(len(self.two.elements)))
-                        )
-                    ]
-
-                function: Self = self.map[index]
-                f.map[index] = function
-                f.one = function.one
-                f.two = function.two
-                f._one.append(self._one[n])
-                f._two.append(self._two[n])
-                # f.generate_matrices()
-
-                var_index = self.index_flat[: len(self.variables)]
-                mul_index = self.index_flat[
-                    len(self.variables) : len(self.variables) + len(self.mul_parameters)
-                ]
-                rhs_index = self.index_flat[
-                    len(self.variables)
-                    + len(self.mul_parameters) : len(self.variables)
-                    + len(self.mul_parameters)
-                    + len(self.rhs_parameters)
-                ]
-                theta_index = self.index_flat[
-                    len(self.variables)
-                    + len(self.mul_parameters)
-                    + len(self.rhs_parameters) :
-                ]
-
-                f.variables = [v(*i) for v, i in zip(self.variables, var_index)]
-                f.mul_parameters = [
-                    p(*i) for p, i in zip(self.mul_parameters, mul_index)
-                ]
-                f.rhs_parameters = [
-                    r(*i) for r, i in zip(self.rhs_parameters, rhs_index)
-                ]
-                f.rhs_thetas = [t(*i) for t, i in zip(self.rhs_thetas, theta_index)]
-                f.A.append(self.A[function.n])
-                f.B.append(self.B[function.n])
-                f.P.append(self.P[function.n])
-
-            f._.append(function)
-
-        return f
-
-    def __getitem__(self, pos: int) -> F:
+    def __getitem__(self, pos: int) -> FunctionNode | None:
+        """Return a stored row, including a shifted-boundary placeholder."""
         return self._[pos]
 
-    def __iter__(self) -> Self:
+    def __iter__(self) -> Iterator[FunctionNode | None]:
+        """
+        Iterate rows and missing-row placeholders in their stored order.
+        """
         return iter(self._)
 
     def __len__(self):
         return len(self._)
 
-    # -----------------------------------------------------
-    #                    Solution
-    # -----------------------------------------------------
+    # endregion
 
-    def solution(self, n_sol: int = 0) -> float | int | list[float | int]:
+    # region Unary operations
+
+    def __neg__(self):
+        """Negate affine rows and infer operand types after simplification.
+
+        Negating a negated variable returns a V, so retaining its earlier F
+        type would corrupt double negation. Compact sums use row scaling to
+        avoid traversing the reduction's self-link. Scalar children store
+        numeric operands directly; wrap those before constructing a new F.
+        """
+        if self.case == FCase.NEGVAR:
+            return self.two
+        if (
+            self.rhs_thetas
+            or self.case == FCase.SUM
+            or hasattr(self, "_row_layout")
+        ):
+            return self * -1
+        return F(
+            one=self._coerce_addend(
+                -cast("SymbolicOperand | Number", self.one)
+            ),
+            two=self._coerce_addend(self.two),
+            add=self.sub,
+            sub=self.add,
+            mul=self.mul,
+            div=self.div,
+        )
+
+    def __pos__(self):
+        return self
+
+    # endregion
+
+    # region Arithmetic helpers
+
+    def _coerce_addend(self, other):
+        """Wrap numeric operands without interpreting term indices as rows.
+
+        A scalar has one dummy coordinate and is broadcast by handle_mismatch.
+        A tuple retains the public theta-bound convention.
+        """
+        other = normalize_operand(other)
+        if isinstance(other, (int, float)):
+            return make_P(other, index=(I(size=1, dummy=True),))
+        if isinstance(other, tuple):
+            return make_T(other, index=(I(size=len(self), dummy=True),))
+        if isinstance(other, list):
+            if other and isinstance(other[0], tuple):
+                return make_T(other)
+            return make_P(other)
+        return other
+
+    def _additive(self, other, subtract=False):
+        """
+        Construct ordinary arithmetic even when an operand is a reduction.
+        """
+        if other is None:
+            return self
+        if isinstance(other, (int, float)) and other == 0:
+            return self
+        return F(
+            one=self,
+            two=self._coerce_addend(other),
+            add=not subtract,
+            sub=subtract,
+            one_type=Elem.F,
+        )
+
+    def _scale_by(self, parameter):
+        """Distribute compatible multipliers and broadcast other row counts.
+
+        Distribution preserves the existing expanded expression display. A
+        reduction or a different-size multiplier is compiled directly from its
+        aligned rows; distributing those would change the broadcast ordering.
+        Theta terms also use compiled rows: distributing into T would invoke
+        its interval transformation instead of scaling coefficients.
+        """
+        if self.rhs_thetas:
+            return F(one=parameter, mul=True, two=self)
+        if (
+            self.case == FCase.SUM
+            or self.parent is not None
+            or hasattr(self, "_row_layout")
+            or len(parameter) != len(self)
+        ):
+            return F(one=parameter, mul=True, two=self)
+        if self.mul:
+            return F(one=parameter * self.one, mul=True, two=self.two)
+        if self.div:
+            return F(one=parameter * self.one, div=True, two=self.two)
+        return F(
+            one=parameter * self.one,
+            two=parameter * self.two,
+            add=self.add,
+            sub=self.sub,
+        )
+
+    # endregion
+
+    # region Binary arithmetic
+
+    def __add__(
+        self,
+        other: Self | ArithmeticOperand | None,
+    ) -> Self:
+        """Add aligned rows, preserving both operands' affine constants."""
+        return self._additive(other)
+
+    def __radd__(
+        self,
+        other: Self | ArithmeticOperand | None,
+    ) -> Self:
+        return self + other
+
+    def __sub__(
+        self,
+        other: Self | ArithmeticOperand | None,
+    ) -> Self:
+        """
+        Subtract aligned rows, negating coefficients and constants together.
+        """
+        return self._additive(other, subtract=True)
+
+    def __rsub__(
+        self,
+        other: Self | ArithmeticOperand | None,
+    ) -> Self:
+        return -self + other
+
+    def __mul__(
+        self,
+        other: Self | ArithmeticOperand | None,
+    ) -> FunctionNode | int | None:
+        """Scale affine coefficients and constants with a numerical operand."""
+        from .parameter import P
+
+        other = normalize_operand(other)
+        if other is None:
+            return None
+        if isinstance(other, (int, float)):
+            if other == 0:
+                return 0
+            if other == 1:
+                return self
+            other = make_P(other, index=(I(size=len(self), dummy=True),))
+        elif isinstance(other, list) and all(
+            isinstance(x, (int, float)) for x in other
+        ):
+            # The all() guard excludes the tuple alternative in NumericList.
+            other = make_P(cast("list[Number]", other))
+        if not isinstance(other, P):
+            message = (
+                f"{self}*{other}: "
+                "Multiplication requires a numerical parameter."
+            )
+            raise NotImplementedError(message)
+        return self._scale_by(other)
+
+    def __rmul__(
+        self,
+        other: Self | ArithmeticOperand | None,
+    ) -> FunctionNode | int | None:
+        """Delegate scaling, including the zero and None identity results."""
+        return self * other
+
+    def __truediv__(
+        self, other: Self | ArithmeticOperand | None
+    ) -> FunctionNode | int | None:
+        """Scale affine rows by reciprocals, including numeric lists."""
+        other = normalize_operand(other)
+        if isinstance(other, list):
+            values = [
+                value for value in other if isinstance(value, (int, float))
+            ]
+            if not values or len(values) != len(other):
+                message = "Division requires a nonempty numeric list"
+                raise TypeError(message)
+            other = make_P(values)
+        # Valid reciprocals are numerical/P operands. Unsupported public inputs
+        # retain Python's original operator TypeError rather than a new guard.
+        return self * (1 / cast("Number | P", other))
+
+    # endregion
+
+    # region Comparisons
+
+    def __ne__(self, other):
+        """Reject disequality instead of inverting a truthy constraint."""
+        reject_disequality()
+
+    def __eq__(self, other: object):
+        """Build equality using arithmetic's existing operand validation."""
+        return C(self - cast("F | ArithmeticOperand | None", other))
+
+    def __lt__(self, other: Self | ExpressionSet):
+        return self <= other
+
+    def __le__(self, other: Self | ExpressionSet):
+
+        return C(self - other, leq=True)
+
+    def __gt__(self, other: Self | ExpressionSet):
+        return self >= other
+
+    def __ge__(self, other: Self | ExpressionSet):
+        return C(-self + other, leq=True)
+
+    # endregion
+
+    # region Matrix compilation
+
+    @staticmethod
+    def _matrix_values(values, kind):
+        """Skip scalar wrappers when compilation needs only symbol presence.
+
+        Native SymbolValues contain no missing members: their V coefficients
+        are one and their T terms use the separately aligned coordinate keys.
+        Lists and shifted/gapped facades retain their actual values so None
+        boundaries and numeric/F payloads keep their existing semantics.
+        """
+        if kind in (Elem.V, Elem.T):
+            facade = import_module("gana.storage.symbols").SymbolValues
+            if isinstance(values, facade):
+                return repeat(True, len(values))
+        return values
+
+    @staticmethod
+    def _operand_theta_terms(operand, kind, value, key):
+        """
+        Read symbolic terms without copying bounds or allocating theta IDs.
+        """
+        if kind == Elem.F and value is not None:
+            return value._theta_terms
+        if kind == Elem.T and value is not None:
+            return [(operand._owner_root, key, -1)]
+        return ()
+
+    def _compile_theta_terms(self):
+        """Propagate signed RHS terms through aligned affine operations."""
+        if not self.rhs_thetas:
+            self._theta_rows = ()
+            return
+        rows: list[list[ThetaTerm]] = []
+        for one, two, key_one, key_two in zip(
+            self._matrix_values(self._one, self.one_type),
+            self._matrix_values(self._two, self.two_type),
+            self._one_map,
+            self._two_map,
+        ):
+            left = self._operand_theta_terms(
+                self.one,
+                self.one_type,
+                one,
+                key_one,
+            )
+            right = self._operand_theta_terms(
+                self.two,
+                self.two_type,
+                two,
+                key_two,
+            )
+            scale = one if self.mul else (-1 if self.sub else 1)
+            terms = [
+                *left,
+                *((owner, key, scale * a) for owner, key, a in right),
+            ]
+            rows.append(terms)
+        self._theta_rows = rows
+
+    @staticmethod
+    def _affine_row(value, kind):
+        """Read one aligned operand as coefficients and a negated constant.
+
+        ``B`` is the right-hand-side constant, so a numeric operand contributes
+        its negative. Reduction rows start with an empty B and mean zero.
+        Theta terms are registered separately by the owning program.
+        """
+        if value is None:
+            return [], 0
+        if kind == Elem.F:
+            return value.A, value.B or 0
+        if kind == Elem.V:
+            return [1], 0
+        if kind == Elem.P:
+            return [], -value
+        return [], 0
+
+    def _combine_row(self, one, two):
+        """Combine already aligned scalar rows without re-expanding indices."""
+        left, lhs_constant = self._affine_row(one, self.one_type)
+        right, rhs_constant = self._affine_row(two, self.two_type)
+        if self.mul:
+            # The consistent affine form places the numerical multiplier first.
+            return [one * a for a in right], one * rhs_constant
+        sign = -1 if self.sub else 1
+        return left + [
+            sign * a for a in right
+        ], lhs_constant + sign * rhs_constant
+
+    def _matrix_operands(self):
+        """
+        Keep operand metadata needed for selection and theta registration.
+        """
+        self.variables = []
+        self.rhs_parameters = []
+        self.mul_parameters = []
+        self.rhs_thetas = []
+        for operand, kind in (
+            (self.one, self.one_type),
+            (self.two, self.two_type),
+        ):
+            if kind == Elem.F:
+                self.variables.extend(cast("F", operand).variables)
+                self.rhs_thetas.extend(getattr(operand, "rhs_thetas", ()))
+            elif kind == Elem.V:
+                self.variables.append(cast("V", operand))
+            elif kind == Elem.T:
+                self.rhs_thetas.append(cast("T", operand)._owner_root)
+        if self.one_type == Elem.P:
+            self.mul_parameters.append(cast("P", self.one))
+        if self.two_type == Elem.P:
+            self.rhs_parameters.append(cast("P", self.two))
+        self.rhs_thetas = list({id(t): t for t in self.rhs_thetas}.values())
+
+    def generate_matrices(self):
+        """Compile affine rows as ``A V = B + F theta``.
+
+        Use the same repeated operand rows as ``birth_functions``. Constants
+        from both operands must survive each operation; term coefficients stay
+        aligned with variable occurrences until accumulation by column ID.
+        """
+        self._matrix_operands()
+        self._compile_theta_terms()
+        self.F, self.Z = [], []
+        coefficients_by_row: list[list[Number]] = []
+        self.A, self.B = coefficients_by_row, []
+        for one, two in zip(
+            self._matrix_values(self._one, self.one_type),
+            self._matrix_values(self._two, self.two_type),
+        ):
+            coefficients, constant = self._combine_row(one, two)
+            coefficients_by_row.append(coefficients)
+            self.B.append(constant)
+
+    @property
+    def matrix(self) -> dict:
+        """Matrix as dict
+
+        Returns:
+            dict: Dictionary mapping of positions to values in A matrix
+        """
+        if self._matrix:
+            return self._matrix
+
+        if self.parent is not None:
+            # Several terms may name the same column, including cancellation.
+            self._matrix = {}
+            for column, coefficient in zip(self.P, self.A):
+                self._matrix[column] = (
+                    self._matrix.get(column, 0) + coefficient
+                )
+        else:
+            self._matrix = {f: cast("F", f).matrix for f in self._}
+
+        return self._matrix
+
+    # endregion
+
+    # region Solution and evaluation
+
+    @staticmethod
+    def _solution_identity(value, identity):
+        """Substitute for an absent operand while preserving solved zeros."""
+        return identity if value is None else value
+
+    def _solution_value(self, n_sol):
+        """
+        Evaluate reductions and unary operands without recursive self-calls.
+
+        Reduced variables require numeric solved values. Missing values keep
+        the arithmetic TypeError instead of being silently omitted or zeroed.
+        """
+        match self.case:
+            case FCase.SUM:
+                return sum(cast("Number", v.X[n_sol]) for v in self.variables)
+            case FCase.NEGSUM:
+                return -sum(cast("Number", v.X[n_sol]) for v in self.variables)
+            case FCase.NEGVAR:
+                return -cast("Number", cast("V", self.two).X[n_sol])
+            case FCase.FVAR:
+                return cast("V", self.two).X[n_sol]
+            case _:
+                return self.solution(n_sol)
+
+    @staticmethod
+    def _solution_operand(elem, elem_type, n_sol):
+        """
+        Resolve a numeric, variable or expression operand at a solve index.
+        """
+        match elem_type:
+            case Elem.P:
+                return elem
+            case Elem.V:
+                return elem.X[n_sol]
+            case Elem.F:
+                return elem._solution_value(n_sol)
+            case _:
+                return None
+
+    def solution(self, n_sol: int = 0) -> Number | list[Number]:
         """Evaluate the value of the function.
 
         :param n_sol: The solution number to evaluate, defaults to 0
@@ -1900,70 +1376,222 @@ class F:
         if self.parent is None:
             # if this is a function, set
             # do evaluations for all the children and return
-            return [f.solution(n_sol) for f in self._]
+            # Children of a root evaluate to scalars. Missing rows retain the
+            # historical AttributeError instead of being silently skipped.
+            return [
+                cast("Number", cast("F", f).solution(n_sol)) for f in self._
+            ]
 
-        def function_eval(f: Self):
-            """Handle special function cases without recursion."""
-            match f.case:
-                case FCase.SUM:
-                    return sum(v.X[n_sol] for v in f.variables)
-                case FCase.NEGSUM:
-                    return -sum(v.X[n_sol] for v in f.variables)
-                case FCase.NEGVAR:
-                    return -f.two.X[n_sol]
-                case FCase.FVAR:
-                    return f.two.X[n_sol]
-                case _:
-                    return f.solution(n_sol)
-
-        def resolve(elem, elem_type):
-            """Return evaluated value based on element type."""
-            match elem_type:
-                case Elem.P:
-                    return elem
-                case Elem.V:
-                    return elem.X[n_sol]
-                case Elem.F:
-                    return function_eval(elem)
-                case _:
-                    return None
-
-        one = resolve(self.one, self.parent.one_type)
-        two = resolve(self.two, self.parent.two_type)
+        one = self._solution_operand(self.one, self.parent.one_type, n_sol)
+        two = self._solution_operand(self.two, self.parent.two_type, n_sol)
 
         # arithmetic evaluation
         if self.mul:
-            self.X[n_sol] = (one or 1) * (two or 1)
+            self.X[n_sol] = self._solution_identity(
+                one,
+                1,
+            ) * self._solution_identity(two, 1)
         elif self.div:
             self.X[n_sol] = one / two
         elif self.add:
-            self.X[n_sol] = (one or 0) + (two or 0)
+            self.X[n_sol] = self._solution_identity(
+                one,
+                0,
+            ) + self._solution_identity(two, 0)
         elif self.sub:
-            self.X[n_sol] = (one or 0) - (two or 0)
+            self.X[n_sol] = self._solution_identity(
+                one,
+                0,
+            ) - self._solution_identity(two, 0)
 
         return self.X[n_sol]
 
+    @overload
+    def eval(self, *values: Number) -> Number:
+        """Evaluate one scalar row using positional numeric values."""
+        ...
+
+    @overload
+    def eval(self, values: Sequence[Sequence[Number]], /) -> list[Number]:
+        """Evaluate a collection with one sequence of per-row values."""
+        ...
+
     def eval(
-        self, *values: float | int | list[float | int]
-    ) -> float | int | list[float | int]:
+        self, *values: Number | Sequence[Sequence[Number]]
+    ) -> Number | list[Number]:
         """Evaluate the function for given parameter values.
 
-        :param values: Values for variables in the order they feature in the function
-        :type values: float | int | list[float | int]
+        :param values: Values for variables in the order they feature in the
+            function
+        :type values: float | int | Sequence[Sequence[float | int]]
 
         :returns: Evaluated function value(s)
         :rtype: float | int | list[float | int]
         """
         if self.parent:
-            return sum(a * v for a, v in zip(self.A, values))
+            coefficients = cast("list[Number]", self.A)
+            scalars = cast("tuple[Number, ...]", values)
+            return sum(a * v for a, v in zip(coefficients, scalars))
         _sol = []
-        for f, v in zip(self._, *values):
+        # The collection overload takes one vector of argument rows; preserve
+        # zip/unpacking errors for other arities rather than reshaping values.
+        vectors = cast("tuple[Sequence[Sequence[Number]], ...]", values)
+        pairs = cast(
+            "Iterable[tuple[F, Sequence[Number]]]", zip(self._, *vectors)
+        )
+        for f, v in pairs:
             _sol.append(f.eval(*v))
         return _sol
 
-    # -----------------------------------------------------
-    #                    Hashing
-    # -----------------------------------------------------
+    # endregion
+
+    # region Display and representation
+
+    @cached_property
+    def longname(self):
+        """Gives a longer more descriptive name for the function"""
+        one = self._long_operand(self.one)
+        two = self._long_operand(self.two)
+        return self._join_display(one, two)
+
+    @staticmethod
+    def _long_operand(value):
+        """Render numbers or symbols without assuming a long name exists."""
+        if value is None:
+            return ""
+        return (
+            str(value) if isinstance(value, (int, float)) else value.longname
+        )
+
+    @staticmethod
+    def _latex_operand(value):
+        """Render a captured numeric value or a symbolic operand."""
+        if value is None:
+            return ""
+        if isinstance(value, (int, float)):
+            return str(value)
+        return value.latex()
+
+    @staticmethod
+    def _latex_sum_index(index, position, reduced):
+        """Render one variable axis, replacing the reduced axis by i."""
+        if position == reduced:
+            return "i"
+        if isinstance(index, list):
+            return index[0].ltx
+        return index.ltx.replace("[", "").replace("]", "")
+
+    def _latex_sum(self):
+        """
+        Render whole or indexed reductions without assuming a single axis.
+        """
+        variable, over, position = cast("ReductionInfo", self.issumhow)
+        axes = (
+            over
+            if isinstance(over, tuple)
+            else (() if over is None else (over,))
+        )
+        domain = r" \times ".join(axis.ltx for axis in axes)
+        prefix = rf"\sum_{{i \in {domain}}}" if domain else r"\sum"
+        if isinstance(variable, F):
+            body = rf"\left({variable.latex()}\right)"
+        else:
+            index = ", ".join(
+                self._latex_sum_index(axis, n, position)
+                for n, axis in enumerate(variable.index)
+            )
+            body = rf"{variable.ltx or variable.name}_{{{index}}}"
+        sign = "-" if self.case == FCase.NEGSUM else ""
+        return rf"{sign}{prefix} {body}"
+
+    def _latex_calculation(self):
+        """
+        Render calculated-variable bindings without mutating expression state.
+        """
+        # CALC rendering is selected only for a bound calculated variable.
+        calculation = cast("V", self.calculation)
+        if calculation.case == FCase.SUM:
+            body = self._latex_sum()
+        else:
+            two = cast("SymbolicOperand", self.two)
+            body = rf"{self._latex_operand(self.one)} \cdot {two.latex()}"
+        return rf"{calculation.latex()} = {body}"
+
+    def _latex_subtraction(self, one, two):
+        """
+        Bracket composite right-hand terms so subtraction remains unambiguous.
+        """
+        compound = (
+            self.two_type == Elem.F
+            and cast("F", self.two).struct != (Elem.P, Elem.V)
+            and cast("F", self.two).case != FCase.SUM
+        )
+        if compound:
+            two = f"({two})"
+            if self.one_type == Elem.F and cast("F", self.one).struct != (
+                Elem.P,
+                Elem.V,
+            ):
+                one = f"({one})"
+        return rf"{one} - {two}"
+
+    def _latex_product(self, one, two):
+        """
+        Bracket affine factors and retain the compact negative-variable form.
+        """
+        if self.case == FCase.NEGVAR:
+            return rf"-{two}"
+        if self.one_type == Elem.F:
+            one = f"({one})"
+        if self.two_type == Elem.F:
+            two = f"({two})"
+        return rf"{one} \cdot {two}"
+
+    def _latex_relation(self, one, two):
+        """Join rendered operands using the selected affine operation."""
+        signed = self._signed_theta_display(one, two)
+        if signed is not None:
+            return signed
+        if self.add:
+            return rf"{one} + {two}"
+        if self.sub:
+            return self._latex_subtraction(one, two)
+        if self.mul:
+            return self._latex_product(one or "0", two)
+        if self.div:
+            return rf"\frac{{{one}}}{{{two}}}"
+        return one
+
+    def latex(self) -> str:
+        """
+        Render affine operations and reductions with their mathematical order.
+        """
+        if self.case == FCase.CALC:
+            return self._latex_calculation()
+        if self.case == FCase.FVAR:
+            return cast("V", self.two).latex()
+        if self.case in (FCase.SUM, FCase.NEGSUM):
+            return self._latex_sum()
+        one = self._latex_operand(self.one)
+        two = self._latex_operand(self.two)
+        if self.two is None:
+            return one
+        return self._latex_relation(one, two)
+
+    def show(self, descriptive: bool = False):
+        """
+        Display the function
+
+        :param descriptive: Whether to show all birthed functions, defaults to
+            False
+        :type descriptive: bool, optional
+        """
+        if descriptive:
+            for f in self._:
+                f = cast("F", f)
+                display(Math(rf"[{f.n}]" + r"\text{   }" + f.latex()))
+        else:
+            display(Math(rf"[{self.n}]" + r"\text{   }" + self.latex()))
 
     def __str__(self):
         return self.name
@@ -1977,3 +1605,5 @@ class F:
         except AttributeError:
             # Fallback for uninitialized state during unpickling
             return id(self)
+
+    # endregion

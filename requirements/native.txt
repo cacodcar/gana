@@ -1,0 +1,5 @@
+# Native build/analysis tools only; preserve the locked Python reference env.
+maturin==1.9.6
+lizard==1.17.31
+pathspec==1.1.1
+Pygments==2.21.0

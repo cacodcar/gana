@@ -3,41 +3,69 @@
 from __future__ import annotations
 
 import logging
+import operator
+import weakref
 from itertools import product
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, Union
 from warnings import warn
 
-from IPython.display import Math, display
+from gana.types import Number, NumericList, NumericTuple
 
+from ..indexing.staging import CartesianMap, fill_map
+from ..storage import parameters as storage
 from ..utils.draw import draw
 from ._element import _E
 from .birth import make_T
-from .cases import Elem, PCase
+from .cases import PCase
 from .function import F
 from .index import I
+from .operands import normalize_operand
 from .variable import V
 
 logger = logging.getLogger("gana")
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from .theta import T
 
-try:
-    from pyomo.environ import Param as PyoParam
+# Optional adapters below are disabled; retain their imports and availability
+# checks alongside that commented implementation until the adapters return.
+# try:
+#     from pyomo.environ import Param as PyoParam
+#
+#     has_pyomo = True
+# except ImportError:
+#     has_pyomo = False
+#
+# try:
+#     from sympy import Idx, IndexedBase, symbols
+#
+#     has_sympy = True
+# except ImportError:
+#     has_sympy = False
 
-    has_pyomo = True
-except ImportError:
-    has_pyomo = False
+# Preserve original union members; keep Self at use sites.
+# Forward references preserve runtime introspection without circular imports.
+type ArithmeticOperand = Union[
+    "V",
+    "T",
+    "F",
+    Number,
+    NumericTuple,
+    NumericList,
+]
+type ComparisonOperand = Union[
+    "P",
+    "T",
+    "F",
+    Number,
+    NumericTuple,
+    NumericList,
+]
 
-try:
-    from sympy import Idx, IndexedBase, symbols
 
-    has_sympy = True
-except ImportError:
-    has_sympy = False
-
-
-class P(_E):
+class P(_E[float]):
     """
     Ordered set of parameters.
 
@@ -69,137 +97,196 @@ class P(_E):
     :ivar case: Special case of the parameter set
     :vartype case: PCase
 
-    :raises ValueError: If `!=` operator is used with any type other than `P`
-    :raises ValueError: If the parameter values and the length of indices do not match
+    Comparisons defer unsupported operand types to Python reflection. Set
+    comparisons reduce pairwise results with ``all``, including ``!=``.
+
+    :raises ValueError: If the parameter values and the length of indices do
+        not match
     """
 
     # TODO update Errors in docstring
     # TODO add examples
+
+    _native_storage: storage.ParameterStorage
+    _compact_staging = True
+
+    # region Construction and validation
+
+    def __setattr__(self, name, value):
+        """
+        Prevent replacement of native facades outside atomic program updates.
+        """
+        if name in ("_", "map") and "_native_storage" in self.__dict__:
+            raise TypeError(storage._STRUCTURAL)
+        object.__setattr__(self, name, value)
+
+    def __setstate__(self, state):
+        """Restore Python metadata and rebind a deserialized native payload."""
+        self.__dict__.update(state)
+        native = self.__dict__.get("_native_storage")
+        if native is not None:
+            native.root = weakref.ref(self)
 
     def __init__(
         self,
         *index: I,
         _: list[float] | float | None = None,
         mutable: bool = False,
-        tag: str = "",
-        ltx: str = "",
+        tag: str | None = "",
+        ltx: str | None = "",
         name: str = "",
     ):
+        """Prepare numeric storage completely before exposing mapped values."""
         _E.__init__(self, *index, tag=tag, ltx=ltx, mutable=mutable, name=name)
+        self.case = PCase.SET
+        self.n_splices = 1
+        if _ is not None:
+            self._initialize_values(_)
 
-    
-        # special case of the parameter
-        self.case: PCase = PCase.SET
-
-        # No value is provided
-        if _ is None:
-            self._ = []
-
-        elif isinstance(_, (int, float)):
-            # if int or float is passed it is a single number
-            # names for these are generated automatically
-            # in __str__()
-            self.name = str(_)  # set the name to the number
-            if _ > 0:
-                # postive number
-                self.case = PCase.NUM
-            elif _ < 0:
-                # negative number
-                self.case = PCase.NEGNUM
-            else:
-                # 0
-                self.case = PCase.ZERO
-
-            if self.index:
-                # if index is passed
-                # make length equal to index
-                self._ = [float(_)] * len(self.map)
-            else:
-                self.index = (I(size=1, dummy=True),)
-                self._ = [float(_)]
-
+    def _initialize_values(self, values) -> None:
+        """
+        Normalize values and reject length mismatches before filling the map.
+        """
+        # Float conversion below already handles list members, including NumPy
+        # scalars. Avoid scanning internally computed numeric lists twice.
+        # Operand dispatch separately rejects empty/invalid arithmetic lists.
+        if not isinstance(values, list):
+            values = normalize_operand(values)
+        if isinstance(values, (int, float)):
+            self._implicit_index(1)
+            self._ = [float(values)] * len(self.map)
+            self._set_numeric_case(values)
         else:
-            # if some sort of iterable is passed
-            # preferably a list
-            # set by program
-            if not self.index and _:
-                # if index is not passed
-                # make a dummy index
-                self.index = (I(size=len(_), dummy=True),)
-                # here the map needs to be remade
-                # self.map = {i: None for i in product(*self.index)}
-                self.name = "φ"  # set the name to phi
-                self.map = {i: None for i in product(*self.index)}
-            self._ = [float(p) for p in _]
+            self._ = [float(value) for value in values]
+            if not self.index and self._:
+                self._implicit_index(len(self._))
+                self.name = "φ"
+        if len(self._) != len(self.map):
+            message = "Parameter values length must match its coordinates"
+            raise ValueError(message)
+        fill_map(self.map, self._)
 
-        # fill in the values
-        for n, k in enumerate(self.map):
-            self.map[k] = self._[n]
-
-    @property
-    def args(self) -> dict[str, str | bool]:
-        """Return the arguments of the parameter set"""
-        return {"tag": self.tag, "ltx": self.ltx, "mutable": self.mutable}
-
-    # -----------------------------------------------------
-    #                   Matrix
-    # -----------------------------------------------------
-    @property
-    def A(self) -> list[list[float]]:
-        """Generate a diagonal matrix representation of the variable set"""
-        return [[self._[i]] for i in range(len(self))]
-
-    # -----------------------------------------------------
-    #                    Printing
-    # -----------------------------------------------------
-    @property
-    def ltx(self) -> str:
-        """LaTeX representation"""
-        if not self._ltx:
-            # use name if no LaTeX
-            self._ltx = self.name.replace("_", r"\_")
-        return r"{\mathrm{" + self._ltx + r"}}"
-
-    @property
-    def index_ltx(self) -> str:
-        """LaTeX representation of the index"""
-        if len(self.index) == 1:
-            return self.index[0].ltx
-
-        if isinstance(self.index, set):
-            return (
-                rf"({')|('.join(','.join(i.ltx for i in idx) for idx in self.index)})"
-            )
-        return rf"{','.join(i.ltx if not isinstance(i, list) else i[0].ltx for i in self.index)}"
-
-    def latex(self) -> str:
+    def _set_numeric_case(self, value: float) -> None:
         """
-        LaTeX representation
-
-        :returns: LaTeX representation of the parameter set
-        :rtype: str
+        Keep constant naming and sign shortcuts consistent after scalar
+        updates.
         """
+        self.name = str(value)
+        if value == 0:
+            self.case = PCase.ZERO
+        elif value < 0:
+            self.case = PCase.NEGNUM
+        else:
+            self.case = PCase.NUM
 
-        if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-            return str(self)
-        return self.ltx + r"_{" + self.index_ltx + r"}"
+    @staticmethod
+    def _check_staged_value(mapped, value) -> None:
+        """Accept numeric aligned values, including an identical NaN object."""
+        if not isinstance(value, (int, float)):
+            message = "Parameter values must be numeric"
+            raise TypeError(message)
+        if mapped is not value and mapped != value:
+            message = "Parameter map and values disagree"
+            raise ValueError(message)
 
-    def show(self, descriptive: bool = False):
-        """Display the variables
+    def _validated_values(self, *, collect: bool = True) -> dict:
+        """Validate raw buffers and optionally collect a detached mutation map.
 
-        Args:
-            descriptive (bool, optional): If True, shows all parameters. Defaults to False.
+        Registration consumes the existing buffers immediately, so it needs
+        validation without a second coordinate dictionary. Conversion still
+        runs in that path to reject invalid numeric subclasses before binding.
         """
-        if descriptive:
-            # just print out the parameters
-            for p in self._:
-                print(p)
+        if "_native_storage" in self.__dict__:
+            # Both facades are views of one payload, including NaN values.
+            return self.map.copy() if collect else {}
+        if len(self._) != len(self.map):
+            message = "Parameter values length must match its coordinates"
+            raise ValueError(message)
+        if not collect and self._validate_compact_values():
+            return {}
+        return self._validate_mapped_values(collect=collect)
 
-        display(Math(self.latex()))
+    def _validate_compact_values(self) -> bool:
+        """Validate raw buffers without keys or redundant float conversion.
 
-    # -----------------------------------------------------
-    #                    Value
-    # -----------------------------------------------------
+        Exact floats can use equality without invoking subclass hooks.
+        Identity admits an unchanged NaN; distinct NaNs still fail.
+        Other inputs retain full validation and conversion on every attempt.
+        """
+        mapping = self.map
+        if not isinstance(mapping, CartesianMap) or not mapping.compact:
+            return False
+        for mapped, value in zip(mapping.staged_values(), self._):
+            if type(value) is float and (
+                mapped is value or (type(mapped) is float and mapped == value)
+            ):
+                continue
+            self._check_staged_value(mapped, value)
+            float(value)
+        return True
+
+    def _validate_mapped_values(self, *, collect: bool) -> dict:
+        """Check edited or irregular maps in their actual insertion order."""
+        mapping = {}
+        for (key, mapped), value in zip(self.map.items(), self._):
+            self._check_staged_value(mapped, value)
+            if key is not None:
+                converted = float(value)
+                if collect:
+                    mapping[key] = converted
+        return mapping
+
+    # endregion
+
+    # region Indexing and selection
+
+    def __call__(self, *key: I) -> P:
+        """
+        Select numerical members, retaining skipped and missing-key behavior.
+
+        New selections are P instances, including when called on a subclass.
+        """
+        if not key or self._unpack_index(key) == self._unpack_index(
+            self.index,
+        ):
+            # if the index is an exact match
+            # or no key is passed
+            return self
+
+        # the check helps to handle if a variable itself is an index
+        # we do not want to iterate over the entire variable set
+        # but treat the variable as a single index element
+        key = self._normalize_index(key)
+
+        # if a subset is passed,
+        # first create a product to match
+        # the indices
+
+        # create a new variable set to return
+        p = self._new_selection(P(**self.args), key)
+        if not storage.select(self, p, key):
+            self._populate_selection(p, product(*key))
+        return p
+
+    def _populate_selection(self, selected, coordinates) -> None:
+        """Populate Python containers with the historical skip policy."""
+        # should be able to map these
+        for coordinate in coordinates:
+            # this helps weed out any None indices
+            # i.e. skips
+            index = None if any(i is None for i in coordinate) else coordinate
+
+            if index is None:
+                parameter = None
+            else:
+                parameter = self.map[index]
+
+            selected.map[index] = parameter
+            selected._.append(parameter)
+
+    # endregion
+
+    # region Unary operations and conversion
 
     def __neg__(self):
         if self.case == PCase.ZERO:
@@ -227,48 +314,174 @@ class P(_E):
         return p
 
     def __pos__(self):
-
-        if self.case == PCase.NEGNUM:
-            # if it is a negative number
-            # return a positive number
-            return P(*self.index, _=-self._[-1], **self.args)
-
-        if self.case == PCase.NEGSET:
-            p = P(*self.index, _=[-i for i in self._], **self.args)
-            p.name = self.name[1:]  # remove the negative sign
-            return p
-
-        # if self.case in [PCase.ZERO, PCase.SET, PCase.NUM]:
-        # if it is zero, a normal set, or a number
-        # return itself
+        """Preserve all values under unary plus."""
         return self
 
     def __abs__(self):
-        if self.case == PCase.ZERO:
-            # if zero return self
-            return self
-
-        if self.case == PCase.SET:
-            # if it is a set return a normal set
-            p = P(*self.index, _=[abs(i) for i in self._], **self.args)
-            p.name = f"|{self.name}|"
-            return p
-
-        if self.case in [PCase.NEGNUM, PCase.NEGSET]:
-            # if it is a negative number or a negated set
-            # return a positive number or a normal set
-            return -self
-        # else just itself
-        return self
+        """Take absolute values independently of the parameter case."""
+        if self.case in (PCase.NUM, PCase.NEGNUM, PCase.ZERO):
+            return P(
+                *self.index,
+                _=abs(self._[-1]),
+                tag=self.tag,
+                ltx=self.ltx,
+                mutable=self.mutable,
+            )
+        p = P(
+            *self.index,
+            _=[abs(value) for value in self._],
+            tag=self.tag,
+            ltx=self.ltx,
+            mutable=self.mutable,
+        )
+        p.name = f"|{self.name}|"
+        return p
 
     def __float__(self):
         if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
             return self._[-1]
         return self
 
-    # -----------------------------------------------------
-    #                    Operators
-    # -----------------------------------------------------
+    # endregion
+
+    # region Arithmetic helpers
+
+    def _subtract_number(self, other):
+        """
+        Subtract a scalar while retaining numeric-parameter simplification.
+        """
+        if other == 0:
+            return self
+        if self.case in [PCase.NEGNUM, PCase.NUM]:
+            value = self._[-1] - other
+            return P(*self.index, _=value, **self.args) if value else 0
+        p = P(*self.index, _=[i - other for i in self._], **self.args)
+        p.name = f"({self}-{other})"
+        return p
+
+    def _subtract_list(self, other):
+        """Keep the existing list broadcasting and mismatch warning policy."""
+        if self.case in [PCase.NUM, PCase.NEGNUM]:
+            values = [self._[-1] - i for i in other]
+        else:
+            if len(self) != len(other):
+                warn(
+                    f"Index mismatch {self} - {other}: "
+                    f"len(self) ({len(self)}) != len(other) ({len(other)})",
+                )
+            values = [i - j for i, j in zip(self._, other)]
+        p = P(*self.index, _=values, **self.args)
+        p.name = f"({self}-φ)"
+        return p
+
+    def _subtract_parameter(self, other):
+        """Subtract parameter values using the existing scalar/set rules."""
+        if other.case == PCase.ZERO:
+            return self
+        if self.case in [PCase.NUM, PCase.NEGNUM]:
+            if other.case in [PCase.NUM, PCase.NEGNUM]:
+                return self._subtract_number(other._[-1])
+            values = [self._[-1] - i for i in other._]
+        elif other.case in [PCase.NUM, PCase.NEGNUM]:
+            values = [i - other._[-1] for i in self._]
+        else:
+            if len(self) != len(other):
+                message = (
+                    f"Index mismatch {self} - {other}: "
+                    f"len(self) ({len(self)}) != len(other) ({len(other)})"
+                )
+                raise ValueError(message)
+            values = [i - j for i, j in zip(self._, other._)]
+        p = P(*self.index, _=values, **self.args)
+        p.name = f"({self}-{other})"
+        return p
+
+    @staticmethod
+    def _numeric_payload(other):
+        """Read a real scalar or nonempty numeric sequence without dispatch."""
+        other = normalize_operand(other)
+        if isinstance(other, (int, float)):
+            return [other], True, ()
+        if isinstance(other, P):
+            scalar = other.case in (PCase.NUM, PCase.NEGNUM, PCase.ZERO)
+            return other._, scalar, other.index
+        if isinstance(other, list) and other:
+            if all(isinstance(value, (int, float)) for value in other):
+                return other, False, ()
+        message = (
+            "Arithmetic requires a numeric scalar, parameter, "
+            "or nonempty numeric list"
+        )
+        raise TypeError(message)
+
+    def _numeric_alignment(self, other):
+        """Broadcast numeric constants; require equal lengths for two sets.
+
+        An indexless scalar may adopt a vector operand's coordinates. Indexed
+        operands retain their own coordinates and cannot be truncated.
+        """
+        right, right_scalar, right_index = self._numeric_payload(other)
+        left_scalar = self.case in (PCase.NUM, PCase.NEGNUM, PCase.ZERO)
+        if left_scalar and right_scalar:
+            return [self._[-1]], [right[-1]], self.index, True
+        size = len(right) if left_scalar else len(self)
+        left = [self._[-1]] * size if left_scalar else self._
+        right = [right[-1]] * size if right_scalar else right
+        if len(left) != len(right):
+            message = (
+                "Numeric operand lengths must match unless one is a scalar"
+            )
+            raise ValueError(message)
+        index = self.index
+        if left_scalar and len(self) == 1 and size != 1:
+            index = right_index
+        return left, right, index, False
+
+    def _numeric_operation(self, other, operation, symbol, reverse=False):
+        """Evaluate numeric results before constructing a parameter."""
+        left, right, index, scalar = self._numeric_alignment(other)
+        if reverse:
+            left, right = right, left
+        values = [operation(a, b) for a, b in zip(left, right)]
+        p = P(
+            *index,
+            _=values[0] if scalar else values,
+            tag=self.tag,
+            ltx=self.ltx,
+            mutable=self.mutable,
+        )
+        if not scalar:
+            label = "φ" if isinstance(other, list) else str(other)
+            p.name = (
+                f"{label}{symbol}{self}"
+                if reverse
+                else f"{self}{symbol}{label}"
+            )
+        return p
+
+    def _divide_numeric(self, numerator: Number) -> P:
+        """Divide numeric values, preserving coordinates and constant cases."""
+        numeric = self.case in (PCase.NUM, PCase.NEGNUM, PCase.ZERO)
+        values = (
+            numerator / self._[-1]
+            if numeric
+            else [numerator / value for value in self._]
+        )
+        p = P(
+            *self.index,
+            _=values,
+            tag=self.tag,
+            ltx=self.ltx,
+            mutable=self.mutable,
+        )
+        if not numeric:
+            p.name = f"{numerator}/{self}"
+        return p
+
+    # endregion
+
+    # region Binary arithmetic
+
     # Handling basic operations----
     # if there is a zero on the left, just return P
     # if the other is a parameter, add the values
@@ -280,400 +493,62 @@ class P(_E):
     # does not have the operation/the operation did not work
     # in this case, we just do the equivalent self
 
-    def __add__(
-        self,
-        other: (
-            V
-            | Self
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> P:
+    def __add__(self, other):
+        """
+        Add real values or defer symbolic addition to expression compilation.
+        """
+        other = normalize_operand(other)
         if other is None:
-            # if adding with None
             return self
-
-        if self.case == PCase.ZERO:
-            # if self is zero
-            # return other
-            return other
-
-        if isinstance(other, (int, float)):
-            # if adding to a number
-            if other in [0, 0.0]:
-                # if adding zero, return self
-                return self
-
-            if self.case in [PCase.NEGNUM, PCase.NUM]:
-                # P (number) - other
-                # the number will be set to NEGNUM, NUM
-                if self._[-1] + other in [0, 0.0]:
-                    # if number returns zero, return int 0
-                    return 0
-
-                return P(*self.index, _=self._[-1] + other, **self.args)
-
-            # if set or negative set
-            # just add the number to each value
-            # and return new parameter set
-            p = P(*self.index, _=[i + other for i in self._], **self.args)
-            p.name = f"({self}+{other})"
-            return p
-
-        if isinstance(other, list):
-            # lengths should match
-            if self.case in [PCase.NUM, PCase.NEGNUM]:
-                p = P(*self.index, _=[self._[-1] + i for i in other], **self.args)
-
-            else:
-                if len(self) != len(other):
-                    warn(
-                        f"Index mismatch {self} + {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                    )
-                # if list, just zip through the values and add
-                p = P(
-                    *self.index, _=[i + j for i, j in zip(self._, other)], **self.args
-                )
-            # change the name to add that something from a list has been added
-            p.name = f"({self}+φ)"
-            return p
-
+        if isinstance(other, (int, float, list, P)):
+            result = self._numeric_operation(other, operator.add, "+")
+            return 0 if result.case == PCase.ZERO else result
         if isinstance(other, tuple):
-            # if tuple, make T
-            # and make a function
-            return F(
-                one=make_T(other, index=self.index),
-                add=True,
-                two=self,
-                one_type=Elem.T,
-                two_type=Elem.P,
-            )
-
-        if isinstance(other, P):
-            # lengths should match
-
-            if other.case == PCase.ZERO:
-                # if other is zero
-                return self
-
-            if self.case in [PCase.NUM, PCase.NEGNUM]:
-
-                if other.case in [PCase.NUM, PCase.NEGNUM]:
-                    # if both are numbers
-                    # let P handle the case
-                    if self._[-1] + other._[-1] in [0, 0.0]:
-                        # if number returns zero, return int 0
-                        return 0
-
-                    return P(*self.index, _=self._[-1] + other._[-1], **self.args)
-                # else make a new parameter set
-
-                p = P(*self.index, _=[self._[-1] + i for i in other._], **self.args)
-                p.name = f"({self}+{other})"
-                return p
-
-            if other.case in [PCase.NUM, PCase.NEGNUM]:
-                # if other is a number, add other to every value in the set
-                p = P(*self.index, _=[i + other._[-1] for i in self._], **self.args)
-                p.name = f"({self}+{other})"
-                return p
-
-            if len(self) != len(other):
-                warn(
-                    f"Index mismatch {self} + {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-            # if either one of them is general parameter
-            p = P(*self.index, _=[i + j for i, j in zip(self._, other._)], **self.args)
-            p.name = f"({self}+{other})"
-            return p
-
-        # if not parameter, let the other handle elements operator handle the addition
-        if self.case in [PCase.NEGNUM, PCase.NEGSET]:
-            # if negative number, handle using sub, but keep parameter at two
-            # (-P) + E = E - P
-            return F(one=other, sub=True, two=-self, two_type=Elem.P)
-
-        # keep additive or subtractive parameter at two
-        # P + E = E + P
-        return F(one=other, add=True, two=self, two_type=Elem.P)
+            other = make_T(other, index=self.index)
+        return F(one=other, two=self, add=True)
 
     def __radd__(
         self,
-        other: (
-            V
-            | Self
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
+        other: Self | ArithmeticOperand | None,
     ) -> P:
         # let __add__() handle the addition
         return self + other
 
-    def __sub__(
-        self,
-        other: (
-            V
-            | Self
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> P | F:
+    def __sub__(self, other):
+        """
+        Subtract real values or preserve the order of symbolic subtraction.
+        """
+        other = normalize_operand(other)
         if other is None:
-            # if adding with None
             return self
-
-        if self.case == PCase.ZERO:
-            # if self is zero
-            # return negative of other
-            return -other
-
-        if isinstance(other, (int, float)):
-            # if adding to a number
-            if other in [0, 0.0]:
-                # if adding zero, return self
-                return self
-
-            if self.case in [PCase.NEGNUM, PCase.NUM]:
-
-                if self._[-1] - other == 0:
-                    # if number returns zero, return int 0
-                    return 0
-
-                # let P make a .NUM type
-                return P(*self.index, _=self._[-1] - other, **self.args)
-
-            p = P(*self.index, _=[i - other for i in self._], **self.args)
-            p.name = f"({self}-{other})"
-            return p
-
-        if isinstance(other, list):
-            # if list, just zip through the values and add
-
-            if self.case in [PCase.NUM, PCase.NEGNUM]:
-                p = P(*self.index, _=[self._[-1] - i for i in other], **self.args)
-            else:
-                if len(self) != len(other):
-                    warn(
-                        f"Index mismatch {self} - {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                    )
-                p = P(
-                    *self.index, _=[i - j for i, j in zip(self._, other)], **self.args
-                )
-                # change the name to add that something from a list has been added
-            p.name = f"({self}-φ)"
-            return p
-
+        if isinstance(other, (int, float, list, P)):
+            result = self._numeric_operation(other, operator.sub, "-")
+            return 0 if result.case == PCase.ZERO else result
         if isinstance(other, tuple):
-            # if tuple, make T
-            # and make a function
-            return F(
-                one=make_T(other, index=self.index),
-                sub=True,
-                two=self,
-                one_type=Elem.T,
-                two_type=Elem.P,
-            )
-
-        if isinstance(other, P):
-
-            if other.case == PCase.ZERO:
-                # if other is zero
-                return self
-
-            if self.case in [PCase.NUM, PCase.NEGNUM]:
-
-                if other.case in [PCase.NUM, PCase.NEGNUM]:
-                    # if both are numbers
-                    # let P handle the case
-                    if self._[-1] - other._[-1] in [0, 0.0]:
-                        # if number returns zero, return int 0
-                        return 0
-                    # let P handle the case based on the value that is determines
-                    return P(*self.index, _=self._[-1] - other._[-1], **self.args)
-
-                p = P(*self.index, _=[self._[-1] - i for i in other._], **self.args)
-                p.name = f"({self}-{other.name})"
-                return p
-
-            if other.case in [PCase.NUM, PCase.NEGNUM]:
-                # if other is a number subtract every value in self with the number
-                p = P(*self.index, _=[i - other._[-1] for i in self._], **self.args)
-                p.name = f"({self}-{other})"
-                return p
-
-            if len(self) != len(other):
-                raise ValueError(
-                    f"Index mismatch {self} - {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-
-            # if both are just general parameters
-            # zip through the values and subtract
-            p = P(*self.index, _=[i - j for i, j in zip(self._, other._)], **self.args)
-            p.name = f"({self}-{other})"
-            return p
-
-        # if not parameter, let the other handle elements operator handle the addition
-        if self.case in [PCase.NEGNUM, PCase.NEGSET]:
-            # if negative number, handle using function sub, but keep parameter at two
-            # -P - E = -E - P
-            return F(one=-other, sub=True, two=self, two_type=Elem.P)
-
-        # keep additive or subtractive parameter at two
-        # P - E = -E + P
-        return F(one=-other, add=True, two=self, two_type=Elem.P)
+            other = make_T(other, index=self.index)
+        return F(one=self, two=other, sub=True)
 
     def __rsub__(
         self,
-        other: (
-            V
-            | Self
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
+        other: Self | ArithmeticOperand | None,
     ) -> P | F:
         # let negation and __add__ handle the subtraction
         return -self + other
 
-    def __mul__(
-        self,
-        other: (
-            V
-            | Self
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> P:
-
+    def __mul__(self, other):
+        """Multiply numbers or delegate symbolic scaling to its operand."""
+        other = normalize_operand(other)
         if other is None:
-            # if multiplying by nothing, return nothing
             return None
-
-        if self.case == PCase.ZERO:
-            # if self is zero, return zero
-            return 0
-
-        if isinstance(other, (int, float)):
-            # if multiplying with a number
-            if other in [1, 1.0]:
-                # by unity, return itself
-                return self
-            if other in [0, 0.0]:
-                # by zero, return 0
-                return 0.0
-
-            if self.case in [PCase.NEGNUM, PCase.NUM]:
-                # if self is a number, just find the product
-                # let P handle the rest
-                return P(*self.index, _=self._[-1] * other, **self.args)
-
-            # else multiply the number to each value
-            p = P(*self.index, _=[i * other for i in self._], **self.args)
-            p.name = f"{self}*{other}"
-            return p
-
-        if isinstance(other, list):
-            # if list, just zip through the values and multiply
-            if self.case in [PCase.NUM, PCase.NEGNUM]:
-                p = P(*self.index, _=[self._[-1] * i for i in other], **self.args)
-            else:
-                if len(self) != len(other):
-                    warn(
-                        f"Index mismatch {self} * {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                    )
-                p = P(
-                    *self.index, _=[i * j for i, j in zip(self._, other)], **self.args
-                )
-            p.name = f"{self}*φ"
-            return p
-
+        if isinstance(other, (int, float, list, P)):
+            result = self._numeric_operation(other, operator.mul, "*")
+            return 0 if result.case == PCase.ZERO else result
         if isinstance(other, tuple):
-            # if tuple, make T
-            # return a scaled T
-            if self.case == PCase.ZERO:
-                # return int zero
-                return 0
-
-            if self.case in [PCase.NUM, PCase.NEGNUM]:
-                # if self is a number, scale the tuple by the number
-                # and make a T
-
-                t = make_T(
-                    tuple([other[0] * self._[-1], other[1] * self._[-1]]), self.index
-                )
-                t.name = f"{self}*θ"
-                return t
-
-            # otherwise self is a set
-            # scale the tuple by each value in the set
-            t = make_T(
-                [tuple([i * other[0], i * other[1]]) for i in self._], self.index
-            )
-            t.name = f"{self}*θ"
-            return t
-
-        if isinstance(other, P):
-
-            if other.case == PCase.ZERO:
-                # if self or other is zero, return int zero
-                return 0
-
-            if self.case in [PCase.NUM, PCase.NEGNUM]:
-                # if self is a number, just find the product
-                # let P handle the rest
-                if other.case in [PCase.NUM, PCase.NEGNUM]:
-
-                    if other._[0] in [0, 0.0]:
-                        # if other is zero, return int zero
-                        return 0
-
-                    return P(*self.index, _=self._[-1] * other._[-1], **self.args)
-
-                p = P(*self.index, _=[self._[-1] * i for i in other._], **self.args)
-                p.name = f"{self}*{other}"
-                return p
-
-            if other.case in [PCase.NUM, PCase.NEGNUM]:
-                # if other is a number, find the product of every value in self with the number
-                p = P(*self.index, _=[i * other._[-1] for i in self._], **self.args)
-                p.name = f"{self}*{other}"
-                return p
-
-            if len(self) != len(other):
-                raise ValueError(
-                    f"Index mismatch {self} * {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-            # if both are just general parameters
-            # else zip through the values and multiply
-            p = P(*self.index, _=[i * j for i, j in zip(self._, other._)], **self.args)
-            p.name = rf"{self}*{other}"
-            return p
-
-        return other * self
+            return make_T(other, index=self.index) * self
+        if isinstance(other, (F, V)):
+            return other * self
+        # Let T own its bound-transform rule without a cyclic import.
+        return NotImplemented
         # TODO - handle multiplication with other types
         # call multiplication function
         # if isinstance(other, F):
@@ -684,497 +559,123 @@ class P(_E):
         #         if self.case in [PCase.NEGNUM, PCase.NEGSET]:
         #             if other.two_type == Elem.P:
         #                 # if the other is a parameter, make it a subtraction
-        #                 return F(one=self * other.one, sub=True, two=self * other.two)
+        # return F(one=self * other.one, sub=True, two=self * other.two)
         #             # make it a subtraction
-        #             return F(one=self * other.one, sub=True, two=self * other.two)
+        # return F(one=self * other.one, sub=True, two=self * other.two)
 
-        #         return F(one=self * other.one, add=True, two=self * other.two)
+        # return F(one=self * other.one, add=True, two=self * other.two)
 
         # return F(one=self, mul=True, two=other, one_type=Elem.P)
 
     def __rmul__(
         self,
-        other: (
-            V
-            | Self
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
+        other: Self | ArithmeticOperand | None,
     ) -> P:
         # multiplication is commutative
         return self * other
 
-    def __truediv__(
-        self,
-        other: (
-            V
-            | Self
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> P:
-        try:
-            if other is None:
-                # if dividing by nothing, return nothing
-                raise ValueError(
-                    "Cannot divide by None. Please provide a valid parameter, variable, or number."
-                )
+    def __truediv__(self, other: Self | ArithmeticOperand | None) -> P:
+        """Divide values, checking denominators even for zero numerators."""
+        return self._numeric_operation(other, operator.truediv, "/")
 
-            if self.case == PCase.ZERO:
-                # if self is zero, return zero
-                # take every opportunity to return int 0
-                return 0
-
-            if isinstance(other, (int, float)):
-                # if dividing by a number
-                if other in [0, 0.0]:
-                    # if dividing by zero, raise an error
-                    raise ZeroDivisionError(f"{self} cannot be divided by zero.")
-
-                if other in [1, 1.0]:
-                    return self
-
-                if self.case in [PCase.NEGNUM, PCase.NUM]:
-                    # if self is a number, just find the division
-                    # let P handle the rest
-                    return P(*self.index, _=self._[-1] / other, **self.args)
-
-                p = P(*self.index, _=[i / other for i in self._], **self.args)
-                p.name = f"{self}/{other}"
-                return p
-
-            if isinstance(other, list):
-                if isinstance(other[0], tuple):
-                    raise ValueError(
-                        "Cannot divide by a list of tuples. Please provide a valid parameter, variable, or number."
-                    )
-
-                if self.case in [PCase.NUM, PCase.NEGNUM]:
-                    # if self is a number, divide the number by each value in the list
-                    p = P(*self.index, _=[self._[-1] / i for i in other], **self.args)
-
-                else:
-                    if len(self) != len(other):
-                        warn(
-                            f"Index mismatch {self} / {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                        )
-                    # if list, just zip through the values and divide
-                    p = P(
-                        *self.index,
-                        _=[i / j for i, j in zip(self._, other)],
-                        **self.args,
-                    )
-                    # change the name to add that something from a list has been added
-                    p.name = f"{self}/φ"
-                    return p
-
-            if isinstance(other, tuple):
-                # dividing by parametric variable
-                raise ValueError(
-                    f"Cannot divide {self} by a tuple. Please provide a valid parameter, variable, or number."
-                )
-
-            if isinstance(other, P):
-
-                if other.case == PCase.ZERO:
-                    raise ZeroDivisionError(f"{self} cannot be divided by zero.")
-
-                if self.case in [PCase.NEGNUM, PCase.NUM]:
-                    if other.case in [PCase.NUM, PCase.NEGNUM]:
-                        # if both are numbers
-                        # let P handle the case
-                        return P(*self.index, _=self._[-1] / other._[-1], **self.args)
-
-                    p = P(*self.index, _=[self._[-1] / i for i in other._], **self.args)
-                    p.name = f"{self}/{other}"
-                    return p
-
-                if other.case in [PCase.NUM, PCase.NEGNUM]:
-                    # if other is a number, divide every value in self by the number
-                    p = P(*self.index, _=[i / other._[-1] for i in self._], **self.args)
-                    p.name = f"{self}/{other}"
-                    return p
-
-                if len(self) != len(other):
-                    raise ValueError(
-                        f"Index mismatch {self} / {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                    )
-                # if both are just general parameters
-                # zip through the values and divide
-                p = P(*self.index, _=[i / j for i, j in zip(self._, other._)])
-                p.name = f"{self}/{other}"
-                return p
-
-            # P / E: not handled yet
-            raise ValueError(
-                f"Cannot divide {self} by {other}. Nonlinear operations are not supported for {type(other).__name__} objects."
+    def __rtruediv__(self, other):
+        """
+        Evaluate reflected numeric division in its original operand order.
+        """
+        other = normalize_operand(other)
+        if isinstance(other, (int, float, list, P)):
+            return self._numeric_operation(
+                other,
+                operator.truediv,
+                "/",
+                reverse=True,
             )
+        return self._divide_numeric(1) * other
 
-        except ZeroDivisionError as e:
-            # handle division by zero
-            raise ZeroDivisionError(f"{self} cannot be divided by zero.") from e
+    def __floordiv__(self, other: Self | ArithmeticOperand | None) -> P:
+        """Apply Python floor division, including flooring by one."""
+        return self._numeric_operation(other, operator.floordiv, "//")
 
-    def __rtruediv__(
-        self,
-        other: (
-            V
-            | Self
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> P:
-        # just do this operation instead
-        return (1 / self) * other
+    def __rfloordiv__(self, other):
+        """Apply floor division with the external numerator first."""
+        return self._numeric_operation(
+            other,
+            operator.floordiv,
+            "//",
+            reverse=True,
+        )
 
-    def __floordiv__(
-        self,
-        other: (
-            V
-            | Self
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> P:
+    def __rmod__(self, other):
+        """Compute remainders with the external dividend first."""
+        return self._numeric_operation(other, operator.mod, "%", reverse=True)
+
+    def __rpow__(self, other):
+        """Raise external bases to this parameter's numeric exponents."""
+        return self._numeric_operation(other, operator.pow, "^", reverse=True)
+
+    def __mod__(self, other: Self | ArithmeticOperand | None) -> P:
+        """Compute remainders without shortcuts or recursive fallback."""
+        return self._numeric_operation(other, operator.mod, "%")
+
+    def __pow__(self, other: Self | ArithmeticOperand | None) -> P | int:
+        """Evaluate powers; exponent zero returns the integer identity."""
+        other = normalize_operand(other)
         if other is None:
-            # if dividing by nothing, return nothing
-            raise ValueError(
-                "Cannot divide by None. Please provide a valid parameter, variable, or number."
-            )
-
-        if self.case == PCase.ZERO:
-            # if self is zero, return zero
-            return 0
-
-        if isinstance(other, (int, float)):
-            # if dividing by a number
-            if other in [0, 0.0]:
-                # if dividing by zero, raise an error
-                raise ZeroDivisionError(f"{self} cannot be divided by zero.")
-
-            if other in [1, 1.0]:
-                return self
-
-            if self.case in [PCase.NEGNUM, PCase.NUM]:
-                # if self is a number, just find the division
-                # let P handle the rest
-                return P(*self.index, _=self._[-1] // other, **self.args)
-
-            p = P(*self.index, _=[i // other for i in self._], **self.args)
-            p.name = f"{self}//{other}"
-            return p
-
-        if isinstance(other, list):
-            if isinstance(other[0], tuple):
-                raise ValueError(
-                    "Cannot divide by a list of tuples. Please provide a valid parameter, variable, or number."
-                )
-
-            if self.case in [PCase.NUM, PCase.NEGNUM]:
-                p = P(*self.index, _=[self._[-1] // i for i in other], **self.args)
-            else:
-                if len(self) != len(other):
-                    warn(
-                        f"Index mismatch {self} // {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                    )
-                # if list, just zip through the values and divide
-                p = P(
-                    *self.index, _=[i // j for i, j in zip(self._, other)], **self.args
-                )
-            # change the name to add that something from a list has been added
-            p.name = f"{self}//φ"
-            return p
-
-        if isinstance(other, tuple):
-            # dividing by parametric variable
-            raise ValueError(
-                f"Cannot divide {self} by a tuple. Please provide a valid parameter, variable, or number."
-            )
-
-        if isinstance(other, P):
-
-            if other.case == PCase.ZERO:
-                raise ZeroDivisionError(f"{self} cannot be divided by zero.")
-
-            if self.case in [PCase.NEGNUM, PCase.NUM]:
-                if other.case in [PCase.NUM, PCase.NEGNUM]:
-                    # if both are numbers
-                    # let P handle the case
-                    return P(*self.index, _=self._[-1] // other._[-1], **self.args)
-
-                p = P(*self.index, _=[self._[-1] // i for i in other._], **self.args)
-                p.name = f"{self}//{other}"
-                return p
-            if other.case in [PCase.NUM, PCase.NEGNUM]:
-                # if other is a number, divide every value in self by the number
-                p = P(*self.index, _=[i // other._[-1] for i in self._], **self.args)
-                p.name = f"{self}//{other}"
-                return p
-            if len(self) != len(other):
-                raise ValueError(
-                    f"Index mismatch {self} // {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-            # if both are just general parameters
-            # zip through the values and divide
-            p = P(*self.index, _=[i // j for i, j in zip(self._, other._)], **self.args)
-            p.name = f"{self}//{other}"
-            return p
-
-        # else let the other handle the division
-        return self // other
-
-    def __mod__(
-        self,
-        other: (
-            V
-            | Self
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> P:
-        if other is None:
-            # if dividing by nothing, return nothing
-            raise ValueError(
-                "Cannot divide by None. Please provide a valid parameter, variable, or number."
-            )
-        if self.case == PCase.ZERO:
-            # if self is zero, return zero
-            return 0
-
-        if isinstance(other, (int, float)):
-            # if dividing by a number
-            if other in [0, 0.0]:
-                # if dividing by zero, raise an error
-                raise ZeroDivisionError(f"{self} cannot be divided by zero.")
-
-            if other in [1, 1.0]:
-                # if dividing by 1, return self
-                return self
-
-            if self.case in [PCase.NEGNUM, PCase.NUM]:
-                # if self is a number, just find the modulus
-                # let P handle the rest
-                p = P(*self.index, _=self._[-1] % other, **self.args)
-                p.name = f"{self} % {other}"
-                return p
-
-            p = P(*self.index, _=[i % other for i in self._], **self.args)
-            p.name = f"{self} % {other}"
-            return p
-
-        if isinstance(other, list):
-            if isinstance(other[0], tuple):
-                raise ValueError(
-                    "Cannot divide by a list of tuples. Please provide a valid parameter, variable, or number."
-                )
-
-            if self.case in [PCase.NUM, PCase.NEGNUM]:
-                # if self is a number, find the mod of self and each number in the list
-                p = P(*self.index, _=[self._[-1] % i for i in other], **self.args)
-
-            else:
-                if len(self) != len(other):
-                    warn(
-                        f"Index mismatch {self} % {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                    )
-                # if list and self is a set, just zip through
-                p = P(
-                    *self.index, _=[i % j for i, j in zip(self._, other)], **self.args
-                )
-                # change the name to add that something from a list has been added
-            p.name = f"{self} % φ"
-            return p
-
-        if isinstance(other, tuple):
-            # dividing by parametric variable
-            raise ValueError(
-                f"Cannot divide {self} by a tuple. Please provide a valid parameter, variable, or number."
-            )
-
-        if isinstance(other, P):
-
-            if self.case == PCase.ZERO:
-                # if self is zero, return zero
-                return 0
-
-            if other.case == PCase.ZERO:
-                raise ZeroDivisionError(f"{self} cannot be divided by zero.")
-
-            if self.case in [PCase.NEGNUM, PCase.NUM]:
-                if other.case in [PCase.NUM, PCase.NEGNUM]:
-                    # if both are numbers
-                    # let P handle the case
-                    return P(*self.index, _=self._[-1] % other._[-1], **self.args)
-
-                p = P(*self.index, _=[self._[-1] % i for i in other._], **self.args)
-                p.name = f"{self} % {other}"
-                return p
-            if other.case in [PCase.NUM, PCase.NEGNUM]:
-                # if other is a number, find the modulus of every value in self with the number
-                p = P(*self.index, _=[i % other._[-1] for i in self._], **self.args)
-                p.name = f"{self} % {other}"
-                return p
-            if len(self) != len(other):
-                raise ValueError(
-                    f"Index mismatch {self} % {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-            # if both are just general parameters
-            # zip through the values and find the modulus
-            p = P(*self.index, _=[i % j for i, j in zip(self._, other._)], **self.args)
-            p.name = f"{self} % {other}"
-            return p
-
-        # else let the other handle the modulus
-        return self % other
-
-    def __pow__(
-        self,
-        other: (
-            V
-            | Self
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> P:
-
-        if other is None:
-            # if raising to None, return self
             return self
-
-        if self.case == PCase.ZERO:
-            # if self is zero, return zero
-            return 0
-
         if isinstance(other, (int, float)):
-            # if raising to power of a number
-            if other in [0, 0.0]:
-                # if raising to zero, return 1
+            if other == 0:
                 return 1
-
-            if other in [1, 1.0]:
-                # if raising to one, return self
+            if other == 1:
                 return self
-            if self.case in [PCase.NEGNUM, PCase.NUM]:
-                # if self is a number, just find the power
-                # let P handle the rest
-                return P(*self.index, _=self._[-1] ** other, **self.args)
+        return self._numeric_operation(other, operator.pow, "^")
 
-            # else find the power of each element in set raised to other
-            p = P(*self.index, _=[i**other for i in self._], **self.args)
-            p.name = f"{self}^({other})"
-            return p
+    # endregion
 
-        if isinstance(other, list):
-            if isinstance(other[0], tuple):
-                raise ValueError(
-                    "Cannot raise to a list of tuples. Please provide a valid parameter, variable, or number."
-                )
+    # region Comparisons
 
-            if self.case in [PCase.NUM, PCase.NEGNUM]:
-                p = P(*self.index, _=[self._[-1] ** i for i in other], **self.args)
-            else:
-                if len(self) != len(other):
-                    warn(
-                        f"Index mismatch {self} ^ {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                    )
-                # if list, just zip through the values and raise to power
-                p = P(*self.index, _=[i**j for i, j in zip(self._, other)], **self.args)
-            # change the name to add that something from a list has been added
-            p.name = f"{self}^φ"
-            return p
+    def _compare_non_numeric(
+        self,
+        other: object,
+        compare: Callable[[float, float], bool],
+        symbol: str,
+    ) -> bool:
+        """Compare known shapes, or return NotImplemented for Python dispatch.
 
-        if isinstance(other, tuple):
-            # setting to the power of a parametric variable
-            raise ValueError(
-                f"Cannot raise {self} to a tuple. Please provide a valid parameter, variable, or number."
-            )
-
+        Preserve scalar/set errors, mismatch warnings and eager pairwise-all
+        evaluation (including !=). Scalar comparisons stay inline to avoid
+        callbacks on construction hot paths.
+        """
+        scalar = self.case in (PCase.NUM, PCase.NEGNUM, PCase.ZERO)
         if isinstance(other, P):
-            # other is a parameter set
-            if other.case == PCase.ZERO:
-                # if other is 0
-                return 1
+            values = other._
+            kind = "parameter set"
+        elif isinstance(other, list):
+            values = other
+            kind = "list"
+        else:
+            return NotImplemented
 
-            if self.case in [PCase.NEGNUM, PCase.NUM]:
-                # if self is a number, just find the power
-                # let P handle the rest
-                if other.case in [PCase.NUM, PCase.NEGNUM]:
-                    return P(*self.index, _=self._[-1] ** other._[-1], **self.args)
-
-                p = P(*self.index, _=[self._[-1] ** i for i in other._], **self.args)
-                p.name = f"{self}^{other}"
-                return p
-
-            if other.case in [PCase.NUM, PCase.NEGNUM]:
-                # if other is a number, raise every value in self to the power of the number
-                p = P(*self.index, _=[i ** other._[-1] for i in self._], **self.args)
-                p.name = f"{self}^{other}"
-                return p
-
-            if len(self) != len(other):
-                raise ValueError(
-                    f"Index mismatch {self} ^ {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-            # if both are just general parameters
-            # zip through the values and raise to power
-            p = P(*self.index, _=[i**j for i, j in zip(self._, other._)], **self.args)
-            p.name = f"{self}^{other}"
-            return p
-
-        # else let the other handle the power
-        # not sure if this will ever be called tbh
-        return self**other
-
-    # -----------------------------------------------------
-    #                    Relational
-    # -----------------------------------------------------
+        if scalar:
+            message = (
+                f"{self} {symbol} {other}: "
+                f"cannot compare a number with a {kind}."
+            )
+            raise NotImplementedError(message)
+        if len(self) != len(other):
+            warn(
+                f"Index mismatch {self} {symbol} {other}: "
+                f"len(self) ({len(self)}) != len(other) ({len(other)})",
+            )
+        return all(list(map(compare, self._, values)))
 
     def __eq__(
         self,
-        other: (
-            Self
-            | P
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
+        other: object,
     ) -> bool:
+        """Compare known values; defer unsupported types to reflection."""
 
+        other = normalize_operand(other)
         if isinstance(other, (int, float)):
-
             if other in [0, 0.0]:
                 if self.case == PCase.ZERO:
                     # if self is zero, return True
@@ -1183,60 +684,94 @@ class P(_E):
             if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
                 # if self is a number, compare it with the last value
                 return self._[-1] == other
-            # if not numeric, False
-            raise NotImplementedError(
-                f"{self} == {other}: cannot compare a parameter set with a number"
+            # Other numeric comparisons require a scalar parameter.
+            message = (
+                f"{self} == {other}: "
+                "cannot compare a parameter set with a number"
             )
+            raise NotImplementedError(message)
 
-        if isinstance(other, list):
+        if isinstance(other, P) and self.case in (
+            PCase.NUM,
+            PCase.NEGNUM,
+            PCase.ZERO,
+        ):
+            if other.case in (PCase.NUM, PCase.NEGNUM, PCase.ZERO):
+                return self._[-1] == other._[-1]
+
+        return self._compare_non_numeric(other, operator.eq, "==")
+
+    def __ne__(
+        self,
+        other: object,
+    ) -> bool:
+        """Compare known values; defer unsupported types to reflection."""
+        other = normalize_operand(other)
+        if isinstance(other, (int, float)):
             if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                raise NotImplementedError(
-                    f"{self} == {other}: cannot compare a number with a list."
-                )
-            # if self is a set, compare it with the list
-            if len(self) != len(other):
-                warn(
-                    f"Index mismatch {self} == {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-            return all([i == j for i, j in zip(self._, other)])
+                # if self is a number, compare it with the last value
+                return self._[-1] != other
+            # Other numeric comparisons require a scalar parameter.
+            message = (
+                f"{self} != {other}: "
+                "cannot compare a parameter set with a number"
+            )
+            raise NotImplementedError(message)
 
-        if isinstance(other, P):
+        if isinstance(other, P) and self.case in (
+            PCase.NUM,
+            PCase.NEGNUM,
+            PCase.ZERO,
+        ):
+            if other.case in (PCase.NUM, PCase.NEGNUM, PCase.ZERO):
+                return self._[-1] != other._[-1]
+
+        return self._compare_non_numeric(other, operator.ne, "!=")
+
+    def __lt__(
+        self,
+        other: object,
+    ) -> bool:
+        """Compare known values; defer unsupported types to reflection."""
+        other = normalize_operand(other)
+        if isinstance(other, (int, float)):
+            if other in [0, 0.0]:
+                if self.case in [PCase.NEGNUM, PCase.NEGSET]:
+                    # if self negative number or negated set, return True
+                    return True
+
+                if self.case in [PCase.ZERO, PCase.NUM, PCase.SET]:
+                    # A positive number or unnegated set is not less than zero.
+                    return False
+
             if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
+                # if self is a number, compare it with the last value
+                return self._[-1] < other
+            # Other numeric comparisons require a scalar parameter.
+            message = (
+                f"{self} < {other}: "
+                "cannot compare a parameter set with a number"
+            )
+            raise NotImplementedError(message)
 
-                if other.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                    # if self is a number, compare it with the last value of other
-                    return self._[-1] == other._[-1]
+        if isinstance(other, P) and self.case in (
+            PCase.NUM,
+            PCase.NEGNUM,
+            PCase.ZERO,
+        ):
+            if other.case in (PCase.NUM, PCase.NEGNUM, PCase.ZERO):
+                return self._[-1] < other._[-1]
 
-                raise NotImplementedError(
-                    f"{self} == {other}: cannot compare a number with a parameter set."
-                )
-
-            if len(self) != len(other):
-                warn(
-                    f"Index mismatch {self} == {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-
-            return all([i == j for i, j in zip(self._, other._)])
-        # else let other handle this
-        return self == other
+        return self._compare_non_numeric(other, operator.lt, "<")
 
     def __le__(
         self,
-        other: (
-            Self
-            | P
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
+        other: object,
     ) -> bool:
+        """Compare known values; defer unsupported types to reflection."""
 
+        other = normalize_operand(other)
         if isinstance(other, (int, float)):
-
             if other in [0, 0.0]:
                 if self.case in [PCase.ZERO, PCase.NEGNUM, PCase.NEGSET]:
                     # if self is zero or negative number, return True
@@ -1249,59 +784,66 @@ class P(_E):
             if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
                 # if self is a number, compare it with the last value
                 return self._[-1] <= other
-            # if not numeric, False
-            raise NotImplementedError(
-                f"{self} <= {other}: cannot compare a parameter set with a number"
+            # Other numeric comparisons require a scalar parameter.
+            message = (
+                f"{self} <= {other}: "
+                "cannot compare a parameter set with a number"
             )
+            raise NotImplementedError(message)
 
-        if isinstance(other, list):
+        if isinstance(other, P) and self.case in (
+            PCase.NUM,
+            PCase.NEGNUM,
+            PCase.ZERO,
+        ):
+            if other.case in (PCase.NUM, PCase.NEGNUM, PCase.ZERO):
+                return self._[-1] <= other._[-1]
+
+        return self._compare_non_numeric(other, operator.le, "<=")
+
+    def __gt__(
+        self,
+        other: object,
+    ) -> bool:
+        """Compare known values; defer unsupported types to reflection."""
+        other = normalize_operand(other)
+        if isinstance(other, (int, float)):
+            if other in [0, 0.0]:
+                if self.case in [PCase.ZERO, PCase.NEGNUM, PCase.NEGSET]:
+                    # Zero and negative cases are not greater than zero.
+                    return False
+
+                if self.case in [PCase.NUM, PCase.SET]:
+                    # if self is a positive number or set, return True
+                    return True
+
             if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                raise NotImplementedError(
-                    f"{self} <= {other}: cannot compare a number with a list."
-                )
-            # if self is a set, compare it with the list
-            if len(self) != len(other):
-                warn(
-                    f"Index mismatch {self} <= {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-            return all([i <= j for i, j in zip(self._, other)])
+                # if self is a number, compare it with the last value
+                return self._[-1] > other
+            # Other numeric comparisons require a scalar parameter.
+            message = (
+                f"{self} > {other}: "
+                "cannot compare a parameter set with a number"
+            )
+            raise NotImplementedError(message)
 
-        if isinstance(other, P):
-            if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
+        if isinstance(other, P) and self.case in (
+            PCase.NUM,
+            PCase.NEGNUM,
+            PCase.ZERO,
+        ):
+            if other.case in (PCase.NUM, PCase.NEGNUM, PCase.ZERO):
+                return self._[-1] > other._[-1]
 
-                if other.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                    # if self is a number, compare it with the last value of other
-                    return self._[-1] <= other._[-1]
-
-                raise NotImplementedError(
-                    f"{self} <= {other}: cannot compare a number with a parameter set."
-                )
-
-            if len(self) != len(other):
-                warn(
-                    f"Index mismatch {self} <= {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-
-            return all([i <= j for i, j in zip(self._, other._)])
-        # else let other handle this
-        return self <= other
+        return self._compare_non_numeric(other, operator.gt, ">")
 
     def __ge__(
         self,
-        other: (
-            Self
-            | P
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
+        other: object,
     ) -> bool:
+        """Compare known values; defer unsupported types to reflection."""
+        other = normalize_operand(other)
         if isinstance(other, (int, float)):
-
             if other in [0, 0.0]:
                 if self.case in [PCase.NEGNUM, PCase.NEGSET]:
                     # if self negative number or negated set, return False
@@ -1314,314 +856,82 @@ class P(_E):
             if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
                 # if self is a number, compare it with the last value
                 return self._[-1] >= other
-            # if not numeric, False
-            raise NotImplementedError(
-                f"{self} >= {other}: cannot compare a parameter set with a number"
+            # Other numeric comparisons require a scalar parameter.
+            message = (
+                f"{self} >= {other}: "
+                "cannot compare a parameter set with a number"
             )
+            raise NotImplementedError(message)
 
-        if isinstance(other, list):
-            if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                raise NotImplementedError(
-                    f"{self} >= {other}: cannot compare a number with a list."
-                )
-            # if self is a set, compare it with the list
-            if len(self) != len(other):
-                warn(
-                    f"Index mismatch {self} >= {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-            return all([i >= j for i, j in zip(self._, other)])
+        if isinstance(other, P) and self.case in (
+            PCase.NUM,
+            PCase.NEGNUM,
+            PCase.ZERO,
+        ):
+            if other.case in (PCase.NUM, PCase.NEGNUM, PCase.ZERO):
+                return self._[-1] >= other._[-1]
 
-        if isinstance(other, P):
-            if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
+        return self._compare_non_numeric(other, operator.ge, ">=")
 
-                if other.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                    # if self is a number, compare it with the last value of other
-                    return self._[-1] >= other._[-1]
+    # endregion
 
-                raise NotImplementedError(
-                    f"{self} >= {other}: cannot compare a number with a parameter set."
-                )
+    # region Matrix representation
 
-            if len(self) != len(other):
-                warn(
-                    f"Index mismatch {self} >= {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
+    @property
+    def A(self) -> list[list[float]]:
+        """Generate a diagonal matrix representation of the variable set"""
+        return [[self._[i]] for i in range(len(self))]
 
-            return all([i >= j for i, j in zip(self._, other._)])
-        # else let other handle this
-        return self >= other
+    # endregion
 
-    def __lt__(
-        self,
-        other: (
-            Self
-            | P
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> bool:
-        if isinstance(other, (int, float)):
+    # region Display and representation
 
-            if other in [0, 0.0]:
+    @property
+    def ltx(self) -> str:
+        """Render the shared escaped name in parameter-specific roman type."""
+        return r"{\mathrm{" + self._latex_name() + r"}}"
 
-                if self.case in [PCase.NEGNUM, PCase.NEGSET]:
-                    # if self negative number or negated set, return True
-                    return True
+    @property
+    def index_ltx(self) -> str:
+        """Render grouped coordinates before inspecting singleton axes."""
+        if isinstance(self.index, set):
+            groups = (",".join(i.ltx for i in idx) for idx in self.index)
+            return "(" + ")|(".join(groups) + ")"
+        if len(self.index) == 1:
+            return self.index[0].ltx
+        return ",".join(
+            i.ltx if not isinstance(i, list) else i[0].ltx for i in self.index
+        )
 
-                if self.case in [PCase.ZERO, PCase.NUM, PCase.SET]:
-                    # if self is a positive number or set, return True
-                    return False
+    def latex(self) -> str:
+        """
+        LaTeX representation
 
-            if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                # if self is a number, compare it with the last value
-                return self._[-1] < other
-            # if not numeric, False
-            raise NotImplementedError(
-                f"{self} < {other}: cannot compare a parameter set with a number"
-            )
+        :returns: LaTeX representation of the parameter set
+        :rtype: str
+        """
 
-        if isinstance(other, list):
-            if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                raise NotImplementedError(
-                    f"{self} < {other}: cannot compare a number with a list."
-                )
-            # if self is a set, compare it with the list
-            if len(self) != len(other):
-                warn(
-                    f"Index mismatch {self} < {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-            return all([i < j for i, j in zip(self._, other)])
+        if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
+            return str(self)
+        return self.ltx + r"_{" + self.index_ltx + r"}"
 
-        if isinstance(other, P):
-            if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
+    def show(self, descriptive: bool = False):
+        """Display the variables
 
-                if other.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                    # if self is a number, compare it with the last value of other
-                    return self._[-1] < other._[-1]
+        Args:
+            descriptive (bool, optional): If True, shows all parameters.
+            Defaults to False.
+        """
+        if descriptive:
+            # just print out the parameters
+            for p in self._:
+                print(p)
 
-                raise NotImplementedError(
-                    f"{self} < {other}: cannot compare a number with a parameter set."
-                )
+        super().show()
 
-            if len(self) != len(other):
-                warn(
-                    f"Index mismatch {self} < {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
+    # endregion
 
-            return all([i < j for i, j in zip(self._, other._)])
-        # else let other handle this
-        return self < other
-
-    def __ne__(
-        self,
-        other: (
-            Self
-            | P
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> bool:
-        if isinstance(other, (int, float)):
-
-            if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                # if self is a number, compare it with the last value
-                return self._[-1] != other
-            # if not numeric, False
-            raise NotImplementedError(
-                f"{self} != {other}: cannot compare a parameter set with a number"
-            )
-
-        if isinstance(other, list):
-            if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                raise NotImplementedError(
-                    f"{self} != {other}: cannot compare a number with a list."
-                )
-            # if self is a set, compare it with the list
-            if len(self) != len(other):
-                warn(
-                    f"Index mismatch {self} != {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-            return all([i != j for i, j in zip(self._, other)])
-
-        if isinstance(other, P):
-            if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-
-                if other.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                    # if self is a number, compare it with the last value of other
-                    return self._[-1] != other._[-1]
-
-                raise NotImplementedError(
-                    f"{self} != {other}: cannot compare a number with a parameter set."
-                )
-
-            if len(self) != len(other):
-                warn(
-                    f"Index mismatch {self} != {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-
-            return all([i != j for i, j in zip(self._, other._)])
-        # else let other handle this
-        return self != other
-
-    def __gt__(
-        self,
-        other: (
-            Self
-            | P
-            | T
-            | F
-            | int
-            | float
-            | tuple[int | float]
-            | list[int | float | tuple[int | float]]
-            | None
-        ),
-    ) -> bool:
-        if isinstance(other, (int, float)):
-
-            if other in [0, 0.0]:
-
-                if self.case in [PCase.ZERO, PCase.NEGNUM, PCase.NEGSET]:
-                    # if self negative number or negated set, return True
-                    return False
-
-                if self.case in [PCase.NUM, PCase.SET]:
-                    # if self is a positive number or set, return True
-                    return True
-
-            if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                # if self is a number, compare it with the last value
-                return self._[-1] > other
-            # if not numeric, False
-            raise NotImplementedError(
-                f"{self} > {other}: cannot compare a parameter set with a number"
-            )
-
-        if isinstance(other, list):
-            if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                raise NotImplementedError(
-                    f"{self} > {other}: cannot compare a number with a list."
-                )
-            # if self is a set, compare it with the list
-            if len(self) != len(other):
-                warn(
-                    f"Index mismatch {self} > {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-            return all([i > j for i, j in zip(self._, other)])
-
-        if isinstance(other, P):
-            if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-
-                if other.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
-                    # if self is a number, compare it with the last value of other
-                    return self._[-1] > other._[-1]
-
-                raise NotImplementedError(
-                    f"{self} > {other}: cannot compare a number with a parameter set."
-                )
-
-            if len(self) != len(other):
-                warn(
-                    f"Index mismatch {self} > {other}: len(self) ({len(self)}) != len(other) ({len(other)})"
-                )
-
-            return all([i > j for i, j in zip(self._, other._)])
-        # else let other handle this
-        return self > other
-
-    def __call__(self, *key: I) -> Self:
-
-        def lister(inp: tuple[I]) -> tuple[I | list[V]]:
-            return tuple([i] if isinstance(i, V) else i for i in inp)
-
-        # if a dependent variable is being passed in the key
-        # extract variable from the index (it will be in a list)
-        def delister(inp: tuple[I | list[V]]):
-            return tuple(i[0] if isinstance(i, list) else i for i in inp)
-
-        if not key or delister(key) == delister(self.index):
-            # if the index is an exact match
-            # or no key is passed
-            return self
-
-        # the check helps to handle if a variable itself is an index
-        # we do not want to iterate over the entire variable set
-        # but treat the variable as a single index element
-        key: tuple[I] | set[tuple[I]] = lister(key)
-
-        # if a subset is passed,
-        # first create a product to match
-        # the indices
-
-        # create a new variable set to return
-        p = P(**self.args)
-        p.name, p.n = self.name, self.n
-        p.index = key
-
-        # should be able to map these
-        for index in product(*key):
-            # this helps weed out any None indices
-            # i.e. skips
-            if any(i is None for i in index):
-                index = None
-
-            if index is None:
-                parameter = None
-            else:
-                parameter = self.map[index]
-
-            p.map[index] = parameter
-            p._.append(parameter)
-
-        return p
-
-    # -----------------------------------------------------
-    #                    Hashing
-    # -----------------------------------------------------
-
-    def __hash__(self):
-        return hash(str(self.name))
-
-    # -----------------------------------------------------
-    #                    Export
-    # -----------------------------------------------------
-
-    # def sympy(self):
-    #     """symbolic representation"""
-    #     if has_sympy:
-    #         return IndexedBase(str(self))[
-    #             symbols(",".join([f"{d}" for d in self.index]), cls=Idx)
-    #         ]
-    #     logger.warning(
-    #         "⚠ sympy is an optional dependency, pip install gana[all] to get optional dependencies ⚠"
-    #     )
-
-    # def pyomo(self):
-    #     """Pyomo representation"""
-    #     # idx = [i.pyomo() for i in self.index]
-    #     # return PyoParam(*idx, initialize=self._, doc=str(self))
-    #     if has_pyomo:
-    #         return PyoParam(
-    #             initialize=self._,
-    #             doc=str(self),
-    #         )
-    #     logger.warning(
-    #         "pyomo is an optional dependency, pip install gana[all] to get optional dependencies"
-    #     )
-
-    # -----------------------------------------------------
-    #                    Plotting
-    # -----------------------------------------------------
+    # region Plotting
 
     def line(
         self,
@@ -1704,3 +1014,34 @@ class P(_E):
             usetex=usetex,
             str_idx_lim=str_idx_lim,
         )
+
+    # endregion
+
+    # region Legacy export sketches
+
+    # def sympy(self):
+    #     """symbolic representation"""
+    #     if has_sympy:
+    #         return IndexedBase(str(self))[
+    #             symbols(",".join([f"{d}" for d in self.index]), cls=Idx)
+    #         ]
+    #     logger.warning(
+    # "⚠ sympy is an optional dependency, pip install gana[all] to get optional
+    # dependencies ⚠"
+    #     )
+
+    # def pyomo(self):
+    #     """Pyomo representation"""
+    #     # idx = [i.pyomo() for i in self.index]
+    #     # return PyoParam(*idx, initialize=self._, doc=str(self))
+    #     if has_pyomo:
+    #         return PyoParam(
+    #             initialize=self._,
+    #             doc=str(self),
+    #         )
+    #     logger.warning(
+    # "pyomo is an optional dependency, pip install gana[all] to get optional
+    # dependencies"
+    #     )
+
+    # endregion
