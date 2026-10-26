@@ -40,7 +40,8 @@ html_theme_options = {
     # These are specific to the package
     "repository_url": "https://github.com/cacodcar/gana",
     "logo": {
-        "image_dark": "_static/ganalogo.jpg",
+        # Soft-white transparent logo from the project's Google Drive assets.
+        "image_dark": "_static/gana-logo-soft-white.png",
         # "text": html_title,  # Uncomment to try text with logo
     },
     "icon_links": [
