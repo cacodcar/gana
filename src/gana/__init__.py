@@ -9,4 +9,4 @@ from .sets.theta import T
 from .sets.variable import V
 
 __all__ = ["I", "P", "Prg", "T", "V", "inf", "sigma", "sup"]
-__version__ = "1.0.14"
+__version__ = "1.1.0"

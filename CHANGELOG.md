@@ -5,6 +5,28 @@ All notable changes to this project will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-10-25
+
+### Added
+- Rust-backed model storage, affine expression handling, and sparse matrix compilation.
+- Native MPS export, bulk Gurobi model construction, and shared solution histories.
+- Reproducible Python and Rust quality checks, coverage reports, and profiling tools.
+- Light and dark documentation themes.
+
+### Changed
+- Require the native extension, `gana._native`, while preserving the Python modeling API.
+- Build Python distributions with Maturin. Compatible wheels include the extension;
+  source installations require Rust/Cargo 1.88 or newer and a platform linker.
+- Remove Python backend selection. Leave `GANA_BACKEND` unset; the legacy
+  `rust-parameters` value remains an alias.
+- Update installation instructions and native implementation documentation.
+
+### Fixed
+- Preserve mutable model identities and relationships during lazy projection,
+  compatibility replay, and serialization.
+- Repair runtime type-alias introspection for documentation generation.
+- Fix Windows portability in profiling and native quality tools.
+
 ## [1.0.14] - 2026-07-11
 
 ### Fixed:
