@@ -1,6 +1,10 @@
 
 <p align="center">
-  <img src="https://github.com/cacodcar/gana/raw/main/docs/_static/ganalogo.jpg" width="75%">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/_static/gana-logo-soft-white.png">
+    <source media="(prefers-color-scheme: light)" srcset="docs/_static/ganalogo.jpg">
+    <img src="docs/_static/ganalogo.jpg" alt="Gana logo" width="75%">
+  </picture>
 </p>
 
 
@@ -8,7 +12,6 @@
 [![PyPI](https://img.shields.io/pypi/v/gana.svg)](https://pypi.org/project/gana)
 [![Python Versions](https://img.shields.io/pypi/pyversions/gana.svg)](https://pypi.org/project/gana/)
 [![Downloads](https://static.pepy.tech/personalized-badge/gana?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads)](https://pepy.tech/project/gana)
-[![Monthly Downloads](https://img.shields.io/pypi/dm/gana)](https://pypi.org/project/gana/)
 [![Documentation](https://img.shields.io/badge/docs-Read%20the%20Docs-blue)](https://gana.readthedocs.io/en/latest/)
 
 <!-- Quality and development -->
