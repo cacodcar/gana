@@ -19,12 +19,14 @@ Row = dict[str, Any]
 
 def read_json(path: Path) -> Any:
     """Read one explicit report or history entry without executing it."""
-    return json.loads(path.read_text())
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def write_json(path: Path, value: Any) -> None:
     """Write a complete structured artifact into a fresh run directory."""
-    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
+    path.write_text(
+        json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
 
 def fingerprint(value: Any) -> str:
@@ -44,7 +46,10 @@ def file_hashes(paths: dict[str, Path]) -> dict[str, str]:
 def named_functions(path: Path) -> dict[int, str]:
     """Resolve methods and nested functions across line-number-only edits."""
     result: dict[int, str] = {}
-    pending: list[tuple[str, ast.AST]] = [("", ast.parse(path.read_text()))]
+    # Let Python honor UTF-8, a BOM or a source encoding declaration.
+    pending: list[tuple[str, ast.AST]] = [
+        ("", ast.parse(path.read_bytes(), filename=str(path)))
+    ]
     while pending:
         prefix, node = pending.pop()
         for child in getattr(node, "body", ()):
@@ -81,17 +86,17 @@ class Symbols:
         path = Path(filename).resolve()
         for package, directory in self.packages.items():
             if path.is_relative_to(directory):
-                return f"{package}/{path.relative_to(directory)}", True
+                relative = path.relative_to(directory).as_posix()
+                return f"{package}/{relative}", True
         if path.is_relative_to(self.root):
-            return str(path.relative_to(self.root)), False
+            return path.relative_to(self.root).as_posix(), False
         if "site-packages" in path.parts:
-            return "site-packages/" + str(path).split("site-packages/", 1)[
-                1
-            ], False
+            start = path.parts.index("site-packages")
+            return "/".join(path.parts[start:]), False
         prefix = Path(sys.base_prefix).resolve()
         if path.is_relative_to(prefix):
-            return "python/" + str(path.relative_to(prefix)), False
-        return filename, False
+            return "python/" + path.relative_to(prefix).as_posix(), False
+        return Path(filename).as_posix(), False
 
     def describe(self, key: tuple[str, int, str]) -> Row:
         """
@@ -323,7 +328,9 @@ def save_report(
     comparison = comparison_for(report, history, reference)
     write_json(output / "profile.json", report)
     write_json(output / "comparison.json", comparison)
-    (output / "profile.txt").write_text(report_text(report, comparison))
+    (output / "profile.txt").write_text(
+        report_text(report, comparison), encoding="utf-8"
+    )
     if report["eligible"]:
         history.mkdir(parents=True, exist_ok=True)
         write_json(

@@ -21,8 +21,10 @@ def run(name, command, output, env):
     try:
         return run_process(name, command, ROOT, env, output, executable=None)
     except OSError as error:
-        (output / f"{name}.stdout.txt").write_text("")
-        (output / f"{name}.stderr.txt").write_text(str(error) + "\n")
+        (output / f"{name}.stdout.txt").write_text("", encoding="utf-8")
+        (output / f"{name}.stderr.txt").write_text(
+            f"{command[0]}: {error}\n", encoding="utf-8"
+        )
         return {"command": command, "exit_code": 127}
 
 
@@ -131,6 +133,7 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     env = environment(output)
     cargo = shutil.which("cargo") or "cargo"
+    python = "Scripts/python.exe" if os.name == "nt" else "bin/python"
     commands = {
         "format": [cargo, "fmt", "--all", "--check"],
         "tests": [cargo, "test", "--locked", "--offline", "-p", "gana-core"],
@@ -146,7 +149,7 @@ def main():
             "warnings",
         ],
         "complexity": [
-            str(ROOT / ".native-venv/bin/python"),
+            str(ROOT / ".native-venv" / python),
             "-m",
             "lizard",
             "-l",

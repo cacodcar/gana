@@ -22,6 +22,7 @@ from profile_stats import (
     named_functions,
     prior_report,
     read_json,
+    save_report,
     write_json,
 )
 
@@ -140,6 +141,63 @@ def test_nested_decorated_names(tmp_path):
     names = named_functions(path)
     CHECK.assertEqual(names[2], "C.run")
     CHECK.assertEqual(names[4], "C.run.nested")
+
+
+@pytest.mark.parametrize("encoding", ["utf-8", "utf-8-sig", "latin-1"])
+def test_source_encoding_preserves_function_names(tmp_path, encoding):
+    """Parse source as Python does, independent of the host text encoding."""
+    path = tmp_path / "encoded.py"
+    declaration = "# coding: latin-1\n" if encoding == "latin-1" else "\n"
+    source = declaration + "# caf\u00e9\ndef caf\u00e9():\n    return 1\n"
+    path.write_bytes(source.encode(encoding))
+    CHECK.assertEqual(named_functions(path), {3: "caf\u00e9"})
+
+
+def test_symbol_paths_use_portable_separators(tmp_path, monkeypatch):
+    """Keep nested project, dependency and standard-library IDs portable."""
+    root = tmp_path / "project"
+    package = root / "src/gana"
+    prefix = tmp_path / "python"
+    monkeypatch.setattr(sys, "base_prefix", str(prefix))
+    symbols = Symbols(root, {"gana": package})
+    cases = [
+        (package / "sets/index.py", "gana/sets/index.py", True),
+        (root / "tools/helper.py", "tools/helper.py", False),
+        (
+            prefix / "Lib/site-packages/dependency/module.py",
+            "site-packages/dependency/module.py",
+            False,
+        ),
+        (
+            prefix / "Lib/pathlib/__init__.py",
+            "python/Lib/pathlib/__init__.py",
+            False,
+        ),
+        (
+            tmp_path / "outside/module.py",
+            (tmp_path / "outside/module.py").as_posix(),
+            False,
+        ),
+    ]
+    for path, expected, project in cases:
+        CHECK.assertEqual(symbols.location(str(path)), (expected, project))
+    CHECK.assertEqual(symbols.location("<string>"), ("<string>", False))
+
+
+def test_unicode_profile_reports_roundtrip(tmp_path):
+    """Readable profiles and JSON preserve names unavailable in cp1252."""
+    report = recorded_report()
+    report.update(scope="test", run_id="unicode", fingerprint="unicode")
+    name = "gana/\u03b8.py::\u03bb"
+    report["functions"][0]["id"] = name
+    save_report(tmp_path, tmp_path / "history", report, None)
+    CHECK.assertIn(
+        name, (tmp_path / "profile.txt").read_text(encoding="utf-8")
+    )
+    CHECK.assertEqual(read_json(tmp_path / "profile.json"), report)
+    json_path = tmp_path / "external.json"
+    json_path.write_text('{"name": "\u03b8"}', encoding="utf-8")
+    CHECK.assertEqual(read_json(json_path), {"name": "\u03b8"})
 
 
 def test_raw_stats_preserve_callers(tmp_path):

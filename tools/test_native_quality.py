@@ -2,6 +2,7 @@
 
 from unittest import TestCase
 
+import native_quality
 from native_quality import run
 from profile_context import source_files
 
@@ -16,6 +17,22 @@ def test_missing_native_tool_is_recorded(tmp_path):
         "does-not-exist",
         (tmp_path / "missing.stderr.txt").read_text(),
     )
+
+
+def test_launch_error_without_filename_keeps_executable(tmp_path, monkeypatch):
+    """Windows launch errors may omit the filename; retain it explicitly."""
+    message = "The system cannot find the file specified"
+
+    def unavailable(*args, **kwargs):
+        raise FileNotFoundError(message)
+
+    monkeypatch.setattr(native_quality, "run_process", unavailable)
+    command = [str(tmp_path / "missing-\u03b8")]
+    result = run("missing", command, tmp_path, {})
+    CHECK.assertEqual(result, {"command": command, "exit_code": 127})
+    diagnostic = (tmp_path / "missing.stderr.txt").read_text(encoding="utf-8")
+    CHECK.assertIn(command[0], diagnostic)
+    CHECK.assertIn(message, diagnostic)
 
 
 def test_profile_hash_inputs_include_native_binary(tmp_path):
