@@ -3,6 +3,9 @@
 Run checks with the dedicated `.quality-venv` so Gana's earlier `.venv` reference
 baseline remains unchanged. The same runner is used by VS Code, tox, CI and
 blocking Git hooks. Reports go to unique directories under `quality/runs/`.
+The current checkout requires its native extension. Source installation needs
+Rust/Cargo 1.88 or newer and a platform linker; CI pins Rust 1.88.0. A compatible
+wheel includes the extension. Leave `GANA_BACKEND` unset for all normal checks.
 
 ```sh
 python3.13 -m venv .quality-venv
@@ -148,7 +151,13 @@ as automatic comparison references.
 
 Comparisons require matching collected tests, test/data hashes, phase outcomes,
 host, Python, non-project dependency versions, thread/locale settings, Hypothesis
-seed and profiling/coverage instrumentation. Package source changes are recorded
+seed, loaded implementation identity and profiling/coverage instrumentation.
+Gana's identity comes from the loaded extension's `BACKEND` value; it is recorded
+as unavailable when that module is not loaded, without importing it for profiling.
+The historical `GANA_BACKEND=rust-parameters` alias is not a separate workload.
+Extension bytes remain in source hashes. Old profile records are preserved and
+their missing implementation metadata prevents incompatible comparisons.
+Package source changes are recorded
 but allowed: those are the changes being investigated. Qualified project function
 names survive shifts in source line numbers. Anonymous expressions retain
 line-based IDs, so moving them can appear as additions/removals; inspect their
@@ -195,3 +204,17 @@ strict E501 line-length checking while Ruff's formatter uses a best-effort targe
 Both read explicit repository configuration in the quality runner. Mypy, Radon,
 tests, coverage and documentation gates retain their existing requirements.
 Historical lock files and measured baseline reports are preserved unchanged.
+
+## Single-backend CI and editor tasks
+
+The Quality workflow runs all Python gates, including native binding integration,
+once for each Python version (3.12 and 3.13). The Native backend workflow retains
+its existing job matrix and check names while running Rust core tests, fmt,
+Clippy, complexity and core coverage. It no longer duplicates the Python suite.
+Both workflows retain failure artifacts; Quality retains its Codecov upload.
+Read the Docs installs the pinned compiler before building the source package.
+
+Use the ordinary Test Coverage or All Quality Checks task for native owners.
+Native Quality remains a separate task for distinct Rust gates. The historical
+Reproducible Baseline task and its preserved environment remain available for
+their frozen sources; they are not a substitute for current native build checks.

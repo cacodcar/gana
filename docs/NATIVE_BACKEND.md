@@ -1,12 +1,13 @@
 # Native owner foundation
 
-This development backend stores registered P values and V/T membership in Rust. Python
-remains the default (`GANA_BACKEND=python`). Select `GANA_BACKEND=rust-parameters`
-**before importing Gana** to exercise the native path. A missing extension is an
-error; native tests and benchmarks never silently substitute Python storage.
+The current development checkout requires Rust storage for registered P values
+and V/T membership. Leave `GANA_BACKEND` unset. The historical value
+`rust-parameters` remains an accepted alias; `python`, unknown values and an
+explicitly empty setting are rejected. A missing `gana._native` extension gives
+installation guidance; dependency and binary-loader errors remain distinct.
+Published releases may predate this retirement.
 
-The historical flag now enables all three owner types. This is an incremental
-integration toward the 1.1.0 backend. Supported affine batches and
+This is the native implementation being prepared for 1.1.0. Supported affine batches and
 reductions and sparse compilation now run in Rust. Coordinate normalization
 still uses Python. Public
 `sigma`, `inf`, and `sup` calls are unchanged.
@@ -189,8 +190,8 @@ remain authoritative. Display retains no persistent expression or text cache;
 repeated display rebuilds the small metadata tree. Cost depends on the formula
 and requested output, and coefficient distribution can still process numeric
 arrays. Explicit descriptive display continues to visit every requested row.
-Deferred display uses the same scalar objective selection and font nesting as
-the Python backend. Objective formatting expands captured numeric coefficients
+Deferred display preserves the historical scalar objective selection and font
+nesting. Objective formatting expands captured numeric coefficients
 where Python does, preserves signs and row IDs, and does not relabel an expression
 reused elsewhere. Membership snapshots do not add a display wrapper of their own.
 Replacing named expressions also uses that compatibility path. There is no
@@ -211,8 +212,8 @@ fallbacks.
 Supported native affine comparisons retain one constraint batch through program
 registration. `p.A` and `p.B` compile from native rows without creating scalar
 variables, expressions or constraints. `p.A_sparse` returns a detached SciPy CSR
-matrix with float64 coefficients; both backends avoid a dense intermediary for
-this property. Row order remains inequalities, equalities, then nonnegativity
+matrix with float64 coefficients; native compilation and its compatibility
+fallback avoid a dense intermediary. Row order remains inequalities, equalities, then nonnegativity
 constraints. Repeated columns accumulate in occurrence order; explicit zeros
 may remain stored. Public `P` input conversion remains floating point.
 
@@ -319,9 +320,7 @@ environments must not be modified.
 # Compiler-matched LLVM tools are needed for the separate native coverage report.
 rustup component add llvm-tools-preview --toolchain 1.88.0
 python tools/native_quality.py --output quality/reports/native
-GANA_BACKEND=rust-parameters python tools/quality.py tests \
-  --output quality/reports/native-python
-GANA_BACKEND=python python tools/quality.py tests \
+python tools/quality.py all \
   --output quality/reports/python
 ```
 
@@ -334,7 +333,14 @@ it currently includes the core's inline unit-test module. Binding code receives
 Python integration tests, but binding-region coverage is still pending. Miri,
 sanitizers, Linux/Windows wheels and Python 3.12 execution remain release checks.
 
-Pytest always records function profiles, backend selection and extension hashes.
+Pytest records function profiles, the loaded extension implementation identity
+and extension hashes. The accepted backend alias does not create a different
+profile workload. Older profile metadata remains unchanged and is compared only
+when all required inputs match; missing implementation identity is a mismatch.
+CI's Quality workflow runs the full Python suite once per Python version.
+The Native backend workflow retains core tests, fmt, Clippy, complexity and core
+coverage under its existing job names. The normal VS Code test task covers native
+owners; the separate Native Quality task covers the Rust gates.
 Hypothesis's lazy constant-pool scan is initialized after collection and recorded
 separately in `hypothesis-startup.prof` and `hypothesis-startup.json`. This uses
 the detected internal hook in the pinned Hypothesis 6.142.3; availability is

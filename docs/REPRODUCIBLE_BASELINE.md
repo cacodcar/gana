@@ -1,5 +1,12 @@
 # Reproducing Gana's quality baseline
 
+This document describes the preserved historical baseline environment. Reproduce
+that reference with its recorded source snapshot. The current checkout requires
+`gana._native`; the old lock alone does not build or install that extension.
+For current development use [the quality workflow](QUALITY_GATES.md) and
+[native build instructions](NATIVE_BACKEND.md), keeping `.venv` and old reports
+unchanged. No backend environment variable is needed for the current code.
+
 This workflow measures the current Gana source with a dedicated environment,
 fixed dependencies and random-test seed, and a fresh temporary test directory.
 It saves raw reports and the exact measured source. It does not modify the
@@ -55,8 +62,8 @@ virtual environment.
 ```
 
 Or select **Tasks: Run Task -> Gana: Reproducible Baseline** in VS Code. This task
-uses Gana's `.venv` explicitly; the older individual tasks still use the selected
-Python extension interpreter and remain useful for quick investigation.
+uses Gana's `.venv` explicitly. Current quality tasks use `.quality-venv` and
+validate the mandatory native implementation separately from this old reference.
 
 Each run gets a new directory under `quality/runs/`, which Git ignores. An
 explicit output directory is allowed, but must not already exist:

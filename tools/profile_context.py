@@ -27,7 +27,6 @@ THREAD_VARIABLES = (
     "LC_ALL",
     "LANG",
     "TZ",
-    "GANA_BACKEND",
 )
 
 
@@ -119,10 +118,21 @@ def environment() -> dict[str, Any]:
     }
 
 
+def implementation_identity() -> dict[str, str | None]:
+    """Record loaded implementations without importing optional dependencies.
+
+    None means the extension identity is unavailable in this process. Binary
+    bytes remain in source hashes so compatible code changes can be measured.
+    """
+    native = sys.modules.get("gana._native")
+    return {"gana": getattr(native, "BACKEND", None)}
+
+
 def comparison_inputs(root: Path, config: Any, items: list) -> dict[str, Any]:
     """Define matching workload, hardware and instrumentation requirements."""
     return {
         "environment": environment(),
+        "implementations": implementation_identity(),
         "instrumentation": instrumentation(root, config),
         "nodeids": [item.nodeid for item in items],
         "workload_hashes": file_hashes(workload_files(root, items)),

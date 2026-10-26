@@ -9,6 +9,12 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.13"
+    # Bootstrap rustup with an RTD-supported version, then use the CI compiler.
+    rust: "1.86"
+  jobs:
+    pre_install:
+      - rustup toolchain install 1.88.0 --profile minimal
+      - rustup override set 1.88.0
 
 python:
   install:

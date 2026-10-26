@@ -186,22 +186,6 @@
       ],
       "group": "test",
       "problemMatcher": []
-    },
-    {
-      "label": "Gana: Native Owner Tests",
-      "type": "process",
-      "command": "${workspaceFolder}/.quality-venv/bin/python",
-      "args": [
-        "tools/quality.py",
-        "tests"
-      ],
-      "options": {
-        "env": {
-          "GANA_BACKEND": "rust-parameters"
-        }
-      },
-      "group": "test",
-      "problemMatcher": []
     }
   ]
 }

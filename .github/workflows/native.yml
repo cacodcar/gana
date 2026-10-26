@@ -11,7 +11,6 @@ jobs:
         python-version: ["3.12", "3.13"]
     env:
       CARGO_HOME: ${{ github.workspace }}/.cache/cargo
-      GANA_BACKEND: rust-parameters
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,10 +28,8 @@ jobs:
           python -m pip install -e '.[test,quality]'
       - name: Native gates and separate core coverage
         run: python tools/native_quality.py --output quality/reports/native
-      - name: Python compatibility and function profiles
-        if: ${{ !cancelled() }}
-        run: python tools/quality.py tests --output quality/reports/native-python
-      - name: Preserve native and Python evidence
+      # Quality runs the full Python suite once per version, including bindings.
+      - name: Preserve native evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:

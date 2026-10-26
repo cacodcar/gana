@@ -1,11 +1,18 @@
 """Verify profile attribution, comparison safeguards and real pytest hooks."""
 
 import os
+import sys
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import TestCase
 
 import pytest
 
+from profile_context import (
+    comparison_inputs,
+    environment,
+    implementation_identity,
+)
 from profile_stats import (
     Symbols,
     compare_reports,
@@ -308,3 +315,54 @@ def test_existing_profile_is_never_overwritten(profiled_project):
     sentinel.write_text("keep this report")
     CHECK.assertNotEqual(invoke_pytest(pytester, output).ret, 0)
     CHECK.assertEqual(sentinel.read_text(), "keep this report")
+
+
+@pytest.mark.parametrize("identity", ["rust-owners-v1", "future-native-abi"])
+def test_implementation_identity_reads_the_loaded_extension(
+    monkeypatch, identity
+):
+    """Capture the actual loaded implementation, not a selector label."""
+    monkeypatch.setitem(
+        sys.modules, "gana._native", SimpleNamespace(BACKEND=identity)
+    )
+    CHECK.assertEqual(implementation_identity(), {"gana": identity})
+
+
+def test_implementation_identity_does_not_import_gana(monkeypatch):
+    """Profiling unrelated projects must not load an optional extension."""
+    monkeypatch.delitem(sys.modules, "gana._native", raising=False)
+    CHECK.assertEqual(implementation_identity(), {"gana": None})
+    CHECK.assertNotIn("gana._native", sys.modules)
+
+
+def test_native_alias_does_not_change_profile_environment(monkeypatch):
+    """The accepted historical alias does not define a separate workload."""
+    monkeypatch.delenv("GANA_BACKEND", raising=False)
+    before = environment()
+    monkeypatch.setenv("GANA_BACKEND", "rust-parameters")
+    CHECK.assertEqual(environment(), before)
+    CHECK.assertNotIn("GANA_BACKEND", before["settings"])
+
+
+def test_comparison_inputs_include_loaded_implementation(
+    pytestconfig, monkeypatch
+):
+    """Make implementation changes part of comparison eligibility."""
+    monkeypatch.setitem(
+        sys.modules, "gana._native", SimpleNamespace(BACKEND="rust-owners-v1")
+    )
+    inputs = comparison_inputs(ROOT, pytestconfig, [])
+    CHECK.assertEqual(inputs["implementations"], {"gana": "rust-owners-v1"})
+
+
+def test_different_implementations_have_no_time_deltas():
+    """Preserve old reports and reject mismatched implementation metadata."""
+    before, after = recorded_report(), recorded_report()
+    after["comparison_inputs"]["implementations"] = {"gana": "rust-owners-v1"}
+    CHECK.assertEqual(
+        compare_reports(before, after),
+        {
+            "status": "incompatible",
+            "changed_inputs": ["implementations"],
+        },
+    )

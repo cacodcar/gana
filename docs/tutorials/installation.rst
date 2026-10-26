@@ -15,7 +15,9 @@ What you are going to need:
 Getting Python
 ---------------
 
-Gana is compatible with Python 3.12 and above. Python can be downloaded from the `official website <https://www.python.org/downloads/>`_. 
+Gana requires Python 3.12 or newer; Python 3.12 and 3.13 are the candidate
+validation matrix. Additional versions and wheel platforms remain unverified.
+Python can be downloaded from the `official website <https://www.python.org/downloads/>`_.
 It is also available through the Microsoft Store on Windows, Homebrew on Mac, and various Linux package managers.
 
 
@@ -23,7 +25,7 @@ It is also available through the Microsoft Store on Windows, Homebrew on Mac, an
 Setting up an Environment
 -------------------------
 
-Virtual environments can be installed using ``pip`` which comes pre-installed with Python.
+Create an isolated environment with Python's ``venv`` module.
 Conda environments can also be used. `Anaconda <https://anaconda.org/anaconda/conda>`_ is a popular choice for managing conda environments with a good GUI.
 
 This tutorial focuses on creating virtual environments through your terminal (Command Prompt, PowerShell, bash, etc.).
@@ -73,7 +75,14 @@ This will populate your activated environment with Gana and its dependencies.
 
 .. code-block:: bash
 
-    pip install gana
+    python -m pip install gana
+
+The current development checkout requires the compiled ``gana._native``
+extension. Published releases may predate this change. A compatible wheel
+includes the extension and does not require a Rust compiler at runtime.
+When pip builds from source, including a Git checkout, Rust/Cargo 1.88 or newer
+and a platform linker are required. Development validation pins Rust 1.88.0.
+Install Rust using the `official Rust installer <https://www.rust-lang.org/tools/install>`_.
 
 
 Once installed, you may need to restart your environment (or terminal). 
@@ -82,7 +91,22 @@ To install the most updated, albeit sometimes unstable, version from git, use:
 
 .. code-block:: bash
 
-    pip install git+https://github.com/cacodcar/gana.git
+    python -m pip install git+https://github.com/cacodcar/gana.git
+
+From a local source checkout, install with ``python -m pip install .``.
+Do not copy a source tree onto ``PYTHONPATH`` as a substitute for building
+its extension. Missing-extension errors provide wheel/source-install guidance;
+binary incompatibility and unrelated dependency errors retain their own details.
+
+Leave ``GANA_BACKEND`` unset. The historical value ``rust-parameters`` remains
+accepted, while ``python``, unknown values and an explicitly empty value raise
+errors. Python staging, mathematical fallbacks and the public modeling API remain
+part of the native implementation. A missing extension never selects another
+backend. Verify installation in your environment with:
+
+.. code-block:: bash
+
+    python -c "from gana import Prg; import gana._native as native; print(native.BACKEND); Prg()"
 
 
 
