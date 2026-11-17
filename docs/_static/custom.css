@@ -21,12 +21,12 @@ html[data-theme="dark"] {
   --title-color: #b2ceff;
 }
 
-/* Match the dark logo's visible size despite its larger transparent margins.
-   Artwork spans 1151/1800 of the dark canvas and 2828/2970 of the light one.
-   Scaling preserves the existing responsive layout and image proportions. */
-.bd-sidebar-primary .logo__image.only-light[src$="/ganalogo.jpg"],
-.bd-article img.only-light[src$="/ganalogo.jpg"] {
-  transform: scale(0.672);
+/* Both logo variants share one canvas and scale. Preserve their transparent
+   backgrounds and original colors when the theme styles content images. */
+html[data-theme] .bd-sidebar-primary img[src*="gana-logo-"],
+html[data-theme] .bd-content img[src*="gana-logo-"] {
+  background-color: transparent;
+  filter: none;
 }
 
 /* Body text */

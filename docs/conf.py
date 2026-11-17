@@ -34,14 +34,13 @@ release = tomllib.loads(
 )['project']['version']
 
 
-html_logo = "_static/ganalogo.jpg"
+html_logo = "_static/gana-logo-light.png"
 html_title = "Gana"
 html_theme_options = {
     # These are specific to the package
     "repository_url": "https://github.com/cacodcar/gana",
     "logo": {
-        # Soft-white transparent logo from the project's Google Drive assets.
-        "image_dark": "_static/gana-logo-soft-white.png",
+        "image_dark": "_static/gana-logo-dark.png",
         # "text": html_title,  # Uncomment to try text with logo
     },
     "icon_links": [

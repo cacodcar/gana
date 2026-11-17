@@ -1,15 +1,15 @@
 Gana Algebraic Modeling Language
 ================================
 
-.. Use local theme-aware banners; skip the README's light-only HTML banner.
+.. Use local theme-aware banners; skip the README's HTML picture banner.
 
-.. image:: _static/ganalogo.jpg
+.. image:: _static/gana-logo-light.png
    :alt: Gana
    :width: 75%
    :align: center
    :class: only-light
 
-.. image:: _static/gana-logo-soft-white.png
+.. image:: _static/gana-logo-dark.png
    :alt: Gana
    :width: 75%
    :align: center

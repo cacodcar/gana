@@ -1,9 +1,9 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/_static/gana-logo-soft-white.png">
-    <source media="(prefers-color-scheme: light)" srcset="docs/_static/ganalogo.jpg">
-    <img src="docs/_static/ganalogo.jpg" alt="Gana logo" width="75%">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/_static/gana-logo-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="docs/_static/gana-logo-light.png">
+    <img src="docs/_static/gana-logo-light.png" alt="Gana logo" width="75%">
   </picture>
 </p>
 
