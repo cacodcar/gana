@@ -12,7 +12,7 @@
   --title-color: #002e8a;
 }
 
-/* Follow the theme switcher's resolved mode, including system preference. */
+/* Follow the theme switcher's selected light or dark mode. */
 html[data-theme="dark"] {
   --text-color: #e8edf5;
   --accent-color: #91baff;

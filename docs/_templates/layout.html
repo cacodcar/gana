@@ -1,0 +1,15 @@
+{% extends "!layout.html" %}
+
+{% block css %}
+  {# Normalize saved system preferences before the theme's initial render. #}
+  <script data-cfasync="false">
+    (() => {
+      const savedMode = localStorage.getItem("mode");
+      const mode = savedMode === "light" || savedMode === "dark"
+        ? savedMode : "{{ default_mode }}";
+      localStorage.setItem("mode", mode);
+      localStorage.setItem("theme", mode);
+    })();
+  </script>
+  {{ super() }}
+{% endblock %}

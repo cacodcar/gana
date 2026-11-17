@@ -221,8 +221,7 @@ html_last_updated_fmt = ""
 # MyST-NB registers the same parser for Markdown and notebook sources.
 source_suffix = {".rst": 'restructuredtext', ".md": 'myst-nb', ".ipynb": 'myst-nb'}
 html_context = {
-    # ...
-    "default_mode": "auto"
+    "default_mode": "dark"
 }
 
 suppress_warnings = [
