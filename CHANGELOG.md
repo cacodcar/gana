@@ -5,6 +5,12 @@ All notable changes to this project will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - Unreleased
+
+### Added
+- `Prg.add_price(account, quantity, price)` defines a unit-price calculation for a continuous multiparametric LP. PPOPT receives parameter-dependent objective coefficients and returns critical regions over the price domain. `Prg.eval()` recovers individual and aggregated accounts at the supplied prices.
+- Scalar prices can be shared across quantities, and indexed prices can vary by coordinate. Deterministic export and unsupported price-dependent constraint matrices raise an explicit error.
+
 ## [1.1.0] - 2026-10-25
 
 ### Added
