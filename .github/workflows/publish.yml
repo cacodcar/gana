@@ -1,0 +1,83 @@
+name: Publish Gana to PyPI
+
+on:
+  pull_request:
+    paths: [.github/workflows/publish.yml]
+  workflow_dispatch:
+  push:
+    branches: [release/publish-1.2.0]
+
+permissions: {}
+
+jobs:
+  verify:
+    if: github.event_name != 'push' || github.event.created
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      artifact-id: ${{ steps.stage.outputs.artifact-id }}
+    steps:
+      - name: Require the release branch to point to main
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          main_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          test "$GITHUB_SHA" = "$main_sha"
+
+      - name: Download the five distributions verified in Gana PR 55
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: '44386712653'
+          artifact-ids: '14465487531,14465913175,14467161143,14467310958,14467420424'
+          merge-multiple: true
+          path: dist
+
+      - name: Check the complete distribution set against the reviewed SHA-256 values
+        working-directory: dist
+        run: |
+          test "$(find . -mindepth 1 | wc -l)" -eq 5
+          sha256sum --check --strict <<'SUMS'
+          4022e74b662826229f8a0eb13495e9e3f4df8b2dc98e0dc4000b27f45f113cf5  gana-1.2.0-cp312-abi3-macosx_10_12_x86_64.whl
+          28e4c3368488608b1f561af816b818f298834937d35e64bc4c9a3f472414e7cc  gana-1.2.0-cp312-abi3-macosx_11_0_arm64.whl
+          94b795a380fed5453a8726089e134c075828e2ea33876aefa4a006b5fd5de04a  gana-1.2.0-cp312-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+          18a4f80495a6fd3e2c75827a6799af900c8edcd9ddee787799093d59a19d7c4d  gana-1.2.0-cp312-abi3-win_amd64.whl
+          0e78fb9e5c148ee0f82a744e1b75214676a13f6130b0b01db254c4a74da6478a  gana-1.2.0.tar.gz
+          SUMS
+
+      - name: Stage the verified bytes for the publishing job
+        if: github.event_name != 'pull_request'
+        id: stage
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: verified-gana-1.2.0-${{ github.run_attempt }}
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    needs: verify
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/release/publish-1.2.0')
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/gana/1.2.0/
+    concurrency: pypi-gana-publish
+    permissions:
+      id-token: write
+    steps:
+      - name: Retrieve the verified distributions
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: ${{ needs.verify.outputs.artifact-id }}
+          merge-multiple: true
+          path: dist
+
+      - name: Publish using the PyPI trusted publisher
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
+        with:
+          skip-existing: true
