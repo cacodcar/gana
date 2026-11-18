@@ -1,17 +1,15 @@
-name: Release 1.1.0 artifacts
+name: Release 1.2.0 artifacts
 
 on:
   push:
-    branches: [release/1.1.0-artifacts]
-    paths: [.github/workflows/release-artifacts.yml]
+    branches: [release/1.2.0-artifacts]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 env:
-  RELEASE_REF: 105ef80d02512ee191018963899a284a3748f07e
-  RELEASE_VERSION: 1.1.0
+  RELEASE_VERSION: 1.2.0
 
 defaults:
   run:
@@ -22,12 +20,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.RELEASE_REF }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Build the source distribution from the merged release
+      - name: Build the source distribution from the release commit
         uses: PyO3/maturin-action@v1
         with:
           command: sdist
@@ -60,7 +56,7 @@ jobs:
           - os: macos-15-intel
             platform: macos-x64
             target: x86_64-apple-darwin
-          - os: macos-14
+          - os: macos-15
             platform: macos-arm64
             target: aarch64-apple-darwin
     steps:
@@ -108,11 +104,9 @@ jobs:
           - platform: macos-x64
             os: macos-15-intel
           - platform: macos-arm64
-            os: macos-14
+            os: macos-15
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.RELEASE_REF }}
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
@@ -137,7 +131,8 @@ jobs:
           root = Path.cwd()
           with tempfile.TemporaryDirectory(prefix='gana-wheel-') as folder:
               for name in ('native_storage_test.py', 'native_coordinates_test.py',
-                           'native_dense_export_test.py', 'native_adapters_test.py'):
+                           'native_dense_export_test.py', 'native_adapters_test.py',
+                           'priced_objective_test.py'):
                   shutil.copy2(root / 'tests' / name, folder)
               env = os.environ.copy()
               env.pop('PYTHONPATH', None)
@@ -146,8 +141,8 @@ jobs:
               env['MPLCONFIGDIR'] = str(Path(folder) / 'mpl')
               check = (
                   'import gana, gana._native; from importlib.metadata import version; '
-                  'from pathlib import Path; '
-                  'assert version("gana") == gana.__version__ == "1.1.0"; '
+                  'from pathlib import Path; import os; '
+                  'assert version("gana") == gana.__version__ == os.environ["RELEASE_VERSION"]; '
                   'assert "site-packages" in Path(gana.__file__).parts; '
                   'print(gana.__file__); print(gana._native.__file__)'
               )
