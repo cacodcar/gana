@@ -6,12 +6,13 @@ import pickle
 import warnings
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
+from functools import cached_property
 from pathlib import Path
 from typing import Literal, cast, overload
 
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
-from IPython.display import Markdown, display
+from IPython.display import Markdown, Math, display
 
 # from numpy import round as npround
 # from numpy import abs as npabs
@@ -44,6 +45,7 @@ from ..sets.variable import V
 from ..storage import parameters as storage
 from ..storage import symbols as symbol_storage
 from ..utils.decorators import timer
+from .priced import PricedMPLP, UnitPrice, price_terms
 from .solution import Solution
 
 logger = logging.getLogger("gana")
@@ -1672,6 +1674,9 @@ class Prg:
         """
         Build a transient sparse adapter only for supported native models.
         """
+        if self.unit_prices:
+            message = "Use solve() for a program with uncertain unit prices"
+            raise ValueError(message)
         return build_native_export(self)
 
     def _write_native_mps(self, snapshot, name):
@@ -1856,6 +1861,10 @@ class Prg:
             solve_mpqp,
         )
         sol = solve_linear(m, getattr(mpqp_algorithm, using))
+        if isinstance(m, PricedMPLP) and not sol.critical_regions:
+            region = m.equality_region()
+            if region is not None:
+                sol.add_region(region)
         if sol.critical_regions:
             # TODO: do not delete
             # this creates actual programs for each critical region
@@ -1927,6 +1936,9 @@ class Prg:
             # region before any evaluation history can be updated.
             message = "No solution exists for the supplied theta values"
             raise TypeError(message)
+        formulation = getattr(self.solutions[n_sol], "program", None)
+        if isinstance(formulation, PricedMPLP):
+            evaluated = formulation.projection.recover(evaluated, _theta_vals)
         sol = [round(float(val[0]), roundoff) for val in evaluated]
 
         self.evaluation.setdefault(n_sol, {})
@@ -2144,6 +2156,9 @@ class Prg:
         lines = [rf"\textbf{{Mathematical Program for }} {self}"]
         lines.extend(self._latex_intro(as_document))
         lines.append(self._latex_heading(1, "Subject to", as_document))
+        lines.extend(
+            f"${equation}$" for equation in self._price_equations(category)
+        )
         if categorical or category:
             sections = self._category_display_sections(
                 descriptive,
@@ -2197,6 +2212,8 @@ class Prg:
         self._show_section("Objective", getattr(self, "objectives", None))
         display(Markdown("<br><br>"))
         display(Markdown(r"## s.t."))
+        for equation in self._price_equations(category):
+            display(Math(equation))
         if categorical or category:
             sections = self._category_display_sections(
                 descriptive,
@@ -2290,6 +2307,56 @@ class Prg:
     #                    Export
     # -----------------------------------------------------
 
+    @cached_property
+    def unit_prices(self) -> dict[int, UnitPrice]:
+        """Price products keyed by the account's registered column."""
+        return {}
+
+    def _price_equations(self, category):
+        """Render the same cost identities for notebook and LaTeX output."""
+        if category in (None, "Calculations"):
+            for col, term in self.unit_prices.items():
+                price = self.thetas[term.theta].latex()
+                usage = self.variables[term.quantity].latex()
+                cost = self.variables[col].latex()
+                yield rf"{cost} = {term.scale:g} \cdot {price} \cdot {usage}"
+
+    def add_price(
+        self, account: V, quantity: V, price: T, *, multiplier: float = 1.0
+    ) -> None:
+        """Define account = multiplier * unit price * quantity for an MPLP.
+
+        A scalar price is shared across all selected coordinates. Indexed
+        prices pair positionally with matching account and quantity selections.
+        Declare all three owners in this program before binding. For example,
+        with registered scalar variables and a theta bounded by (7.86, 8.89)::
+
+            p.add_price(p.spend, p.consumption, p.unit_price)
+            p.objective = inf(p.spend)
+            p.solve()
+            values = p.eval(8.375)
+
+        The solver uses physical decision columns. Program evaluation also
+        returns the priced accounts and their additive totals. A constraint
+        that retains a price times a decision is outside the MPLP form.
+        """
+        if (
+            not isinstance(account, V)
+            or not isinstance(quantity, V)
+            or not isinstance(price, T)
+        ):
+            message = "A price binding requires two variables and a theta"
+            raise TypeError(message)
+        if not all(self._bound_here(v) for v in (account, quantity, price)):
+            message = (
+                "Register the account, quantity and price in this program"
+            )
+            raise ValueError(message)
+        self.unit_prices.update(
+            price_terms(account, quantity, price, multiplier, self.unit_prices)
+        )
+        self.optimized = False
+
     def ppopt(self) -> MPLP_Program:
         """Convert constraints and the active affine objective to ppopt."""
 
@@ -2300,6 +2367,12 @@ class Prg:
         # b_t is the critical region RHS vector
         # F is the matrix of theta coefficients (including nn constraints)
         # H are the parameteric objective coefficients
+
+        if self.unit_prices:
+            priced = PricedMPLP(self)
+            self.formulations[self.n_formulations] = priced
+            self.n_formulations += 1
+            return priced
 
         _A = self.A
         _NN = self.NN
