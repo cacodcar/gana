@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from src.gana import I, Prg, T, V, inf, sigma, sup
+from gana import I, Prg, T, V, inf, sigma, sup
 
 
 def suppliers():
@@ -120,7 +120,7 @@ def test_price_equation_in_latex_and_notebook(monkeypatch):
     assert equation in p.latex(category="Calculations")
     assert equation not in p.latex(category="Capacity")
     displayed = []
-    monkeypatch.setattr("src.gana.block.program.display", displayed.append)
+    monkeypatch.setattr("gana.block.program.display", displayed.append)
     p.show()
     assert equation in [item.data for item in displayed]
 
