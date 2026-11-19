@@ -238,12 +238,15 @@ class O:
         return f"O{self.n}"
 
     def __str__(self):
+        """Return the objective name."""
         return rf"{self.name}"
 
     def __repr__(self):
+        """Display the objective by name."""
         return str(self)
 
     def __hash__(self):
+        """Hash the objective by name."""
         return hash(str(self))
 
     # endregion

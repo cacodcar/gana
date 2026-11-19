@@ -317,11 +317,24 @@ class V(_E["V"]):
     # region Indexing and selection
 
     def __call__(self, *key: I, make_new: bool = False) -> V:
-        """Select shared children, preserving copy flags and missing-key slots.
+        """
+        Select existing variable members by index coordinates.
 
-        Already aligned coordinates need no index unpacking. Keep the shortcut
-        inside this method so subclass selection overrides still dispatch.
-        New selections are V instances, including when called on a subclass.
+        The selection shares its scalar variables with the original set. An
+        unshifted full-domain call returns the original set by default.
+
+        .. admonition:: Example
+
+            .. code-block:: python
+
+                from gana import I, Prg, V
+
+                p = Prg()
+                p.day = I(size=3)
+                p.output = V(p.day)
+                last_two = p.output(p.day[1:])
+                assert len(last_two) == 2
+                assert last_two[0] is p.output[1]
         """
         if not make_new:
             if not key or self._matches_index(key):
@@ -372,6 +385,7 @@ class V(_E["V"]):
         return key == tuple(self.index)
 
     def __len__(self) -> int:
+        """Count the member positions in this variable set or selection."""
         # For the love of god
         # Do not change this
         return len(self._)
@@ -432,6 +446,7 @@ class V(_E["V"]):
         self,
         other: Self | ArithmeticOperand | None,
     ) -> Self | F:
+        """Add a left operand while preserving the variable coordinates."""
         # radd will only be called by non gana elements
         # default to add
         return self + other
@@ -564,24 +579,45 @@ class V(_E["V"]):
         self,
         other: Self | ArithmeticOperand | None,
     ) -> C:
+        """Build the same non-strict upper bound as the <= operator."""
         return self <= other
 
     def __le__(
         self,
         other: Self | ArithmeticOperand | None,
     ) -> C:
+        """
+        Create one upper-bound constraint per aligned row.
+
+        .. admonition:: Example
+
+            .. code-block:: python
+
+                from gana import I, P, Prg, V
+
+                p = Prg()
+                p.plants = I("north", "south")
+                p.output = V(p.plants)
+                p.capacity = P(p.plants, _=[8, 12])
+                p.limit = p.output <= p.capacity
+
+                assert p.A == [[1, 0], [0, 1]]
+                assert p.B == [8, 12]
+        """
         return C(self - other, leq=True)
 
     def __gt__(
         self,
         other: Self | ArithmeticOperand | None,
     ) -> C:
+        """Build the same non-strict lower bound as the >= operator."""
         return self >= other
 
     def __ge__(
         self,
         other: Self | ArithmeticOperand | None,
     ):
+        """Create one lower-bound constraint per aligned row."""
         return C(other - self, leq=True)
 
     # endregion

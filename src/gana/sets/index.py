@@ -70,30 +70,24 @@ class I:
     :raises ValueError: If indices of elements (P, V) are not compatible
     :raises ValueError: If index set is not ordered and step is given
 
-
     .. admonition:: Example
 
         .. code-block:: python
 
-            p = Program()
-            p.s1 = I('a', 'b', 'c')
-            p.s2 = I('a', 'd', 'e', 'f')
+            from gana import I, Prg
 
-            # Intersection
-            p.s1 & p.s2
-            # I('a')
+            p = Prg()
+            p.day = I("solar", "wind")
+            p.night = I("wind", "storage")
+            p.shared = p.day & p.night
+            p.available = p.day | p.night
+            p.exclusive = p.day ^ p.night
+            p.day_only = p.day - p.night
 
-            # Union
-            p.s1 | p.s2
-            # I('a', 'b', 'c', 'd', 'e', 'f')
-
-            # Symmetric difference
-            p.s1 ^ p.s2
-            # I('b', 'c', 'd', 'e', 'f')
-
-            # Difference
-            p.s1 - p.s2
-            # I('b', 'c')
+            assert [i.name for i in p.shared] == ["wind"]
+            assert list(p.available) == [p.solar, p.wind, p.storage]
+            assert [i.name for i in p.exclusive] == ["solar", "storage"]
+            assert [i.name for i in p.day_only] == ["solar"]
     """
 
     # region Construction and ownership
@@ -341,10 +335,12 @@ class I:
         return iter(self._)
 
     def __len__(self) -> int:
+        """Count the positions in the current index."""
         return len(self._)
         # return len([i for i in self._ if not isinstance(i, Skip)])
 
     def __contains__(self, other: Self):
+        """Test whether an index member belongs to this domain."""
         return True if other in self._ else False
 
     # endregion
@@ -352,12 +348,14 @@ class I:
     # region Set operations and index shifts
 
     def __and__(self, other: Self):
+        """Intersect the domains in the left domain's member order."""
         # Members that exist in both Index sets
         _and = [i for i in self.members if i in other.members]
 
         return self.birth_index(rf"{self.name} & {other.name}", _and)
 
     def __or__(self, other: Self):
+        """Append new members from the right to form an ordered union."""
         # members that exist in either self or other
         # make a copy of the members in self
         _or = list(self.members)
@@ -393,6 +391,21 @@ class I:
         return self.birth_index(rf"{self.name} ^ {other.name}", _xor)
 
     def __add__(self, other: int | Self):
+        """
+        Shift an ordered domain by an integer and pad with ``None``.
+
+        .. admonition:: Example
+
+            .. code-block:: python
+
+                from gana import I, Prg
+
+                p = Prg()
+                p.hour = I(size=3)
+                next_hour = p.hour + 1
+                assert next_hour[0] is p.hour[1]
+                assert next_hour[-1] is None
+        """
         # if other is an integer, step up the index set
         if isinstance(other, int):
             return self.step(other)
@@ -580,12 +593,15 @@ class I:
         return rf"_{self[pos]}"
 
     def __str__(self):
+        """Return the index name."""
         return self.name
 
     def __repr__(self):
+        """Display the index by name."""
         return str(self)
 
     def __hash__(self):
+        """Cache the hash of the index name on first use."""
         # this seems to work the fastest
         # not sure how pythonic this is though
         try:

@@ -238,7 +238,22 @@ class C:
         return C(function=self.function(key), **self.args)
 
     def __getitem__(self, pos: int) -> C:
-        """Return the stored scalar constraint at a positional index."""
+        """
+        Read the scalar constraint at a zero-based row position.
+
+        .. admonition:: Example
+
+            .. code-block:: python
+
+                from gana import I, Prg, V
+
+                p = Prg()
+                p.hour = I(size=3)
+                p.power = V(p.hour)
+                p.limit = p.power <= [4, 6, 5]
+                assert p.limit[1].B == 6
+                assert p.limit[1].P == [1]
+        """
         return self._[pos]
 
     def __iter__(self) -> Iterator[C]:
@@ -248,6 +263,7 @@ class C:
         return iter(self._)
 
     def __len__(self):
+        """Count the scalar rows in this constraint."""
         return len(self._)
 
     def order(self) -> int:
@@ -494,12 +510,15 @@ class C:
         return f"C{self.n}"
 
     def __str__(self):
+        """Return the constraint name."""
         return self.name
 
     def __repr__(self):
+        """Display the constraint by name."""
         return self.name
 
     def __hash__(self):
+        """Hash the constraint name, falling back to object identity."""
         try:
             return hash(self.name)
         except AttributeError:

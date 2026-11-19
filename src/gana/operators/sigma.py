@@ -114,10 +114,10 @@ def sigma(
     position: int | None = None,
 ) -> F:
     """
-    Summation without recursion, also allows better printing
+    Sum a variable or expression over an index.
 
-    A whole-set reduction of a one-row expression returns that expression:
-    its coefficients and constant already represent the complete sum.
+    A whole-set reduction of a one-row expression returns the expression with
+    its coefficients and constant intact.
 
     :param variable: variable set or expression
     :type variable: V | F
@@ -128,6 +128,25 @@ def sigma(
 
     :returns: summed up function
     :rtype: F
+
+    .. admonition:: Example
+
+        .. code-block:: python
+
+            from gana import I, Prg, V, sigma
+
+            p = Prg()
+            p.plants = I("north", "south")
+            p.day = I(size=3)
+            p.output = V(p.plants, p.day)
+            daily_total = sigma(p.output, over=p.plants)
+            p.limit = daily_total <= 10
+
+            assert p.A == [
+                [1, 0, 0, 1, 0, 0],
+                [0, 1, 0, 0, 1, 0],
+                [0, 0, 1, 0, 0, 1],
+            ]
     """
     if (
         isinstance(variable, F)

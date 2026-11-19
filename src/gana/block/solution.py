@@ -23,7 +23,7 @@ class Solution:
     name: str = " "
 
     def __post_init__(self):
-
+        """Start an empty record collection keyed by variable name."""
         self._: dict[str, dict[str, list]] = {}
 
     def asdict(self):
@@ -247,4 +247,21 @@ class Solution:
         self.draw(kind="bar", **kwargs)
 
     def __getitem__(self, item):
+        """
+        Look up values and coordinate metadata by variable-set name.
+
+        .. admonition:: Example
+
+            .. code-block:: python
+
+                from gana import Prg, V, inf
+
+                p = Prg()
+                p.output = V()
+                p.demand = p.output >= 4
+                p.cost = inf(p.output)
+                p.opt()
+                assert p.solution["output"]["values"] == [4]
+                assert p.solution(p.output[0])["values"] == 4
+        """
         return self._[item]

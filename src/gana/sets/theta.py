@@ -417,7 +417,23 @@ class T(_E["T | tuple[float, ...] | None"]):
         reject_disequality()
 
     def __le__(self, other):
-        """Build an affine upper bound without changing interval bounds."""
+        """
+        Build an affine upper bound on the parametric variable.
+
+        .. admonition:: Example
+
+            .. code-block:: python
+
+                from gana import Prg, T, V
+
+                p = Prg()
+                p.output = V()
+                p.demand = T(_=(2, 8))
+                p.meet_demand = p.demand <= p.output
+                # Gana writes this row as -output <= -demand.
+                assert p.A == [[-1]]
+                assert p.F == [[-1]]
+        """
         return C(self - other, leq=True)
 
     def __lt__(self, other):
