@@ -105,7 +105,6 @@ class P(_E[float]):
     """
 
     # TODO update Errors in docstring
-    # TODO add examples
 
     _native_storage: storage.ParameterStorage
     _compact_staging = True
@@ -242,9 +241,19 @@ class P(_E[float]):
 
     def __call__(self, *key: I) -> P:
         """
-        Select numerical members, retaining skipped and missing-key behavior.
+        Select parameter values by index coordinates in the requested order.
 
-        New selections are P instances, including when called on a subclass.
+        .. admonition:: Example
+
+            .. code-block:: python
+
+                from gana import I, P, Prg
+
+                p = Prg()
+                p.hour = I(size=3)
+                p.price = P(p.hour, _=[12, 20, 15])
+                assert p.price[1] == 20
+                assert list(p.price(p.hour[1:])) == [20, 15]
         """
         if not key or self._unpack_index(key) == self._unpack_index(
             self.index,
@@ -289,6 +298,7 @@ class P(_E[float]):
     # region Unary operations and conversion
 
     def __neg__(self):
+        """Negate the parameter values element by element."""
         if self.case == PCase.ZERO:
             # if zero return self
             return self
@@ -338,6 +348,7 @@ class P(_E[float]):
         return p
 
     def __float__(self):
+        """Convert a parameter representing a numeric constant to a float."""
         if self.case in [PCase.NUM, PCase.NEGNUM, PCase.ZERO]:
             return self._[-1]
         return self
@@ -511,6 +522,7 @@ class P(_E[float]):
         self,
         other: Self | ArithmeticOperand | None,
     ) -> P:
+        """Add this parameter to a left operand using aligned values."""
         # let __add__() handle the addition
         return self + other
 
@@ -532,6 +544,19 @@ class P(_E[float]):
         self,
         other: Self | ArithmeticOperand | None,
     ) -> P | F:
+        """
+        Subtract the parameter values from the left operand in order.
+
+        .. admonition:: Example
+
+            .. code-block:: python
+
+                from gana import P
+
+                demand = P(_=[3, 7])
+                spare_capacity = 10 - demand
+                assert list(spare_capacity) == [7, 3]
+        """
         # let negation and __add__ handle the subtraction
         return -self + other
 
@@ -571,6 +596,7 @@ class P(_E[float]):
         self,
         other: Self | ArithmeticOperand | None,
     ) -> P:
+        """Multiply the left operand by the corresponding parameter values."""
         # multiplication is commutative
         return self * other
 
@@ -672,7 +698,21 @@ class P(_E[float]):
         self,
         other: object,
     ) -> bool:
-        """Compare known values; defer unsupported types to reflection."""
+        """
+        Compare known values, requiring all paired values to agree.
+
+        Unsupported operand types can supply a reflected comparison.
+
+        .. admonition:: Example
+
+            .. code-block:: python
+
+                from gana import P
+
+                forecast = P(_=[3, 5])
+                assert forecast == P(_=[3, 5])
+                assert (forecast == P(_=[3, 6])) is False
+        """
 
         other = normalize_operand(other)
         if isinstance(other, (int, float)):

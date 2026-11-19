@@ -95,6 +95,7 @@ class PriceProjection:
     """Recover declared accounts from decisions and evaluated prices."""
 
     def __init__(self, program: Prg):
+        """Map decisions and unit prices back to declared accounts."""
         prices = program.unit_prices
         sums = _dependent_sums(program.cons(), prices)
         self.decisions = [
@@ -169,6 +170,7 @@ class PricedMPLP(MPLP_Program):
     """MPLP in physical coordinates with recovery of named variables."""
 
     def __init__(self, program: Prg):
+        """Compile a continuous LP with unit prices and a scalar objective."""
         if program.active_objective is None:
             message = "Set an objective before compiling a price-parametric LP"
             raise ValueError(message)

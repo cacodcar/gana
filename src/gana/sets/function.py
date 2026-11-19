@@ -948,6 +948,7 @@ class F(NumericDispatch):
         return iter(self._)
 
     def __len__(self):
+        """Count expression rows, including shifted placeholders."""
         return len(self._)
 
     # endregion
@@ -982,6 +983,7 @@ class F(NumericDispatch):
         )
 
     def __pos__(self):
+        """Return the same expression under unary plus."""
         return self
 
     # endregion
@@ -1065,6 +1067,7 @@ class F(NumericDispatch):
         self,
         other: Self | ArithmeticOperand | None,
     ) -> Self:
+        """Add a left operand to each aligned expression row."""
         return self + other
 
     def __sub__(
@@ -1080,6 +1083,23 @@ class F(NumericDispatch):
         self,
         other: Self | ArithmeticOperand | None,
     ) -> Self:
+        """
+        Subtract each expression row from the corresponding left operand.
+
+        .. admonition:: Example
+
+            .. code-block:: python
+
+                from gana import Prg, V
+
+                p = Prg()
+                p.x = V()
+                usage = 2 * p.x + 1
+                p.reserve = 10 - usage >= 3
+                # 10 - (2*x + 1) >= 3 gives 2*x <= 6.
+                assert p.A == [[2]]
+                assert p.B == [6]
+        """
         return -self + other
 
     def __mul__(
@@ -1144,20 +1164,37 @@ class F(NumericDispatch):
         reject_disequality()
 
     def __eq__(self, other: object):
-        """Build equality using arithmetic's existing operand validation."""
+        """
+        Build equality constraints between the corresponding expression rows.
+
+        .. admonition:: Example
+
+            .. code-block:: python
+
+                from gana import Prg, V
+
+                p = Prg()
+                p.wind, p.solar = V(), V()
+                p.balance = p.wind + p.solar == 12
+                assert p.H == [[1, 1]]
+                assert p.balance.eq
+        """
         return C(self - cast("F | ArithmeticOperand | None", other))
 
     def __lt__(self, other: Self | ExpressionSet):
+        """Build the same non-strict upper bound as the <= operator."""
         return self <= other
 
     def __le__(self, other: Self | ExpressionSet):
-
+        """Create one upper-bound constraint per aligned row."""
         return C(self - other, leq=True)
 
     def __gt__(self, other: Self | ExpressionSet):
+        """Build the same non-strict lower bound as the >= operator."""
         return self >= other
 
     def __ge__(self, other: Self | ExpressionSet):
+        """Create one lower-bound constraint per aligned row."""
         return C(-self + other, leq=True)
 
     # endregion
@@ -1594,12 +1631,15 @@ class F(NumericDispatch):
             display(Math(rf"[{self.n}]" + r"\text{   }" + self.latex()))
 
     def __str__(self):
+        """Return the expression name."""
         return self.name
 
     def __repr__(self):
+        """Display the expression by name."""
         return self.name
 
     def __hash__(self):
+        """Hash the expression name, falling back to object identity."""
         try:
             return hash(self.name)
         except AttributeError:

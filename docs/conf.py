@@ -234,3 +234,34 @@ nb_execution_mode = "off"
 # -----# Bibtex configuration-------------------------------------------------------
 # bibtex_bibfiles = ["refs.bib", "frameworks.bib"]
 # bibtex_default_style = "unsrt"
+
+
+# Include Python syntax that users can write in a Gana model. Methods
+# inherited from Gana's element base also belong on the concrete API pages.
+_model_operators = {
+    "__abs__", "__add__", "__and__", "__call__", "__contains__", "__eq__",
+    "__float__", "__floordiv__", "__ge__", "__getitem__", "__gt__", "__iter__",
+    "__le__", "__len__", "__lt__", "__mod__", "__mul__", "__ne__", "__neg__",
+    "__or__", "__pos__", "__pow__", "__radd__", "__rfloordiv__", "__rmod__",
+    "__rmul__", "__rpow__", "__rsub__", "__rtruediv__", "__sub__",
+    "__truediv__", "__xor__",
+}
+
+
+def include_model_operator(app, what, name, obj, skip, options):
+    """Show documented modeling operators in the API reference."""
+    if what != "class" or not getattr(obj, "__doc__", None):
+        return None
+    module = getattr(obj, "__module__", "")
+    if module == "gana.block.program" and name == "__setattr__":
+        return False
+    if name in _model_operators and (
+        module.startswith(("gana.sets.", "gana.value."))
+        or module == "gana.block.solution"
+    ):
+        return False
+    return None
+
+
+def setup(app):
+    app.connect("autodoc-skip-member", include_model_operator)

@@ -961,7 +961,20 @@ class Prg:
 
     def __setattr__(self, name, value) -> None:
         """
-        Dispatch registrations; mutations preserve the existing root attribute.
+        Register model declarations under their assigned attribute names.
+
+        .. admonition:: Example
+
+            .. code-block:: python
+
+                from gana import I, Prg, V
+
+                p = Prg()
+                p.plants = I("north", "south")
+                p.output = V(p.plants)
+                p.capacity = p.output <= 10
+                assert len(p.output) == 2
+                assert p.B == [10, 10]
         """
         store = True
         if isinstance(value, I):
@@ -2250,13 +2263,16 @@ class Prg:
     # -----------------------------------------------------
 
     def __str__(self):
+        """Return the program name."""
         # return rf"{self.name}"
         return self.name
 
     def __repr__(self):
+        """Display the program by name."""
         return self.name
 
     def __hash__(self):
+        """Hash the program by name."""
         return hash(str(self))
 
     def __init_subclass__(cls):
