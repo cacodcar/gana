@@ -60,8 +60,8 @@ Issues = "https://github.com/cacodcar/gana/issues"
 #  independent measured coverage floors.
 [tool.research-quality]
 package = "gana"
-statement-floor = 53
-branch-floor = 35
+statement-floor = 89
+branch-floor = 83
 local-dependencies = []
 
 #  check annotated and unannotated bodies.
