@@ -10,6 +10,7 @@ from functools import cached_property
 from pathlib import Path
 from typing import Literal, cast, overload
 
+from gurobipy import GRB
 from gurobipy import Model as GPModel
 from gurobipy import read as gpread
 from IPython.display import Markdown, Math, display
@@ -29,6 +30,7 @@ from gana.types import Number
 
 from ..backends.native import registry as native_registry
 from ..backends.native.constraints import compile_program
+from ..backends.native.export import ExportSnapshot
 from ..backends.native.export import build as build_native_export
 from ..backends.native.export import renumber as renumber_native_export
 from ..backends.native.results import load as load_native_results
@@ -47,6 +49,13 @@ from ..storage import symbols as symbol_storage
 from ..utils.decorators import timer
 from .priced import PricedMPLP, UnitPrice, price_terms
 from .solution import Solution
+from .solution_file import (
+    SolutionRecord,
+    fingerprint_snapshot,
+    formulation_fingerprint,
+    validate_record,
+    write_record,
+)
 
 logger = logging.getLogger("gana")
 logger.setLevel(logging.INFO)
@@ -58,7 +67,8 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-# Keep renderer row types at module scope: Prg.C is the objective vector.
+# Keep row types at module scope: Prg.C is the objective vector.
+type _ConstraintRows = list[C]
 type _DisplayItem = C | Func | V
 type _DisplaySection = tuple[int, str, Sequence[_DisplayItem]]
 
@@ -203,6 +213,7 @@ class Prg:
 
         # the solution object
         self.solutions: dict[int, Solution | MPSolution] = {}
+        self._solution_records: dict[int, SolutionRecord] = {}
 
         # number of solutions
         self.n_solutions: int = 0
@@ -1660,6 +1671,10 @@ class Prg:
                 kind, value = ("LI" if variable.itg else "LO"), "0"
             stream.write(f" {kind} BND1      {variable.mps():<10}{value}\n")
 
+    def _mps_constraints(self) -> _ConstraintRows:
+        """Return compatibility rows included in the solver formulation."""
+        return [c for c in self.cons() if not c.redundant_bound]
+
     @timer(logger, kind="generate-mps", with_return=False)
     def mps(self, name: str | None = None):
         """
@@ -1671,7 +1686,7 @@ class Prg:
             self._write_native_mps(snapshot, output_name)
             return output_name
         self.renumber()
-        constraints = [c for c in self.cons() if not c.redundant_bound]
+        constraints = self._mps_constraints()
         objective = self.active_objective
         _, columns = self._solution_columns()
         with open(f"{output_name}.mps", "w", encoding="utf-8") as stream:
@@ -1683,7 +1698,7 @@ class Prg:
             stream.write("ENDATA")
         return output_name
 
-    def _native_export(self):
+    def _native_export(self) -> ExportSnapshot | None:
         """
         Build a transient sparse adapter only for supported native models.
         """
@@ -1712,28 +1727,72 @@ class Prg:
     @timer(logger, kind="optimize", with_return=False)
     def opt(self, using: str = "gurobi"):
         """Determine the optimal solution to the program"""
+        if using != "gurobi":
+            return None
 
-        if using == "gurobi":
-            m = self.gurobi()
+        snapshot = self._native_export()
+        m = self._build_gurobi(snapshot)
+        self.formulations[self.n_formulations] = m
+        self.n_formulations += 1
 
-            self.formulations[self.n_formulations] = m
-            self.n_formulations += 1
+        m.optimize()
+        try:
+            values = {v.VarName: v.X for v in m.getVars()}
+            objective_value = m.ObjVal
+            record = self._capture_solution(
+                m, snapshot, values, objective_value
+            )
+            self._load_values((values, objective_value), snapshot)
+            self.optimized = True
+            self._birth_solution(record)
+        except AttributeError:
+            logger.warning("🛑 No solution found. Check the model 🛑")
+            return False
+        else:
+            return self, using
 
-            m.optimize()
-            try:
-                self._load_values(
-                    ({v.VarName: v.X for v in m.getVars()}, m.ObjVal),
-                )
-                self.optimized = True
-                self._birth_solution()
+    def _capture_solution(
+        self,
+        model: GPModel,
+        snapshot: ExportSnapshot | None,
+        values: dict[str, Number],
+        objective_value: Number,
+    ) -> SolutionRecord | None:
+        """Capture the metadata for the current deterministic solve."""
+        if self.n_thetas:
+            return None
+        return SolutionRecord(
+            format_version=1,
+            values=values,
+            objective_value=objective_value,
+            objective_sense="min",
+            status="optimal" if model.Status == GRB.OPTIMAL else "incumbent",
+            formulation_fingerprint=self._solution_fingerprint(snapshot),
+        )
 
-            except AttributeError:
-                logger.warning("🛑 No solution found. Check the model 🛑")
+    def _solution_fingerprint(self, snapshot: ExportSnapshot | None) -> str:
+        """Fingerprint the formulation independently of the solver model."""
+        if snapshot is not None:
+            return fingerprint_snapshot(snapshot)
 
-                return False
-            else:
-                return self, using
-        return None
+        objective = self.active_objective
+        _, selected = self._solution_columns()
+        columns = (
+            (v.mps(), "B" if v.bnr else ("I" if v.itg else "C"), v.bnr or v.nn)
+            for v in selected
+        )
+        rows = (
+            ("=" if c.eq else "<", cast("Number", c.B), c.matrix)
+            for c in self._mps_constraints()
+        )
+        if objective is None:
+            return formulation_fingerprint(columns, {}, 0, rows)
+        return formulation_fingerprint(
+            columns,
+            objective.matrix,
+            objective.constant,
+            rows,
+        )
 
     def _mps_column_groups(self) -> tuple[list[V], list[V]]:
         """
@@ -1786,13 +1845,16 @@ class Prg:
             raise ValueError(message)
         return [values.get(v.mps()) for v in self.variables]
 
-    def _load_values(self, sol_and_obj):
+    def _load_values(
+        self, sol_and_obj, snapshot: ExportSnapshot | None = None
+    ):
         """
         Load (column values, objective); store variable history in declaration
         order.
         """
         values, objective_value = sol_and_obj
-        snapshot = self._native_export()
+        if snapshot is None:
+            snapshot = self._native_export()
         if snapshot is not None and load_native_results(
             self,
             snapshot,
@@ -1809,8 +1871,58 @@ class Prg:
         if self.active_objective is not None:
             self.active_objective.X = objective_value
 
-    def import_solution(self, name: str):
-        """Import JSON/pickle containing (column values, objective value).
+    def export_solution(
+        self,
+        path: str | Path,
+        *,
+        n_sol: int | None = None,
+    ) -> None:
+        """
+        Write one stored deterministic result to a versioned JSON file.
+
+        By default, export the latest solution. Pass its zero-based index to
+        select an earlier result. The JSON includes the objective in Gana's
+        minimization convention, even for objectives declared with ``sup``.
+        Versioned imports and deterministic solves supply the metadata required
+        by this format. The destination is replaced after the write succeeds.
+
+        .. admonition:: Example
+
+            .. code-block:: python
+
+                from gana import Prg, V, inf
+
+                def build():
+                    model = Prg()
+                    model.x = V()
+                    model.minimum = model.x >= 4
+                    model.cost = inf(model.x)
+                    return model
+
+                p = build()
+                p.opt()
+                p.export_solution("solution.json")
+                rebuilt = build()
+                rebuilt.import_solution("solution.json")
+                assert rebuilt.obj() == 4
+        """
+        number = self.n_solutions - 1 if n_sol is None else n_sol
+        record = getattr(self, "_solution_records", {}).get(number)
+        if record is None:
+            message = f"No exportable deterministic solution at index {number}"
+            raise ValueError(message)
+        destination = Path(path)
+        if destination.suffix != ".json":
+            message = "Solution export requires a .json destination"
+            raise ValueError(message)
+        write_record(destination, record)
+
+    def import_solution(self, name: str | Path) -> None:
+        """
+        Attach a versioned JSON result to a matching deterministic program.
+
+        The formulation fingerprint is verified before loading values. Legacy
+        JSON and pickle files contain (column values, objective value).
 
         Prefer values keyed by exported names (Vn, or Xn for binary variables).
         Legacy lists use MPS column order, with optional omission of unused
@@ -1819,15 +1931,18 @@ class Prg:
         Pickle files must come from a trusted source: loading them can execute
         Python code. Use JSON when exchanging solution data with other sources.
 
-        :param name: file name, with extenstion
-        :type name: str
+        :param name: path to the solution file
+        :type name: str | Path
 
         """
         ext = Path(name).suffix
 
         if ext == ".json":
-            with open(name, "r") as f:
+            with open(name, encoding="utf-8") as f:
                 sol_and_obj = json.load(f)
+            if isinstance(sol_and_obj, dict):
+                self._import_solution_record(validate_record(sol_and_obj))
+                return
 
         elif ext == ".pkl":
             with open(name, "rb") as f:
@@ -1842,6 +1957,27 @@ class Prg:
 
         self.optimized = True
         self._birth_solution()
+
+    def _import_solution_record(self, record: SolutionRecord) -> None:
+        """Verify the target before registering a versioned result."""
+        if self.n_thetas:
+            message = (
+                "A deterministic solution requires a deterministic program"
+            )
+            raise ValueError(message)
+        snapshot = self._native_export()
+        if record["formulation_fingerprint"] != self._solution_fingerprint(
+            snapshot,
+        ):
+            message = (
+                "Solution formulation fingerprint does not match the program"
+            )
+            raise ValueError(message)
+        self._load_values(
+            (record["values"], record["objective_value"]), snapshot
+        )
+        self.optimized = True
+        self._birth_solution(record)
 
     @timer(logger, kind="solve-mpqp")
     def solve(
@@ -2011,13 +2147,16 @@ class Prg:
         return None
 
     @timer(logger, kind="generate-solution", with_return=False)
-    def _birth_solution(self):
+    def _birth_solution(self, record: SolutionRecord | None = None):
         """Makes a solution object for the program"""
 
         _solution = Solution(self.name + "_solution_" + str(self.n_solutions))
         _solution.update(self.variables, n_sol=self.n_solutions)
 
         self.solutions[self.n_solutions] = _solution
+        if record is not None:
+            records = self.__dict__.setdefault("_solution_records", {})
+            records[self.n_solutions] = record
         self.sol_types["MIP"].append(self.n_solutions)
         self.n_solutions += 1
 
@@ -2421,7 +2560,10 @@ class Prg:
         """
         Build native models through bulk CSR APIs, retaining the MPS artifact.
         """
-        snapshot = self._native_export()
+        return self._build_gurobi(self._native_export())
+
+    def _build_gurobi(self, snapshot: ExportSnapshot | None) -> GPModel:
+        """Construct the solver so a solve can reuse its exported snapshot."""
         if snapshot is not None:
             self._write_native_mps(snapshot, self.name)
             return snapshot.gurobi(self.name, GPModel, csr_matrix)
