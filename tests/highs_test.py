@@ -12,7 +12,7 @@ from gana import Prg, T, V, inf, sup
 def test_highs_mip_record_and_gurobi_parity(
     tmp_path, monkeypatch, compatibility
 ):
-    """Map mixed domains by name, retain an offset and round-trip either path."""
+    """Round-trip mixed domains and an offset through either export path."""
     monkeypatch.chdir(tmp_path)
     p = Prg()
     p.units = V(itg=True, nn=False)
@@ -44,7 +44,7 @@ def test_highs_mip_record_and_gurobi_parity(
 
 
 def test_highs_infeasible_solve_keeps_previous_result():
-    """An unsuccessful solve exposes its status and preserves the last result."""
+    """An infeasible solve preserves the last successful result."""
     p = Prg()
     p.x = V()
     p.limit = p.x <= 2
