@@ -10,7 +10,7 @@ features = ["extension-module"]
 
 [project]
 name = "gana"
-version = "1.4.0"
+version = "1.5.0"
 authors = [
   { name="Rahul Kakodkar", email="cacodcar@gmail.com" },
 ]
