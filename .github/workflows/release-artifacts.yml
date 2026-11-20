@@ -1,15 +1,12 @@
-name: Release 1.2.0 artifacts
+name: Build Gana release artifacts
 
 on:
   push:
-    branches: [release/1.2.0-artifacts]
+    branches: ['release/*-artifacts']
   workflow_dispatch:
 
 permissions:
   contents: read
-
-env:
-  RELEASE_VERSION: 1.2.0
 
 defaults:
   run:
@@ -18,11 +15,19 @@ defaults:
 jobs:
   source:
     runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Read the package version
+        id: version
+        run: |
+          version=$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - name: Build the source distribution from the release commit
         uses: PyO3/maturin-action@v1
         with:
@@ -43,6 +48,8 @@ jobs:
   wheels:
     needs: source
     runs-on: ${{ matrix.os }}
+    env:
+      RELEASE_VERSION: ${{ needs.source.outputs.version }}
     strategy:
       fail-fast: false
       matrix:
@@ -89,8 +96,10 @@ jobs:
           if-no-files-found: error
 
   installed-wheel-tests:
-    needs: wheels
+    needs: [source, wheels]
     runs-on: ${{ matrix.os }}
+    env:
+      RELEASE_VERSION: ${{ needs.source.outputs.version }}
     strategy:
       fail-fast: false
       matrix:
@@ -132,7 +141,7 @@ jobs:
           with tempfile.TemporaryDirectory(prefix='gana-wheel-') as folder:
               for name in ('native_storage_test.py', 'native_coordinates_test.py',
                            'native_dense_export_test.py', 'native_adapters_test.py',
-                           'priced_objective_test.py'):
+                           'priced_objective_test.py', 'solution_file_test.py'):
                   shutil.copy2(root / 'tests' / name, folder)
               env = os.environ.copy()
               env.pop('PYTHONPATH', None)
@@ -150,3 +159,37 @@ jobs:
               subprocess.run([sys.executable, '-I', '-m', 'pytest', '-q', folder],
                              cwd=folder, env=env, check=True)
           PY
+
+  bundle:
+    needs: [source, installed-wheel-tests]
+    runs-on: ubuntu-24.04
+    env:
+      RELEASE_VERSION: ${{ needs.source.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: release/dist
+      - name: Collect the tested distributions and changelog entry
+        run: |
+          sha256sum release/dist/* > release/SHA256SUMS
+          cd release/dist
+          test "$(find . -mindepth 1 | wc -l)" -eq 5
+          test -f "gana-$RELEASE_VERSION.tar.gz"
+          test -f "gana-$RELEASE_VERSION-cp312-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+          test -f "gana-$RELEASE_VERSION-cp312-abi3-win_amd64.whl"
+          test -f "gana-$RELEASE_VERSION-cp312-abi3-macosx_10_12_x86_64.whl"
+          test -f "gana-$RELEASE_VERSION-cp312-abi3-macosx_11_0_arm64.whl"
+          cd ../..
+          awk -v heading="## [$RELEASE_VERSION] - " '
+            /^## / { if (printing) exit; printing = index($0, heading) == 1 }
+            printing { print }
+          ' CHANGELOG.md > release/notes.md
+          test -s release/notes.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gana-release-${{ github.run_attempt }}
+          path: release/
+          if-no-files-found: error
