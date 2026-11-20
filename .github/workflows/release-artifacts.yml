@@ -141,7 +141,8 @@ jobs:
           with tempfile.TemporaryDirectory(prefix='gana-wheel-') as folder:
               for name in ('native_storage_test.py', 'native_coordinates_test.py',
                            'native_dense_export_test.py', 'native_adapters_test.py',
-                           'priced_objective_test.py', 'solution_file_test.py'):
+                           'priced_objective_test.py', 'solution_file_test.py',
+                           'highs_test.py', 'default_solver_test.py'):
                   shutil.copy2(root / 'tests' / name, folder)
               env = os.environ.copy()
               env.pop('PYTHONPATH', None)
