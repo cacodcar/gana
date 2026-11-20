@@ -1,13 +1,14 @@
 """HiGHS adapter for Gana's deterministic MPS formulation."""
 
 from pathlib import Path
+from shutil import copyfile
 from tempfile import TemporaryDirectory
 
 from highspy import Highs, HighsModelStatus, HighsStatus, SolutionStatus
 
 
 def build(program, snapshot) -> Highs:
-    """Read the existing MPS representation using a private per-solve path."""
+    """Read a private MPS file and retain the program's named export."""
     model = Highs()
     with TemporaryDirectory() as directory:
         stem = str(Path(directory) / "program")
@@ -18,6 +19,7 @@ def build(program, snapshot) -> Highs:
         if model.readModel(f"{stem}.mps") == HighsStatus.kError:
             message = "HiGHS could not read the exported Gana formulation"
             raise ValueError(message)
+        copyfile(f"{stem}.mps", f"{program.name}.mps")
     return model
 
 

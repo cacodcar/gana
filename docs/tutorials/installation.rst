@@ -136,8 +136,9 @@ The options are:
 HiGHS for linear and mixed-integer programs
 -------------------------------------------
 
-Install the Python bindings with ``python -m pip install "gana[highs]"``.
-Select HiGHS when optimizing a deterministic program.
+HiGHS is included with ``python -m pip install gana`` and is the default
+solver for deterministic programs. The existing ``gana[highs]`` extra remains
+supported.
 
 .. code-block:: python
 
@@ -147,13 +148,15 @@ Select HiGHS when optimizing a deterministic program.
     program.units = V(itg=True)
     program.demand = program.units >= 2.5
     program.cost = inf(4 * program.units)
-    program.opt(using="highs")
+    program.opt()
     assert program.obj() == 12
     program.export_solution("result.json")
 
 ``program.formulation`` holds the HiGHS model and its solver status.
-``program.opt()`` selects Gurobi by default. Use ``program.solve()``
-for multiparametric programs.
+The solve retains ``<program.name>.mps`` for inspection or use with other solvers.
+Select Gurobi explicitly with ``program.opt(using="gurobi")``; it requires
+a suitable Gurobi license. ``program.opt(using="highs")`` also remains
+supported. Use ``program.solve()`` for multiparametric programs.
 
 .. _ides:
 

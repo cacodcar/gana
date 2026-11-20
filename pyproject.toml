@@ -30,7 +30,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-dependencies = ["ppopt", "gurobipy", "IPython", "numpy", "pandas", "matplotlib"]
+dependencies = ["ppopt", "gurobipy", "highspy>=1.11", "IPython", "numpy", "pandas", "matplotlib"]
 [project.optional-dependencies]
 highs = ["highspy>=1.11"]
 all = ["pyomo", "sympy", "highspy>=1.11"]

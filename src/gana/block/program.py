@@ -1729,10 +1729,11 @@ class Prg:
     # --------------------------------------------------
 
     @timer(logger, kind="optimize", with_return=False)
-    def opt(self, using: str = "gurobi"):
-        """Optimize a deterministic program with Gurobi or HiGHS.
+    def opt(self, using: str = "highs"):
+        """Optimize a deterministic program with HiGHS by default.
 
-        Install ``gana[highs]`` to select ``using="highs"``.
+        HiGHS is included with Gana. Select ``using="gurobi"`` to use Gurobi.
+        Both solvers retain the formulation in ``<program.name>.mps``.
         Successful solves append to the same solution history for both solvers.
         """
         if using not in ("gurobi", "highs"):
@@ -1764,7 +1765,7 @@ class Prg:
 
     @staticmethod
     def _highs_backend():
-        """Load the optional solver only when requested."""
+        """Load HiGHS only when selected."""
         try:
             from ..backends import highs  # noqa: PLC0415
         except ModuleNotFoundError as error:
