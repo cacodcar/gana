@@ -79,7 +79,9 @@ The list of natively supported solvers are:
 
 1. [PPOPT](https://github.com/TAMUparametric/PPOPT) for multiparametric programming (mp)
 2. [Gurobi](https://www.gurobi.com/) for Mixed Integer Programming (MIP)
-Programs  can, however, be exported as a [.mps](https://www.ibm.com/docs/en/icos/22.1.2?topic=formats-working-mps-files) or [.lp](https://www.ibm.com/docs/en/icos/22.1.2?topic=formats-working-lp-files) file and passed to most solvers.
+3. [HiGHS](https://highs.dev/) for linear and mixed-integer programming. Install `gana[highs]` and call `program.opt(using="highs")`.
+
+Programs can be exported as a [.mps](https://www.ibm.com/docs/en/icos/22.1.2?topic=formats-working-mps-files) or [.lp](https://www.ibm.com/docs/en/icos/22.1.2?topic=formats-working-lp-files) file and passed to most solvers.
 
 
 # Illustration
