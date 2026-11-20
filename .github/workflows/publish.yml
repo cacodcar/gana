@@ -1,83 +1,215 @@
-name: Publish Gana to PyPI
+name: Publish Gana release
 
 on:
-  pull_request:
-    paths: [.github/workflows/publish.yml]
   workflow_dispatch:
-  push:
-    branches: [release/publish-1.2.0]
+    inputs:
+      build_run_id:
+        description: Successful Build Gana release artifacts run ID from main
+        required: true
+        type: string
 
 permissions: {}
 
+concurrency: pypi-gana-publish
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   verify:
-    if: github.event_name != 'push' || github.event.created
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
     outputs:
-      artifact-id: ${{ steps.stage.outputs.artifact-id }}
+      artifact-id: ${{ steps.build.outputs.artifact-id }}
+      version: ${{ steps.distributions.outputs.version }}
     steps:
-      - name: Require the release branch to point to main
-        if: github.event_name == 'push'
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Select the tested artifact for this commit
+        id: build
         env:
           GH_TOKEN: ${{ github.token }}
+          BUILD_RUN_ID: ${{ inputs.build_run_id }}
         run: |
-          main_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
-          test "$GITHUB_SHA" = "$main_sha"
+          [[ "$BUILD_RUN_ID" =~ ^[0-9]+$ ]]
+          run=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID")
+          attempt=$(jq -er --arg repo "$GITHUB_REPOSITORY" --arg sha "$GITHUB_SHA" '
+            select(
+              .path == ".github/workflows/release-artifacts.yml"
+              and .head_repository.full_name == $repo
+              and .head_branch == "main"
+              and .head_sha == $sha
+              and .event == "workflow_dispatch"
+              and .conclusion == "success"
+            ) | .run_attempt
+          ' <<<"$run")
+          artifact_id=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID/artifacts" |
+            jq -er --arg name "gana-release-$attempt" '
+              [.artifacts[] | select(.name == $name and (.expired | not))]
+              | select(length == 1) | .[0].id
+            ')
+          echo "artifact-id=$artifact_id" >> "$GITHUB_OUTPUT"
 
-      - name: Download the five distributions verified in Gana PR 55
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           github-token: ${{ github.token }}
-          run-id: '44386712653'
-          artifact-ids: '14465487531,14465913175,14467161143,14467310958,14467420424'
+          run-id: ${{ inputs.build_run_id }}
+          artifact-ids: ${{ steps.build.outputs.artifact-id }}
           merge-multiple: true
-          path: dist
+          path: release
 
-      - name: Check the complete distribution set against the reviewed SHA-256 values
-        working-directory: dist
+      - name: Verify the distribution checksums and release version
+        id: distributions
         run: |
-          test "$(find . -mindepth 1 | wc -l)" -eq 5
-          sha256sum --check --strict <<'SUMS'
-          4022e74b662826229f8a0eb13495e9e3f4df8b2dc98e0dc4000b27f45f113cf5  gana-1.2.0-cp312-abi3-macosx_10_12_x86_64.whl
-          28e4c3368488608b1f561af816b818f298834937d35e64bc4c9a3f472414e7cc  gana-1.2.0-cp312-abi3-macosx_11_0_arm64.whl
-          94b795a380fed5453a8726089e134c075828e2ea33876aefa4a006b5fd5de04a  gana-1.2.0-cp312-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-          18a4f80495a6fd3e2c75827a6799af900c8edcd9ddee787799093d59a19d7c4d  gana-1.2.0-cp312-abi3-win_amd64.whl
-          0e78fb9e5c148ee0f82a744e1b75214676a13f6130b0b01db254c4a74da6478a  gana-1.2.0.tar.gz
-          SUMS
+          version=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          sha256sum --check --strict release/SHA256SUMS
+          cmp release/SHA256SUMS <(sha256sum release/dist/*)
+          test -f "release/dist/gana-$version.tar.gz"
+          test -s release/notes.md
+          tag_sha=$(git ls-remote origin "refs/tags/$version" "refs/tags/$version^{}" |
+            sort -k2 | tail -n 1 | cut -f1)
+          [[ -z "$tag_sha" || "$tag_sha" == "$GITHUB_SHA" ]]
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
-      - name: Stage the verified bytes for the publishing job
-        if: github.event_name != 'pull_request'
-        id: stage
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: verified-gana-1.2.0-${{ github.run_attempt }}
-          path: dist/
-          if-no-files-found: error
+      - name: Check any existing PyPI files before retrying an upload
+        env:
+          RELEASE_VERSION: ${{ steps.distributions.outputs.version }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from urllib.error import HTTPError
+          from urllib.request import urlopen
 
-  publish:
+          version = os.environ["RELEASE_VERSION"]
+          expected = {
+              Path(path).name: digest
+              for digest, path in (
+                  line.split() for line in Path("release/SHA256SUMS").read_text().splitlines()
+              )
+          }
+          try:
+              with urlopen(f"https://pypi.org/pypi/gana/{version}/json", timeout=30) as response:
+                  existing = json.load(response)["urls"]
+          except HTTPError as error:
+              if error.code != 404:
+                  raise
+          else:
+              for file in existing:
+                  name = file["filename"]
+                  if expected.get(name) != file["digests"]["sha256"]:
+                      raise SystemExit(f"PyPI already has an unexpected distribution: {name}")
+          PY
+
+  pypi:
     needs: verify
-    if: >-
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'push' && github.ref == 'refs/heads/release/publish-1.2.0')
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/project/gana/1.2.0/
-    concurrency: pypi-gana-publish
+      url: https://pypi.org/project/gana/${{ needs.verify.outputs.version }}/
     permissions:
+      actions: read
       id-token: write
     steps:
-      - name: Retrieve the verified distributions
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.build_run_id }}
           artifact-ids: ${{ needs.verify.outputs.artifact-id }}
           merge-multiple: true
-          path: dist
+          path: release
 
       - name: Publish using the PyPI trusted publisher
         uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
         with:
+          packages-dir: release/dist/
           skip-existing: true
+
+  github-release:
+    needs: [verify, pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    env:
+      RELEASE_VERSION: ${{ needs.verify.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.build_run_id }}
+          artifact-ids: ${{ needs.verify.outputs.artifact-id }}
+          merge-multiple: true
+          path: release
+
+      - name: Verify the public PyPI files match the tested distributions
+        run: |
+          for attempt in {1..6}; do
+            if curl --fail --silent --show-error --max-time 30 "https://pypi.org/pypi/gana/$RELEASE_VERSION/json" |
+              jq -r '.urls[] | "\(.digests.sha256)  release/dist/\(.filename)"' |
+              sort -k2 > pypi-sums &&
+              diff -u <(sort -k2 release/SHA256SUMS) pypi-sums; then
+              exit 0
+            fi
+            if (( attempt < 6 )); then sleep 5; fi
+          done
+          exit 1
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Smoke-test the PyPI wheel in a fresh environment
+        run: |
+          python -m venv "$RUNNER_TEMP/gana-release"
+          venv_python="$RUNNER_TEMP/gana-release/bin/python"
+          "$venv_python" -m pip install --only-binary=:all: "gana==$RELEASE_VERSION"
+          "$venv_python" -m pip check
+          "$venv_python" -I -c 'import gana, gana._native, os; assert gana.__version__ == os.environ["RELEASE_VERSION"]'
+
+      - name: Attach the verified distributions and publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          releases_api="repos/$GITHUB_REPOSITORY/releases"
+          release=$(gh api --paginate "$releases_api?per_page=100" |
+            jq -s --arg version "$RELEASE_VERSION" '[.[][] | select(.tag_name == $version)] | first // empty')
+          if [[ -z "$release" ]]; then
+            gh release create "$RELEASE_VERSION" --repo "$GITHUB_REPOSITORY" \
+              --draft --target "$GITHUB_SHA" --title "Gana $RELEASE_VERSION" --notes-file release/notes.md
+            release=$(gh api --paginate "$releases_api?per_page=100" |
+              jq -es --arg version "$RELEASE_VERSION" '[.[][] | select(.tag_name == $version)] | first')
+          fi
+          release_id=$(jq -er '.id' <<<"$release")
+          tag_sha=$(git ls-remote "https://github.com/$GITHUB_REPOSITORY.git" \
+            "refs/tags/$RELEASE_VERSION" "refs/tags/$RELEASE_VERSION^{}" |
+            sort -k2 | tail -n 1 | cut -f1)
+          if [[ -n "$tag_sha" ]]; then
+            test "$tag_sha" = "$GITHUB_SHA"
+          else
+            test "$(jq -r '.target_commitish' <<<"$release")" = "$GITHUB_SHA"
+          fi
+
+          while read -r digest path; do
+            existing=$(jq -r --arg name "${path##*/}" '.assets[] | select(.name == $name) | .digest' <<<"$release")
+            if [[ -z "$existing" ]]; then
+              test "$(jq -r '.draft' <<<"$release")" = true
+              gh release upload "$RELEASE_VERSION" "$path" --repo "$GITHUB_REPOSITORY"
+            else
+              test "$existing" = "sha256:$digest"
+            fi
+          done < release/SHA256SUMS
+
+          gh api "$releases_api/$release_id" |
+            jq -r '.assets[] | "\(.digest | sub("^sha256:"; ""))  release/dist/\(.name)"' |
+            sort -k2 > github-sums
+          diff -u <(sort -k2 release/SHA256SUMS) github-sums
+          if [[ "$(jq -r '.draft' <<<"$release")" == true ]]; then
+            gh release edit "$RELEASE_VERSION" --draft=false --repo "$GITHUB_REPOSITORY"
+          fi
+          test "$(gh api "$releases_api/$release_id" --jq .draft)" = false

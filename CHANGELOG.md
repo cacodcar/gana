@@ -5,6 +5,15 @@ All notable changes to this project will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-11-19
+
+### Added
+- `Prg.export_solution(path, *, n_sol=None)` writes a stored deterministic result to a versioned JSON file. It exports the latest result by default and accepts a zero-based index for earlier results.
+- `Prg.import_solution(path)` reads the new format and verifies that the formulation matches before loading the result. Existing JSON and pickle imports remain supported.
+
+### Changed
+- The API docs now show modeling operators and runnable examples. The docs theme follows the reader's system setting until they choose Light or Dark.
+
 ## [1.2.0] - 2026-11-18
 
 ### Added
