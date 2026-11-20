@@ -16,6 +16,7 @@
 
 <!-- Quality and development -->
 [![Quality](https://github.com/cacodcar/gana/actions/workflows/python-package.yml/badge.svg)](https://github.com/cacodcar/gana/actions/workflows/python-package.yml)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/cb9156e4af784f6385e3607ca574f801)](https://app.codacy.com/gh/cacodcar/gana/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Coverage](https://codecov.io/gh/cacodcar/gana/graph/badge.svg)](https://codecov.io/gh/cacodcar/gana)
 [![License](https://img.shields.io/github/license/cacodcar/gana)](https://github.com/cacodcar/gana/blob/main/LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/cacodcar/gana)](https://github.com/cacodcar/gana/commits/main)
