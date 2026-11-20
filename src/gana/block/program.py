@@ -8,7 +8,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from functools import cached_property
 from pathlib import Path
-from typing import Literal, cast, overload
+from typing import TYPE_CHECKING, Literal, cast, overload
 
 from gurobipy import GRB
 from gurobipy import Model as GPModel
@@ -56,6 +56,10 @@ from .solution_file import (
     validate_record,
     write_record,
 )
+
+if TYPE_CHECKING:
+    from highspy import Highs
+
 
 logger = logging.getLogger("gana")
 logger.setLevel(logging.INFO)
@@ -222,7 +226,7 @@ class Prg:
         self.X: dict[int, list[Number | None]] = {}
 
         # formulations available
-        self.formulations: dict[int, GPModel | MPLP_Program] = {}
+        self.formulations: dict[int, GPModel | Highs | MPLP_Program] = {}
 
         # number of formulations
         self.n_formulations: int = 0
@@ -249,7 +253,7 @@ class Prg:
         return None
 
     @property
-    def formulation(self) -> GPModel | MPLP_Program | None:
+    def formulation(self) -> "GPModel | Highs | MPLP_Program | None":
         """
         Returns the latest formulation of the program
 
@@ -1726,34 +1730,67 @@ class Prg:
 
     @timer(logger, kind="optimize", with_return=False)
     def opt(self, using: str = "gurobi"):
-        """Determine the optimal solution to the program"""
-        if using != "gurobi":
+        """Optimize a deterministic program with Gurobi or HiGHS.
+
+        Install ``gana[highs]`` to select ``using="highs"``.
+        Successful solves append to the same solution history for both solvers.
+        """
+        if using not in ("gurobi", "highs"):
             return None
-
         snapshot = self._native_export()
-        m = self._build_gurobi(snapshot)
-        self.formulations[self.n_formulations] = m
-        self.n_formulations += 1
-
-        m.optimize()
-        try:
-            values = {v.VarName: v.X for v in m.getVars()}
-            objective_value = m.ObjVal
-            record = self._capture_solution(
-                m, snapshot, values, objective_value
-            )
-            self._load_values((values, objective_value), snapshot)
-            self.optimized = True
-            self._birth_solution(record)
-        except AttributeError:
+        if using == "highs":
+            if self.n_thetas:
+                message = "Use solve() for a multiparametric program"
+                raise ValueError(message)
+            backend = self._highs_backend()
+            highs_model = backend.build(self, snapshot)
+            self._register_formulation(highs_model)
+            result = backend.optimize(highs_model)
+        else:
+            gurobi_model = self._build_gurobi(snapshot)
+            self._register_formulation(gurobi_model)
+            result = self._optimize_gurobi(gurobi_model)
+        if result is None:
             logger.warning("🛑 No solution found. Check the model 🛑")
             return False
-        else:
-            return self, using
+        values, objective_value, optimal = result
+        record = self._capture_solution(
+            optimal, snapshot, values, objective_value
+        )
+        self._load_values((values, objective_value), snapshot)
+        self.optimized = True
+        self._birth_solution(record)
+        return self, using
+
+    @staticmethod
+    def _highs_backend():
+        """Load the optional solver only when requested."""
+        try:
+            from ..backends import highs  # noqa: PLC0415
+        except ModuleNotFoundError as error:
+            if error.name != "highspy":
+                raise
+            message = "Install gana[highs] to optimize with HiGHS"
+            raise ModuleNotFoundError(message) from error
+        return highs
+
+    def _register_formulation(self, model):
+        """Retain the solver model even when it has no solution."""
+        self.formulations[self.n_formulations] = model
+        self.n_formulations += 1
+
+    @staticmethod
+    def _optimize_gurobi(model: GPModel):
+        """Read an optimal solution or an available incumbent."""
+        model.optimize()
+        if not model.SolCount:
+            return None
+        values = {v.VarName: v.X for v in model.getVars()}
+        return values, model.ObjVal, model.Status == GRB.OPTIMAL
 
     def _capture_solution(
         self,
-        model: GPModel,
+        optimal: bool,
         snapshot: ExportSnapshot | None,
         values: dict[str, Number],
         objective_value: Number,
@@ -1766,7 +1803,7 @@ class Prg:
             values=values,
             objective_value=objective_value,
             objective_sense="min",
-            status="optimal" if model.Status == GRB.OPTIMAL else "incumbent",
+            status="optimal" if optimal else "incumbent",
             formulation_fingerprint=self._solution_fingerprint(snapshot),
         )
 

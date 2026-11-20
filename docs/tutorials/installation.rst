@@ -133,6 +133,28 @@ The options are:
     Install Gana locally if possible to avoid overloading these services.
 
 
+HiGHS for linear and mixed-integer programs
+-------------------------------------------
+
+Install the Python bindings with ``python -m pip install "gana[highs]"``.
+Select HiGHS when optimizing a deterministic program.
+
+.. code-block:: python
+
+    from gana import Prg, V, inf
+
+    program = Prg()
+    program.units = V(itg=True)
+    program.demand = program.units >= 2.5
+    program.cost = inf(4 * program.units)
+    program.opt(using="highs")
+    assert program.obj() == 12
+    program.export_solution("result.json")
+
+``program.formulation`` holds the HiGHS model and its solver status.
+``program.opt()`` selects Gurobi by default. Use ``program.solve()``
+for multiparametric programs.
+
 .. _ides:
 
 Integrated Development Environments (IDEs)
