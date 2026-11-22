@@ -331,7 +331,7 @@ with warnings as errors, and pinned Lizard with a per-function CCN ceiling of 10
 Core LLVM line/region coverage is separate from Python statement/branch coverage;
 it currently includes the core's inline unit-test module. Binding code receives
 Python integration tests, but binding-region coverage is still pending. Miri,
-sanitizers, Linux/Windows wheels and Python 3.12 execution remain release checks.
+sanitizers, platform wheels and Python 3.12--3.14 execution remain release checks.
 
 Pytest records function profiles, the loaded extension implementation identity
 and extension hashes. The accepted backend alias does not create a different

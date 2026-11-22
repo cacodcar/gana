@@ -27,13 +27,13 @@ Generated programs (```Prg```) can be subclasses of Multiparametric Mixed Intege
 # Installation
 
 The current development checkout requires the Rust extension, `gana._native`.
-The Python modeling API is unchanged. Use Python 3.12 or 3.13 for the candidate
-validation matrix; other versions and wheel platforms are not yet verified.
+The Python modeling API is unchanged. Use Python 3.12, 3.13 or 3.14; each
+version is included in the candidate validation matrix.
 
 Install an available release and its dependencies in a fresh environment:
 
 ```sh
-python3.13 -m venv .venv
+python3.14 -m venv .venv
 .venv/bin/python -m pip install gana
 ```
 

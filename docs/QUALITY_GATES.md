@@ -208,9 +208,9 @@ Historical lock files and measured baseline reports are preserved unchanged.
 ## Single-backend CI and editor tasks
 
 The Quality workflow runs all Python gates, including native binding integration,
-once for each Python version (3.12 and 3.13). The Native backend workflow retains
-its existing job matrix and check names while running Rust core tests, fmt,
-Clippy, complexity and core coverage. It no longer duplicates the Python suite.
+once for each Python version (3.12, 3.13 and 3.14). The Native backend workflow
+retains its existing job matrix and check names while running Rust core tests,
+fmt, Clippy, complexity and core coverage. It no longer duplicates the Python suite.
 Both workflows retain failure artifacts; Quality retains its Codecov upload.
 Read the Docs installs the pinned compiler before building the source package.
 

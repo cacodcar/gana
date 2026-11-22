@@ -19,7 +19,7 @@ machine used to establish the baseline. Its 59 packages include the complete
 runtime/test/quality dependency closure, with exact versions and SHA-256 wheel
 hashes. It is not a universal Linux, Windows, Apple Silicon, or Python 3.12 lock.
 Those targets need separately generated and verified locks. Existing GitHub
-Python 3.12/3.13 CI remains independent and unchanged.
+Python 3.12/3.13/3.14 CI remains independent and unchanged.
 
 The full suite requires Gurobi to be able to solve the test models. Solver
 failures remain failures; the runner does not silently skip them. License

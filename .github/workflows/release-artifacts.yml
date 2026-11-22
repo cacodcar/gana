@@ -103,7 +103,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.12', '3.13']
+        python-version: ['3.12', '3.13', '3.14']
         platform: [linux-x64, windows-x64, macos-x64, macos-arm64]
         include:
           - platform: linux-x64
