@@ -15,8 +15,11 @@ What you are going to need:
 Getting Python
 ---------------
 
-Gana requires Python 3.12 or newer; Python 3.12 and 3.13 are the candidate
-validation matrix. Additional versions and wheel platforms remain unverified.
+Gana requires Python 3.12 or newer; Python 3.12, 3.13 and 3.14 are the
+candidate validation matrix. Additional versions remain unverified.
+On Intel macOS, use Python 3.12 or 3.13 because PPOPT's Numba dependency does
+not yet provide a stable Python 3.14 wheel for that platform. Python 3.14 is
+validated on Linux, Windows and Apple silicon.
 Python can be downloaded from the `official website <https://www.python.org/downloads/>`_.
 It is also available through the Microsoft Store on Windows, Homebrew on Mac, and various Linux package managers.
 

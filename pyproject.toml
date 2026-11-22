@@ -10,7 +10,7 @@ features = ["extension-module"]
 
 [project]
 name = "gana"
-version = "1.5.0"
+version = "1.6.0"
 authors = [
   { name="Rahul Kakodkar", email="cacodcar@gmail.com" },
 ]
@@ -24,6 +24,7 @@ license = { file = "LICENSE" }
 keywords = ["modeling", "optimization", "programming", "aml"]
 
 classifiers = [
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",

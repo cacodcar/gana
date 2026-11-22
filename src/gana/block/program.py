@@ -36,6 +36,7 @@ from ..backends.native.export import renumber as renumber_native_export
 from ..backends.native.results import load as load_native_results
 from ..backends.native.theta import register_pending
 from ..operators.composition import inf, sup
+from ..plotting.api import PlotMethods
 from ..sets.cases import ICase
 from ..sets.constraint import C
 from ..sets.function import F as Func
@@ -78,7 +79,7 @@ type _DisplaySection = tuple[int, str, Sequence[_DisplayItem]]
 
 
 @dataclass
-class Prg:
+class Prg(PlotMethods):
     """
     A mathematical program.
 

@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.13"]
+        python-version: ["3.12", "3.13", "3.14"]
     env:
       CARGO_HOME: ${{ github.workspace }}/.cache/cargo
     steps:
