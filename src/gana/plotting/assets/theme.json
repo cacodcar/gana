@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "style_version": "0.2.1",
+  "palette": {
+    "title": "#416C88",
+    "carbon": "#2E75B6",
+    "gold": "#C49A20",
+    "blue": "#507D9B",
+    "red": "#CD5C5C",
+    "gray": "#929498",
+    "black": "#24272B",
+    "ink": "#191919",
+    "muted": "#555555",
+    "paper": "#FFFFFF",
+    "green": "#879D73"
+  },
+  "typography": {
+    "text_family": "Latin Modern Roman",
+    "mathtext": "cm",
+    "regular": "fonts/lmroman10-regular.otf",
+    "bold": "fonts/lmroman10-bold.otf"
+  },
+  "graph_hatches": {
+    "dense": [
+      "....",
+      "////",
+      "\\\\\\\\",
+      "oooo",
+      "OOOO",
+      "xxxx"
+    ],
+    "lighter": [
+      "..",
+      "//",
+      "\\\\",
+      "oo",
+      "OO",
+      "xx"
+    ],
+    "alternatives": [
+      "----",
+      "||||",
+      "++++",
+      "****"
+    ]
+  },
+  "profiles": {
+    "print": {
+      "font_size": 9,
+      "title_size": 12,
+      "node_size": 10,
+      "annotation_size": 8,
+      "composite_size": 7,
+      "group_size": 11,
+      "slide_title_size": 16,
+      "subtitle_size": 10,
+      "stroke": 0.7,
+      "hatch_linewidth": 0.65,
+      "dpi": 300
+    },
+    "computer": {
+      "font_size": 11,
+      "title_size": 14,
+      "node_size": 12,
+      "annotation_size": 9,
+      "composite_size": 8,
+      "group_size": 13,
+      "slide_title_size": 24,
+      "subtitle_size": 12,
+      "stroke": 0.8,
+      "hatch_linewidth": 0.65,
+      "dpi": 180
+    },
+    "slides": {
+      "font_size": 12,
+      "title_size": 16,
+      "node_size": 14,
+      "annotation_size": 9.3,
+      "composite_size": 8,
+      "group_size": 15.6,
+      "slide_title_size": 30,
+      "subtitle_size": 15,
+      "stroke": 0.85,
+      "hatch_linewidth": 0.65,
+      "dpi": 200
+    }
+  },
+  "series": {
+    "color_order": [
+      "blue",
+      "green",
+      "red",
+      "gold"
+    ],
+    "hatches": [
+      "////",
+      "....",
+      "\\\\\\\\",
+      "xxxx"
+    ],
+    "pattern_density": 4,
+    "interior": "white",
+    "legend_keys": "boxed"
+  }
+}

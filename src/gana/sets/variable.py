@@ -11,8 +11,8 @@ from IPython.display import Math, display
 
 from gana.types import Number, NumericList, NumericTuple
 
+from ..plotting.api import ElementPlots
 from ..storage import symbols as symbol_storage
-from ..utils.draw import draw
 from ._element import _E, _ElementArgs
 from .birth import make_P, make_T
 from .cases import Elem, FCase
@@ -78,7 +78,7 @@ class _VariableArgs(_ElementArgs):
     bnr: bool
 
 
-class V(_E["V"]):
+class V(ElementPlots, _E["V"]):
     """
     Ordered set of variables (Var).
 
@@ -832,92 +832,6 @@ class V(_E["V"]):
         :rtype: str
         """
         return f"{self}_{self.pos}"
-
-    # endregion
-
-    # region Plotting
-
-    def line(
-        self,
-        font_size: float = 16,
-        fig_size: tuple[float, float] = (12, 6),
-        linewidth: float = 0.7,
-        color: str = "blue",
-        grid_alpha: float = 0.3,
-        usetex: bool = True,
-        str_idx_lim: int = 10,
-    ):
-        """
-        Plot the variable set
-
-        :param font_size: Font size for the plot. Defaults to 16.
-        :type font_size: float, optional
-        :param fig_size: Size of the figure. Defaults to (12, 6).
-        :type fig_size: tuple[float, float], optional
-        :param linewidth: Width of the line in the plot. Defaults to 0.7.
-        :type linewidth: float, optional
-        :param color: Color of the line in the plot. Defaults to 'blue'.
-        :type color: str, optional
-        :param grid_alpha: Transparency of the grid lines. Defaults to 0.3.
-        :type grid_alpha: float, optional
-        :param usetex: Use LaTeX for text rendering. Defaults to True.
-        :type usetex: bool, optional
-        :param str_idx_lim: Limit for string indices display. Defaults to 10.
-        :type str_idx_lim: int, optional
-        """
-        draw(
-            element=self,
-            data=self.output(aslist=True),
-            kind="line",
-            font_size=font_size,
-            fig_size=fig_size,
-            linewidth=linewidth,
-            color=color,
-            grid_alpha=grid_alpha,
-            usetex=usetex,
-            str_idx_lim=str_idx_lim,
-        )
-
-    def bar(
-        self,
-        font_size: float = 16,
-        fig_size: tuple[float, float] = (12, 6),
-        linewidth: float = 0.7,
-        color: str = "blue",
-        grid_alpha: float = 0.3,
-        usetex: bool = True,
-        str_idx_lim: int = 10,
-    ):
-        """
-        Plot the variable set
-
-        :param font_size: Font size for the plot. Defaults to 16.
-        :type font_size: float, optional
-        :param fig_size: Size of the figure. Defaults to (12, 6).
-        :type fig_size: tuple[float, float], optional
-        :param linewidth: Width of the line in the plot. Defaults to 0.7.
-        :type linewidth: float, optional
-        :param color: Color of the line in the plot. Defaults to 'blue'.
-        :type color: str, optional
-        :param grid_alpha: Transparency of the grid lines. Defaults to 0.3.
-        :type grid_alpha: float, optional
-        :param usetex: Use LaTeX for text rendering. Defaults to True.
-        :type usetex: bool, optional
-        :param str_idx_lim: Limit for string indices display. Defaults to 10.
-        :type str_idx_lim: int, optional
-        """
-        draw(
-            element=self,
-            data=self.output(aslist=True),
-            kind="bar",
-            font_size=font_size,
-            fig_size=fig_size,
-            linewidth=linewidth,
-            color=color,
-            grid_alpha=grid_alpha,
-            usetex=usetex,
-            str_idx_lim=str_idx_lim,
-        )
 
     # endregion
 

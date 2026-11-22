@@ -4,10 +4,9 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import cast
 
-from matplotlib import pyplot as plt
-from matplotlib import rc
-
 from ..backends.native.results import _SolutionColumn, update_solution
+from ..plotting.data import Series
+from ..plotting.plot import Layer, Plot
 from ..sets.index import I
 from ..sets.variable import V
 
@@ -167,49 +166,30 @@ class Solution:
 
         hold = self._held_indices(data["index"])
 
-        ax = plt.subplots(figsize=fig_size)[1]
-
-        # the indices are the x-axis
-        x = range(len(data["values"]))
-        # the values are the y-axis
-        y = data["values"]
-
-        if usetex:
-            rc(
-                "font",
-                **{
-                    "family": "serif",
-                    "serif": ["Computer Modern"],
-                    "size": font_size,
-                },
-            )
-            rc("text", usetex=usetex)
-        else:
-            rc("font", **{"size": font_size})
-
-        if kind == "line":
-            ax.plot(x, y, linewidth=linewidth, color=color)
-
-        elif kind == "bar":
-            ax.bar(x, y, linewidth=linewidth, color=color)
-
+        x = tuple(range(len(data["values"])))
         title = rf"${variable.tag or variable.name}$"
-
         if hold:
             title += " (" + ", ".join(str(item) for item in hold) + ")"
-
-        ax.set_title(title)
-        ax.set_ylabel(r"Values")
-
-        ax.set_xlabel(r"Indices")
-        ax.grid(alpha=grid_alpha)
-
+        options = {
+            "title": title,
+            "fig_size": fig_size,
+            "grid_alpha": grid_alpha,
+            "legend": False,
+            "rc": {"font.size": font_size, "text.usetex": usetex},
+        }
         if len(x) <= x_ticks_lim:
-            ax.set_xticks(x)
-
-            ax.set_xticklabels(self._plot_tick_labels(data, hold))
-
-        plt.rcdefaults()
+            options["ticks"] = x
+            options["tick_labels"] = self._plot_tick_labels(data, hold)
+        chart = kind if kind in {"line", "bar"} else "empty"
+        record = Series(x, tuple(data["values"]), x)
+        Plot(
+            (
+                Layer(
+                    chart, (record,), {"color": color, "linewidth": linewidth}
+                ),
+            ),
+            **options,
+        ).render()
 
     @staticmethod
     def _held_indices(indices):
