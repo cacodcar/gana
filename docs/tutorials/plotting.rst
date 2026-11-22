@@ -181,3 +181,43 @@ API
 
 .. automodule:: gana.plotting
    :members: Plot, RenderedPlot, Series, Layout, line, scatter, bar, stacked, band, errorbar, area, row, column, grid, style_context
+
+Domain adapters
+---------------
+
+Downstream libraries can reuse the renderer without manufacturing Gana variables.
+``snapshot(quantity, n_sol=0)`` returns detached values and complete coordinate
+keys in the same order. It neither declares variables nor evaluates expressions;
+missing solution columns remain ``None``. Domain-specific code can select those
+records, attach physical meaning and construct a public ``Series``:
+
+.. code-block:: python
+
+   from gana.plotting import Series, line, snapshot
+
+   saved = snapshot(p.production)
+   series = Series(
+       x=(0, 1, 2, 3), values=saved.values,
+       coordinates=saved.coordinates, domain=("hour",),
+       key=("production",), label="Production", unit="MWh",
+   )
+   line(series).save("production.pdf", profile="print")
+
+Every chart constructor accepts ``Series`` and copies its values, bounds and
+errors. Preserve semantic ``domain``, ordered ``coordinates`` and stable category
+``key`` values across related figures. ``unit`` checks prevent combining known
+incompatible units, including shared y axes. Unknown units remain unspecified;
+Gana does not infer or convert them. A series already defines its axes; indexed
+axis selectors must be resolved in the adapter. ``scatter(series, x=other_series)``
+uses values from a coordinate-aligned series as its horizontal quantity.
+
+``PlotMethods`` and ``ElementPlots`` are public convenience mixins. Override
+``_plot_arguments(sources, options)`` to supply these records, then reuse the same
+chart constructors, composition, theme and export paths.
+
+PDF export uses the bundled Latin Modern outlines with the default Type 3 embedding.
+Explicit ``rc`` export settings are retained;
+``rc={"svg.fonttype": "none"}`` requests editable SVG text rather than the
+portable outlined default. For a publisher requiring Type 1/TrueType text, use a
+compatible font/TeX export setup and verify the resulting PDF. Forcing Type 42
+on the bundled CFF/OpenType fonts does not convert them into TrueType fonts.

@@ -135,7 +135,8 @@ class Plot:
         result = self.render(**options)
         try:
             with style_context(
-                result.specification.options.get("profile", "computer")
+                result.specification.options.get("profile", "computer"),
+                result.specification.options.get("rc"),
             ):
                 result.figure.savefig(path, dpi=dpi)
         finally:
@@ -150,6 +151,11 @@ def _validate_panel(entries):
     groups: dict[tuple, Series] = {}
     for layer, series in entries:
         compatible(first, series)
+        if first.unit != series.unit:
+            message = (
+                "Combined plots require matching units; use separate panels"
+            )
+            raise ValueError(message)
         if layer.chart in {"bar", "area"}:
             group = (layer.chart, layer.options.get("kind", "grouped"))
             previous = groups.setdefault(group, series)
@@ -268,7 +274,7 @@ class Layout:
         self.options = dict(options)
 
     def _validate_shared(self, options):
-        if not checks_enabled() or not options.get("sharex"):
+        if not checks_enabled():
             return
         records = [
             s
@@ -278,7 +284,11 @@ class Layout:
             for s in plot.data
         ]
         for series in records[1:]:
-            compatible(records[0], series)
+            if options.get("sharex"):
+                compatible(records[0], series)
+            if options.get("sharey") and records[0].unit != series.unit:
+                message = "Shared y axes require matching units"
+                raise ValueError(message)
 
     def _draw_cells(self, axes, options):
         records = []

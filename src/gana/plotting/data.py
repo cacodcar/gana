@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from importlib import import_module
 from numbers import Number
 from typing import Any
@@ -29,6 +29,34 @@ class Series:
     xerr: Any = None
     yerr: Any = None
     source: Any = field(default=None, repr=False, compare=False)
+    unit: str | None = None
+
+
+@dataclass(frozen=True)
+class Snapshot:
+    """Detached values and complete coordinate keys for domain adapters."""
+
+    coordinates: tuple
+    values: tuple
+    n_sol: int | None
+
+
+def snapshot(source, *, n_sol=0):
+    """Read an indexed quantity without declaring or evaluating variables.
+
+    Coordinate order matches ``values``. Missing solution columns remain None;
+    an unavailable solution raises ValueError. Downstream domain adapters can
+    select these records and supply ``Series`` to the public chart functions.
+    """
+    values = values_of(source, n_sol)
+    coordinates = (
+        coordinate_keys(source)
+        if hasattr(source, "map")
+        else tuple(range(len(values)))
+    )
+    return Snapshot(
+        coordinates, values, n_sol if hasattr(source, "output") else None
+    )
 
 
 def checks_enabled() -> bool:
@@ -194,6 +222,12 @@ def extract(
     and the third-last dimension supplies panels. Additional varying
     dimensions require a selection. Numerical arrays form one profile.
     """
+    if isinstance(source, Series):
+        return (
+            _detached(
+                source, x, series, panel, lower, upper, xerr, yerr, label
+            ),
+        )
     values = values_of(source, n_sol)
     if not hasattr(source, "map"):
         coordinates = tuple(range(len(values))) if x is None else tuple(x)
@@ -353,3 +387,55 @@ def compatible(left: Series, right: Series, *, aligned=False):
             "Grouped and stacked series require matching coordinate order"
         )
         raise ValueError(message)
+
+
+def _series_bound(value, source):
+    if isinstance(value, Series):
+        if checks_enabled():
+            compatible(source, value, aligned=True)
+            if source.unit != value.unit:
+                message = "Interval bounds require matching units"
+                raise ValueError(message)
+        return tuple(value.values)
+    return None if value is None else tuple(np.atleast_1d(value).tolist())
+
+
+def _series_axes(source, x, series, panel):
+    """Resolve an optional value axis against the original coordinates."""
+    if any(value is not None for value in (series, panel)) or (
+        x is not None and not isinstance(x, Series)
+    ):
+        message = "Series already define x, series and panel coordinates"
+        raise ValueError(message)
+    if x is not None:
+        if checks_enabled():
+            compatible(source, x, aligned=True)
+        source = replace(
+            source,
+            x=tuple(x.values),
+            domain=("quantity", x.key),
+            xlabel=x.label,
+        )
+    return source
+
+
+def _detached(source, x, series, panel, lower, upper, xerr, yerr, label):
+    """Copy adapter records while retaining their coordinate semantics."""
+    bounds = {}
+    for name, value in (("lower", lower), ("upper", upper)):
+        selected = getattr(source, name) if value is None else value
+        bounds[name] = _series_bound(selected, source)
+    source = _series_axes(source, x, series, panel)
+    return replace(
+        source,
+        x=tuple(source.x),
+        values=tuple(source.values),
+        coordinates=tuple(source.coordinates),
+        domain=tuple(source.domain),
+        key=tuple(source.key),
+        panel=tuple(source.panel),
+        label=source.label if label is None else label,
+        xerr=_copy_error(source.xerr if xerr is None else xerr),
+        yerr=_copy_error(source.yerr if yerr is None else yerr),
+        **bounds,
+    )

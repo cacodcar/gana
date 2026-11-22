@@ -7,12 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - Unreleased
+
 ### Added
+- Expose read-only indexed snapshots and accept detached `Series` records from downstream domain adapters. Preserve coordinate identities, selected results and unit compatibility in composed figures.
 - Add reusable line, scatter, grouped/stacked bar, band, error-bar and area plots through element methods, program methods and numerical-array functions in `gana.plotting`.
 - Compose plot descriptions with `+`, arrange explicit panels, inspect plotted data and export PDF/SVG/PNG with bundled typography and patterned profiles.
 - Preserve index identities with right-to-left axis defaults and default-on `gana.plotting.CHECK_INDICES` validation. Select variable histories explicitly with `n_sol`.
 
 ### Changed
+- Preserve explicit export settings, including editable SVG text.
 - Use open top/right axes, borderless translucent legends and distinct line styles for grayscale readability. Patterned keys retain their individual boxes; interval keys show a path without connecting the observations.
 - Element `line()` and `bar()` return plot descriptions for explicit `.show()` or `.render()` calls. Legacy `draw()` entry points retain immediate rendering through the common renderer, without resetting global Matplotlib settings.
 
