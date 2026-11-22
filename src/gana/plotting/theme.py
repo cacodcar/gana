@@ -2,9 +2,11 @@
 
 import json
 from contextlib import contextmanager
+from copy import copy
 from pathlib import Path
 
 from matplotlib import rc_context, rcParams
+from matplotlib.container import ErrorbarContainer
 from matplotlib.font_manager import FontProperties, fontManager
 from matplotlib.legend_handler import HandlerTuple
 from matplotlib.patches import Rectangle
@@ -16,6 +18,7 @@ COLORS = tuple(
     TOKENS["palette"][key] for key in TOKENS["series"]["color_order"]
 )
 HATCHES = tuple(TOKENS["series"]["hatches"])
+LINESTYLES = tuple(TOKENS["series"]["linestyles"])
 INK = TOKENS["palette"]["ink"]
 
 
@@ -44,6 +47,7 @@ def style_context(profile="computer", overrides=None):
         "savefig.dpi": preset["dpi"],
         "svg.fonttype": "path",
     }
+    settings.update(TOKENS["graph_rc"])
     settings.update(overrides or {})
     with rc_context():
         rcParams.update(settings)
@@ -69,7 +73,8 @@ def pattern_key(color, hatch):
 def legend(ax, handles, labels):
     """Retain first-seen labels, with boxed keys for patterned quantities."""
     unique: dict = {}
-    for label, handle in zip(labels, handles):
+    for label, original in zip(labels, handles):
+        handle = _legend_handle(original)
         if label in unique:
             previous = unique[label]
             first = previous if isinstance(previous, tuple) else (previous,)
@@ -83,3 +88,17 @@ def legend(ax, handles, labels):
             list(unique),
             handler_map={tuple: HandlerTuple(ndivide=1, pad=0)},
         )
+
+
+def _legend_handle(handle):
+    """Give interval keys a visible path without connecting observations."""
+    if isinstance(handle, ErrorbarContainer) and handle.lines[0] is not None:
+        line = copy(handle.lines[0])
+        if line.get_linestyle() == "None":
+            line.set_linestyle("-")
+        return ErrorbarContainer(
+            (line, *handle.lines[1:]),
+            has_xerr=handle.has_xerr,
+            has_yerr=handle.has_yerr,
+        )
+    return handle

@@ -5,9 +5,10 @@ Matplotlib artists consume the same detached profiles for every entry point.
 from collections import Counter
 
 import numpy as np
+from matplotlib import rcParams
 from matplotlib.collections import LineCollection
 
-from .theme import COLORS, HATCHES, INK, legend, pattern_key
+from .theme import COLORS, HATCHES, INK, LINESTYLES, legend, pattern_key
 
 
 def render_panel(ax, layers, panel, settings, colors):
@@ -24,6 +25,7 @@ def render_panel(ax, layers, panel, settings, colors):
         style = dict(layer.options)
         style.setdefault("color", COLORS[number % len(COLORS)])
         style.setdefault("hatch", HATCHES[number % len(HATCHES)])
+        style.setdefault("linestyle", LINESTYLES[number % len(LINESTYLES)])
         group = _group(layer)
         style["offset"] = positions[group]
         style["count"] = counts[group]
@@ -66,7 +68,7 @@ def _draw(ax, chart, series, style, stacks, group):
             x,
             y,
             color=color,
-            linewidth=width,
+            linewidth=style.get("linewidth", rcParams["lines.linewidth"]),
             linestyle=style.get("linestyle", "-"),
             marker=style.get("marker"),
             drawstyle=drawstyle,
@@ -187,6 +189,8 @@ def _area(ax, chart, series, y, style, stacks, group):
 
 
 def _decorate(ax, entries, settings):
+    ax.spines["top"].set_visible(rcParams["axes.spines.top"])
+    ax.spines["right"].set_visible(rcParams["axes.spines.right"])
     first = entries[0][1] if entries else None
     title = settings.get("title", "")
     if first is not None and first.panel_label:

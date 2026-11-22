@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "style_version": "0.2.1",
+  "style_version": "0.2.2",
   "palette": {
     "title": "#416C88",
     "carbon": "#2E75B6",
@@ -100,6 +100,26 @@
     ],
     "pattern_density": 4,
     "interior": "white",
-    "legend_keys": "boxed"
+    "legend_keys": "boxed",
+    "linestyles": [
+      "-",
+      "--",
+      "-.",
+      ":"
+    ]
+  },
+  "graph_rc": {
+    "axes.spines.top": false,
+    "axes.spines.right": false,
+    "legend.frameon": true,
+    "legend.facecolor": "white",
+    "legend.edgecolor": "none",
+    "legend.framealpha": 0.85,
+    "legend.fancybox": false,
+    "lines.linewidth": 1.35,
+    "lines.solid_joinstyle": "miter",
+    "lines.dash_joinstyle": "miter",
+    "lines.solid_capstyle": "butt",
+    "lines.dash_capstyle": "butt"
   }
 }

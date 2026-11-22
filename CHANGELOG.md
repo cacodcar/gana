@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Preserve index identities with right-to-left axis defaults and default-on `gana.plotting.CHECK_INDICES` validation. Select variable histories explicitly with `n_sol`.
 
 ### Changed
+- Use open top/right axes, borderless translucent legends and distinct line styles for grayscale readability. Patterned keys retain their individual boxes; interval keys show a path without connecting the observations.
 - Element `line()` and `bar()` return plot descriptions for explicit `.show()` or `.render()` calls. Legacy `draw()` entry points retain immediate rendering through the common renderer, without resetting global Matplotlib settings.
 
 ## [1.5.0] - 2026-11-20

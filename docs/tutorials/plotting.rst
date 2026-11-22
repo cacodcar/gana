@@ -125,7 +125,14 @@ neutral outlines and boxed pattern keys. Profiles ``print``, ``computer``
 (the default) and ``slides`` set typography and export resolution. The assets
 are bundled and rendering does not fetch theme settings or fonts online.
 
-``color``, ``hatch``, ``linewidth``, ``marker`` and chart-specific options apply
+Top and right spines are hidden. Legends have a borderless white background
+with slight transparency; only filled/patterned keys have individual boxes.
+Line series cycle through solid, dashed, dash-dot and dotted styles as well
+as colours, preserving identities across panels. For more than four line
+series, use explicit markers, labels or separate panels. Interval keys show
+a short path with their marker and caps without connecting the observations.
+
+``color``, ``hatch``, ``linestyle``, ``linewidth``, ``marker`` and chart options apply
 to the quantities supplied in that call. Independently styled calls can be
 combined with ``+``. Category styles are resolved across the combined figure,
 including its panels. Figure settings include ``title``, ``xlabel``, ``ylabel``,
