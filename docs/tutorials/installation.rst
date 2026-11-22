@@ -17,6 +17,9 @@ Getting Python
 
 Gana requires Python 3.12 or newer; Python 3.12, 3.13 and 3.14 are the
 candidate validation matrix. Additional versions remain unverified.
+On Intel macOS, use Python 3.12 or 3.13 because PPOPT's Numba dependency does
+not yet provide a stable Python 3.14 wheel for that platform. Python 3.14 is
+validated on Linux, Windows and Apple silicon.
 Python can be downloaded from the `official website <https://www.python.org/downloads/>`_.
 It is also available through the Microsoft Store on Windows, Homebrew on Mac, and various Linux package managers.
 
@@ -33,13 +36,13 @@ To do so, navigate to your project folder and run the following command.
 
 .. code-block:: bash
 
-    python3.14 -m venv .venv
+    python3.13 -m venv .venv
 
 .. tip:: For a conda environment:
 
     .. code-block:: bash
 
-        conda create --name env python=3.14
+        conda create --name env python=3.13
 
 Now that your environment is ready, you will need to activate it.
 
