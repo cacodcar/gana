@@ -1,4 +1,4 @@
-# Shared documentation baseline 1
+# Shared documentation baseline 2
 
 Canonical maintenance home: `cacodcar/gana`, `docs/_shared`. Energia and
 Vaelchi vendor the same directory. This is build configuration, not a package
@@ -71,3 +71,8 @@ RTD's actual Git identifier selects repository source/edit links.
 `browser-check.cjs` tests the rendered home page with Playwright 1.62.1. CI
 runs it on Python 3.13 after the strict build, checking appearance choices,
 persistence, live system changes, keyboard activation, and mobile navigation.
+Serve the generated HTML with Python's standard HTTP server, bound to
+`127.0.0.1:8765`, before invoking the script. CI waits for `/index.html` and
+stops the server when the browser step exits. For local use, run
+`python -m http.server 8765 --bind 127.0.0.1 --directory /tmp/docs-html`, then
+`node docs/_shared/browser-check.cjs` in another terminal with Playwright available.

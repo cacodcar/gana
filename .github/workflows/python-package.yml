@@ -33,7 +33,12 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/docs-browser" --no-save playwright@1.62.1
           "$RUNNER_TEMP/docs-browser/node_modules/.bin/playwright" install --with-deps chromium
-          NODE_PATH="$RUNNER_TEMP/docs-browser/node_modules" node docs/_shared/browser-check.cjs quality/reports/ci/html
+          python -m http.server 8765 --bind 127.0.0.1 --directory quality/reports/ci/html > "$RUNNER_TEMP/docs-http.log" 2>&1 &
+          docs_server_pid=$!
+          trap 'kill "$docs_server_pid"' EXIT
+          curl --fail --silent --show-error --retry 10 --retry-connrefused --retry-delay 1 http://127.0.0.1:8765/index.html > /dev/null
+          kill -0 "$docs_server_pid"
+          NODE_PATH="$RUNNER_TEMP/docs-browser/node_modules" node docs/_shared/browser-check.cjs
       - name: Upload coverage to Codecov
         if: ${{ !cancelled() && hashFiles('quality/reports/ci/coverage.xml') != '' }}
         uses: codecov/codecov-action@v5
