@@ -1025,7 +1025,7 @@ class Prg(PlotMethods):
         """less than or equal constraint sets"""
         return [x for x in self.constraint_sets if x.leq and not x.nn]
 
-    def nncons(self, n: bool = False) -> list[int | C]:
+    def nncons(self, n: bool = False) -> _ConstraintRows | list[int]:
         """Return nonnegativity rows or their assigned program row numbers."""
         if n:
             return [cast(int, x.n) for x in self.constraints if x.nn]
